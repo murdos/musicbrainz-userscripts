@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
+// @version        2011-08-20_02
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @include        http://www.encyclopedisque.fr/disque/*.html
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        http://userscripts.org/scripts/source/110844.user.js
 // ==/UserScript==
 
 // Script Update Checker
@@ -16,10 +18,7 @@ try{function updateCheck(forced){if ((forced) || (parseInt(GM_getValue('SUC_last
 $(document).ready(function() {
 
 	var release = parseEncyclopedisquePage();
-	var url = cookImportUrl(release);
-	
-	var importLink = $("<li><a href=\""+ url +"\">Import in Musicbrainz</a></li>");
-	importLink.appendTo("#menu ul");
+    setupUI(release);
 
 });
 
@@ -28,26 +27,57 @@ $(document).ready(function() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+function setupUI(release) {
+
+	// Form parameters
+    var edit_note = 'Imported from ' + window.location.href;
+	var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+
+	// Build form
+	var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+	
+    // Append search link
+	innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
+
+	var importLink = $("<li>"+ innerHTML + "</li>");
+	importLink.appendTo("#menu ul");
+
+}
+
 // Analyze Encyclopedisque data and prepare to release object
 function parseEncyclopedisquePage() {
 
 	release = new Object();
 	
 	var infoHeader =  document.body.querySelector("#contenu > h2:nth-of-type(1)");
-	
-	release.artist = infoHeader.querySelector("div.floatright:nth-of-type(1)").textContent.trim().replace("’", "'");
-	release.title = infoHeader.querySelector("span:nth-of-type(1)").textContent.trim().replace("’", "'");
-	release.format = 7; // Disque vinyl
-	release.country = 73; // France - correct in most case, but not all
-	release.tracks = [];
-	//console.log(release.artist + ": " + release.title);
+
+	// Release artist credit
+    release.artist_credit = new Array();
+	var artist_name = infoHeader.querySelector("div.floatright:nth-of-type(1)").textContent.trim();
+    release.artist_credit.push( { 'artist_name': artist_name } );
+
+    // Release title
+	release.title = infoHeader.querySelector("span:nth-of-type(1)").textContent.trim();
+
+    // Release country
+	release.country = 'FR'; // France - correct in most case, but not all
+
+    // Other hard-coded info
+    release.type = 'single';
+    release.status = 'official';
+    release.language = 'fra';
+    release.script = 'Latn';
+
+    var disc = {'position': 1, 'tracks': [] };
+	disc.format = '7" Vinyl'; // Disque vinyl 7"
+	release.discs = [ disc ];
 
 	// Parse other infos
 	var releaseInfos = document.body.querySelectorAll("div.pochetteprincipale ~ div tr");
 	for (var i = 0; i < releaseInfos.length; i++) {
 		var infoType = releaseInfos[i].querySelector("td:nth-of-type(1)").textContent.trim();
 		
-		// Release event
+		// Release date
 		if (infoType == "Sortie :") {
 			var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
 			var re = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d\?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^\)]*)?\)?/;
@@ -74,19 +104,17 @@ function parseEncyclopedisquePage() {
 				}
 			}
 			release.year = m[2];
+            release.labels = [ { 'catno': m[4] } ]
 			var label = m[3];
-			if (label != undefined) release.label = label.trim();
-			release.catno = m[4];
+			if (label != undefined) release.labels[0].name = label.trim();
 			//}
 		} 
 		// Tracks
 		else if (infoType.match(/^Face [AB]/)) {
 			var title = releaseInfos[i].querySelector("td:nth-of-type(2) strong").textContent.trim();
 			var track = new Object();
-			track.title = title.replace("’", "'");
-			track.title = title.replace("(avec ", "(feat. ");
-			release.tracks.push(track);
-			//console.log("Track: " + track.title);
+			track.title = title; //.replace("(avec ", "(feat. ");
+			disc.tracks.push(track);
 		}
 		
 	}
@@ -94,76 +122,3 @@ function parseEncyclopedisquePage() {
 	return release;
 }
 
-// Helper function: compute url for a release object
-function cookImportUrl(release) {
-
-	var importURL = "http://musicbrainz.org/cdi/enter.html?artistname=" + encodeURIComponent(release.artist) + "&releasename=" + encodeURIComponent(release.title);
-
-	// Multiple artists on tracks?
-	var artists = [];
-	for (var i=0; i < release.tracks.length; i++) {
-		if (release.tracks[i].artist)
-			artists.push(release.tracks[i].artist);
-	}
-	
-	if (artists.length > 1)
-		importURL += "&hasmultipletrackartists=1&artistid=1";
-	else 
-		importURL += "&hasmultipletrackartists=0";
-		
-	// Add tracks
-	for (var i=0; i < release.tracks.length; i++) {
-	
-		importURL += "&track" + i + "=" + encodeURIComponent(release.tracks[i].title);
-
-        var tracklength = (typeof release.tracks[i].duration != 'undefined' && release.tracks[i].duration != '') ? release.tracks[i].duration : "?:??";
-
-		importURL += "&tracklength" + i + 	"=" + encodeURIComponent(tracklength);
-
-	
-        // TODO: ??
-
-        importURL += '&trackseq' + i + "=" + (i + 1);
-
-        importURL += '&tr' + i + '_mp=0';
-
-		if (artists.length > 1 && release.tracks[i].artist) {
-			importURL += "&tr" + i + "_artistedit=1";
-			importURL += "&tr" + i + "_artistname=" + encodeURIComponent(release.tracks[i].artist);
-		}
-	}
-	importURL += '&tracks=' + release.tracks.length;
-	
-    importURL += '&submitvalue=Keep+editing'; // Needed to allow RE imports
-
-    // Release event
-
-    if (typeof release.catno != 'undefined' && release.catno != "none") {
-
-        importURL += '&rev_catno-0=' + release.catno;
-
-    }
-
-
-
-    importURL += '&rev_labelname-0=' + encodeURIComponent(release.label);
-
-    importURL += '&rev_format-0=' + release.format;
-
-    if (!isNaN(release.year)) { importURL += '&rev_year-0=' + release.year; }
-
-    if (!isNaN(release.month)) { importURL += '&rev_month-0=' + release.month; }
-
-    if (!isNaN(release.day)) { importURL += '&rev_day-0=' + release.day; }
-
-    importURL += '&rev_country-0=' + release.country;
-
-    importURL += '&attr_type=2';        // Release type = single
-    importURL += '&attr_status=100';    // Release status = official
-    importURL += '&attr_language=134';  // Release lang = French
-    importURL += '&attr_script=28';     // Release script = Latin
-
-    importURL += '&notetext=' + encodeURIComponent(window.location.href);
-    
-	return importURL;
-}
