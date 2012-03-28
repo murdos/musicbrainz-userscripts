@@ -7,7 +7,7 @@
 // Script Update Checker
 // -- http://userscripts.org/scripts/show/20145
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
-var version_timestamp = 1231756540161; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1262637660222; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 try {
 function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "0")) + 86400000 <= (new Date().getTime()))) {try {GM_xmlhttpRequest({method: "GET",url: "http://userscripts.org/scripts/review/" + version_scriptNum + "?" + new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(xhrResponse) {GM_setValue("lastUpdate", new Date().getTime() + ""); var rt = xhrResponse.responseText.replace(/&nbsp;?/gm, " ").replace(/<li>/gm, "\n").replace(/<[^>]*>/gm, ""); var scriptName = (/@name\s*(.*?)\s*$/m.exec(rt))[1]; GM_setValue("targetScriptName", scriptName); if (parseInt(/version_timestamp\s*=\s*([0-9]+)/.exec(rt)[1]) > version_timestamp) {if (confirm("There is an update available for the Greasemonkey script \"" + scriptName + ".\"\nWould you like to go to the install page now?")) {GM_openInTab("http://userscripts.org/scripts/show/" + version_scriptNum);}} else if (forced) {alert("No update is available for \"" + scriptName + ".\"");}}});} catch (err) {if (forced) {alert("An error occurred while checking for updates:\n" + err);}}}} GM_registerMenuCommand(GM_getValue("targetScriptName", "???") + " - Manual Update Check", function() {updateCheck(true);}); updateCheck(false);
 } catch(e) {}
@@ -17,7 +17,7 @@ var discogsApiKey = "84b3bec008";
 
 // Discogs Webservice URL
 var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
-
+console.log(discogsWsUrl);
 // Grabs information from Discogs
 
 GM_xmlhttpRequest({
@@ -79,10 +79,18 @@ function parseReleases(xmldoc) {
 		// Track position and release number
 		var trackPosition = trackNode.getElementsByTagName("position").item(0).textContent;
 		var releaseNumber = 1;
+        // Multi discs e.g. 1.1 or 1-1
 		var tmp = trackPosition.match(/^(\d)(?=(-|\.)\d*)/);
 		if (tmp && tmp[0]) {
 			releaseNumber = tmp[0];
-		}
+		} else {
+        // Vinyls disc numbering: A1, B3, ...
+            tmp = trackPosition.match(/^(\w)\d*/);
+            if (tmp && tmp[0]) { 
+                var code = tmp[0].charCodeAt(0)-65;
+                releaseNumber = (code-code%2)/2+1; 
+            }
+        }
 		
 		// Create release if needed
 		if( !releases[releaseNumber-1] ) {
@@ -103,30 +111,34 @@ function parseReleases(xmldoc) {
 			releases[i].title += " (disc "+ (i+1) +")";
 	}
 	
+    console.log(releases);
 	return releases;
 }
 
 // Insert links in Discogs page
 function insertLinks(releases) {
 
-	var tr = document.createElement('tr');
-	var trInnerHTML
-	trInnerHTML = '<td>';
-	trInnerHTML += '<table width="100%" class="cb"><tbody>';
-	trInnerHTML += '<tr><td align="center" class="ar"><b>MusicBrainz</b></td></tr>';
+	var mbUI = document.createElement('div');
+    mbUI.innerHTML = "<h3>MusicBrainz</h3>";
+    mbUI.className = "section";
+    
+	var mbContentBlock = document.createElement('div');
+    mbContentBlock.className = "section_content";
+    mbUI.appendChild(mbContentBlock);
+    
+	var innerHTML = '';
 	if (releases.length == 1) {
-		trInnerHTML += '<tr><td><a target="_blank" href="' + cookImportUrl(releases[0]) + '">Import release</a></td></tr>';
+		innerHTML += '<div><a target="_blank" href="' + cookImportUrl(releases[0]) + '">Import release</a></div>';
 	} else {
 		for (var i=0; i < releases.length; i++) {
-			trInnerHTML += '<tr><td><a target="_blank" href="' + cookImportUrl(releases[i]) + '">Import disc ' + (i+1) + '</a></td></tr>';
+			innerHTML += '<div><a target="_blank" href="' + cookImportUrl(releases[i]) + '">Import disc ' + (i+1) + '</a></div>';
 		}
 	}
-	trInnerHTML += '</tbody></table>';
-	trInnerHTML += '</td>';
-	tr.innerHTML = trInnerHTML;
+
+	mbContentBlock.innerHTML = innerHTML;
 	
-	var tbody = document.getElementsByTagName("table").item(0).getElementsByTagName("tbody").item(0);
-	tbody.insertBefore(tr, tbody.firstChild);
+	var prevNode = document.body.querySelector("div.section.ratings");
+	prevNode.parentNode.insertBefore(mbUI, prevNode);
 
 }
 
@@ -170,4 +182,22 @@ function cookImportUrl(release) {
 	importURL += '&tracks=' + release.tracks.length;
 
 	return importURL;
+}
+
+// Helper function for getting html element by class name
+// Written by Jonathan Snook, http://www.snook.ca/jonathan
+// Add-ons by Robert Nyman, http://www.robertnyman.com
+function getElementsByClassName(oElm, strTagName, strClassName){
+    var arrElements = (strTagName == "*" && oElm.all)? oElm.all : oElm.getElementsByTagName(strTagName);
+    var arrReturnElements = [];
+    strClassName = strClassName.replace(/\-/g, "\\-");
+    var oRegExp = new RegExp("(^|\\s)" + strClassName + "(\\s|$)");
+    var oElement;
+    for(var i=0; i<arrElements.length; i++){
+        oElement = arrElements[i];      
+        if(oRegExp.test(oElement.className)){
+            arrReturnElements.push(oElement);
+        }   
+    }
+    return (arrReturnElements);
 }
