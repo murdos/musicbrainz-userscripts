@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2012-02-14_01
+// @version        2012-02-22_01
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
@@ -327,7 +327,7 @@ MediaTypes["Blu-ray"] = "Blu-ray";
 MediaTypes["Blu-ray-R"] = "Blu-ray";
 MediaTypes["Cassette"] = "Cassette";
 MediaTypes["CD"] = "CD";
-MediaTypes["CDr"] = "CD";
+MediaTypes["CDr"] = "CD-R";
 MediaTypes["CDV"] = "CD";
 MediaTypes["Cylinder"] = "Wax Cylinder";
 MediaTypes["DAT"] = "DAT";
@@ -496,7 +496,6 @@ Countries["Micronesia, Federated States of"] = "FM";
 Countries["Morocco"] = "MA";
 Countries["Monaco"] = "MC";
 Countries["Mongolia"] = "MN";
-
 Countries["Mozambique"] = "MZ";
 Countries["Myanmar"] = "MM";
 Countries["Namibia"] = "NA";
@@ -529,6 +528,7 @@ Countries["Qatar"] = "QA";
 Countries["Reunion"] = "RE";
 Countries["Romania"] = "RO";
 Countries["Russian Federation"] = "RU";
+Countries["Russia"] = "RU";
 Countries["Rwanda"] = "RW";
 Countries["Saint Kitts and Nevis"] = "KN";
 Countries["Saint Lucia"] = "LC";
@@ -591,7 +591,9 @@ Countries["Congo, The Democratic Republic of the"] = "CD";
 Countries["Slovakia"] = "SK";
 Countries["Bosnia and Herzegovina"] = "BA";
 Countries["Korea (North), Democratic People's Republic of"] = "KP";
+Countries["North Korea"] = "KR"; 
 Countries["Korea (South), Republic of"] = "KR";
+Countries["South Korea"] = "KR"; 
 Countries["Montenegro"] = "ME";
 Countries["South Georgia and the South Sandwich Islands"] = "GS";
 Countries["Palestinian Territory"] = "PS";
