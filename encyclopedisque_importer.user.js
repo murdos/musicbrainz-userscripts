@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2011-08-28_01
+// @version        2012-03-28~1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @include        http://www.encyclopedisque.fr/disque/*.html
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require        http://userscripts.org/scripts/source/110844.user.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
 // Script Update Checker
