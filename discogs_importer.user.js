@@ -1,16 +1,18 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-08-28_01
+// @version        2011-09-11_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
 // @include        http://*musicbrainz.org/release/*/edit
+// @include        http://www.discogs.com/*
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        http://userscripts.org/scripts/source/110844.user.js
+
 // ==/UserScript==
 
 // Script Update Checker
@@ -28,41 +30,80 @@ $(document).ready(function(){
 	// On Musicbrainz website
 	if (window.location.href.match(/(musicbrainz\.org)/)) {
 	
-		//$add_disc_dialog = $('div.add-disc-dialog');
+		$add_disc_dialog = $('div.add-disc-dialog');
 		//$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
 
-		//var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
-		//innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
-	    //innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
-		//innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
-		//innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
-		//innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
+		var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
+		innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
+	    innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
 		//$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
 
 	// On Discogs website
 	} else {
 
-		// Discogs Webservice URL
-		var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
+        magnifyLinks();
 
-		mylog(discogsWsUrl);
+        // Release page?
+        if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
 
-		/* Main function */
-		GM_xmlhttpRequest({
-		  method: "GET",
-		  url: discogsWsUrl,
-		  headers: {
-			"User-Agent":"monkeyagent",
-			"Accept":"text/monkey,text/xml",
-			},
-		  onload: function(response) {
-			var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
-			var release = parseDiscogsRelease(xmldoc);
-			insertLink(release);
-		  }
-		});
+		    // Discogs Webservice URL
+		    var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
+
+		    mylog(discogsWsUrl);
+
+		    /* Main function */
+		    GM_xmlhttpRequest({
+		      method: "GET",
+		      url: discogsWsUrl,
+		      headers: {
+			    "User-Agent":"monkeyagent",
+			    "Accept":"text/monkey,text/xml",
+			    },
+		      onload: function(response) {
+			    var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
+			    var release = parseDiscogsRelease(xmldoc);
+			    insertLink(release);
+		      }
+		    });
+        }
+        
 	}
 });
+
+function magnifyLinks() {
+
+    // Check if we already added links for this content
+    if (document.body.hasAttribute('discogsLinksMagnified'))
+        return;
+    document.body.setAttribute('discogsLinksMagnified', true);
+
+
+    var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
+
+    var elems = document.body.getElementsByTagName('a');
+    for (var i = 0; i < elems.length; i++) {
+        var elem = elems[i];
+
+        // Ignore empty links
+        if (!elem.href || trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
+            continue;
+			
+        //~ // Check if the link matches
+        if (m = re.exec(elem.href)) {
+            var type = m[2];
+            var id = m[3];
+            elem.href = "http://www.discogs.com/" + type + "/" + id;
+        }
+    }
+}
+
+// Remove whitespace in the beginning and end
+function trim(str) {
+    return str.replace(/^\s+/, '').replace(/\s+$/, '');
+}
 
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(xmldoc) {
@@ -74,11 +115,10 @@ function parseDiscogsRelease(xmldoc) {
     $(xmldoc).find("release > artists artist").each(function() {
         var $artist = $(this);
         var ac = { 
-			'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
-			'credited_name': $artist.find("anv").text(), 
-			'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
-		};
-		mylog($artist.find("join").text());
+            'artist_name': $artist.find("name").text(), 
+            'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text()), 
+            'joinphrase': $artist.find("join").text()};
+        ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
         release.artist_credit.push(ac);
     });
 
@@ -110,10 +150,19 @@ function parseDiscogsRelease(xmldoc) {
 
     // Release format
     var release_format = MediaTypes[getXPathVal(xmldoc, "//release/formats/format/@name", true)];
-    // Special handle of vinyl 7", 10" and 12"
+
     $(xmldoc).find("release formats descriptions description").each(function() {
         var desc = $(this).text();
+        // Release format: special handling of vinyl 7", 10" and 12"
         if (desc.match(/7"|10"|12"/)) release_format = MediaTypes[desc];
+        // Release status
+        if (desc.match(/Promo|Smplr/)) release.status = "promotion";
+        // Release type
+        if (desc.match(/Compilation/)) release.type = "compilation";
+        if (desc.match(/Single/)) release.type = "single";
+        // Release packaging => not exported in Discogs API
+        //if (desc.match(/Cardboard/)) release.packaging = "paper sleeve";
+
     });
 
     // TODO: detect promo releases and set release.status
@@ -144,12 +193,11 @@ function parseDiscogsRelease(xmldoc) {
 		track.artist_credit = new Array();
 		$trackNode.find("artists artist").each(function() {
 			var $artist = $(this);
-			var ac = { 	
-				'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
-				// TODO: use 'name' rather than 'anv' for 'credited_name' until MBS-2323 being fixed
-				'credited_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
-				joinphrase: decodeDiscogsJoinphrase($artist.find("join").text())
-			};
+			var ac = { 
+                'artist_name': $artist.find("name").text(), 
+                'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text()), 
+                'joinphrase': $artist.find("join").text()};
+			ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
 			track.artist_credit.push(ac);
 		});		
 		
@@ -237,16 +285,6 @@ getXPathVal = function (xmldoc, xpathExpression, wantSingleNode, rootNode) {
     } else {
         return xmldoc.evaluate(xpathExpression, rootNode, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     }
-}
-
-function decodeDiscogsJoinphrase(join) {
-	var joinphrase = "";
-	var trimedjoin = join.replace(/^\s*/, "").replace(/\s*$/, "");
-	if (trimedjoin == "") return trimedjoin;
-	if (trimedjoin != ",") joinphrase += " ";
-	joinphrase += trimedjoin;
-	joinphrase += " ";
-	return joinphrase;
 }
 
 function mylog(obj) {
@@ -435,6 +473,7 @@ Countries["Micronesia, Federated States of"] = "FM";
 Countries["Morocco"] = "MA";
 Countries["Monaco"] = "MC";
 Countries["Mongolia"] = "MN";
+
 Countries["Mozambique"] = "MZ";
 Countries["Myanmar"] = "MM";
 Countries["Namibia"] = "NA";
