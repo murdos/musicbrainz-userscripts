@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-09-11_03
+// @version        2011-11-06_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -10,7 +10,7 @@
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
-// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require        http://userscripts.org/scripts/source/110844.user.js
 // ==/UserScript==
 
@@ -19,10 +19,7 @@
 var SUC_script_num = 36376;
 try{function updateCheck(forced){if ((forced) || (parseInt(GM_getValue('SUC_last_update', '0')) + 86400000 <= (new Date().getTime()))){try{GM_xmlhttpRequest({method: 'GET',url: 'http://userscripts.org/scripts/source/'+SUC_script_num+'.meta.js?'+new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(resp){var local_version, remote_version, rt, script_name;rt=resp.responseText;GM_setValue('SUC_last_update', new Date().getTime()+'');remote_version=parseInt(/@uso:version\s*(.*?)\s*$/m.exec(rt)[1]);local_version=parseInt(GM_getValue('SUC_current_version', '-1'));if(local_version!=-1){script_name = (/@name\s*(.*?)\s*$/m.exec(rt))[1];GM_setValue('SUC_target_script_name', script_name);if (remote_version > local_version){if(confirm('There is an update available for the Greasemonkey script "'+script_name+'."\nWould you like to go to the install page now?')){GM_openInTab('http://userscripts.org/scripts/show/'+SUC_script_num);GM_setValue('SUC_current_version', remote_version);}}else if (forced)alert('No update is available for "'+script_name+'."');}else GM_setValue('SUC_current_version', remote_version+'');}});}catch (err){if (forced)alert('An error occurred while checking for updates:\n'+err);}}}GM_registerMenuCommand(GM_getValue('SUC_target_script_name', '???') + ' - Manual Update Check', function(){updateCheck(true);});updateCheck(false);}catch(err){}
 
-
-
-// Discogs API KEY (you may need to replace with yours if you encounter limit issues)
-var discogsApiKey = "84b3bec008";
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
 
@@ -48,25 +45,35 @@ $(document).ready(function(){
         // Release page?
         if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
 
-		    // Discogs Webservice URL
-		    var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
+		    // Discogs Webservice URL           
+            var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
+            var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
 
 		    mylog(discogsWsUrl);
 
-		    /* Main function */
-		    GM_xmlhttpRequest({
-		      method: "GET",
-		      url: discogsWsUrl,
-		      headers: {
-			    "User-Agent":"monkeyagent",
-			    "Accept":"text/monkey,text/xml",
-			    },
-		      onload: function(response) {
-			    var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
-			    var release = parseDiscogsRelease(xmldoc);
-			    insertLink(release);
-		      }
-		    });
+            // Swith JQuery to MB's one, and save GreaseMonkey one
+            var GM_JQuery = $;
+            $ = unsafeWindow.$;
+            
+            $.ajax({
+              url: discogsWsUrl,
+              dataType: 'jsonp',
+              headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
+              crossDomain: true,
+              success: function (data, textStatus, jqXHR) {
+                //mylog(data);
+                var release = parseDiscogsRelease(data);
+                insertLink(release);
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                mylog("AJAX Status:" + textStatus);
+                mylog("AJAX error thrown:" + errorThrown);
+              }
+            });
+            
+            // Back to GreaseMonkey's JQuery
+            $ = GM_JQuery;
+            
         }
         
 	}
@@ -78,7 +85,6 @@ function magnifyLinks() {
     if (document.body.hasAttribute('discogsLinksMagnified'))
         return;
     document.body.setAttribute('discogsLinksMagnified', true);
-
 
     var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
 
@@ -105,101 +111,117 @@ function trim(str) {
 }
 
 // Analyze Discogs data and return a release object
-function parseDiscogsRelease(xmldoc) {
+function parseDiscogsRelease(data) {
+    
+    var discogsRelease = data.data;
+    
     var release = new Object();
 	release.discs = [];
 
 	// Release artist credit
     release.artist_credit = new Array();
-    $(xmldoc).find("release > artists artist").each(function() {
-        var $artist = $(this);
+    $.each(discogsRelease.artists, function(index, artist) {
         var ac = { 
-            'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
-            'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
-            'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
+            'artist_name': artist.name.replace(/ \(\d+\)$/, ""), 
+            'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")), 
+            'joinphrase': decodeDiscogsJoinphrase(artist.join)
         };
         release.artist_credit.push(ac);
     });
-
+    
 	// Release title
-	release.title = getXPathVal(xmldoc, "//release/title", true);
+	release.title = discogsRelease.title;
 
     // Release date
-    var releasedate = getXPathVal(xmldoc, "//release/released", true);
-    if (typeof releasedate != "undefined" && releasedate != "") {
-        var tmp = releasedate.split('-');        if (tmp[0] != "undefined" && tmp[0] != "") {
-            release.year = parseInt(tmp[0], 10);
-            if (tmp[1] != "undefined" && tmp[1] != "") {
-                release.month = parseInt(tmp[1], 10);                
-				if (tmp[2] != "undefined" && tmp[2] != "") {
-                    release.day = parseInt(tmp[2], 10);
+    if (discogsRelease.released) {
+        var releasedate = discogsRelease.released;
+        if (typeof releasedate != "undefined" && releasedate != "") {
+            var tmp = releasedate.split('-');        if (tmp[0] != "undefined" && tmp[0] != "") {
+                release.year = parseInt(tmp[0], 10);
+                if (tmp[1] != "undefined" && tmp[1] != "") {
+                    release.month = parseInt(tmp[1], 10);                
+                    if (tmp[2] != "undefined" && tmp[2] != "") {
+                        release.day = parseInt(tmp[2], 10);
+                    }
                 }
             }
         }
-    }  
+    }
 
-    // Release country   
-    release.country = Countries[ getXPathVal(xmldoc, "//release/country", true) ];
+    // Release country
+    if (discogsRelease.country) {
+        release.country = Countries[ discogsRelease.country ];
+    }
 
     // Release labels
     release.labels = new Array();
-    $(xmldoc).find("release labels label").each(function() {
-        release.labels.push( { name: $(this).attr('name'), catno: $(this).attr('catno') } );
-    });   
-
+    if (discogsRelease.labels) {
+        $.each(discogsRelease.labels, function(index, label) {
+            release.labels.push( { name: label.name, catno: label.catno } );
+        });   
+    }
+    
     // Release format
-    var release_format = MediaTypes[getXPathVal(xmldoc, "//release/formats/format/@name", true)];
+    var release_format;
 
-    $(xmldoc).find("release formats descriptions description").each(function() {
-        var desc = $(this).text();
-        // Release format: special handling of vinyl 7", 10" and 12"
-        if (desc.match(/7"|10"|12"/)) release_format = MediaTypes[desc];
-        // Release status
-        if (desc.match(/Promo|Smplr/)) release.status = "promotion";
-        // Release type
-        if (desc.match(/Compilation/)) release.type = "compilation";
-        if (desc.match(/Single/)) release.type = "single";
-        // Release packaging => not exported in Discogs API
-        //if (desc.match(/Cardboard/)) release.packaging = "paper sleeve";
+    if (discogsRelease.formats.length > 0) {
+        release_format = MediaTypes[ discogsRelease.formats[0].name ];
+        
+        if (discogsRelease.formats[0].descriptions) {
+            $.each(discogsRelease.formats[0].descriptions, function(index, desc) {
+                // Release format: special handling of vinyl 7", 10" and 12"
+                if (desc.match(/7"|10"|12"/)) release_format = MediaTypes[desc];
+                // Release status
+                if (desc.match(/Promo|Smplr/)) release.status = "promotion";
+                // Release type
+                if (desc.match(/Compilation/)) release.type = "compilation";
+                if (desc.match(/Single/)) release.type = "single";
 
-    });
-
-    // Barcode: grab barcode from discogs page, it's not available in webservice response
-    $('div.section.major.barcodes div.section_content ul li').each(function() {
-        if ($(this).text().indexOf('Barcode: ') != -1) {
-            release.barcode = $(this).text().replace('Barcode: ', '').replace(/ -/, '');
-            return false;
+            });
         }
-    });
+        
+        // Release packaging
+        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Cardboard/)) release.packaging = "paper sleeve";
+        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Digipak/)) release.packaging = "digipak";
+        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Jewel/)) release.packaging = "jewel";
+    }
 
+    // Barcode
+    if (discogsRelease.identifiers) {
+        $.each(discogsRelease.identifiers, function(index, identifier) {
+            if (identifier.type == "Barcode") {
+                release.barcode = identifier.value.replace(/ /g, '');
+                return false;
+            }
+        });
+    }
+    
 	// Inspect tracks
 	var tracks = [];
-	var trackNodes = getXPathVal(xmldoc, "//tracklist/track", false);
 
-	$(xmldoc).find("tracklist track").each(function() {
-
+	$.each(discogsRelease.tracklist, function(index, discogsTrack) {
 		// TODO: dectect disc title and set disc.title
 
 		var track = new Object();
-		var $trackNode = $(this);
 		
-		track.title = $trackNode.find("title").text();
-		track.duration = $trackNode.find("duration").text();
+		track.title = discogsTrack.title;
+		track.duration = discogsTrack.duration;
 		
 		// Track artist credit
 		track.artist_credit = new Array();
-		$trackNode.find("artists artist").each(function() {
-			var $artist = $(this);
-			var ac = { 
-                'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
-                'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
-                'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
-            };
-			track.artist_credit.push(ac);
-		});		
+        if (discogsTrack.artists) {
+            $.each(discogsTrack.artists, function(index, artist) {
+                var ac = { 
+                    'artist_name': artist.name.replace(/ \(\d+\)$/, ""), 
+                    'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")), 
+                    'joinphrase': decodeDiscogsJoinphrase(artist.join)
+                };
+                track.artist_credit.push(ac);
+            });
+        }
 		
 		// Track position and release number
-		var trackPosition = $trackNode.find("position").text();
+		var trackPosition = discogsTrack.position;
 		var releaseNumber = 1;
 
         // Skip special tracks
@@ -232,7 +254,7 @@ function parseDiscogsRelease(xmldoc) {
         }
 
 		// Create release if needed
-		if( !release.discs[releaseNumber-1] ) {
+		if ( !release.discs[releaseNumber-1] ) {
 			release.discs.push(new Object());
 			release.discs[releaseNumber-1].tracks = [];
             release.discs[releaseNumber-1].format = release_format;
