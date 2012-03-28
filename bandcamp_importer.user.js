@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2012-02-22_01
+// @version        2012-03-28~1
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*.bandcamp.com/album/*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        https://raw.github.com/phstc/jquery-dateFormat/master/jquery.dateFormat-1.0.js
-// @require        http://userscripts.org/scripts/source/110844.user.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
