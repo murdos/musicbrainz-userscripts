@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-08-20_01
+// @version        2011-08-20_02
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -114,7 +114,13 @@ function parseDiscogsRelease(xmldoc) {
 
     // TODO: detect promo releases and set release.status
 
-    // TODO: grab barcode from discogs page (and not webservice response, until it's added there) and set release.barcode
+    // Barcode: grab barcode from discogs page, it's not available in webservice response
+    $('div.section.major.barcodes div.section_content ul li').each(function() {
+        if ($(this).text().indexOf('Barcode: ') != -1) {
+            release.barcode = $(this).text().replace('Barcode: ', '').replace(/ -/, '');
+            return false;
+        }
+    });
 
 	// Inspect tracks
 	var tracks = [];
