@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-06-19_01
+// @version        2011-08-20_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -10,6 +10,7 @@
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        http://userscripts.org/scripts/source/110844.user.js
 // ==/UserScript==
 
 // Script Update Checker
@@ -69,18 +70,18 @@ function parseDiscogsRelease(xmldoc) {
 	release.discs = [];
 
 	// Release artist credit
-    release.artist_credits = new Array();
+    release.artist_credit = new Array();
     $(xmldoc).find("release > artists artist").each(function() {
         var $artist = $(this);
-        var ac = { name: $artist.find("name").text(), anv: $artist.find("anv").text(), join: $artist.find("join").text()};
-        //ac.name = ac.name.replace(/ \(\d+\)$/, "");
-        release.artist_credits.push(ac);
+        var ac = { 'artist_name': $artist.find("name").text(), 'credited_name': $artist.find("anv").text(), 'joinphrase': $artist.find("join").text()};
+        ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+        release.artist_credit.push(ac);
     });
 
-	// Grab release title
+	// Release title
 	release.title = getXPathVal(xmldoc, "//release/title", true);
 
-    // Grab release event information
+    // Release date
     var releasedate = getXPathVal(xmldoc, "//release/released", true);
     if (typeof releasedate != "undefined" && releasedate != "") {
         var tmp = releasedate.split('-');        if (tmp[0] != "undefined" && tmp[0] != "") {
@@ -93,26 +94,36 @@ function parseDiscogsRelease(xmldoc) {
             }
         }
     }  
-   
+
+    // Release country   
+    release.country = Countries[ getXPathVal(xmldoc, "//release/country", true) ];
+
+    // Release labels
     release.labels = new Array();
     $(xmldoc).find("release labels label").each(function() {
         release.labels.push( { name: $(this).attr('name'), catno: $(this).attr('catno') } );
     });   
 
-    release.format = MediaTypes[getXPathVal(xmldoc, "//release/formats/format/@name", true)];
+    // Release format
+    var release_format = MediaTypes[getXPathVal(xmldoc, "//release/formats/format/@name", true)];
     // Special handle of vinyl 7", 10" and 12"
     $(xmldoc).find("release formats descriptions description").each(function() {
         var desc = $(this).text();
-        if (desc.match(/7"|10"|12"/)) release.format = MediaTypes[desc];
+        if (desc.match(/7"|10"|12"/)) release_format = MediaTypes[desc];
     });
 
-    release.country = Countries[ getXPathVal(xmldoc, "//release/country", true) ];
+    // TODO: detect promo releases and set release.status
 
-	// Grab tracks
+    // TODO: grab barcode from discogs page (and not webservice response, until it's added there) and set release.barcode
+
+	// Inspect tracks
 	var tracks = [];
 	var trackNodes = getXPathVal(xmldoc, "//tracklist/track", false);
 
 	$(xmldoc).find("tracklist track").each(function() {
+
+		// TODO: dectect disc title and set disc.title
+
 		var track = new Object();
 		var $trackNode = $(this);
 		
@@ -120,12 +131,12 @@ function parseDiscogsRelease(xmldoc) {
 		track.duration = $trackNode.find("duration").text();
 		
 		// Track artist credit
-		track.artist_credits = new Array();
+		track.artist_credit = new Array();
 		$trackNode.find("artists artist").each(function() {
 			var $artist = $(this);
-			var ac = { name: $artist.find("name").text(), anv: $artist.find("anv").text(), join: $artist.find("join").text()};
-			ac.name = ac.name.replace(/ \(\d+\)$/, "");
-			track.artist_credits.push(ac);
+			var ac = { 'artist_name': $artist.find("name").text(), 'credited_name': $artist.find("anv").text(), joinphrase: $artist.find("join").text()};
+			ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+			track.artist_credit.push(ac);
 		});		
 		
 		// Track position and release number
@@ -165,6 +176,7 @@ function parseDiscogsRelease(xmldoc) {
 		if( !release.discs[releaseNumber-1] ) {
 			release.discs.push(new Object());
 			release.discs[releaseNumber-1].tracks = [];
+            release.discs[releaseNumber-1].format = release_format;
 		}
 
 		// Trackposition is empty e.g. for release title
@@ -189,118 +201,17 @@ function insertLink(release) {
     mbUI.appendChild(mbContentBlock);
 
 	// Form parameters
-	var parameters = buildFormParameters(release);
+    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/');
+	var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
 	// Build form
-	var innerHTML = '<form action="http://musicbrainz.org/release/add" method="post" target="_blank">';
-	parameters.forEach(function(parameter) {
-        var value = parameter.value + "";
-		innerHTML += "<input type='hidden' value='" + value.replace(/'/g,"&apos;") + "' name='" + parameter.name + "'/>";
-	});
-
-	innerHTML += '<input type="submit" value="Import into MB">';
-	innerHTML += '</form>';
-
-	var totaltracks = 0;
-	for (var i=0; i < release.discs.length; i++) {
-		totaltracks += release.discs[i].tracks.length;
-	}
-    var releaseartist = "";
-    for (var i=0; i < release.artist_credits.length; i++) {
-        var ac = release.artist_credits[i];
-        releaseartist += ac.name;
-        if (typeof ac.join != 'undefined' && ac.join != "") {
-			if (i != release.artist_credits-1) releaseartist += " ";
-            releaseartist += " " + ac.join; + " ";
-			if (i != release.artist_credits-1) releaseartist += " ";
-        } else {
-			if (i != release.artist_credits-1) releaseartist += ", ";
-		}
-    }
-
-	innerHTML += ' <small>(<a href="http://musicbrainz.org/search?query=artist%3A(' + luceneEscape(releaseartist) + ')%20release%3A(' + luceneEscape(release.title) + ')%20tracks%3A(' + totaltracks + ')%20country:'+release.country+'&type=release&advanced=1">';
-	innerHTML += "Search in MusicBrainz</a>)</small>";
+	var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    // Append search link
+	innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
 
 	mbContentBlock.innerHTML = innerHTML;
 	var prevNode = document.body.querySelector("div.section.ratings");
 	prevNode.parentNode.insertBefore(mbUI, prevNode);
-}
-
-function appendParameter(parameters, paramName, paramValue) {
-	parameters.push( { name: paramName, value: paramValue } );
-}
-
-function luceneEscape(text) {
-	var newtext = text.replace(/[-[\]{}()*+?~:\\^!"]/g, "\\$&");
-	return newtext.replace("&&", "\&&").replace("||", "\||");
-}
-
-// Helper function: compute url for a release object
-function buildFormParameters(release) {    
-	// Form parameters
-	var parameters = new Array();
-	appendParameter(parameters, 'name', release.title);
-
-	// Date + country
-	appendParameter(parameters, 'country', release.country);
-	if (!isNaN(release.year) && release.year != 0) { appendParameter(parameters, 'date.year', release.year); };
-	if (!isNaN(release.month) && release.month != 0) { appendParameter(parameters, 'date.month', release.month); };
-	if (!isNaN(release.day) && release.day != 0) { appendParameter(parameters, 'date.day', release.day); };
-
-	// Label + catnos
-    for (var i=0; i < release.labels.length; i++) {
-        var label = release.labels[i];
-        appendParameter(parameters, 'labels.'+i+'.name', label.name);
-	    if (typeof label.catno != 'undefined' && label.catno != "none") {
-            appendParameter(parameters, 'labels.'+i+'.catalog_number', label.catno);
-        }
-    }
-
-	// Release Artist credits
-	mapDiscogsArtistCreditsToMBParams(parameters, "", release.artist_credits);
-	
-	// Mediums
-	for (var i=0; i < release.discs.length; i++) {
-		var disc = release.discs[i];
-		appendParameter(parameters, 'mediums.'+i+'.format', release.format);
-		appendParameter(parameters, 'mediums.'+i+'.position', i);
-
-		// TODO: Disc title
-		// appendParameter(parameters, 'mediums.'+i+'.name', release.format);
-
-		// Tracks
-		for (var j=0; j < disc.tracks.length; j++) {
-			var track = disc.tracks[j];
-			appendParameter(parameters, 'mediums.'+i+'.track.'+j+'.name', track.title);
-			var tracklength = (typeof track.duration != 'undefined' && track.duration != '') ? track.duration : "?:??";
-			appendParameter(parameters, 'mediums.'+i+'.track.'+j+'.length', tracklength);
-
-			mapDiscogsArtistCreditsToMBParams(parameters, 'mediums.'+i+'.track.'+j+'.', track.artist_credits);
-		}
-	}
-
-	// Edit note 
-	appendParameter(parameters, 'edit_note', 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/'));
-
-	return parameters;
-}
-
-function mapDiscogsArtistCreditsToMBParams(parameters, paramPrefix, artist_credits) {
-
-    for (var i=0; i < artist_credits.length; i++) {
-        var ac = artist_credits[i];
-		// FIXME: use ac.anv one MB Release Editor accept artist_credit.names.N.artist.name
-    	appendParameter(parameters, paramPrefix+'artist_credit.names.'+i+'.name', ac.name);
-        appendParameter(parameters, paramPrefix+'artist_credit.names.'+i+'.artist.name', ac.name);
-		var joinphrase = "";
-		if (typeof ac.join != 'undefined' && ac.join != "") {
-			if (i != artist_credits-1) joinphrase += " ";
-            joinphrase += " " + ac.join; + " ";
-			if (i != artist_credits-1) joinphrase += " ";
-			appendParameter(parameters, paramPrefix+'artist_credit.names.'+i+'.join_phrase', joinphrase);
-        }
-    }
-
 }
 
 // Helper function: get data from a given XPATH
@@ -323,7 +234,10 @@ function mylog(obj) {
 
 // Reference Discogs <-> MusicBrainz map
 
-var MediaTypes = new Array();MediaTypes["8-Track Cartridge"] = "Cartridge";MediaTypes["Acetate"] = "Vinyl";MediaTypes["Betamax"] = "Betamax";
+var MediaTypes = new Array();
+MediaTypes["8-Track Cartridge"] = "Cartridge";
+MediaTypes["Acetate"] = "Vinyl";
+MediaTypes["Betamax"] = "Betamax";
 MediaTypes["Blu-ray"] = "Blu-ray";
 MediaTypes["Blu-ray-R"] = "Blu-ray";
 MediaTypes["Cassette"] = "Cassette";
@@ -354,7 +268,10 @@ MediaTypes["Shellac"] = "Vinyl";
 MediaTypes["UMD"] = "UMD";
 MediaTypes["VHS"] = "VHS";
 MediaTypes["Video 2000"] = "Other";
-MediaTypes["Vinyl"] = "Vinyl";MediaTypes['7"'] = '7" Vinyl';MediaTypes['10"'] = '10" Vinyl';MediaTypes['12"'] = '12" Vinyl';
+MediaTypes["Vinyl"] = "Vinyl";
+MediaTypes['7"'] = '7" Vinyl';
+MediaTypes['10"'] = '10" Vinyl';
+MediaTypes['12"'] = '12" Vinyl';
 
 var Countries = new Array();
 Countries["Afghanistan"] = "AF";
