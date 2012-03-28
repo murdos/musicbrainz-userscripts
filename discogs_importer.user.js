@@ -7,7 +7,7 @@
 // Script Update Checker
 // -- http://userscripts.org/scripts/show/20145
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
-var version_timestamp = 1265308452702; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1266343559851; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 try {
 function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "0")) + 86400000 <= (new Date().getTime()))) {try {GM_xmlhttpRequest({method: "GET",url: "http://userscripts.org/scripts/review/" + version_scriptNum + "?" + new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(xhrResponse) {GM_setValue("lastUpdate", new Date().getTime() + ""); var rt = xhrResponse.responseText.replace(/&nbsp;?/gm, " ").replace(/<li>/gm, "\n").replace(/<[^>]*>/gm, ""); var scriptName = (/@name\s*(.*?)\s*$/m.exec(rt))[1]; GM_setValue("targetScriptName", scriptName); if (parseInt(/version_timestamp\s*=\s*([0-9]+)/.exec(rt)[1]) > version_timestamp) {if (confirm("There is an update available for the Greasemonkey script \"" + scriptName + ".\"\nWould you like to go to the install page now?")) {GM_openInTab("http://userscripts.org/scripts/show/" + version_scriptNum);}} else if (forced) {alert("No update is available for \"" + scriptName + ".\"");}}});} catch (err) {if (forced) {alert("An error occurred while checking for updates:\n" + err);}}}} GM_registerMenuCommand(GM_getValue("targetScriptName", "???") + " - Manual Update Check", function() {updateCheck(true);}); updateCheck(false);
 } catch(e) {}
@@ -79,6 +79,12 @@ function parseReleases(xmldoc) {
 		// Track position and release number
 		var trackPosition = trackNode.getElementsByTagName("position").item(0).textContent;
 		var releaseNumber = 1;
+
+        // Skip special tracks
+        if (trackPosition.toLowerCase().match("^(video|mp3)")) { 
+            trackPosition = "";
+        }
+
         // Multi discs e.g. 1.1 or 1-1
 		var tmp = trackPosition.match(/^(\d)(?=(-|\.)\d*)/);
 		if (tmp && tmp[0]) {
