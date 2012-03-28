@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-09-11_02
+// @version        2011-09-11_03
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -116,7 +116,8 @@ function parseDiscogsRelease(xmldoc) {
         var ac = { 
             'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
             'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
-            'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text()});
+            'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
+        };
         release.artist_credit.push(ac);
     });
 
@@ -192,7 +193,8 @@ function parseDiscogsRelease(xmldoc) {
 			var ac = { 
                 'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
                 'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
-                'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text()});
+                'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
+            };
 			track.artist_credit.push(ac);
 		});		
 		
