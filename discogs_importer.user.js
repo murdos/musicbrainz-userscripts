@@ -7,7 +7,7 @@
 // Script Update Checker
 // -- http://userscripts.org/scripts/show/20145
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
-var version_timestamp = 1265235404660; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1265308452702; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 try {
 function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "0")) + 86400000 <= (new Date().getTime()))) {try {GM_xmlhttpRequest({method: "GET",url: "http://userscripts.org/scripts/review/" + version_scriptNum + "?" + new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(xhrResponse) {GM_setValue("lastUpdate", new Date().getTime() + ""); var rt = xhrResponse.responseText.replace(/&nbsp;?/gm, " ").replace(/<li>/gm, "\n").replace(/<[^>]*>/gm, ""); var scriptName = (/@name\s*(.*?)\s*$/m.exec(rt))[1]; GM_setValue("targetScriptName", scriptName); if (parseInt(/version_timestamp\s*=\s*([0-9]+)/.exec(rt)[1]) > version_timestamp) {if (confirm("There is an update available for the Greasemonkey script \"" + scriptName + ".\"\nWould you like to go to the install page now?")) {GM_openInTab("http://userscripts.org/scripts/show/" + version_scriptNum);}} else if (forced) {alert("No update is available for \"" + scriptName + ".\"");}}});} catch (err) {if (forced) {alert("An error occurred while checking for updates:\n" + err);}}}} GM_registerMenuCommand(GM_getValue("targetScriptName", "???") + " - Manual Update Check", function() {updateCheck(true);}); updateCheck(false);
 } catch(e) {}
@@ -17,7 +17,7 @@ var discogsApiKey = "84b3bec008";
 
 // Discogs Webservice URL
 var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
-unsafeWindow.console.log(discogsWsUrl);
+//unsafeWindow.console.log(discogsWsUrl);
 // Grabs information from Discogs
 
 GM_xmlhttpRequest({
@@ -111,7 +111,7 @@ function parseReleases(xmldoc) {
 			releases[i].title += " (disc "+ (i+1) +")";
 	}
 	
-    unsafeWindow.console.log(releases);
+    //unsafeWindow.console.log(releases);
 	return releases;
 }
 
