@@ -85,6 +85,8 @@ function parseReleases(xmldoc) {
             trackPosition = "";
         }
 
+	// Remove "CD" prefix
+	trackPosition = trackPosition.replace(/^CD/i, "");
         // Multi discs e.g. 1.1 or 1-1
 		var tmp = trackPosition.match(/^(\d)(?=(-|\.)\d*)/);
 		if (tmp && tmp[0]) {
