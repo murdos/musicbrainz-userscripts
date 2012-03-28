@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2011-11-09_01
+// @version        2012-01-09_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*.bandcamp.com/album/*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
@@ -52,7 +52,7 @@ function retrieveReleaseInfo() {
     $.each(bandcampAlbumData.trackinfo, function(index, bctrack) {
         var track = {
             'title': bctrack.title,
-            'duration': bctrack.durationstr,
+            'duration': bctrack.duration*1000,
             'artist_credit': []
         }
         disc.tracks.push(track);
