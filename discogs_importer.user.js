@@ -86,7 +86,7 @@ function parseReleases(xmldoc) {
 		} else {
         // Vinyls disc numbering: A1, B3, ...
             tmp = trackPosition.match(/^([A-Za-z])\d*/);
-            if (tmp && tmp[0]) { 
+            if (tmp && tmp[0] && tmp[0] != "V") { 
                 var code = tmp[0].charCodeAt(0)-65;
                 releaseNumber = (code-code%2)/2+1; 
             }
