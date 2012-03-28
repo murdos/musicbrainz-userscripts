@@ -1,10 +1,14 @@
 // ==UserScript==
 // @name           Import Discogs releases to MusicBrainz
-// @version		   2011-05-24_01
+// @version		   2011-05-24_02
 // @namespace      http://userscripts.org/users/22504
+// @include        http://*musicbrainz.org/release/add
+// @include        http://*musicbrainz.org/release/*/add
+// @include        http://*musicbrainz.org/release/*/edit
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
+// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // ==/UserScript==
 
 // Script Update Checker
@@ -18,12 +22,51 @@ function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "
 // Discogs API KEY (you may need to replace with yours if you encounter limit issues)
 var discogsApiKey = "84b3bec008";
 
-// Discogs Webservice URL
-var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
-mylog(discogsWsUrl);
+$(document).ready(function(){
+
+	// On Musicbrainz website
+	if (window.location.href.match(/(musicbrainz\.org)/)) {
+	
+		$add_disc_dialog = $('div.add-disc-dialog');
+		$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
+		
+		var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
+		innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
+	    innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
+		innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
+		$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
+
+	// On Discogs website
+	} else {
+		// Discogs Webservice URL
+		var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
+		mylog(discogsWsUrl);
+		
+		/* Main function */
+
+		GM_xmlhttpRequest({
+		  method: "GET",
+		  url: discogsWsUrl,
+		  headers: {
+			"User-Agent":"monkeyagent",
+			"Accept":"text/monkey,text/xml",
+			},
+		  onload: function(response) {
+			var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
+			var release = parseDiscogsRelease(xmldoc);
+			insertLink(release);
+		  }
+		});
+	}
+
+});
+
+
 
 // Analyze Discogs data and return a release object
-function parseRelease(xmldoc) {
+function parseDiscogsRelease(xmldoc) {
     var release = new Object();
 	release.discs = [];
 
@@ -548,18 +591,3 @@ Countries["Yemen"] = 234;
 Countries["Yugoslavia"] = 235;
 Countries["Zambia"] = 237;
 Countries["Zimbabwe"] = 238;
-/* Main function */
-
-GM_xmlhttpRequest({
-  method: "GET",
-  url: discogsWsUrl,
-  headers: {
-    "User-Agent":"monkeyagent",
-    "Accept":"text/monkey,text/xml",
-    },
-  onload: function(response) {
-  	var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
-	var release = parseRelease(xmldoc);
-	insertLink(release);
-  }
-});
