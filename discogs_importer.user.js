@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-11-29_01
+// @version        2012-01-18_01
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
@@ -158,7 +158,7 @@ function parseDiscogsRelease(data) {
     release.labels = new Array();
     if (discogsRelease.labels) {
         $.each(discogsRelease.labels, function(index, label) {
-            release.labels.push( { name: label.name, catno: label.catno } );
+            release.labels.push( { name: label.name, catno: (label.catno == "none" ? "[none]" : label.catno) } );
         });   
     }
     
