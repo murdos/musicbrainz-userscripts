@@ -1,8 +1,9 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-11-06_01
+// @version        2011-11-29_01
 // @namespace      http://userscripts.org/users/22504
+// @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
 // @include        http://*musicbrainz.org/release/*/edit
@@ -304,17 +305,6 @@ function decodeDiscogsJoinphrase(join) {
     joinphrase += " ";
     return joinphrase;
 } 
-
-// Helper function: get data from a given XPATH
-getXPathVal = function (xmldoc, xpathExpression, wantSingleNode, rootNode) {
-    if (arguments.length == 3) rootNode = xmldoc;   
-    if (wantSingleNode) {       
-        var nodeval = xmldoc.evaluate(xpathExpression, rootNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        return (nodeval != null) ? nodeval.textContent : "";
-    } else {
-        return xmldoc.evaluate(xpathExpression, rootNode, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    }
-}
 
 function mylog(obj) {
     var DEBUG = true;
