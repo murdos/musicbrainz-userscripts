@@ -7,7 +7,7 @@
 // Script Update Checker
 // -- http://userscripts.org/scripts/show/20145
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
-var version_timestamp = 1262637660222; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1263489365220; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 try {
 function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "0")) + 86400000 <= (new Date().getTime()))) {try {GM_xmlhttpRequest({method: "GET",url: "http://userscripts.org/scripts/review/" + version_scriptNum + "?" + new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(xhrResponse) {GM_setValue("lastUpdate", new Date().getTime() + ""); var rt = xhrResponse.responseText.replace(/&nbsp;?/gm, " ").replace(/<li>/gm, "\n").replace(/<[^>]*>/gm, ""); var scriptName = (/@name\s*(.*?)\s*$/m.exec(rt))[1]; GM_setValue("targetScriptName", scriptName); if (parseInt(/version_timestamp\s*=\s*([0-9]+)/.exec(rt)[1]) > version_timestamp) {if (confirm("There is an update available for the Greasemonkey script \"" + scriptName + ".\"\nWould you like to go to the install page now?")) {GM_openInTab("http://userscripts.org/scripts/show/" + version_scriptNum);}} else if (forced) {alert("No update is available for \"" + scriptName + ".\"");}}});} catch (err) {if (forced) {alert("An error occurred while checking for updates:\n" + err);}}}} GM_registerMenuCommand(GM_getValue("targetScriptName", "???") + " - Manual Update Check", function() {updateCheck(true);}); updateCheck(false);
 } catch(e) {}
@@ -85,7 +85,7 @@ function parseReleases(xmldoc) {
 			releaseNumber = tmp[0];
 		} else {
         // Vinyls disc numbering: A1, B3, ...
-            tmp = trackPosition.match(/^(\w)\d*/);
+            tmp = trackPosition.match(/^([A-Za-z])\d*/);
             if (tmp && tmp[0]) { 
                 var code = tmp[0].charCodeAt(0)-65;
                 releaseNumber = (code-code%2)/2+1; 
