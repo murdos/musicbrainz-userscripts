@@ -20,7 +20,7 @@
 
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
 
-var version_timestamp = 1278013461315; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1278544436552; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 
 try {
 
@@ -364,7 +364,7 @@ function cookImportUrl(release, discno) {
 
     }
 
-    importURL += '&rev_labelname-0=' + release.label;
+    importURL += '&rev_labelname-0=' + encodeURIComponent(release.label);
 
     importURL += '&rev_format-0=' + release.format;
 
