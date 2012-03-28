@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name           Import Discogs releases to MusicBrainz
+// @version		   2011-05-24_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
@@ -9,7 +10,7 @@
 // Script Update Checker
 // -- http://userscripts.org/scripts/show/20145
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
-var version_timestamp = 1285063139833; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1306238657649; // Used to differentiate one version of the script from an older one. Use the (new Date()).getTime() function to get a value for this.
 try {
 function updateCheck(forced) {if((forced)||(parseInt(GM_getValue("lastUpdate", "0")) + 86400000 <= (new Date().getTime()))) {try {GM_xmlhttpRequest({method: "GET",url: "http://userscripts.org/scripts/review/" + version_scriptNum + "?" + new Date().getTime(),headers: {'Cache-Control': 'no-cache'},onload: function(xhrResponse) {GM_setValue("lastUpdate", new Date().getTime() + ""); var rt = xhrResponse.responseText.replace(/&nbsp;?/gm, " ").replace(/<li>/gm, "\n").replace(/<[^>]*>/gm, ""); var scriptName = (/@name\s*(.*?)\s*$/m.exec(rt))[1]; GM_setValue("targetScriptName", scriptName); if (parseInt(/version_timestamp\s*=\s*([0-9]+)/.exec(rt)[1]) > version_timestamp) {if (confirm("There is an update available for the Greasemonkey script \"" + scriptName + ".\"\nWould you like to go to the install page now?")) {GM_openInTab("http://userscripts.org/scripts/show/" + version_scriptNum);}} else if (forced) {alert("No update is available for \"" + scriptName + ".\"");}}});} catch (err) {if (forced) {alert("An error occurred while checking for updates:\n" + err);}}}} GM_registerMenuCommand(GM_getValue("targetScriptName", "???") + " - Manual Update Check", function() {updateCheck(true);}); updateCheck(false);
 } catch(e) {}
@@ -19,15 +20,7 @@ var discogsApiKey = "84b3bec008";
 
 // Discogs Webservice URL
 var discogsWsUrl = window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/') + "?f=xml&api_key=" + discogsApiKey;
-//unsafeWindow.console.log(discogsWsUrl);
-// Grabs information from Discogs
-
-/*
-var xmlhttp = new XMLHttpRequest();
-xmlhttp.onreadystatechange = function() { var releases = parseRelease(xmlhttp.responseXML); insertLinks(releases);};
-xmlhttp.open("GET", url, true);
-xmlhttp.send(null);
-*/
+mylog(discogsWsUrl);
 
 // Analyze Discogs data and return a release object
 function parseRelease(xmldoc) {
@@ -50,15 +43,15 @@ function parseRelease(xmldoc) {
 
     
             if (tmp[1] != "undefined" && tmp[1] != "") {
-
-                release.month = parseInt(tmp[1], 10);                if (tmp[2] != "undefined" && tmp[2] != "") {
-
+                release.month = parseInt(tmp[1], 10);                
+				if (tmp[2] != "undefined" && tmp[2] != "") {
                     release.day = parseInt(tmp[2], 10);
                 }
             }
         }
 
-    }     release.label = getXPathVal(xmldoc, "//release/labels/label/@name", true);
+    }     
+	release.label = getXPathVal(xmldoc, "//release/labels/label/@name", true);
     release.catno = getXPathVal(xmldoc, "//release/labels/label/@catno", true);
     release.format = MediaTypes[getXPathVal(xmldoc, "//release/formats/format/@name", true)];
     release.country = Countries[ getXPathVal(xmldoc, "//release/country", true) ];
@@ -93,7 +86,7 @@ function parseRelease(xmldoc) {
 	    // Remove "CD" prefix
     	trackPosition = trackPosition.replace(/^CD/i, "");
         // Multi discs e.g. 1.1 or 1-1
-		var tmp = trackPosition.match(/^(\d)(?=(-|\.)\d*)/);
+		var tmp = trackPosition.match(/^(\d+)(?=(-|\.)\d*)/);
 		if (tmp && tmp[0]) {
 			releaseNumber = tmp[0];
 		} else {
@@ -128,114 +121,104 @@ function parseRelease(xmldoc) {
 }
 
 // Insert links in Discogs page
-function insertLinks(release) {
+function insertLink(release) {
 
 	var mbUI = document.createElement('div');
-    mbUI.innerHTML = "<h3>MusicBrainz</h3>";    mbUI.className = "section";
+    mbUI.innerHTML = "<h3>MusicBrainz</h3>";    
+	mbUI.className = "section";
     
 	var mbContentBlock = document.createElement('div');
     mbContentBlock.className = "section_content";
     mbUI.appendChild(mbContentBlock);
-    
-	var innerHTML = '';
-	if (release.discs.length == 1) {
-		innerHTML += '<div><a target="_blank" href="' + cookImportUrl(release) + '">Import release</a>';
-        innerHTML += ' <small>(<a href="http://musicbrainz.org/search/textsearch.html?query=artist%3A(' + luceneEscape(release.artist) + ')%20release%3A(' + luceneEscape(release.title) + ')%20tracks%3A(' + release.discs[0].tracks.length + ')%20&type=release&handlearguments=1&adv=on">';
-        innerHTML += "Search this disc in MusicBrainz</a>)</small>";
-        innerHTML += "</div>";
-	} else {
-		for (var i=0; i < release.discs.length; i++) {
-			innerHTML += '<div><a target="_blank" href="' + cookImportUrl(release, i) + '">Import disc ' + (i+1) + '</a>';
-            innerHTML += " <small>(<a href='http://musicbrainz.org/search/textsearch.html?query=artist%3A(" + luceneEscape(release.artist) + ")%20release%3A(" + luceneEscape(release.title) + " disc "+ (i+1) + ")%20tracks%3A(" + release.discs[i].tracks.length + ")%20&type=release&handlearguments=1&adv=on'>";
-            innerHTML += "Search this disc in MusicBrainz</a>)</small>";
-            innerHTML += "</div>";
-		}
-	}
 
+	// Form parameters
+	var parameters = buildFormParameters(release);
+
+	// Build form
+	var innerHTML = '<form action="http://musicbrainz.org/release/add" method="post" target="_blank">';
+	parameters.forEach(function(parameter) {
+		innerHTML += '<input type="hidden" value="' + parameter.value + '" name="' + parameter.name + '"/>';
+	});
+	innerHTML += '<input type="submit" value="Import into MB">';
+	innerHTML += '</form>';
+	
+	var totaltracks = 0;
+	for (var i=0; i < release.discs.length; i++) {
+		totaltracks += release.discs[i].tracks.length;
+	}
+	innerHTML += ' <small>(<a href="http://musicbrainz.org/search?query=artist%3A(' + luceneEscape(release.artist) + ')%20release%3A(' + luceneEscape(release.title) + ')%20tracks%3A(' + totaltracks + ')%20country:'+release.country+'&type=release&advanced=1">';
+	innerHTML += "Search in MusicBrainz</a>)</small>";
+	
 	mbContentBlock.innerHTML = innerHTML;
 	
 	var prevNode = document.body.querySelector("div.section.ratings");
 	prevNode.parentNode.insertBefore(mbUI, prevNode);
 
 }
+
+function appendParameter(parameters, paramName, paramValue) {
+	parameters.push( { name: paramName, value: paramValue } );
+}
+	
 function luceneEscape(string) {
 
     return encodeURIComponent(string.replace(/\-|\/|\(\)/, ""));
 
 }
 // Helper function: compute url for a release object
-function cookImportUrl(release, discno) {    
+function buildFormParameters(release) {    
 
-    var disc;
-    if (arguments.length == 1) {
-        disc = release.discs[0];
-    } else {
-        disc = release.discs[discno];
-    }
+	// Form parameters
+	var parameters = new Array();
 
-	var importURL = "http://musicbrainz.org/cdi/enter.html?";
-
-	// Multiple artists on tracks?
-	var artists = [];
-	for (var i=0; i < disc.tracks.length; i++) {
-		if (typeof disc.tracks[i].artist != 'undefined' && disc.tracks[i].artist != release.artist) {
-			artists.push(disc.tracks[i].artist);
-        }
-	}
-
-    console.log(artists.length);
+	appendParameter(parameters, 'name', release.title);
 	
-	if (artists.length > 0)
-		importURL += "hasmultipletrackartists=1&artistid=1";
-	else 
-		importURL += "hasmultipletrackartists=0";
-        //importURL += "hasmultipletrackartists=0&artistid=2";
-
-    importURL += "&artistname=" + encodeURIComponent(release.artist);
-
-    if (release.discs.length > 1) {
-        importURL += "&releasename=" + encodeURIComponent(release.title + " (disc " + (discno + 1) + ")");
-
-    } else {
-
-        importURL += "&releasename=" + encodeURIComponent(release.title);
-
+	// Date + country
+	appendParameter(parameters, 'country', release.country);
+	if (!isNaN(release.year) && release.year != 0) { appendParameter(parameters, 'date.year', release.year); };
+	if (!isNaN(release.month) && release.month != 0) { appendParameter(parameters, 'date.month', release.month); };
+	if (!isNaN(release.day) && release.day != 0) { appendParameter(parameters, 'date.day', release.day); };
+	
+	// Label + catnos
+	// TODO: Handle multiple labels & catnos
+	if (typeof release.catno != 'undefined' && release.catno != "none") {
+        appendParameter(parameters, 'labels.0.catalog_number', release.catno);
     }
-    importURL += '&tracks=' + disc.tracks.length;
+	appendParameter(parameters, 'labels.0.name', release.label);
+
+	// Release Artist credits
+	// TODO: Handle multiple artists
+	appendParameter(parameters, 'artist_credit.names.0.name', release.artist);
+	//appendParameter(parameters, 'artist_credit.names.0.join_phrase', release.label);
+	
+	// Mediums
+	for (var i=0; i < release.discs.length; i++) {
+		var disc = release.discs[i];
+		appendParameter(parameters, 'mediums.'+i+'.format', release.format);
+		// FIXME: i or i+1?
+		appendParameter(parameters, 'mediums.'+i+'.position', i);
+		// TODO: Disc title
+		// appendParameter(parameters, 'mediums.'+i+'.name', release.format);
 		
-	// Add tracks
-	for (var i=0; i < disc.tracks.length; i++) {
-	
-		importURL += "&track" + i + "=" + encodeURIComponent(disc.tracks[i].title);
-
-        var tracklength = (typeof disc.tracks[i].duration != 'undefined' && disc.tracks[i].duration != '') ? disc.tracks[i].duration : "?:??";
-		importURL += "&tracklength" + i + "=" + encodeURIComponent(tracklength);
-        // TODO: ??
-        importURL += '&trackseq' + i + "=" + (i + 1);
-        importURL += '&tr' + i + '_mp=0';
-	
-		if (artists.length > 0) {
-			importURL += "&tr" + i + "_artistedit=1";
-            if (typeof disc.tracks[i].artist != "undefined" && disc.tracks[i].artist != "") {
-    			importURL += "&tr" + i + "_artistname=" + encodeURIComponent(disc.tracks[i].artist);
-            } else {
-                importURL += "&tr" + i + "_artistname=" + encodeURIComponent(release.artist);
-            }
+		// Tracks
+		for (var j=0; j < disc.tracks.length; j++) {
+			var track = disc.tracks[j];
+			appendParameter(parameters, 'mediums.'+i+'.track.'+j+'.name', track.title);
+			var tracklength = (typeof track.duration != 'undefined' && track.duration != '') ? track.duration : "?:??";
+			appendParameter(parameters, 'mediums.'+i+'.track.'+j+'.length', tracklength);
+			
+			// TODO: Handle multiple artists
+			if (typeof track.artist != "undefined" && track.artist != "") {
+				appendParameter(parameters, 'mediums.'+i+'.track.'+j+'.artist_credit.names.0.name', track.artist);
+			}
 		}
+
 	}
+	
+	// Edit note 
+	appendParameter(parameters, 'edit_note', 'From ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/'));
 
-    importURL += '&submitvalue=Keep+editing'; // Needed to allow RE imports
-    if (typeof release.catno != 'undefined' && release.catno != "none") {
-        importURL += '&rev_catno-0=' + release.catno;
-    }
-    importURL += '&rev_labelname-0=' + encodeURIComponent(release.label);
-    importURL += '&rev_format-0=' + release.format;
-    if (!isNaN(release.year) && release.year != 0) { importURL += '&rev_year-0=' + release.year; }
-    if (!isNaN(release.month) && release.month != 0) { importURL += '&rev_month-0=' + release.month; }
-    if (!isNaN(release.day) && release.day != 0) { importURL += '&rev_day-0=' + release.day; }
-    importURL += '&rev_country-0=' + release.country;
-
-	return importURL;
+	return parameters;
 }
 
 // Helper function: get data from a given XPATH
@@ -274,7 +257,7 @@ function cookArtistName(nodes) {
 }
 
 function mylog(obj) {
-    var DEBUG = false;
+    var DEBUG = true;
     if (DEBUG) {
         unsafeWindow.console.log(obj);
     }
@@ -318,7 +301,7 @@ MediaTypes["Video 2000"] = 13;
 MediaTypes["Vinyl"] = 7;
 
 var Countries = new Array();
-Countries["France"] = 73;
+Countries["France"] = "FR";
 Countries["Germany"] = 81;
 Countries["US"] = 222;
 Countries["UK"] = 221;
@@ -565,19 +548,18 @@ Countries["Yemen"] = 234;
 Countries["Yugoslavia"] = 235;
 Countries["Zambia"] = 237;
 Countries["Zimbabwe"] = 238;
-
 /* Main function */
 
 GM_xmlhttpRequest({
-  method:"GET",
-  url:discogsWsUrl,
-  headers:{
+  method: "GET",
+  url: discogsWsUrl,
+  headers: {
     "User-Agent":"monkeyagent",
     "Accept":"text/monkey,text/xml",
     },
-  onload:function(response) {
+  onload: function(response) {
   	var xmldoc = new DOMParser().parseFromString(response.responseText,"text/xml");
 	var release = parseRelease(xmldoc);
-	insertLinks(release);
+	insertLink(release);
   }
 });
