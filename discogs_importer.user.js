@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-08-20_02
+// @version        2011-08-28_01
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -28,15 +28,15 @@ $(document).ready(function(){
 	// On Musicbrainz website
 	if (window.location.href.match(/(musicbrainz\.org)/)) {
 	
-		$add_disc_dialog = $('div.add-disc-dialog');
+		//$add_disc_dialog = $('div.add-disc-dialog');
 		//$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
 
-		var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
-		innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
-	    innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
+		//var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
+		//innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
+	    //innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
+		//innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
+		//innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
+		//innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
 		//$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
 
 	// On Discogs website
@@ -73,8 +73,12 @@ function parseDiscogsRelease(xmldoc) {
     release.artist_credit = new Array();
     $(xmldoc).find("release > artists artist").each(function() {
         var $artist = $(this);
-        var ac = { 'artist_name': $artist.find("name").text(), 'credited_name': $artist.find("anv").text(), 'joinphrase': $artist.find("join").text()};
-        ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+        var ac = { 
+			'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
+			'credited_name': $artist.find("anv").text(), 
+			'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text())
+		};
+		mylog($artist.find("join").text());
         release.artist_credit.push(ac);
     });
 
@@ -140,8 +144,12 @@ function parseDiscogsRelease(xmldoc) {
 		track.artist_credit = new Array();
 		$trackNode.find("artists artist").each(function() {
 			var $artist = $(this);
-			var ac = { 'artist_name': $artist.find("name").text(), 'credited_name': $artist.find("anv").text(), joinphrase: $artist.find("join").text()};
-			ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+			var ac = { 	
+				'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
+				// TODO: use 'name' rather than 'anv' for 'credited_name' until MBS-2323 being fixed
+				'credited_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
+				joinphrase: decodeDiscogsJoinphrase($artist.find("join").text())
+			};
 			track.artist_credit.push(ac);
 		});		
 		
@@ -229,6 +237,16 @@ getXPathVal = function (xmldoc, xpathExpression, wantSingleNode, rootNode) {
     } else {
         return xmldoc.evaluate(xpathExpression, rootNode, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     }
+}
+
+function decodeDiscogsJoinphrase(join) {
+	var joinphrase = "";
+	var trimedjoin = join.replace(/^\s*/, "").replace(/\s*$/, "");
+	if (trimedjoin == "") return trimedjoin;
+	if (trimedjoin != ",") joinphrase += " ";
+	joinphrase += trimedjoin;
+	joinphrase += " ";
+	return joinphrase;
 }
 
 function mylog(obj) {
