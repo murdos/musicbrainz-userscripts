@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2011-08-20_02
+// @version        2011-08-28_01
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @include        http://www.encyclopedisque.fr/disque/*.html
@@ -63,7 +63,6 @@ function parseEncyclopedisquePage() {
 	release.country = 'FR'; // France - correct in most case, but not all
 
     // Other hard-coded info
-    release.type = 'single';
     release.status = 'official';
     release.language = 'fra';
     release.script = 'Latn';
@@ -104,9 +103,15 @@ function parseEncyclopedisquePage() {
 				}
 			}
 			release.year = m[2];
-            release.labels = [ { 'catno': m[4] } ]
-			var label = m[3];
-			if (label != undefined) release.labels[0].name = label.trim();
+            release.labels = [ ];
+			var labels = m[3];
+			if (labels != undefined) {
+				$.each(labels.split("/"), function(index, label) {
+					release.labels.push({ 'name': label.trim(), 'catno': m[4] });
+				});
+			} else {
+				release.labels.push({ 'catno': m[4] });
+			}
 			//}
 		} 
 		// Tracks
@@ -119,6 +124,9 @@ function parseEncyclopedisquePage() {
 		
 	}
 
+	// Guessing release type (EP, single) from number of tracks
+	release.type = (disc.tracks.length > 3) ? 'ep' : 'single';
+	
 	return release;
 }
 
