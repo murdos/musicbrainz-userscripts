@@ -12,7 +12,7 @@
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
-// @require        http://userscripts.org/scripts/source/110844.user.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
 // Script Update Checker
