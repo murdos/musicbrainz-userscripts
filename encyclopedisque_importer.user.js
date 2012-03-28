@@ -50,15 +50,33 @@ function parseEncyclopedisquePage() {
 		// Release event
 		if (infoType == "Sortie :") {
 			var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
-			var re = /\s*([\d\?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^\)]*)?\)?/;
-			//console.log(infoValue);
-			//console.log(infoValue.match(re));
+			var re = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d\?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^\)]*)?\)?/;
+			console.log(infoValue);
+			console.log(infoValue.match(re));
 			//if (m = infoValue.match(re) != null) {
-			m = infoValue.match(re);	
-			release.year = m[1];
-			var label = m[2];
+			m = infoValue.match(re);
+			month = m[1];
+			if (month != undefined) {
+				switch (month)
+				{
+					case "janvier":		release.month = 1; break;
+					case "février":		release.month = 2; break;
+					case "mars":		release.month = 3; break;
+					case "avril":		release.month = 4; break;
+					case "mai":			release.month = 5; break;
+					case "juin":		release.month = 6; break;
+					case "juillet":		release.month = 7; break;
+					case "août":		release.month = 8; break;
+					case "septembre":	release.month = 9; break;
+					case "octobre":		release.month = 10; break;
+					case "novembre":	release.month = 11; break;
+					case "décembre":	release.month = 12; break;
+				}
+			}
+			release.year = m[2];
+			var label = m[3];
 			if (label != undefined) release.label = label.trim();
-			release.catno = m[3];
+			release.catno = m[4];
 			//}
 		} 
 		// Tracks
