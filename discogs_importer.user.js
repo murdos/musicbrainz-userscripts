@@ -20,7 +20,7 @@
 
 var version_scriptNum = 36376; // Change this to the number given to the script by userscripts.org (check the address bar)
 
-var version_timestamp = 1278011802979; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
+var version_timestamp = 1278013461315; // Used to differentiate one version of the script from an older one. Use the Date.getTime() function to get a value for this.
 
 try {
 
@@ -244,7 +244,7 @@ function insertLinks(release) {
 
 		for (var i=0; i < release.discs.length; i++) {
 
-			innerHTML += '<div><a target="_blank" href="' + cookImportUrl(release, release.discs[i]) + '">Import disc ' + (i+1) + '</a></div>';
+			innerHTML += '<div><a target="_blank" href="' + cookImportUrl(release, i) + '">Import disc ' + (i+1) + '</a></div>';
 
 		}
 
@@ -268,11 +268,16 @@ function insertLinks(release) {
 
 // Helper function: compute url for a release object
 
-function cookImportUrl(release, disc) {
+function cookImportUrl(release, discno) {
 
 
+    var disc;
 
-    if (arguments.length == 1) disc = release.discs[0];
+    if (arguments.length == 1) {
+        disc = release.discs[0];
+    } else {
+        disc = release.discs[discno];
+    }
 
 
 
@@ -309,8 +314,12 @@ function cookImportUrl(release, disc) {
 
 
     importURL += "&artistname=" + encodeURIComponent(release.artist);
+    if (release.discs.length > 1) {
 
-    importURL += "&releasename=" + encodeURIComponent(release.title);
+        importURL += "&releasename=" + encodeURIComponent(release.title + " (disc " + (discno + 1) + ")");
+    } else {
+        importURL += "&releasename=" + encodeURIComponent(release.title);
+    }
 
     importURL += '&tracks=' + disc.tracks.length;
 
@@ -323,8 +332,9 @@ function cookImportUrl(release, disc) {
 	
 
 		importURL += "&track" + i + 		"=" + encodeURIComponent(disc.tracks[i].title);
+        var tracklength = (typeof disc.tracks[i].duration != 'undefined' && disc.tracks[i].duration != '') ? disc.tracks[i].duration : "?:??";
 
-		importURL += "&tracklength" + i + 	"=" + encodeURIComponent(disc.tracks[i].duration);
+		importURL += "&tracklength" + i + 	"=" + encodeURIComponent(tracklength);
 
         // TODO: ??
 
