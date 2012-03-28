@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2011-09-11_01
+// @version        2011-09-11_02
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
@@ -12,7 +12,6 @@
 // @exclude        http://www.discogs.com/release/add
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        http://userscripts.org/scripts/source/110844.user.js
-
 // ==/UserScript==
 
 // Script Update Checker
@@ -115,10 +114,9 @@ function parseDiscogsRelease(xmldoc) {
     $(xmldoc).find("release > artists artist").each(function() {
         var $artist = $(this);
         var ac = { 
-            'artist_name': $artist.find("name").text(), 
-            'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text()), 
-            'joinphrase': $artist.find("join").text()};
-        ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+            'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
+            'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
+            'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text()});
         release.artist_credit.push(ac);
     });
 
@@ -165,8 +163,6 @@ function parseDiscogsRelease(xmldoc) {
 
     });
 
-    // TODO: detect promo releases and set release.status
-
     // Barcode: grab barcode from discogs page, it's not available in webservice response
     $('div.section.major.barcodes div.section_content ul li').each(function() {
         if ($(this).text().indexOf('Barcode: ') != -1) {
@@ -194,10 +190,9 @@ function parseDiscogsRelease(xmldoc) {
 		$trackNode.find("artists artist").each(function() {
 			var $artist = $(this);
 			var ac = { 
-                'artist_name': $artist.find("name").text(), 
-                'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text()), 
-                'joinphrase': $artist.find("join").text()};
-			ac.artist_name = ac.artist_name.replace(/ \(\d+\)$/, "");
+                'artist_name': $artist.find("name").text().replace(/ \(\d+\)$/, ""), 
+                'credited_name': ($artist.find("anv").text() ? $artist.find("anv").text() : $artist.find("name").text().replace(/ \(\d+\)$/, "")), 
+                'joinphrase': decodeDiscogsJoinphrase($artist.find("join").text()});
 			track.artist_credit.push(ac);
 		});		
 		
@@ -275,6 +270,16 @@ function insertLink(release) {
 	var prevNode = document.body.querySelector("div.section.ratings");
 	prevNode.parentNode.insertBefore(mbUI, prevNode);
 }
+
+function decodeDiscogsJoinphrase(join) {
+    var joinphrase = "";
+    var trimedjoin = join.replace(/^\s*/, "").replace(/\s*$/, "");
+    if (trimedjoin == "") return trimedjoin;
+    if (trimedjoin != ",") joinphrase += " ";
+    joinphrase += trimedjoin;
+    joinphrase += " ";
+    return joinphrase;
+} 
 
 // Helper function: get data from a given XPATH
 getXPathVal = function (xmldoc, xpathExpression, wantSingleNode, rootNode) {
