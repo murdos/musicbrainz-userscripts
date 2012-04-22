@@ -26,33 +26,33 @@ if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
 
-	// On Musicbrainz website
-	if (window.location.href.match(/(musicbrainz\.org)/)) {
-	
-		$add_disc_dialog = $('div.add-disc-dialog');
-		//$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
+    // On Musicbrainz website
+    if (window.location.href.match(/(musicbrainz\.org)/)) {
+    
+        $add_disc_dialog = $('div.add-disc-dialog');
+        //$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
 
-		var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
-		innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
-	    innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
-		innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
-		//$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
+        var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
+        innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
+        innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
+        innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
+        innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
+        innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
+        //$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
 
-	// On Discogs website
-	} else {
+    // On Discogs website
+    } else {
 
         magnifyLinks();
 
         // Release page?
         if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
 
-		    // Discogs Webservice URL           
+            // Discogs Webservice URL           
             var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
             var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
 
-		    mylog(discogsWsUrl);
+            mylog(discogsWsUrl);
 
             // Swith JQuery to MB's one, and save GreaseMonkey one
             var GM_JQuery = $;
@@ -79,7 +79,7 @@ $(document).ready(function(){
             
         }
         
-	}
+    }
 });
 
 function magnifyLinks() {
@@ -98,7 +98,7 @@ function magnifyLinks() {
         // Ignore empty links
         if (!elem.href || trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
             continue;
-			
+            
         //~ // Check if the link matches
         if (m = re.exec(elem.href)) {
             var type = m[2];
@@ -119,9 +119,9 @@ function parseDiscogsRelease(data) {
     var discogsRelease = data.data;
     
     var release = new Object();
-	release.discs = [];
+    release.discs = [];
 
-	// Release artist credit
+    // Release artist credit
     release.artist_credit = new Array();
     $.each(discogsRelease.artists, function(index, artist) {
         var ac = { 
@@ -132,8 +132,8 @@ function parseDiscogsRelease(data) {
         release.artist_credit.push(ac);
     });
     
-	// Release title
-	release.title = discogsRelease.title;
+    // Release title
+    release.title = discogsRelease.title;
 
     // Release date
     if (discogsRelease.released) {
@@ -201,19 +201,19 @@ function parseDiscogsRelease(data) {
         });
     }
     
-	// Inspect tracks
-	var tracks = [];
+    // Inspect tracks
+    var tracks = [];
 
-	$.each(discogsRelease.tracklist, function(index, discogsTrack) {
-		// TODO: dectect disc title and set disc.title
+    $.each(discogsRelease.tracklist, function(index, discogsTrack) {
+        // TODO: dectect disc title and set disc.title
 
-		var track = new Object();
-		
-		track.title = discogsTrack.title;
-		track.duration = discogsTrack.duration;
-		
-		// Track artist credit
-		track.artist_credit = new Array();
+        var track = new Object();
+        
+        track.title = discogsTrack.title;
+        track.duration = discogsTrack.duration;
+        
+        // Track artist credit
+        track.artist_credit = new Array();
         if (discogsTrack.artists) {
             $.each(discogsTrack.artists, function(index, artist) {
                 var ac = { 
@@ -224,25 +224,25 @@ function parseDiscogsRelease(data) {
                 track.artist_credit.push(ac);
             });
         }
-		
-		// Track position and release number
-		var trackPosition = discogsTrack.position;
-		var releaseNumber = 1;
+        
+        // Track position and release number
+        var trackPosition = discogsTrack.position;
+        var releaseNumber = 1;
 
         // Skip special tracks
         if (trackPosition.toLowerCase().match("^(video|mp3)")) { 
             trackPosition = "";
         }
 
-	    // Remove "CD" prefix
-    	trackPosition = trackPosition.replace(/^CD/i, "");
+        // Remove "CD" prefix
+        trackPosition = trackPosition.replace(/^CD/i, "");
 
         // Multi discs e.g. 1.1 or 1-1
-		var tmp = trackPosition.match(/^(\d+)(?=(-|\.)\d*)/);
+        var tmp = trackPosition.match(/^(\d+)(?=(-|\.)\d*)/);
 
-		if (tmp && tmp[0]) {
-			releaseNumber = tmp[0];
-		} else {
+        if (tmp && tmp[0]) {
+            releaseNumber = tmp[0];
+        } else {
         // Vinyls disc numbering: A1, B3, ...
             tmp = trackPosition.match(/^([A-Za-z])\d*/);
             if (tmp && tmp[0] && tmp[0] != "V") { 
@@ -258,46 +258,46 @@ function parseDiscogsRelease(data) {
             }
         }
 
-		// Create release if needed
-		if ( !release.discs[releaseNumber-1] ) {
-			release.discs.push(new Object());
-			release.discs[releaseNumber-1].tracks = [];
+        // Create release if needed
+        if ( !release.discs[releaseNumber-1] ) {
+            release.discs.push(new Object());
+            release.discs[releaseNumber-1].tracks = [];
             release.discs[releaseNumber-1].format = release_format;
-		}
+        }
 
-		// Trackposition is empty e.g. for release title
-		if (trackPosition != "" && trackPosition != null)
-			release.discs[releaseNumber-1].tracks.push(track);
-		
-	});
+        // Trackposition is empty e.g. for release title
+        if (trackPosition != "" && trackPosition != null)
+            release.discs[releaseNumber-1].tracks.push(track);
+        
+    });
 
     mylog(release);
-	return release;
+    return release;
 }
 
 // Insert links in Discogs page
 function insertLink(release) {
 
-	var mbUI = document.createElement('div');
+    var mbUI = document.createElement('div');
     mbUI.innerHTML = "<h3>MusicBrainz</h3>";    
-	mbUI.className = "section";
+    mbUI.className = "section";
 
-	var mbContentBlock = document.createElement('div');
+    var mbContentBlock = document.createElement('div');
     mbContentBlock.className = "section_content";
     mbUI.appendChild(mbContentBlock);
 
-	// Form parameters
+    // Form parameters
     var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
-	var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
-	// Build form
-	var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    // Build form
+    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
     // Append search link
-	innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
+    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
 
-	mbContentBlock.innerHTML = innerHTML;
-	var prevNode = document.body.querySelector("div.section.ratings");
-	prevNode.parentNode.insertBefore(mbUI, prevNode);
+    mbContentBlock.innerHTML = innerHTML;
+    var prevNode = document.body.querySelector("div.section.ratings");
+    prevNode.parentNode.insertBefore(mbUI, prevNode);
 }
 
 function decodeDiscogsJoinphrase(join) {
