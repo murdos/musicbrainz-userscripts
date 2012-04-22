@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2012-03-28~1
+// @version        2012-04-22~1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
@@ -287,7 +287,7 @@ function insertLink(release) {
     mbUI.appendChild(mbContentBlock);
 
 	// Form parameters
-    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://discogs.com/release/');
+    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
 	var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
 	// Build form
