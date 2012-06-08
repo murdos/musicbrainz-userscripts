@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2012-04-22~1
+// @version        2012-06-09~1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
@@ -165,7 +165,7 @@ function parseDiscogsRelease(data) {
     }
     
     // Release format
-    var release_format;
+    var release_format = "";
 
     if (discogsRelease.formats.length > 0) {
         release_format = MediaTypes[ discogsRelease.formats[0].name ];
@@ -263,6 +263,12 @@ function parseDiscogsRelease(data) {
             release.discs.push(new Object());
             release.discs[releaseNumber-1].tracks = [];
             release.discs[releaseNumber-1].format = release_format;
+        }
+
+        // Track number (only for Vinyl and Cassette)
+        if ( release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/) 
+            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/) ){
+            track.number = discogsTrack.position;
         }
 
         // Trackposition is empty e.g. for release title
