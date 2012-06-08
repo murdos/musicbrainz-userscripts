@@ -28,7 +28,7 @@ $(document).ready(function(){
 
     // On Musicbrainz website
     if (window.location.href.match(/(musicbrainz\.org)/)) {
-    
+
         $add_disc_dialog = $('div.add-disc-dialog');
         //$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
 
@@ -48,7 +48,7 @@ $(document).ready(function(){
         // Release page?
         if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
 
-            // Discogs Webservice URL           
+            // Discogs Webservice URL
             var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
             var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
 
@@ -57,7 +57,7 @@ $(document).ready(function(){
             // Swith JQuery to MB's one, and save GreaseMonkey one
             var GM_JQuery = $;
             $ = unsafeWindow.$;
-            
+
             $.ajax({
               url: discogsWsUrl,
               dataType: 'jsonp',
@@ -73,12 +73,12 @@ $(document).ready(function(){
                 mylog("AJAX error thrown:" + errorThrown);
               }
             });
-            
+
             // Back to GreaseMonkey's JQuery
             $ = GM_JQuery;
-            
+
         }
-        
+
     }
 });
 
@@ -98,7 +98,7 @@ function magnifyLinks() {
         // Ignore empty links
         if (!elem.href || trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
             continue;
-            
+
         //~ // Check if the link matches
         if (m = re.exec(elem.href)) {
             var type = m[2];
@@ -115,23 +115,23 @@ function trim(str) {
 
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
-    
+
     var discogsRelease = data.data;
-    
+
     var release = new Object();
     release.discs = [];
 
     // Release artist credit
     release.artist_credit = new Array();
     $.each(discogsRelease.artists, function(index, artist) {
-        var ac = { 
-            'artist_name': artist.name.replace(/ \(\d+\)$/, ""), 
-            'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")), 
+        var ac = {
+            'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
+            'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
             'joinphrase': decodeDiscogsJoinphrase(artist.join)
         };
         release.artist_credit.push(ac);
     });
-    
+
     // Release title
     release.title = discogsRelease.title;
 
@@ -142,7 +142,7 @@ function parseDiscogsRelease(data) {
             var tmp = releasedate.split('-');        if (tmp[0] != "undefined" && tmp[0] != "") {
                 release.year = parseInt(tmp[0], 10);
                 if (tmp[1] != "undefined" && tmp[1] != "") {
-                    release.month = parseInt(tmp[1], 10);                
+                    release.month = parseInt(tmp[1], 10);
                     if (tmp[2] != "undefined" && tmp[2] != "") {
                         release.day = parseInt(tmp[2], 10);
                     }
@@ -161,15 +161,15 @@ function parseDiscogsRelease(data) {
     if (discogsRelease.labels) {
         $.each(discogsRelease.labels, function(index, label) {
             release.labels.push( { name: label.name, catno: (label.catno == "none" ? "[none]" : label.catno) } );
-        });   
+        });
     }
-    
+
     // Release format
     var release_format = "";
 
     if (discogsRelease.formats.length > 0) {
         release_format = MediaTypes[ discogsRelease.formats[0].name ];
-        
+
         if (discogsRelease.formats[0].descriptions) {
             $.each(discogsRelease.formats[0].descriptions, function(index, desc) {
                 // Release format: special handling of vinyl 7", 10" and 12"
@@ -184,7 +184,7 @@ function parseDiscogsRelease(data) {
 
             });
         }
-        
+
         // Release packaging
         if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Cardboard/)) release.packaging = "paper sleeve";
         if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Digipak/)) release.packaging = "digipak";
@@ -200,7 +200,7 @@ function parseDiscogsRelease(data) {
             }
         });
     }
-    
+
     // Inspect tracks
     var tracks = [];
 
@@ -208,29 +208,29 @@ function parseDiscogsRelease(data) {
         // TODO: dectect disc title and set disc.title
 
         var track = new Object();
-        
+
         track.title = discogsTrack.title;
         track.duration = discogsTrack.duration;
-        
+
         // Track artist credit
         track.artist_credit = new Array();
         if (discogsTrack.artists) {
             $.each(discogsTrack.artists, function(index, artist) {
-                var ac = { 
-                    'artist_name': artist.name.replace(/ \(\d+\)$/, ""), 
-                    'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")), 
+                var ac = {
+                    'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
+                    'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
                     'joinphrase': decodeDiscogsJoinphrase(artist.join)
                 };
                 track.artist_credit.push(ac);
             });
         }
-        
+
         // Track position and release number
         var trackPosition = discogsTrack.position;
         var releaseNumber = 1;
 
         // Skip special tracks
-        if (trackPosition.toLowerCase().match("^(video|mp3)")) { 
+        if (trackPosition.toLowerCase().match("^(video|mp3)")) {
             trackPosition = "";
         }
 
@@ -245,16 +245,16 @@ function parseDiscogsRelease(data) {
         } else {
         // Vinyls disc numbering: A1, B3, ...
             tmp = trackPosition.match(/^([A-Za-z])\d*/);
-            if (tmp && tmp[0] && tmp[0] != "V") { 
+            if (tmp && tmp[0] && tmp[0] != "V") {
                 var code = tmp[0].charCodeAt(0);
-                // A-Z 
+                // A-Z
                 if (65 <= code && code <= 90) {
                     code = code - 65;
                 } else if (97 <= code && code <= 122) {
                 // a-z
                     code = code - (65 + 32);
                 }
-                releaseNumber = (code-code%2)/2+1; 
+                releaseNumber = (code-code%2)/2+1;
             }
         }
 
@@ -266,7 +266,7 @@ function parseDiscogsRelease(data) {
         }
 
         // Track number (only for Vinyl and Cassette)
-        if ( release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/) 
+        if ( release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
             && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/) ){
             track.number = discogsTrack.position;
         }
@@ -274,7 +274,7 @@ function parseDiscogsRelease(data) {
         // Trackposition is empty e.g. for release title
         if (trackPosition != "" && trackPosition != null)
             release.discs[releaseNumber-1].tracks.push(track);
-        
+
     });
 
     mylog(release);
@@ -285,7 +285,7 @@ function parseDiscogsRelease(data) {
 function insertLink(release) {
 
     var mbUI = document.createElement('div');
-    mbUI.innerHTML = "<h3>MusicBrainz</h3>";    
+    mbUI.innerHTML = "<h3>MusicBrainz</h3>";
     mbUI.className = "section";
 
     var mbContentBlock = document.createElement('div');
@@ -314,7 +314,7 @@ function decodeDiscogsJoinphrase(join) {
     joinphrase += trimedjoin;
     joinphrase += " ";
     return joinphrase;
-} 
+}
 
 function mylog(obj) {
     var DEBUG = true;
@@ -597,9 +597,9 @@ Countries["Congo, The Democratic Republic of the"] = "CD";
 Countries["Slovakia"] = "SK";
 Countries["Bosnia and Herzegovina"] = "BA";
 Countries["Korea (North), Democratic People's Republic of"] = "KP";
-Countries["North Korea"] = "KP"; 
+Countries["North Korea"] = "KP";
 Countries["Korea (South), Republic of"] = "KR";
-Countries["South Korea"] = "KR"; 
+Countries["South Korea"] = "KR";
 Countries["Montenegro"] = "ME";
 Countries["South Georgia and the South Sandwich Islands"] = "GS";
 Countries["Palestinian Territory"] = "PS";
