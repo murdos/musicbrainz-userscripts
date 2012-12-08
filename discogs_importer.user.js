@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2012-06-09~1
+// @version        2012.09.14.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @include        http://*musicbrainz.org/release/add
@@ -165,30 +165,34 @@ function parseDiscogsRelease(data) {
     }
 
     // Release format
-    var release_format = "";
+    var release_formats = new Array();
 
     if (discogsRelease.formats.length > 0) {
-        release_format = MediaTypes[ discogsRelease.formats[0].name ];
+        for(var i = 0; i < discogsRelease.formats.length; i++)
+        {
+            for(var j = 0; j < discogsRelease.formats[i].qty; j++)
+                release_formats.push(MediaTypes[ discogsRelease.formats[i].name ]);
 
-        if (discogsRelease.formats[0].descriptions) {
-            $.each(discogsRelease.formats[0].descriptions, function(index, desc) {
-                // Release format: special handling of vinyl 7", 10" and 12"
-                if (desc.match(/7"|10"|12"/)) release_format = MediaTypes[desc];
-                // Release format: special handling of Vinyl, LP == 12" (http://www.discogs.com/help/submission-guidelines-release-format.html#LP)
-                if (discogsRelease.formats[0].name == "Vinyl" && desc == "LP") release_format = '12" Vinyl';
-                // Release status
-                if (desc.match(/Promo|Smplr/)) release.status = "promotion";
-                // Release type
-                if (desc.match(/Compilation/)) release.type = "compilation";
-                if (desc.match(/Single/)) release.type = "single";
+            if (discogsRelease.formats[i].descriptions) {
+                $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
+                    // Release format: special handling of vinyl 7", 10" and 12"
+                    if (desc.match(/7"|10"|12"/)) release_formats[release_formats.length-1] = MediaTypes[desc];
+                    // Release format: special handling of Vinyl, LP == 12" (http://www.discogs.com/help/submission-guidelines-release-format.html#LP)
+                    if (discogsRelease.formats[i].name == "Vinyl" && desc == "LP") release_formats[release_formats.length-1] = '12" Vinyl';
+                    // Release status
+                    if (desc.match(/Promo|Smplr/)) release.status = "promotion";
+                    // Release type
+                    if (desc.match(/Compilation/)) release.type = "compilation";
+                    if (desc.match(/Single/)) release.type = "single";
 
-            });
+                });
+            }
+
+            // Release packaging
+            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Cardboard/)) release.packaging = "paper sleeve";
+            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Digipak/)) release.packaging = "digipak";
+            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Jewel/)) release.packaging = "jewel";
         }
-
-        // Release packaging
-        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Cardboard/)) release.packaging = "paper sleeve";
-        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Digipak/)) release.packaging = "digipak";
-        if (discogsRelease.formats[0].text && discogsRelease.formats[0].text.match(/Jewel/)) release.packaging = "jewel";
     }
 
     // Barcode
@@ -204,6 +208,8 @@ function parseDiscogsRelease(data) {
     // Inspect tracks
     var tracks = [];
 
+    var releaseNumber = 1;
+    var lastPosition = 0;
     $.each(discogsRelease.tracklist, function(index, discogsTrack) {
         // TODO: dectect disc title and set disc.title
 
@@ -227,26 +233,25 @@ function parseDiscogsRelease(data) {
 
         // Track position and release number
         var trackPosition = discogsTrack.position;
-        var releaseNumber = 1;
 
         // Skip special tracks
         if (trackPosition.toLowerCase().match("^(video|mp3)")) {
             trackPosition = "";
         }
 
-        // Remove "CD" prefix
-        trackPosition = trackPosition.replace(/^CD/i, "");
-
-        // Multi discs e.g. 1.1 or 1-1
-        var tmp = trackPosition.match(/^(\d+)(?=(-|\.)\d*)/);
-
-        if (tmp && tmp[0]) {
-            releaseNumber = tmp[0];
-        } else {
-        // Vinyls disc numbering: A1, B3, ...
-            tmp = trackPosition.match(/^([A-Za-z])\d*/);
-            if (tmp && tmp[0] && tmp[0] != "V") {
-                var code = tmp[0].charCodeAt(0);
+        var tmp = trackPosition.match(/(\d+)(?:[\.-](\d+))?/);
+        if(tmp)
+        {
+            tmp[1] = parseInt(tmp[1], 10);
+            var trackNumber = 1;
+            if(tmp[2]) // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
+            {
+                releaseNumber = tmp[1];
+                trackNumber = parseInt(tmp[2], 10);
+            }
+            else if(trackPosition.match(/^[A-Za-z]\d*$/)) // Vinyl or cassette, handle it specially
+            {
+                var code = trackPosition.charCodeAt(0);
                 // A-Z
                 if (65 <= code && code <= 90) {
                     code = code - 65;
@@ -256,13 +261,24 @@ function parseDiscogsRelease(data) {
                 }
                 releaseNumber = (code-code%2)/2+1;
             }
+            else if(tmp[1] <= lastPosition) // 1, 2, 3, ... - We've moved onto a new medium
+            {
+                releaseNumber++;
+                trackNumber = tmp[1];
+            }
+            else
+            {
+                trackNumber = tmp[1];
+            }
+
+            lastPosition = trackNumber;
         }
 
         // Create release if needed
         if ( !release.discs[releaseNumber-1] ) {
             release.discs.push(new Object());
             release.discs[releaseNumber-1].tracks = [];
-            release.discs[releaseNumber-1].format = release_format;
+            release.discs[releaseNumber-1].format = release_formats[releaseNumber-1];
         }
 
         // Track number (only for Vinyl and Cassette)
