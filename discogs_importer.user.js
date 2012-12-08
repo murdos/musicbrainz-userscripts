@@ -1,9 +1,11 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2012.09.14.1
+// @version        2012.12.08.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
+// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
+// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @include        http://*musicbrainz.org/release/add
 // @include        http://*musicbrainz.org/release/*/add
 // @include        http://*musicbrainz.org/release/*/edit
@@ -189,9 +191,15 @@ function parseDiscogsRelease(data) {
             }
 
             // Release packaging
-            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Cardboard/)) release.packaging = "paper sleeve";
-            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Digipak/)) release.packaging = "digipak";
-            if (discogsRelease.formats[i].text && discogsRelease.formats[i].text.match(/Jewel/)) release.packaging = "jewel";
+            if (discogsRelease.formats[i].text) {
+                var freetext = discogsRelease.formats[i].text.toLowerCase().replace(/-/g, '').replace(/ /g, '');
+                if (freetext.match(/cardboard|paper/)) release.packaging = "cardboard/paper sleeve";
+                if (freetext.match(/digipak/)) release.packaging = "digipak";
+                if (freetext.match(/keepcase/)) release.packaging = "keep case";
+                if (freetext.match(/jewel/)) {
+                    release.packaging = freetext.match(/slim/) ? "slim jewel case" : "jewel case";
+                }
+            }
         }
     }
 
