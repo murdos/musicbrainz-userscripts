@@ -35,7 +35,9 @@ function retrieveReleaseInfo() {
     // Grab release event information
     var releasedate = bandcampAlbumData.current.release_date;
 
-	 var parent_album = bandcampEmbedData.album_title;
+	 if(bandcampEmbedData.album_title) {
+		 release.parent_album = bandcampEmbedData.album_title;
+    }
 
     if (typeof releasedate != "undefined" && releasedate != "") {
         release.year = $.format.date(releasedate, "yyyy");
@@ -52,7 +54,7 @@ function retrieveReleaseInfo() {
 
 	 // map Bandcamp single tracks to singles
 	 if(release.type == "track")
-	 { release.type = "Single"; }
+	 { release.type = "single"; }
 
 	// Tracks
     var disc = new Object();
@@ -76,7 +78,8 @@ function retrieveReleaseInfo() {
 // Insert links in page
 function insertLink(release) {
 
-	if(typeof parent_album == "undefined") {
+	if(release.type == "single" && typeof release.parent_album != "undefined") {
+		mylog("This is part of an album, not continuing.");
 		return false;
 	}
 
