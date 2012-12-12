@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2012-03-28~1
+// @version        2012-12-12~1
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*.bandcamp.com/album/*
+// @include        http://*.bandcamp.com/track/*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        https://raw.github.com/phstc/jquery-dateFormat/master/jquery.dateFormat-1.0.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
@@ -23,6 +24,7 @@ function retrieveReleaseInfo() {
 	release.discs = [];
 
     var bandcampAlbumData = unsafeWindow.TralbumData;
+	 var bandcampEmbedData = unsafeWindow.EmbedData;
 
     // Release artist credit
     release.artist_credit = [ { artist_name: bandcampAlbumData.artist } ];
@@ -32,6 +34,8 @@ function retrieveReleaseInfo() {
 
     // Grab release event information
     var releasedate = bandcampAlbumData.current.release_date;
+
+	 var parent_album = bandcampEmbedData.album_title;
 
     if (typeof releasedate != "undefined" && releasedate != "") {
         release.year = $.format.date(releasedate, "yyyy");
@@ -45,6 +49,10 @@ function retrieveReleaseInfo() {
     // FIXME: implement a mapping between bandcamp release types and MB ones
     release.type = bandcampAlbumData.current.type;
     release.status = 'official';
+
+	 // map Bandcamp single tracks to singles
+	 if(release.type == "track")
+	 { release.type = "Single"; }
 
 	// Tracks
     var disc = new Object();
@@ -67,6 +75,10 @@ function retrieveReleaseInfo() {
 
 // Insert links in page
 function insertLink(release) {
+
+	if(typeof parent_album == "undefined") {
+		return false;
+	}
 
     /*
 	var mbUI = document.createElement('div');
