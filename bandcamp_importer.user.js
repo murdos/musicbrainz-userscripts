@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2012-12-12~1
+// @version        2012.12.12.2
 // @namespace      http://userscripts.org/users/22504
 // @include        http://*.bandcamp.com/album/*
 // @include        http://*.bandcamp.com/track/*
