@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2013.03.04.1
+// @version        2013.08.03.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -41,6 +41,16 @@ $(document).ready(function(){
     } else {
 
         magnifyLinks();
+        insertMBLinks();
+
+        // Handle page navigation on artist page
+        $("#releases").bind("DOMNodeInserted",function(event) {
+            // Only child of $("#releases") are of interest
+            if (event.target.parentNode.id == 'releases') {
+                magnifyLinks(event.target);
+                insertMBLinks($(event.target));
+            }
+        });
 
         // Release page?
         if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
@@ -48,8 +58,6 @@ $(document).ready(function(){
             // Discogs Webservice URL
             var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
             var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
-
-            mylog(discogsWsUrl);
 
             // Swith JQuery to MB's one, and save GreaseMonkey one
             var GM_JQuery = $;
@@ -79,16 +87,93 @@ $(document).ready(function(){
     }
 });
 
-function magnifyLinks() {
+
+function insertMBLinks($root) {
 
     // Check if we already added links for this content
-    if (document.body.hasAttribute('discogsLinksMagnified'))
+    var CACHE_STRING = localStorage.getItem('DISCOGS_MB_MAPPING_CACHE');
+    if(!CACHE_STRING) {
+        CACHE_STRING = "{}";
+    }
+    var CACHE = JSON.parse(CACHE_STRING);
+
+    var ajax_requests = [];
+
+    setInterval(function() {
+        if(ajax_requests.length > 0) {
+            var request = ajax_requests.shift();
+            if(typeof request === "function") {
+                request();
+            }
+        }
+    }, 1000);
+
+    function createLink(mb_url) {
+        return '<a href="'+mb_url+'"><img src="http://musicbrainz.org/favicon.ico" /></a> ';
+    }
+
+    function searcAndDisplayMbLink($tr, mb_type, discogs_type) {
+        $tr.find('a[href*="http://www.discogs.com/'+discogs_type+'/"]').each(function() {
+            var $link = $(this);
+            var discogs_url = $link.attr('href');
+
+            if(CACHE[discogs_url]) {
+                $.each(CACHE[discogs_url], function(mb_url) {
+                    $link.before(createLink(mb_url));
+                });
+            } else {
+                ajax_requests.push($.proxy(function() {
+                    var context = this;
+                    $.getJSON('http://musicbrainz.org/ws/2/url?resource='+context.discogs_url+'&inc='+context.mb_type+'-rels', function(data) {
+                        if ('relations' in data) {
+                            CACHE[context.discogs_url] = [];
+                            $.each(data['relations'], function(idx, relation) {
+                                if (context.mb_type.replace('-', '_') in relation) {
+                                    var mb_url = 'http://musicbrainz.org/'+context.mb_type+'/' + relation[context.mb_type.replace('-', '_')]['id'];
+                                    CACHE[context.discogs_url].push(mb_url);
+                                    localStorage.setItem('DISCOGS_MB_MAPPING_CACHE', JSON.stringify(CACHE));
+                                    context.$link.before(createLink(mb_url));
+                                }
+                            });
+                        }
+                    });
+                }, {'discogs_url': discogs_url, '$link': $link, 'mb_type': mb_type}));
+            }
+        });
+    }
+
+    if (!$root) {
+        $root = $('body');
+    }
+
+    $root.find('tr.master').each(function() {
+        searcAndDisplayMbLink($(this), 'release-group', 'master');
+    });
+
+    $root.find('tr.release').each(function() {
+        searcAndDisplayMbLink($(this), 'release', 'release');
+    });
+
+    $root.find('tr.hidden.r_tr').each(function() {
+        searcAndDisplayMbLink($(this), 'release', 'release');
+    });
+
+}
+
+function magnifyLinks(rootNode) {
+
+    if (!rootNode) {
+        rootNode = document.body;
+    }
+
+    // Check if we already added links for this content
+    if (rootNode.hasAttribute('discogsLinksMagnified'))
         return;
-    document.body.setAttribute('discogsLinksMagnified', true);
+    rootNode.setAttribute('discogsLinksMagnified', true);
 
     var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
 
-    var elems = document.body.getElementsByTagName('a');
+    var elems = rootNode.getElementsByTagName('a');
     for (var i = 0; i < elems.length; i++) {
         var elem = elems[i];
 
