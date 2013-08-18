@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2013.08.03.1
+// @version        2013.08.18.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -118,7 +118,7 @@ function insertMBLinks($root) {
             var discogs_url = $link.attr('href');
 
             if(CACHE[discogs_url]) {
-                $.each(CACHE[discogs_url], function(mb_url) {
+                $.each(CACHE[discogs_url], function(index, mb_url) {
                     $link.before(createLink(mb_url));
                 });
             } else {
