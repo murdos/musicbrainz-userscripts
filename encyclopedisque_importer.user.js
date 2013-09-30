@@ -1,17 +1,22 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2013.09.30.1
+// @version        2013.09.30.2
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @include        http://www.encyclopedisque.fr/disque/*.html
-// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @include        http://www.encyclopedisque.fr/artiste/*.html
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
 $(document).ready(function() {
 
-    var release = parseEncyclopedisquePage();
-    setupUI(release);
+    if (window.location.href.match( /encyclopedisque\.fr\/disque\/(\d+)/) ) {
+        var release = parseEncyclopedisquePage();
+        setupUI(release);
+    }
+
+    insertMBLinks();
 
 });
 
@@ -34,6 +39,74 @@ function setupUI(release) {
 
     var importLink = $("<li>"+ innerHTML + "</li>");
     importLink.appendTo("#menu ul");
+
+}
+
+function insertMBLinks($root) {
+
+    // Check if we already added links for this content
+    var CACHE_STRING = localStorage.getItem('ENCYCLOPEDISQUE_MB_MAPPING_CACHE');
+    if(!CACHE_STRING) {
+        CACHE_STRING = "{}";
+    }
+    var CACHE = JSON.parse(CACHE_STRING);
+
+    var ajax_requests = [];
+
+    setInterval(function() {
+        if(ajax_requests.length > 0) {
+            var request = ajax_requests.shift();
+            if(typeof request === "function") {
+                request();
+            }
+        }
+    }, 1000);
+
+    function createLink(mb_url) {
+        return '<a href="'+mb_url+'"><img src="http://musicbrainz.org/favicon.ico" /></a> ';
+    }
+
+    function searchAndDisplayMbLink($div) {
+        $div.find('a[href*="/disque/"]').each(function() {
+            var $link = $(this);
+            var external_url = 'http://www.encyclopedisque.fr' + $link.attr('href');
+
+            if(CACHE[external_url]) {
+                $.each(CACHE[external_url], function(index, mb_url) {
+                    $link.after(createLink(mb_url)).after('<br />');
+                });
+            } else {
+                ajax_requests.push($.proxy(function() {
+                    var context = this;
+                    $.getJSON('http://musicbrainz.org/ws/2/url?resource='+context.external_url+'&inc=release-rels', function(data) {
+                        if ('relations' in data) {
+                            CACHE[context.external_url] = [];
+                            $.each(data['relations'], function(idx, relation) {
+                                if ('release'.replace('-', '_') in relation) {
+                                    var mb_url = 'http://musicbrainz.org/release/' + relation['release']['id'];
+                                    CACHE[context.external_url].push(mb_url);
+                                    localStorage.setItem('ENCYCLOPEDISQUE_MB_MAPPING_CACHE', JSON.stringify(CACHE));
+                                    context.$link.after(createLink(mb_url)).after('<br />');
+                                }
+                            });
+                        }
+                    });
+                }, {'external_url': external_url, '$link': $link}));
+            }
+        });
+    }
+
+    if (!$root) {
+        $root = $('body');
+    }
+
+    $root.find('div.v7P').each(function() {
+        searchAndDisplayMbLink($(this));
+    });
+
+    $root.find('div.v12P').each(function() {
+        searchAndDisplayMbLink($(this));
+    });
 
 }
 
