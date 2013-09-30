@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2012.12.13.1
+// @version        2013.09.30.1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @include        http://www.encyclopedisque.fr/disque/*.html
@@ -52,20 +52,20 @@ function parseEncyclopedisquePage() {
     // Release title
     release.title = infoHeader.querySelector("span:nth-of-type(1)").textContent.trim();
 
-    // Release country
-    release.country = 'FR'; // France - correct in most case, but not all
+    // Default status is official, will change if "tirage promo" is found (see below)
+    release.status = 'official';
 
     // Other hard-coded info
-    release.status = 'official';
     release.language = 'fra';
     release.script = 'Latn';
 
     var disc = {'position': 1, 'tracks': [] };
-    disc.format = '7" Vinyl'; // Disque vinyl 7"
     release.discs = [ disc ];
 
     // Parse other infos
-    var releaseInfos = document.body.querySelectorAll("div.pochetteprincipale ~ div tr");
+    var releaseInfos = document.body.querySelectorAll("div.main tr");
+    var lastVinylFace = '';
+    var lastInfoType;
     for (var i = 0; i < releaseInfos.length; i++) {
         var infoType = releaseInfos[i].querySelector("td:nth-of-type(1)").textContent.trim();
 
@@ -73,9 +73,6 @@ function parseEncyclopedisquePage() {
         if (infoType == "Sortie :") {
             var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
             var re = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d\?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^\)]*)?\)?/;
-            console.log(infoValue);
-            console.log(infoValue.match(re));
-            //if (m = infoValue.match(re) != null) {
             m = infoValue.match(re);
             month = m[1];
             if (month != undefined) {
@@ -96,7 +93,7 @@ function parseEncyclopedisquePage() {
                 }
             }
             release.year = m[2];
-            release.labels = [ ];
+            release.labels = [];
             var labels = m[3];
             if (labels != undefined) {
                 $.each(labels.split("/"), function(index, label) {
@@ -105,20 +102,80 @@ function parseEncyclopedisquePage() {
             } else {
                 release.labels.push({ 'catno': m[4] });
             }
-            //}
-        }
-        // Tracks
-        else if (infoType.match(/^Face [AB]/)) {
-            var title = releaseInfos[i].querySelector("td:nth-of-type(2) strong").textContent.trim();
+        } else if (infoType.match(/^Face [A-Z]/) || (infoType == '' && lastInfoType.match(/^Face [A-Z]/))) {
+            // Tracks
             var track = new Object();
-            track.title = title; //.replace("(avec ", "(feat. ");
+
+            // First part of tracknumber (A, B, ...)
+            var tnum_part1 = '';
+            if (m = infoType.match(/^Face ([A-Z])/)) {
+                lastVinylFace = m[1];
+                tnum_part1 = m[1];
+            } else {
+                tnum_part1 = lastVinylFace;
+            }
+
+            // Track title
+            if (releaseInfos[i].querySelector("td:nth-of-type(2) em") == null) {
+                continue;
+            }
+            var title = releaseInfos[i].querySelector("td:nth-of-type(2) em").textContent.trim();
+
+            // 2nd part of tracknumber (1, 2, ...)
+            var tnum_part2 = '';
+            if (m = infoType.match(/^Face [A-Z](\d+)/)) {
+                tnum_part2 = m[1];
+            } else if (m = title.match(/^(\d+)\.\s+(.*)$/)) {
+                tnum_part2 = m[1];
+                title = m[2];
+            }
+
+            // Track length
+            if (m = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim().match(/- (\d+)’(\d+)$/)) {
+                track.duration = m[1] + ':' + m[2];
+            }
+
+            track.number = tnum_part1 + tnum_part2;
+            track.title = title;
             disc.tracks.push(track);
+        } else if (infoType == "Format :") {
+            // Format => medium format, release-group type, release status
+            var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
+            var values = infoValue.split(" / ");
+            values.forEach(function(value) {
+                if (value.contains('45 tours')) { disc.format = '7" Vinyl'; }
+                if (value.contains('33 tours')) { disc.format = '12" Vinyl'; }
+                if (value.contains('LP')) { release.type = 'album'; }
+                if (value.contains('EP')) { release.type = 'ep'; }
+                if (value.contains('SP')) { release.type = 'single'; }
+                if (value.contains('tirage promo')) { release.status = 'promotion'; }
+            });
+        } else if (infoType == "Pays :") {
+            // Country
+            var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
+            if (infoValue == 'France') {
+                release.country = 'FR';
+            } else if (infoValue == 'Royaume-uni') {
+                release.country = 'UK';
+            } else if (infoValue == 'Allemagne') {
+                release.country = 'DE';
+            } else if (infoValue == 'Belgique') {
+                release.country = 'BE';
+            }
         }
 
+        if (infoType != '') {
+            lastInfoType = infoType;
+        }
     }
 
-    // Guessing release type (EP, single) from number of tracks
-    release.type = (disc.tracks.length > 3) ? 'ep' : 'single';
+    // Barcode ?
+    if (parseInt(release.year) <= 1982) {
+        // FIXME: not working
+        release.no_barcode = '1';
+    }
+
+    console.log(release);
 
     return release;
 }
