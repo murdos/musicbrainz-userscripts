@@ -1,14 +1,11 @@
 // ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2013.12.03.1
+// @version        2013.12.31.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @include        http://*musicbrainz.org/release/add
-// @include        http://*musicbrainz.org/release/*/add
-// @include        http://*musicbrainz.org/release/*/edit
 // @include        http://www.discogs.com/*
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
@@ -23,78 +20,64 @@ if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
 
-    // On Musicbrainz website
-    if (window.location.href.match(/(musicbrainz\.org)/)) {
+    initCache();
 
-        $add_disc_dialog = $('div.add-disc-dialog');
-        //$add_disc_dialog.find('div.tabs ul.tabs').append('<li><a class="discogs" href="#discogs">Discogs import</a></li>');
+    // Feature #1: Normalize Discogs links on current page by removing title from URL
+    magnifyLinks();
 
-        var innerHTML = '<div class="add-disc-tab discogs" style="display: none">';
-        innerHTML += '<p>Use the following fields to search for a Discogs release.</p>';
-        innerHTML += '<div class="pager" style="width: 100%; text-align: right; display: none;"><a href="#prev">&lt;&lt;</a><span class="pager"></span><a href="#next">&gt;&gt;</a></div>';
-        innerHTML += '<div style="display: none;" class="tracklist-searching import-message"><p><img src="/static/images/icons/loading.gif" />&nbsp;Searching...</p></div>';
-        innerHTML += '<div style="display: none;" class="tracklist-no-results import-message"><p>No results</p></div>';
-        innerHTML += '<div style="display: none;" class="tracklist-error import-message"><p>An error occured: <span class="message"> </span></p></div></div>';
-        //$add_disc_dialog.find('div.add-disc-tab:last').after(innerHTML);
+    // Feature #2: Display links of equivalent MusicBrainz entities for masters and releases
+    initAjaxEngine();
+    insertMBLinks();
 
-    // On Discogs website
-    } else {
+    // Handle page navigation on artist page for the first two features
+    $("#releases").bind("DOMNodeInserted",function(event) {
+        // Only child of $("#releases") are of interest
+        if (event.target.parentNode.id == 'releases') {
+            magnifyLinks(event.target);
+            insertMBLinks($(event.target));
+        }
+    });
 
-        initAjaxEngine();
-        magnifyLinks();
-        insertMBLinks();
+    // Feature #3: Add an import button in a new section in sidebar, if we're on a release page?
+    if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
 
-        // Handle page navigation on artist page
-        $("#releases").bind("DOMNodeInserted",function(event) {
-            // Only child of $("#releases") are of interest
-            if (event.target.parentNode.id == 'releases') {
-                magnifyLinks(event.target);
-                insertMBLinks($(event.target));
-            }
+        // Discogs Webservice URL
+        var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
+        var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
+
+        // Swith JQuery to MB's one, and save GreaseMonkey one
+        var GM_JQuery = $;
+        $ = unsafeWindow.$;
+
+        $.ajax({
+          url: discogsWsUrl,
+          dataType: 'jsonp',
+          headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
+          crossDomain: true,
+          success: function (data, textStatus, jqXHR) {
+            //mylog(data);
+            var release = parseDiscogsRelease(data);
+            insertLink(release);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            mylog("AJAX Status:" + textStatus);
+            mylog("AJAX error thrown:" + errorThrown);
+          }
         });
 
-        // Release page?
-        if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
-
-            // Discogs Webservice URL
-            var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
-            var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
-
-            // Swith JQuery to MB's one, and save GreaseMonkey one
-            var GM_JQuery = $;
-            $ = unsafeWindow.$;
-
-            $.ajax({
-              url: discogsWsUrl,
-              dataType: 'jsonp',
-              headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
-              crossDomain: true,
-              success: function (data, textStatus, jqXHR) {
-                //mylog(data);
-                var release = parseDiscogsRelease(data);
-                insertLink(release);
-              },
-              error: function(jqXHR, textStatus, errorThrown) {
-                mylog("AJAX Status:" + textStatus);
-                mylog("AJAX error thrown:" + errorThrown);
-              }
-            });
-
-            // Back to GreaseMonkey's JQuery
-            $ = GM_JQuery;
-
-        }
+        // Back to GreaseMonkey's JQuery
+        $ = GM_JQuery;
 
     }
 });
 
-var CACHE = {};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                 Display links of equivalent MusicBrainz entities for masters and releases                          //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Ajax engine to throttle requests to MusicBrainz
 var ajax_requests = [];
-
 function initAjaxEngine() {
-
-    initCache();
-
     setInterval(function() {
         if(ajax_requests.length > 0) {
             var request = ajax_requests.shift();
@@ -103,8 +86,10 @@ function initAjaxEngine() {
             }
         }
     }, 1000);
-
 }
+
+// Cache for Discogs to MB mapping
+var DISCOGS_MB_MAPPING_CACHE = {};
 
 function initCache() {
     // Check if we already added links for this content
@@ -112,26 +97,25 @@ function initCache() {
     if(!CACHE_STRING) {
         CACHE_STRING = "{}";
     }
-    CACHE = JSON.parse(CACHE_STRING);
+    DISCOGS_MB_MAPPING_CACHE = JSON.parse(CACHE_STRING);
 }
 
 function saveCACHE() {
-    localStorage.setItem('DISCOGS_MB_MAPPING_CACHE', JSON.stringify(CACHE));
+    localStorage.setItem('DISCOGS_MB_MAPPING_CACHE', JSON.stringify(DISCOGS_MB_MAPPING_CACHE));
 }
 
 function createMusicBrainzLink(mb_url) {
     return '<a href="'+mb_url+'"><img src="http://musicbrainz.org/favicon.ico" /></a> ';
 }
 
+// Insert MusicBrainz links in a section of the page
 function insertMBLinks($root) {
 
-    function searcAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
+    function searchAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
         $tr.find('a[href*="http://www.discogs.com/'+discogs_type+'/"]').each(function() {
             var $link = $(this);
             var discogs_url = $link.attr('href');
-
-            searcAndDisplayMbLink(discogs_url, mb_type, $link)
-
+            searchAndDisplayMbLink(discogs_url, mb_type, $link);
         });
     }
 
@@ -140,23 +124,25 @@ function insertMBLinks($root) {
     }
 
     $root.find('tr.master').each(function() {
-        searcAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+        searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
     });
 
     $root.find('tr.release').each(function() {
-        searcAndDisplayMbLinkInSection($(this), 'release', 'release');
+        searchAndDisplayMbLinkInSection($(this), 'release', 'release');
     });
 
     $root.find('tr.hidden.r_tr').each(function() {
-        searcAndDisplayMbLinkInSection($(this), 'release', 'release');
+        searchAndDisplayMbLinkInSection($(this), 'release', 'release');
     });
 
 }
 
-function searcAndDisplayMbLink(discogs_url, mb_type, link_container) {
+// Ask MusicBrainz if the provided Discogs URL is linked to MusicBrainz entities (release-group or release)
+// and then create links to these MB entities inside the provided DOM container
+function searchAndDisplayMbLink(discogs_url, mb_type, link_container) {
 
-    if(CACHE[discogs_url]) {
-        $.each(CACHE[discogs_url], function(idx, mb_url) {
+    if(DISCOGS_MB_MAPPING_CACHE[discogs_url]) {
+        $.each(DISCOGS_MB_MAPPING_CACHE[discogs_url], function(idx, mb_url) {
             link_container.before(createMusicBrainzLink(mb_url));
         });
     } else {
@@ -164,11 +150,11 @@ function searcAndDisplayMbLink(discogs_url, mb_type, link_container) {
             var context = this;
             $.getJSON('http://musicbrainz.org/ws/2/url?resource='+context.discogs_url+'&inc='+context.mb_type+'-rels', function(data) {
                 if ('relations' in data) {
-                    CACHE[context.discogs_url] = [];
+                    DISCOGS_MB_MAPPING_CACHE[context.discogs_url] = [];
                     $.each(data['relations'], function(idx, relation) {
                         if (context.mb_type.replace('-', '_') in relation) {
                             var mb_url = 'http://musicbrainz.org/'+context.mb_type+'/' + relation[context.mb_type.replace('-', '_')]['id'];
-                            CACHE[context.discogs_url].push(mb_url);
+                            DISCOGS_MB_MAPPING_CACHE[context.discogs_url].push(mb_url);
                             saveCACHE();
                             context.$link.before(createMusicBrainzLink(mb_url));
                         }
@@ -179,6 +165,11 @@ function searcAndDisplayMbLink(discogs_url, mb_type, link_container) {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                 Normalize Discogs URLs in a DOM tree                                               //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Normalize Discogs URLs in a DOM tree
 function magnifyLinks(rootNode) {
 
     if (!rootNode) {
@@ -197,22 +188,59 @@ function magnifyLinks(rootNode) {
         var elem = elems[i];
 
         // Ignore empty links
-        if (!elem.href || trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
+        if (!elem.href || $.trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
             continue;
 
-        //~ // Check if the link matches
-        if (m = re.exec(elem.href)) {
-            var type = m[2];
-            var id = m[3];
-            elem.href = "http://www.discogs.com/" + type + "/" + id;
-        }
+        elem.href = magnifyLink(elem.href);
     }
 }
 
-// Remove whitespace in the beginning and end
-function trim(str) {
-    return str.replace(/^\s+/, '').replace(/\s+$/, '');
+// Normalize Discogs URL by removing title from URL
+function magnifyLink(url) {
+    var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
+    if (m = re.exec(url)) {
+        var type = m[2];
+        var id = m[3];
+        return "http://www.discogs.com/" + type + "/" + id;
+    }
+    return url;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                             Insert MusicBrainz section into Discogs page                                           //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Insert links in Discogs page
+function insertLink(release) {
+
+    var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>');
+
+    var mbContentBlock = $('<div class="section_content"></div>');
+    mbUI.append(mbContentBlock);
+
+    // Form parameters
+    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
+    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+
+    // Build form
+    var innerHTML = "MusicBrainz release(s) linked to this release: <span></span><br /><br />";
+    innerHTML += MBReleaseImportHelper.buildFormHTML(parameters);
+    // Append search link
+    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
+
+    mbContentBlock.html(innerHTML);
+    var prevNode = $("div.section.social");
+    prevNode.before(mbUI);
+
+    // Find MB release(s) linked to this Discogs release
+    var mbLinkContainer = $("div.section.musicbrainz div.section_content span");
+    searchAndDisplayMbLink(magnifyLink(window.location.href), 'release', mbLinkContainer);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               Parsing of Discogs data                                              //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
@@ -404,33 +432,6 @@ function parseDiscogsRelease(data) {
     return release;
 }
 
-// Insert links in Discogs page
-function insertLink(release) {
-
-    var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>');
-
-    var mbContentBlock = $('<div class="section_content"></div>');
-    mbUI.append(mbContentBlock);
-
-    // Form parameters
-    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
-
-    // Build form
-    var innerHTML = "MusicBrainz release(s) linked to this release: <span></span><br /><br />";
-    innerHTML += MBReleaseImportHelper.buildFormHTML(parameters);
-    // Append search link
-    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
-
-    mbContentBlock.html(innerHTML);
-    var prevNode = $("div.section.social");
-    prevNode.before(mbUI);
-
-    // Find MB release(s) linked to this Discogs release
-    var mbLinkContainer = $("div.section.musicbrainz div.section_content span");
-    searcAndDisplayMbLink(window.location.href, 'release', mbLinkContainer);
-}
-
 function decodeDiscogsJoinphrase(join) {
     var joinphrase = "";
     var trimedjoin = join.replace(/^\s*/, "").replace(/\s*$/, "");
@@ -448,7 +449,9 @@ function mylog(obj) {
     }
 }
 
-// Reference Discogs <-> MusicBrainz map
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                   Discogs -> MusicBrainz mapping                                                   //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var MediaTypes = new Array();
 MediaTypes["8-Track Cartridge"] = "Cartridge";
