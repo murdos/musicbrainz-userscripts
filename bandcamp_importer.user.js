@@ -2,8 +2,8 @@
 // @name           Import Bandcamp releases into MB
 // @version        2013.03.04.1
 // @namespace      http://userscripts.org/users/22504
-// @include        http://*.bandcamp.com/album/*
-// @include        http://*.bandcamp.com/track/*
+// @include        http*://*.bandcamp.com/album/*
+// @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
