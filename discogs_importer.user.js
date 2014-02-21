@@ -293,6 +293,10 @@ function parseDiscogsRelease(data) {
         });
     }
 
+    // Release URL
+    release.urls = new Array();
+    release.urls.push( { url: window.location.href, link_type: 76 } );
+
     // Release format
     var release_formats = new Array();
 
