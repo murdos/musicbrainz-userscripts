@@ -5,6 +5,7 @@
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/dateFormat.js
 // @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
@@ -69,6 +70,35 @@ function retrieveReleaseInfo() {
         }
         disc.tracks.push(track);
     });
+
+    // URLs
+    // link_type mapping:
+    // - 74: purchase for download
+    // - 75: download for free
+    // - 85: stream {video} for free
+    // - 301: license
+    release.urls = new Array();
+    // Download for free vs. for purchase
+    if (bandcampAlbumData.current.download_pref !== null) {
+        if (bandcampAlbumData.current.minimum_price_nonzero === null ||
+            bandcampAlbumData.current.minimum_price == 0.0) {
+                release.urls.push( { 'url': window.location.href, 'link_type': 75 } );
+        }
+        if (bandcampAlbumData.current.minimum_price_nonzero !== null &&
+            bandcampAlbumData.current.minimum_price > 0.0) {
+            release.urls.push( { 'url': window.location.href, 'link_type': 74 } );
+        }
+    }
+    // Check if the release is streamable
+    if (bandcampAlbumData.hasAudio) {
+        release.urls.push( { 'url': window.location.href, 'link_type': 85 } );
+    }
+    // Check if release is Creative Commons licensed
+    if ($("div#license a.cc-icons").length > 0) {
+        release.urls.push( {
+            'url': $("div#license a.cc-icons").attr("href"), 'link_type': 301
+        } );
+    }
 
     mylog(release);
     return release;

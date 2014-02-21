@@ -135,6 +135,10 @@ function parseEncyclopedisquePage() {
     var disc = {'position': 1, 'tracks': [] };
     release.discs = [ disc ];
 
+    // Release URL
+    release.urls = new Array();
+    release.urls.push( { 'url': window.location.href, 'link_type': 82 } );
+
     // Parse other infos
     var releaseInfos = document.body.querySelectorAll("div.main tr");
     var lastVinylFace = '';
