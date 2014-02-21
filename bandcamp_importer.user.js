@@ -43,8 +43,8 @@ function retrieveReleaseInfo() {
         release.year = $.format.date(releasedate, "yyyy");
         release.month = $.format.date(releasedate, "MM");
         release.day = $.format.date(releasedate, "dd");
-    }  
-   
+    }
+
     release.labels = new Array();
     release.format = "Digital Media";
     release.country = "XW"; // Worldwide
@@ -85,7 +85,7 @@ function insertLink(release) {
 
     /*
 	var mbUI = document.createElement('div');
-    mbUI.innerHTML = "<h3>MusicBrainz</h3>";    
+    mbUI.innerHTML = "<h3>MusicBrainz</h3>";
 	mbUI.className = "section";
 
 
