@@ -50,19 +50,19 @@ $(document).ready(function(){
         $ = unsafeWindow.$;
 
         $.ajax({
-          url: discogsWsUrl,
-          dataType: 'jsonp',
-          headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
-          crossDomain: true,
-          success: function (data, textStatus, jqXHR) {
+        url: discogsWsUrl,
+        dataType: 'jsonp',
+        headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
+        crossDomain: true,
+        success: function (data, textStatus, jqXHR) {
             //mylog(data);
             var release = parseDiscogsRelease(data);
             insertLink(release);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
             mylog("AJAX Status:" + textStatus);
             mylog("AJAX error thrown:" + errorThrown);
-          }
+        }
         });
 
         // Back to GreaseMonkey's JQuery

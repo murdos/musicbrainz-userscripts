@@ -24,7 +24,7 @@ function retrieveReleaseInfo() {
     release.discs = [];
 
     var bandcampAlbumData = unsafeWindow.TralbumData;
-     var bandcampEmbedData = unsafeWindow.EmbedData;
+    var bandcampEmbedData = unsafeWindow.EmbedData;
 
     // Release artist credit
     release.artist_credit = [ { artist_name: bandcampAlbumData.artist } ];
@@ -35,8 +35,8 @@ function retrieveReleaseInfo() {
     // Grab release event information
     var releasedate = bandcampAlbumData.current.release_date;
 
-     if(bandcampEmbedData.album_title) {
-         release.parent_album = bandcampEmbedData.album_title;
+    if(bandcampEmbedData.album_title) {
+        release.parent_album = bandcampEmbedData.album_title;
     }
 
     if (typeof releasedate != "undefined" && releasedate != "") {
@@ -52,9 +52,9 @@ function retrieveReleaseInfo() {
     release.type = bandcampAlbumData.current.type;
     release.status = 'official';
 
-     // map Bandcamp single tracks to singles
-     if(release.type == "track")
-     { release.type = "single"; }
+    // map Bandcamp single tracks to singles
+    if(release.type == "track")
+    { release.type = "single"; }
 
     // Tracks
     var disc = new Object();
