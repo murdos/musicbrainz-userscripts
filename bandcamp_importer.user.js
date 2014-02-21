@@ -75,6 +75,7 @@ function retrieveReleaseInfo() {
     // - 74: purchase for download
     // - 75: download for free
     // - 85: stream {video} for free
+    // - 301: license
     release.urls = new Array();
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
@@ -90,6 +91,12 @@ function retrieveReleaseInfo() {
     // Check if the release is streamable
     if (bandcampAlbumData.hasAudio) {
         release.urls.push( { 'url': window.location.href, 'link_type': 85 } );
+    }
+    // Check if release is Creative Commons licensed
+    if ($("div#license a.cc-icons").length > 0) {
+        release.urls.push( {
+            'url': $("div#license a.cc-icons").attr("href"), 'link_type': 301
+        } );
     }
 
     mylog(release);
