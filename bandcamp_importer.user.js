@@ -70,6 +70,28 @@ function retrieveReleaseInfo() {
         disc.tracks.push(track);
     });
 
+    // URLs
+    // link_type mapping:
+    // - 74: purchase for download
+    // - 75: download for free
+    // - 85: stream {video} for free
+    release.urls = new Array();
+    // Download for free vs. for purchase
+    if (bandcampAlbumData.current.download_pref !== null) {
+        if (bandcampAlbumData.current.minimum_price_nonzero === null ||
+            bandcampAlbumData.current.minimum_price == 0.0) {
+                release.urls.push( { 'url': window.location.href, 'link_type': 75 } );
+        }
+        if (bandcampAlbumData.current.minimum_price_nonzero !== null &&
+            bandcampAlbumData.current.minimum_price > 0.0) {
+            release.urls.push( { 'url': window.location.href, 'link_type': 74 } );
+        }
+    }
+    // Check if the release is streamable
+    if (bandcampAlbumData.hasAudio) {
+        release.urls.push( { 'url': window.location.href, 'link_type': 85 } );
+    }
+
     mylog(release);
     return release;
 
