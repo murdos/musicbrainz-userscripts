@@ -21,22 +21,22 @@ $(document).ready(function(){
 // Analyze Bandcamp data and return a release object
 function retrieveReleaseInfo() {
     var release = new Object();
-	release.discs = [];
+    release.discs = [];
 
     var bandcampAlbumData = unsafeWindow.TralbumData;
-	 var bandcampEmbedData = unsafeWindow.EmbedData;
+     var bandcampEmbedData = unsafeWindow.EmbedData;
 
     // Release artist credit
     release.artist_credit = [ { artist_name: bandcampAlbumData.artist } ];
 
-	// Grab release title
-	release.title = bandcampAlbumData.current.title;
+    // Grab release title
+    release.title = bandcampAlbumData.current.title;
 
     // Grab release event information
     var releasedate = bandcampAlbumData.current.release_date;
 
-	 if(bandcampEmbedData.album_title) {
-		 release.parent_album = bandcampEmbedData.album_title;
+     if(bandcampEmbedData.album_title) {
+         release.parent_album = bandcampEmbedData.album_title;
     }
 
     if (typeof releasedate != "undefined" && releasedate != "") {
@@ -52,11 +52,11 @@ function retrieveReleaseInfo() {
     release.type = bandcampAlbumData.current.type;
     release.status = 'official';
 
-	 // map Bandcamp single tracks to singles
-	 if(release.type == "track")
-	 { release.type = "single"; }
+     // map Bandcamp single tracks to singles
+     if(release.type == "track")
+     { release.type = "single"; }
 
-	// Tracks
+    // Tracks
     var disc = new Object();
     disc.tracks = new Array();
     disc.format = release.format;
@@ -71,37 +71,37 @@ function retrieveReleaseInfo() {
     });
 
     mylog(release);
-	return release;
+    return release;
 
 }
 
 // Insert links in page
 function insertLink(release) {
 
-	if(release.type == "single" && typeof release.parent_album != "undefined") {
-		mylog("This is part of an album, not continuing.");
-		return false;
-	}
+    if(release.type == "single" && typeof release.parent_album != "undefined") {
+        mylog("This is part of an album, not continuing.");
+        return false;
+    }
 
     /*
-	var mbUI = document.createElement('div');
+    var mbUI = document.createElement('div');
     mbUI.innerHTML = "<h3>MusicBrainz</h3>";
-	mbUI.className = "section";
+    mbUI.className = "section";
 
 
-	var mbContentBlock = document.createElement('div');
+    var mbContentBlock = document.createElement('div');
     mbContentBlock.className = "section_content";
     mbUI.appendChild(mbContentBlock);
     */
 
     // Form parameters
     var edit_note = 'Imported from ' + window.location.href;
-	var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
-	// Build form
-	var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    // Build form
+    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
     // Append search link
-	//innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
+    //innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
 
     $('h2.trackTitle').append(innerHTML);
 
