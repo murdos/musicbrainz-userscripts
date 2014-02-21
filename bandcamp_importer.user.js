@@ -5,6 +5,7 @@
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/dateFormat.js
 // @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
