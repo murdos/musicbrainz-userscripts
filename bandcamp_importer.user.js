@@ -84,8 +84,7 @@ function retrieveReleaseInfo() {
             bandcampAlbumData.current.minimum_price == 0.0) {
                 release.urls.push( { 'url': window.location.href, 'link_type': 75 } );
         }
-        if (bandcampAlbumData.current.minimum_price_nonzero !== null &&
-            bandcampAlbumData.current.minimum_price > 0.0) {
+        if (bandcampAlbumData.current.minimum_price_nonzero !== null) {
             release.urls.push( { 'url': window.location.href, 'link_type': 74 } );
         }
     }
