@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2013.03.04.1
+// @version        2014.02.22.1
 // @namespace      http://userscripts.org/users/22504
+// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
+// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
