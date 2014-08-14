@@ -299,6 +299,7 @@ function parseDiscogsRelease(data) {
 
     // Release format
     var release_formats = new Array();
+    release.secondary_types = new Array();
 
     if (discogsRelease.formats.length > 0) {
         for(var i = 0; i < discogsRelease.formats.length; i++)
@@ -316,8 +317,10 @@ function parseDiscogsRelease(data) {
                     if (desc.match(/Promo|Smplr/)) release.status = "promotion";
                     if (desc.match(/Unofficial Release/)) release.status = "bootleg";
                     // Release type
-                    if (desc.match(/Compilation/)) release.type = "compilation";
+                    if (desc.match(/Compilation/)) release.secondary_types.push("compilation");
+                    if (desc.match(/^Album/)) release.type = "album";
                     if (desc.match(/Single/)) release.type = "single";
+                    if (desc.match(/EP|Mini-Album/)) release.type = "ep";
 
                 });
             }
