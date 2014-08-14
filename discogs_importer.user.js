@@ -314,6 +314,7 @@ function parseDiscogsRelease(data) {
                     if (discogsRelease.formats[i].name == "Vinyl" && desc == "LP") release_formats[release_formats.length-1] = '12" Vinyl';
                     // Release status
                     if (desc.match(/Promo|Smplr/)) release.status = "promotion";
+                    if (desc.match(/Unofficial Release/)) release.status = "bootleg";
                     // Release type
                     if (desc.match(/Compilation/)) release.type = "compilation";
                     if (desc.match(/Single/)) release.type = "single";
