@@ -52,6 +52,9 @@ function retrieveReleaseInfo() {
     // FIXME: implement a mapping between bandcamp release types and MB ones
     release.type = bandcampAlbumData.current.type;
     release.status = 'official';
+    release.packaging = 'none';
+    release.language = 'eng';
+    release.script = 'Latn';
 
     // map Bandcamp single tracks to singles
     if(release.type == "track")
