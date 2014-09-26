@@ -80,26 +80,41 @@ function retrieveReleaseInfo() {
     // - 75: download for free
     // - 85: stream {video} for free
     // - 301: license
+    LINK_PURCHASE_FOR_DOWNLOAD = 74
+    LINK_DOWNLOAD_FOR_FREE = 75
+    LINK_STREAM_FOR_FREE = 85
+    LINK_LICENSE = 301
     release.urls = new Array();
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
-        if (bandcampAlbumData.current.minimum_price_nonzero === null ||
-            bandcampAlbumData.current.minimum_price == 0.0) {
-                release.urls.push( { 'url': window.location.href, 'link_type': 75 } );
+        if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
+            bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)) {
+            release.urls.push({
+                'url': window.location.href,
+                'link_type': LINK_DOWNLOAD_FOR_FREE
+            });
         }
-        if (bandcampAlbumData.current.minimum_price_nonzero !== null) {
-            release.urls.push( { 'url': window.location.href, 'link_type': 74 } );
+        if (bandcampAlbumData.current.download_pref === 2) {
+            // - 74: purchase for download
+            release.urls.push({
+                'url': window.location.href,
+                'link_type': LINK_PURCHASE_FOR_DOWNLOAD
+            });
         }
     }
     // Check if the release is streamable
     if (bandcampAlbumData.hasAudio) {
-        release.urls.push( { 'url': window.location.href, 'link_type': 85 } );
+        release.urls.push({
+            'url': window.location.href,
+            'link_type': LINK_STREAM_FOR_FREE
+        });
     }
     // Check if release is Creative Commons licensed
     if ($("div#license a.cc-icons").length > 0) {
-        release.urls.push( {
-            'url': $("div#license a.cc-icons").attr("href"), 'link_type': 301
-        } );
+        release.urls.push({
+            'url': $("div#license a.cc-icons").attr("href"),
+            'link_type': LINK_LICENSE
+        });
     }
 
     mylog(release);
