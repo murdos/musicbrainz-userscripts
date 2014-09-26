@@ -16,7 +16,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-if (!unsafeWindow) unsafeWindow = window;
+var unsafeWindow = unsafeWindow || window;
 
 $(document).ready(function(){
 
@@ -299,6 +299,7 @@ function parseDiscogsRelease(data) {
 
     // Release format
     var release_formats = new Array();
+    release.secondary_types = new Array();
 
     if (discogsRelease.formats.length > 0) {
         for(var i = 0; i < discogsRelease.formats.length; i++)
@@ -308,15 +309,20 @@ function parseDiscogsRelease(data) {
 
             if (discogsRelease.formats[i].descriptions) {
                 $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
-                    // Release format: special handling of vinyl 7", 10" and 12"
-                    if (desc.match(/7"|10"|12"/)) release_formats[release_formats.length-1] = MediaTypes[desc];
+                    // Release format: special handling of vinyl 7", 10" and 12" and other more specific CD/DVD formats
+                    if (desc.match(/7"|10"|12"|^VCD|SVCD|CD\+G|HDCD|DVD-Audio|DVD-Video/)) release_formats[release_formats.length-1] = MediaTypes[desc];
                     // Release format: special handling of Vinyl, LP == 12" (http://www.discogs.com/help/submission-guidelines-release-format.html#LP)
                     if (discogsRelease.formats[i].name == "Vinyl" && desc == "LP") release_formats[release_formats.length-1] = '12" Vinyl';
+                    // Release format: special handling of CD, Mini == 8cm CD
+                    if (discogsRelease.formats[i].name == "CD" && desc == "Mini") release_formats[release_formats.length-1] = '8cm CD';
                     // Release status
                     if (desc.match(/Promo|Smplr/)) release.status = "promotion";
+                    if (desc.match(/Unofficial Release/)) release.status = "bootleg";
                     // Release type
-                    if (desc.match(/Compilation/)) release.type = "compilation";
+                    if (desc.match(/Compilation/)) release.secondary_types.push("compilation");
+                    if (desc.match(/^Album/)) release.type = "album";
                     if (desc.match(/Single/)) release.type = "single";
+                    if (desc.match(/EP|Mini-Album/)) release.type = "ep";
 
                 });
             }
@@ -466,29 +472,35 @@ MediaTypes["Blu-ray-R"] = "Blu-ray";
 MediaTypes["Cassette"] = "Cassette";
 MediaTypes["CD"] = "CD";
 MediaTypes["CDr"] = "CD-R";
-MediaTypes["CDV"] = "CD";
+MediaTypes["CDV"] = "CDV";
+MediaTypes["CD+G"] = "CD+G";
 MediaTypes["Cylinder"] = "Wax Cylinder";
 MediaTypes["DAT"] = "DAT";
 MediaTypes["Datassette"] = "Other";
 MediaTypes["DCC"] = "DCC";
 MediaTypes["DVD"] = "DVD";
 MediaTypes["DVDr"] = "DVD";
+MediaTypes["DVD-Audio"] = "DVD-Audio";
+MediaTypes["DVD-Video"] = "DVD-Video";
 MediaTypes["Edison Disc"] = "Vinyl";
 MediaTypes["File"] = "Digital Media";
 MediaTypes["Flexi-disc"] = "Vinyl";
-MediaTypes["Floppy Disk"] = 12;
+MediaTypes["Floppy Disk"] = "Other";
+MediaTypes["HDCD"] = "HDCD";
 MediaTypes["HD DVD"] = "HD-DVD";
 MediaTypes["HD DVD-R"] = "HD-DVD";
 MediaTypes["Hybrid"] = "Other";
 MediaTypes["Laserdisc"] = "LaserDisc";
-MediaTypes["Memory Stick"] = "Digital Media";
+MediaTypes["Memory Stick"] = "Other";
 MediaTypes["Microcassette"] = "Other";
 MediaTypes["Minidisc"] = "MiniDisc";
 MediaTypes["MVD"] = "Other";
 MediaTypes["Reel-To-Reel"] = "Reel-to-reel";
 MediaTypes["SelectaVision"] = "Other";
 MediaTypes["Shellac"] = "Vinyl";
+MediaTypes["SVCD"] = "SVCD";
 MediaTypes["UMD"] = "UMD";
+MediaTypes["VCD"] = "VCD";
 MediaTypes["VHS"] = "VHS";
 MediaTypes["Video 2000"] = "Other";
 MediaTypes["Vinyl"] = "Vinyl";
