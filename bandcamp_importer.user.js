@@ -7,8 +7,6 @@
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/dateFormat.js
-// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
@@ -36,16 +34,16 @@ function retrieveReleaseInfo() {
     release.title = bandcampAlbumData.current.title;
 
     // Grab release event information
-    var releasedate = bandcampAlbumData.current.release_date;
+    var releasedate = $('.tralbumData meta[itemprop="datePublished"]').attr("content");
 
     if(bandcampEmbedData.album_title) {
         release.parent_album = bandcampEmbedData.album_title;
     }
 
     if (typeof releasedate != "undefined" && releasedate != "") {
-        release.year = $.format.date(releasedate, "yyyy");
-        release.month = $.format.date(releasedate, "MM");
-        release.day = $.format.date(releasedate, "dd");
+        release.year = releasedate.substring(0, 4);
+        release.month = releasedate.substring(4, 6);
+        release.day = releasedate.substring(6, 8);
     }
 
     release.labels = new Array();
@@ -54,6 +52,9 @@ function retrieveReleaseInfo() {
     // FIXME: implement a mapping between bandcamp release types and MB ones
     release.type = bandcampAlbumData.current.type;
     release.status = 'official';
+    release.packaging = 'none';
+    release.language = 'eng';
+    release.script = 'Latn';
 
     // map Bandcamp single tracks to singles
     if(release.type == "track")
@@ -79,26 +80,41 @@ function retrieveReleaseInfo() {
     // - 75: download for free
     // - 85: stream {video} for free
     // - 301: license
+    LINK_PURCHASE_FOR_DOWNLOAD = 74
+    LINK_DOWNLOAD_FOR_FREE = 75
+    LINK_STREAM_FOR_FREE = 85
+    LINK_LICENSE = 301
     release.urls = new Array();
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
-        if (bandcampAlbumData.current.minimum_price_nonzero === null ||
-            bandcampAlbumData.current.minimum_price == 0.0) {
-                release.urls.push( { 'url': window.location.href, 'link_type': 75 } );
+        if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
+            bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)) {
+            release.urls.push({
+                'url': window.location.href,
+                'link_type': LINK_DOWNLOAD_FOR_FREE
+            });
         }
-        if (bandcampAlbumData.current.minimum_price_nonzero !== null) {
-            release.urls.push( { 'url': window.location.href, 'link_type': 74 } );
+        if (bandcampAlbumData.current.download_pref === 2) {
+            // - 74: purchase for download
+            release.urls.push({
+                'url': window.location.href,
+                'link_type': LINK_PURCHASE_FOR_DOWNLOAD
+            });
         }
     }
     // Check if the release is streamable
     if (bandcampAlbumData.hasAudio) {
-        release.urls.push( { 'url': window.location.href, 'link_type': 85 } );
+        release.urls.push({
+            'url': window.location.href,
+            'link_type': LINK_STREAM_FOR_FREE
+        });
     }
     // Check if release is Creative Commons licensed
     if ($("div#license a.cc-icons").length > 0) {
-        release.urls.push( {
-            'url': $("div#license a.cc-icons").attr("href"), 'link_type': 301
-        } );
+        release.urls.push({
+            'url': $("div#license a.cc-icons").attr("href"),
+            'link_type': LINK_LICENSE
+        });
     }
 
     mylog(release);
