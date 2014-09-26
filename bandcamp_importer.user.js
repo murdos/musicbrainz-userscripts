@@ -7,8 +7,6 @@
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/dateFormat.js
-// @require        https://raw.github.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // ==/UserScript==
 
@@ -36,16 +34,16 @@ function retrieveReleaseInfo() {
     release.title = bandcampAlbumData.current.title;
 
     // Grab release event information
-    var releasedate = bandcampAlbumData.current.release_date;
+    var releasedate = $('.tralbumData meta[itemprop="datePublished"]').attr("content");
 
     if(bandcampEmbedData.album_title) {
         release.parent_album = bandcampEmbedData.album_title;
     }
 
     if (typeof releasedate != "undefined" && releasedate != "") {
-        release.year = $.format.date(releasedate, "yyyy");
-        release.month = $.format.date(releasedate, "MM");
-        release.day = $.format.date(releasedate, "dd");
+        release.year = releasedate.substring(0, 4);
+        release.month = releasedate.substring(4, 6);
+        release.day = releasedate.substring(6, 8);
     }
 
     release.labels = new Array();
