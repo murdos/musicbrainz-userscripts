@@ -427,7 +427,7 @@ function parseDiscogsRelease(data) {
         }
 
         // Track number (only for Vinyl and Cassette)
-        if (release.discs[releaseNumber-1].format && release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
+        if ( release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
             && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/) ){
             track.number = discogsTrack.position;
         }
