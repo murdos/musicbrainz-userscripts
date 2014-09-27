@@ -222,12 +222,12 @@ function parseEncyclopedisquePage() {
             var infoValue = releaseInfos[i].querySelector("td:nth-of-type(2)").textContent.trim();
             var values = infoValue.split(" / ");
             values.forEach(function(value) {
-                if (value.contains('45 tours')) { disc.format = '7" Vinyl'; }
-                if (value.contains('33 tours')) { disc.format = '12" Vinyl'; }
-                if (value.contains('LP')) { release.type = 'album'; }
-                if (value.contains('EP')) { release.type = 'ep'; }
-                if (value.contains('SP')) { release.type = 'single'; }
-                if (value.contains('tirage promo')) { release.status = 'promotion'; }
+                if (value.indexOf('45 tours') > -1) { disc.format = '7" Vinyl'; }
+                if (value.indexOf('33 tours') > -1) { disc.format = '12" Vinyl'; }
+                if (value.indexOf('LP') > -1) { release.type = 'album'; }
+                if (value.indexOf('EP') > -1) { release.type = 'ep'; }
+                if (value.indexOf('SP') > -1) { release.type = 'single'; }
+                if (value.indexOf('tirage promo') > -1) { release.status = 'promotion'; }
             });
         } else if (infoType == "Pays :") {
             // Country
