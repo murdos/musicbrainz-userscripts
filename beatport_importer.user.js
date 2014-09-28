@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Import from Beatport
-// @version        2014.09.26.0
+// @version        2014.09.29.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http*://www.beatport.com/release/*
@@ -82,8 +82,9 @@ function insertLink(release) {
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-
-    $("table.meta-data tbody").append(innerHTML);
+    var tr = $("<tr><td span='2' /></tr>");
+    tr.find('td').append(innerHTML);
+    $("table.meta-data tbody").append(tr);
 }
 
 function mylog(obj) {
