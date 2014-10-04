@@ -33,6 +33,8 @@ function retrieveReleaseInfo() {
   release.urls.push( { 'url': window.location.href } );
   release.id = $( "a[data-release]" ).attr('data-release');
 
+  release.title = $( "h3.interior-type:contains('Release')" ).next().text().trim();
+
   var releaseDate = $( ".category:contains('Release Date')" ).next().text().split("-");
   release.year = releaseDate[0];
   release.month = releaseDate[1];
