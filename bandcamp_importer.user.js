@@ -52,7 +52,7 @@ function retrieveReleaseInfo() {
 
         return {
           "year": d.getUTCFullYear(),
-          "month": d.getUTCMonth(),
+          "month": d.getUTCMonth() + 1,
           "day": d.getUTCDate()
         }
       }
