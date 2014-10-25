@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2014.02.22.1
+// @version        2014.10.18.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -34,16 +34,33 @@ function retrieveReleaseInfo() {
     release.title = bandcampAlbumData.current.title;
 
     // Grab release event information
-    var releasedate = $('.tralbumData meta[itemprop="datePublished"]').attr("content");
+    var date = convdate(bandcampAlbumData.current.release_date);
+    if (date) {
+      if (!(date.year > 2008 || (date.year == 2008 && date.month >= 9))) {
+        // use publish date if release date is before Bandcamp launch (2008-09)
+        var pdate = convdate(bandcampAlbumData.current.publish_date);
+        if (pdate) date = pdate;
+      }
+      release.year = date.year
+      release.month = date.month
+      release.day = date.day
+    }
+
+    function convdate(date) {
+      if (typeof date != "undefined" && date != "") {
+        var d = new Date(date);
+
+        return {
+          "year": d.getUTCFullYear(),
+          "month": d.getUTCMonth() + 1,
+          "day": d.getUTCDate()
+        }
+      }
+      return false;
+    }
 
     if(bandcampEmbedData.album_title) {
         release.parent_album = bandcampEmbedData.album_title;
-    }
-
-    if (typeof releasedate != "undefined" && releasedate != "") {
-        release.year = releasedate.substring(0, 4);
-        release.month = releasedate.substring(4, 6);
-        release.day = releasedate.substring(6, 8);
     }
 
     release.labels = new Array();
