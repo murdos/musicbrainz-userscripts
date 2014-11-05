@@ -2,7 +2,7 @@
 // @name           MusicBrainz: Set recording comments for a release
 // @version        2014-11-05
 // @author         Michael Wiencek
-// @namespace      *://userscripts.org/users/266906
+// @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @include        *://musicbrainz.org/release/*
 // @include        *://beta.musicbrainz.org/release/*
 // @include        *://*.mbsandbox.org/release/*
