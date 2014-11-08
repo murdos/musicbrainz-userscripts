@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2014-11-05
+// @version        2014-11-07
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @include        *://musicbrainz.org/release/*
@@ -24,7 +24,7 @@ function setRecordingComments() {
 
     var $tracks, $inputs = $(), nameColumn = 1;
 
-    $("head").append($("<style></style>").text("input.recording-comment { background: inherit; border: 1px #999 solid; width: 18em; margin-left: 0.5em; }"));
+    $("head").append($("<style></style>").text("input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }"));
 
     var delay = setInterval(function () {
         if ($("th.video").length > 0) {
@@ -92,11 +92,11 @@ function setRecordingComments() {
 <table id="set-recording-comments">\
   <tr>\
     <td><label for="all-recording-comments">Set all comments to:</label></td>\
-    <td><input type="text" id="all-recording-comments" style="width: 18em;"></td>\
+    <td><input type="text" id="all-recording-comments" style="width: 32em;"></td>\
   </tr>\
   <tr>\
     <td><label for="recording-comments-edit-note">Edit note:</label></td>\
-    <td><input type="text" id="recording-comments-edit-note" style="width: 18em;"></td>\
+    <td><textarea id="recording-comments-edit-note" style="width: 32em;" rows="5"></textarea></td>\
   </tr>\
   <tr>\
     <td colspan="2">\
