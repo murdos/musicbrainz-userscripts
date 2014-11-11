@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2014-11-07
+// @version        2014-11-11
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @include        *://musicbrainz.org/release/*
@@ -9,6 +9,7 @@
 // @match          *://musicbrainz.org/release/*
 // @match          *://beta.musicbrainz.org/release/*
 // @match          *://*.mbsandbox.org/release/*
+// @grant          none
 // ==/UserScript==
 
 var scr = document.createElement("script");
