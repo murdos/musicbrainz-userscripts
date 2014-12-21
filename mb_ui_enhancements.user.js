@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2014.12.21.1
+// @version        2014.12.21.2
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -115,7 +115,7 @@ function main() {
     if (window.location.href.match(re)) {
         var $youtube_link = $('#sidebar li.youtube-favicon a');
         if ($youtube_link.length > 0) {
-            var youtube_id = $youtube_link.attr("href").match(/http:\/\/www\.youtube\.com\/watch\?v=(.*)/)[1];
+            var youtube_id = $youtube_link.prop("href").match(/http:\/\/www\.youtube\.com\/watch\?v=(.*)/)[1];
             $("table.details").width("60%");
             $("h2:contains('Relationships')").after('<iframe width="360" height="275" frameborder="0" style="float: right;" src="https://www.youtube.com/embed/'+ youtube_id +'?rel=0" allowfullscreen=""></iframe>');
         }
