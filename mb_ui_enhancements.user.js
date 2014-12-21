@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2014.12.21.3
+// @version        2014.12.21.4
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -37,6 +37,8 @@ function main() {
             });
         }
     );
+
+    var re;
 
     // Top tracks from Lastfm
     re = new RegExp("musicbrainz\.org\/artist\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$","i");
@@ -83,7 +85,7 @@ function main() {
     }
 
     // Batch merge -> open in a new tab/windows
-    var re = new RegExp("musicbrainz\.org\/artist\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/(recordings|releases|works)","i");
+    re = new RegExp("musicbrainz\.org\/artist\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/(recordings|releases|works)","i");
     if (window.location.href.match(re)) {
         $("form").filter(function() {
             return $(this).prop("action").match("merge_queue");
@@ -91,7 +93,7 @@ function main() {
     }
 
     // Modify link to edits: remove " - <Edit type>" from the link "Edit XXXX - <Edit type>"
-    var re = new RegExp("musicbrainz\.org/.*/(open_)?edits","i");
+    re = new RegExp("musicbrainz\.org/.*/(open_)?edits","i");
     if (window.location.href.match(re)) {
         $("div.edit-description ~ h2").each(function() {
             var parts = $(this).find("a").text().split(" - ");
@@ -101,7 +103,7 @@ function main() {
     }
 
     // Add direct link to cover art tab for Add cover art edits
-    var re = new RegExp("musicbrainz\.org/(.*/(open_)?edits|edit\/\d+)","i");
+    re = new RegExp("musicbrainz\.org/(.*/(open_)?edits|edit\/\d+)","i");
     if (window.location.href.match(re)) {
         $("div.edit-description ~ h2:contains('cover art')").each(function() {
             $editdetails = $(this).parents('.edit-header').siblings('.edit-details');
@@ -148,6 +150,36 @@ function main() {
                 if (index !=  isrcs.length-1) { newHTML += "<br>" };
             });
             $td.html(newHTML);
+        });
+    }
+
+    // Display ISRCs on release tracklisting
+    re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
+    if (window.location.href.match(re)) {
+        var COLUMN_POSITION = 2;
+        var mbid = window.location.href.match(re)[1];
+        // Get ISRC data from webservice
+        var wsurl = "/ws/2/release/" + mbid + "?inc=isrcs+recordings";
+        $.getJSON(wsurl, function(data) {
+            // Table header
+            $("table.tbl thead th:nth-last-child("+COLUMN_POSITION+")").before("<th> ISRC </th>");
+            // Extend colspan for medium table row
+            $("table.tbl tbody tr.subh").each(function() {
+                $(this).find("td:eq(1)").attr("colspan", $(this).find("td:eq(1)").attr("colspan")+1);
+            });
+
+            $.each(data.media, function(index, medium) {
+                $.each(medium.tracks, function(i, track) {
+                    var links = "";
+                    if (track.recording.isrcs.length != 0) {
+                        var isrcsLinks = jQuery.map(track.recording.isrcs, function(isrc, i) {
+                            return ("<a href='/isrc/" + isrc + "'>" + isrc + "</a>");
+                        });
+                        links = isrcsLinks.join(", ");
+                    }
+                    $('#'+track.id).find("td:nth-last-child("+COLUMN_POSITION+")").before("<td class='isrc'><small>"+links+"</small></td>");
+                });
+            });
         });
     }
 
