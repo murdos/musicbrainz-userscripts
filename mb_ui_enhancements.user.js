@@ -137,16 +137,21 @@ function main() {
     if (window.location.href.match(re)) {
         var isrcColNo; // = ($("#content table.tbl thead th:eq(2)").text() == "Artist") ? 3 : 2;
         $("#content table.tbl thead th").each(function(index, th) {
-            if ($(th).text() == "ISRCs") isrcColNo = index;
+            if ($(th).text() == "ISRCs") {
+                isrcColNo = index;
+                return false;
+            }
         });
+        var reg = new RegExp("([A-Z]{2}[A-Z0-9]{3}[0-9]{7})");
         $("#content table.tbl tbody tr").each(function() {
             var $td = $(this).find("td:eq("+isrcColNo+")");
-            var reg = new RegExp("([A-Z]{2}[A-Z0-9]{3}[0-9]{7})");
             var isrcs = $td.text().trim().split("\n<br>\n");
             var newHTML = "";
             $.each(isrcs, function(index, isrc) {
                 isrc = isrc.trim();
+                newHTML += "<a href='/isrc/" + isrc + "'><code>";
                 newHTML += isrc.substring(0,5) + "<b>" + isrc.substring(5,7) + "</b>" + isrc.substring(7);
+                newHTML += "</code></a>";
                 if (index !=  isrcs.length-1) { newHTML += "<br>" };
             });
             $td.html(newHTML);
