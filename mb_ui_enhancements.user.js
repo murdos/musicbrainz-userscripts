@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2014.12.21.4
+// @version        2014.12.25.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -153,16 +153,16 @@ function main() {
         });
     }
 
-    // Display ISRCs on release tracklisting
+    // Display ISRCs and recording comment on release tracklisting
     re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
     if (window.location.href.match(re)) {
-        var COLUMN_POSITION = 2;
+        var ISRC_COLUMN_POSITION = 2;
         var mbid = window.location.href.match(re)[1];
         // Get ISRC data from webservice
         var wsurl = "/ws/2/release/" + mbid + "?inc=isrcs+recordings";
         $.getJSON(wsurl, function(data) {
             // Table header
-            $("table.tbl thead th:nth-last-child("+COLUMN_POSITION+")").before("<th> ISRC </th>");
+            $("table.tbl thead th:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<th> ISRC </th>");
             // Extend colspan for medium table row
             $("table.tbl tbody tr.subh").each(function() {
                 $(this).find("td:eq(1)").attr("colspan", $(this).find("td:eq(1)").attr("colspan")+1);
@@ -170,14 +170,20 @@ function main() {
 
             $.each(data.media, function(index, medium) {
                 $.each(medium.tracks, function(i, track) {
-                    var links = "";
-                    if (track.recording.isrcs.length != 0) {
-                        var isrcsLinks = jQuery.map(track.recording.isrcs, function(isrc, i) {
+                    var recording = track.recording;
+                    // Recording comment
+                    if (recording.disambiguation != "") {
+                        $("#"+track.id).find("td:eq(1) a:eq(0)").after(' <span class="comment">(' + recording.disambiguation + ')</span>');
+                    }
+                    // ISRCS
+                    var isrcsLinks = "";
+                    if (recording.isrcs.length != 0) {
+                        var links = jQuery.map(recording.isrcs, function(isrc, i) {
                             return ("<a href='/isrc/" + isrc + "'>" + isrc + "</a>");
                         });
-                        links = isrcsLinks.join(", ");
+                        isrcsLinks = links.join(", ");
                     }
-                    $('#'+track.id).find("td:nth-last-child("+COLUMN_POSITION+")").before("<td class='isrc'><small>"+links+"</small></td>");
+                    $('#'+track.id).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc'><small>"+isrcsLinks+"</small></td>");
                 });
             });
         });
