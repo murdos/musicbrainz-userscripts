@@ -667,9 +667,9 @@ function batch_recording_rels() {
 
     var $date_element = $('<input />')
         .attr('type', 'text')
+        .attr('placeholder', 'yyyy-mm-dd')
         .addClass('date')
         .addClass('bpr-date-input')
-        .val("yyyy-mm-dd")
         .css({ color : "#ddd", "width": "7em", border: "1px #999 solid" });
 
     $recordings.append(td(
@@ -683,17 +683,6 @@ function batch_recording_rels() {
         $date_element).addClass("bpr_attrs"));
 
     $(document)
-        .on('focus', 'input.bpr-date-input', function () {
-            if (this.value === "yyyy-mm-dd") {
-                $(this).val("").css("color", "#000");
-            }
-        })
-        .on('blur', 'input.bpr-date-input', function () {
-            if (this.value === "") {
-                $(this).val("yyyy-mm-dd").css("color", "#ddd");
-                $(this).parent().data("date", null);
-            }
-        })
         .on('input', 'input.bpr-date-input', function () {
             var $input = $(this);
 
