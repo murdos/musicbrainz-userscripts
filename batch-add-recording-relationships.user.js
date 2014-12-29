@@ -224,14 +224,14 @@ function batch_recording_rels() {
 
     function make_checkbox(func, default_val, lbl) {
         var chkbox = $('<input type="checkbox"/>')
-            .bind("change", func)
+            .on("change", func)
             .attr("checked", default_val);
         return label(chkbox, lbl)
     }
 
     var $display_table = table(
         tr(td(label("Filter recordings list: ",
-                    $('<input type="text"/>').bind("input", filter_recordings))),
+                    $('<input type="text"/>').on("input", filter_recordings))),
            td(make_checkbox(toggle_performed_recordings, hide_performed_recs,
                             "Hide recordings with performance ARs"),
               "&#160;",
@@ -319,13 +319,15 @@ function batch_recording_rels() {
 
     // Don't check hidden rows when the "select all" checkbox is pressed
 
+    function uncheckRows($rows) {
+        $rows.find("input[name=add-to-merge]").attr("checked", false);
+    }
+
     $(".tbl > thead input[type=checkbox]")
-        .bind("change", function () {
-            if (this.checked)
-                $recordings
-                    .filter(":hidden")
-                    .find("input[name=add-to-merge]")
-                    .attr("checked", false);
+        .on("change", function () {
+            if (this.checked) {
+                uncheckRows($recordings.filter(":hidden"));
+            }
         });
 
     var ARTIST_MBID = window.location.href.match(MBID_REGEX)[0];
@@ -999,11 +1001,8 @@ function batch_recording_rels() {
             return;
         }
 
+        var $button = $(this).attr("disabled", true).css("color", "#EAEAEA");
         ws_requests.stopped = true;
-
-        $button = $(this)
-                .attr("disabled", true)
-                .css("color", "#EAEAEA");
 
         function callback() {
             ws_requests.stopped = false;
@@ -1108,8 +1107,7 @@ function batch_recording_rels() {
                 $row.addClass("performed");
 
                 if (hide_performed_recs) {
-                    $row.find("input[name=add-to-merge]").attr("checked", false);
-                    $row.hide();
+                    uncheckRows($row.hide());
                     restripeRows();
                 }
 
@@ -1157,8 +1155,7 @@ function batch_recording_rels() {
         hide_performed_recs = this.checked;
 
         if (hide_performed_recs) {
-            $performed.find("input[name=add-to-merge]").attr("checked", false);
-            $performed.hide();
+            uncheckRows($performed.hide());
         } else {
             $performed.filter(function () { return !$(this).data("filtered") }).show();
         }
@@ -1173,8 +1170,7 @@ function batch_recording_rels() {
         hide_pending_edits = checked !== undefined ? checked : this.checked;
 
         if (hide_pending_edits) {
-            $pending.find("input[name=add-to-merge]").attr("checked", false);
-            $pending.hide();
+            uncheckRows($pending.hide());
         } else {
             $pending.filter(function () { return !$(this).data("filtered") }).show();
         }
@@ -1190,7 +1186,7 @@ function batch_recording_rels() {
     }
 
     function entity_lookup($input, entity) {
-        $input.bind("input", function () {
+        $input.on("input", function () {
             var match = this.value.match(MBID_REGEX);
             $(this).data("selected", false);
             if (match) {
