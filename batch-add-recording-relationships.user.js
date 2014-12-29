@@ -739,11 +739,12 @@ function batch_recording_rels() {
 
     $(".tbl > thead input[type=checkbox]")
         .bind("change", function () {
-            if (this.checked)
+            if (this.checked) {
                 $recordings
                     .filter(":hidden")
                     .find("input[name=add-to-merge]")
                     .attr("checked", false);
+            }
         });
 
     var ARTIST_MBID = window.location.href.match(MBID_REGEX)[0];
@@ -759,8 +760,8 @@ function batch_recording_rels() {
 
     if (page_numbers !== undefined) {
         CURRENT_PAGE = parseInt(page_numbers.href.match(/.+\?page=(\d+)/)[1] || "1", 10);
-        TOTAL_PAGES = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
-        TOTAL_PAGES = Math.ceil((TOTAL_PAGES ? parseInt(TOTAL_PAGES[1], 10) : 1) / 2);
+        var re_match = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
+        TOTAL_PAGES = Math.ceil((re_match ? parseInt(re_match[1], 10) : 1) / 2);
     }
 
     var NAME_FILTER = $.trim($("#id-filter\\.name").val());
@@ -866,56 +867,51 @@ function batch_recording_rels() {
     }
 
     function parse_recording(node, $row) {
-        var rels = node.relations;
-        var rec_title = $row.children("td").not(":has(input)").first();
+        var
+        $attrs = $row.children("td.bpr_attrs"),
+        performed = false;
 
         $row.data("performances", []);
-        var $attrs = $row.children("td.bpr_attrs"), performed = false;
         $attrs.data("checked", false).css("color", "black");
 
-        _.each(rels, function (rel) {
-            if (!rel.type.match(/performance/)) {
-                return;
-            }
-
-            if (!performed) {
-                $row.addClass("performed");
-                performed = true;
-            }
-
-            var work_mbid = rel.work.id;
-            var work_title = rel.work.title;
-            var work_comment = rel.work.disambiguation;
-            var attrs = [];
-
-            if (rel.begin) {
-                $attrs.find("input.date").val(rel.begin).trigger("input");
-            }
-
-            _.each(rel.attributes, function (name) {
-                name = name.toLowerCase();
-                attrs.push(name);
-
-                var $button = $attrs.find("span." + name);
-                if (!$button.data("checked")) {
-                    $button.click();
+        _.each(node.relations, function (rel) {
+            if (rel.type.match(/performance/)) {
+                if (!performed) {
+                    $row.addClass("performed");
+                    performed = true;
                 }
-            });
 
-            add_work_link($row, work_mbid, work_title, work_comment, attrs);
-            $row.data("performances").push(work_mbid);
+                if (rel.begin) {
+                    $attrs.find("input.date").val(rel.begin).trigger("input");
+                }
+
+                var attrs = [];
+                _.each(rel.attributes, function (name) {
+                    var
+                    cannonical_name = name.toLowerCase(),
+                    $button = $attrs.find("span." + cannonical_name)
+
+                    attrs.push(cannonical_name);
+                    if (!$button.data("checked")) {
+                        $button.click();
+                    }
+                });
+
+                add_work_link($row, rel.work.id, rel.work.title, rel.work.disambiguation, attrs);
+                $row.data("performances").push(rel.work.id);
+            }
         });
 
+        //Use the dates in "live YYYY-MM-DD" disambiguation comments
+
         var comment = node.disambiguation;
-        if (comment) {
-            var date = comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
-            if (date) {
-                $attrs.find("input.date").val(date[1]).trigger("input");
-            }
+        var date = comment && comment.match && comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
+        if (date) {
+            $attrs.find("input.date").val(date[1]).trigger("input");
         }
 
         if (!performed) {
-            if (node.title.match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
+            if (node.title.match(/.+\(live.*\)/) || (comment && comment.match && comment.match(/^live.*/))) {
                 $attrs.find("span.live").click();
             } else {
                 var url = "/ws/2/recording/" + node.id + "?inc=releases+release-groups&fmt=json";
