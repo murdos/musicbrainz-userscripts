@@ -29,6 +29,9 @@ function batch_recording_rels() {
     function table() {
         return make_element("table", arguments);
     }
+    function label() {
+        return make_element("label", arguments);
+    }
     function goBtn(func) {
         return $("<button>Go</button>").click(func);
     }
@@ -521,24 +524,24 @@ function batch_recording_rels() {
 
     // Add button to manage performance ARs
     var $relate_table = table(
-        tr(td("New work with this title:"),
+        tr(td(label("New work with this title:").attr('for',"bpr-new-work")),
            td('<input type="text" id="bpr-new-work"/>',
               goBtn(relate_to_new_titled_work))),
-        tr(td("Existing work (URL/MBID):"),
+        tr(td(label("Existing work (URL/MBID):").attr('for',"bpr-existing-work")),
            td(entity_lookup($('<input type="text" id="bpr-existing-work"/>'), "work"),
               goBtn(relate_to_existing_work))),
         tr(td("New works using recording titles"),
            td(goBtn(relate_to_new_works))),
         tr(td("Their suggested works"),
            td(goBtn(relate_to_suggested_works))),
-        tr(td('<label for="bpr-work-type">Work type:</label>'),
+        tr(td(label("Work type:").attr('for',"bpr-work-type")),
            td(work_type_options)),
-        tr(td('<label for="bpr-work-language">Lyrics language:</label>'),
+        tr(td(label("Lyrics language:").attr('for', "bpr-work-language")),
            td(work_language_options))).hide();
 
     var $works_table = table(
         $('<tr id="bpr-works-row"></tr>').append(
-            td("Load another artist’s works (URL/MBID):"),
+            td(label("Load another artist’s works (URL/MBID):").attr('for', "bpr-load-artist")),
             td(entity_lookup($('<input type="text" id="bpr-load-artist"/>'), "artist"),
                goBtn(load_artist_works_btn)))
             .hide());
@@ -560,21 +563,21 @@ function batch_recording_rels() {
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
 
+    function make_checkbox(func, default_val, lbl) {
+        var chkbox = $('<input type="checkbox"/>')
+            .bind("change", func)
+            .attr("checked", default_val);
+        return label(chkbox, lbl)
+    }
+
     var $display_table = table(
-        tr(td($("<label></label>").append(
-            "Filter recordings list: ",
-            $('<input type="text"/>').bind("input", filter_recordings))),
-           td($("<label></label>").append(
-               $('<input type="checkbox"/>')
-                   .bind("change", toggle_performed_recordings)
-                   .attr("checked", hide_performed_recs),
-               "Hide recordings with performance ARs"),
+        tr(td(label("Filter recordings list: ",
+                    $('<input type="text"/>').bind("input", filter_recordings))),
+           td(make_checkbox(toggle_performed_recordings, hide_performed_recs,
+                            "Hide recordings with performance ARs"),
               "&#160;",
-              $("<label></label>").append(
-                  $('<input type="checkbox"/>')
-                      .bind("change", toggle_pending_edits)
-                      .attr("checked", hide_pending_edits),
-                  "Hide recordings with pending edits"))))
+              make_checkbox(toggle_pending_edits, hide_pending_edits,
+                            "Hide recordings with pending edits"))))
         .css("margin", "0.5em")
         .insertAfter($container);
 
