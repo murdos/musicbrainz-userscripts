@@ -690,16 +690,7 @@ function batch_recording_rels() {
 
     var artist_mbid = window.location.href.match(MBID_REGEX)[0],
         artist_name = $("h1 a").text(),
-        $artist_works_msg = $("<td></td>"),
-        ws_requests = new RequestManager(1000, 1),
-        edit_requests = new RequestManager(1500, 2);
-
-    var current_reqs = 0;
-    setInterval(function () {
-        if (current_reqs > 0) {
-            current_reqs -= 1;
-        }
-    }, 1000);
+        $artist_works_msg = $("<td></td>");
 
     // Load performance relationships
 
@@ -1619,56 +1610,70 @@ function batch_recording_rels() {
         return $row.children('td:has(' + TITLE_SELECTOR + ')');
     }
 
+    // Request rate limiting
+
+    var REQUEST_COUNT = 0;
+    setInterval(function () {
+        if (REQUEST_COUNT > 0) {
+            REQUEST_COUNT -= 1;
+        }
+    }, 1000);
+
     function RequestManager(rate, count) {
         this.queue = [];
         this.last = 0;
         this.active = false;
         this.stopped = false;
-
-        this.next = function () {
-            if (this.stopped || !this.queue.length) {
-                this.active = false;
-                return;
-            }
-            this.queue.shift()();
-            this.last = new Date().getTime();
-
-            current_reqs += count;
-            if (current_reqs >= 10) {
-                var diff = current_reqs - 9, timeout = diff * 1000;
-                setTimeout(function (foo) { foo.next() }, rate + timeout, this);
-            } else {
-                setTimeout(function (foo) { foo.next() }, rate, this);
-            }
-        }
-
-        this.push = function (req) {
-            this.queue.push(req);
-            if (!(this.active || this.stopped)) {
-                this.start_queue();
-            }
-        }
-
-        this.unshift = function (req) {
-            this.queue.unshift(req);
-            if (!(this.active || this.stopped)) {
-                this.start_queue();
-            }
-        }
-
-        this.start_queue = function () {
-            if (this.active) {
-                return;
-            }
-            this.active = true;
-            this.stopped = false;
-            var now = new Date().getTime();
-            if (now - this.last >= rate) {
-                this.next();
-            } else {
-                var timeout = rate - now + this.last;
-                setTimeout(function (foo) { foo.next() }, timeout, this);
-            }
-        }
     }
+
+    RequestManager.prototype.next = function () {
+        if (this.stopped || !this.queue.length) {
+            this.active = false;
+            return;
+        }
+        this.queue.shift()();
+        this.last = new Date().getTime();
+
+        REQUEST_COUNT += count;
+        if (REQUEST_COUNT >= 10) {
+            var diff = REQUEST_COUNT - 9;
+            var timeout = diff * 1000;
+
+            setTimeout(function (foo) { foo.next() }, rate + timeout, this);
+        } else {
+            setTimeout(function (foo) { foo.next() }, rate, this);
+        }
+    };
+
+    RequestManager.prototype.push = function (req) {
+        this.queue.push(req);
+        if (!(this.active || this.stopped)) {
+            this.start_queue();
+        }
+    };
+
+    RequestManager.prototype.unshift = function (req) {
+        this.queue.unshift(req);
+        if (!(this.active || this.stopped)) {
+            this.start_queue();
+        }
+    };
+
+    RequestManager.prototype.start_queue = function () {
+        if (this.active) {
+            return;
+        }
+        this.active = true;
+        this.stopped = false;
+        var now = new Date().getTime();
+        if (now - this.last >= rate) {
+            this.next();
+        } else {
+            var timeout = rate - now + this.last;
+            setTimeout(function (foo) { foo.next() }, timeout, this);
+        }
+    };
+
+    var ws_requests = new RequestManager(1000, 1);
+    var edit_requests = new RequestManager(1500, 2);
 }
