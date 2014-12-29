@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
-// @version     2014-03-21
+// @version     2014-12-28
 // @author      Michael Wiencek
 // @include     *://musicbrainz.org/artist/*/recordings*
 // @include     *://*.musicbrainz.org/artist/*/recordings*
@@ -1418,29 +1418,35 @@ function batch_recording_rels() {
         }
 
         var data = {
-            "ar.as_auto_editor": "1",
-            "ar.link_type_id": "278",
-            "type1": "work",
-            "entity1": work_mbid,
-            "type0": "recording",
-            "entity0": rec_mbid,
-            "ar.attrs.partial": selected("partial"),
-            "ar.attrs.live": selected("live"),
-            "ar.attrs.instrumental": selected("instrumental"),
-            "ar.attrs.cover": selected("cover")
+            "rel-editor.rels.0.action": "add",
+            "rel-editor.rels.0.link_type": "278",
+            "rel-editor.rels.0.entity.1.type": "work",
+            "rel-editor.rels.0.entity.1.gid": work_mbid,
+            "rel-editor.rels.0.entity.0.type": "recording",
+            "rel-editor.rels.0.entity.0.gid": rec_mbid
         };
+
+        var attrs = [];
+        if (selected("live")) attrs.push("70007db6-a8bc-46d7-a770-80e6a0bb551a");
+        if (selected("partial")) attrs.push("d2b63be6-91ec-426a-987a-30b47f8aae2d");
+        if (selected("instrumental")) attrs.push("c031ed4f-c9bb-4394-8cf5-e8ce4db512ae");
+        if (selected("cover")) attrs.push("1e8536bd-6eda-3822-8e78-1c0f4d3d2113");
+
+        for (var i = 0; i <= attrs.length; i++) {
+            data["rel-editor.rels.0.attributes."+i+".type.gid"] = attrs[i];
+        }
 
         var date = $attrs.data("date");
         if (date != null) {
-            data["ar.period.begin_date.year"] = date["year"];
-            data["ar.period.begin_date.month"] = date["month"] || "";
-            data["ar.period.begin_date.day"] = date["day"] || "";
-            data["ar.period.end_date.year"] = date["year"];
-            data["ar.period.end_date.month"] = date["month"] || "";
-            data["ar.period.end_date.day"] = date["day"] || "";
+            data["rel-editor.rels.0.period.begin_date.year"] = date["year"];
+            data["rel-editor.rels.0.period.begin_date.month"] = date["month"] || "";
+            data["rel-editor.rels.0.period.begin_date.day"] = date["day"] || "";
+            data["rel-editor.rels.0.period.end_date.year"] = date["year"];
+            data["rel-editor.rels.0.period.end_date.month"] = date["month"] || "";
+            data["rel-editor.rels.0.period.end_date.day"] = date["day"] || "";
         }
 
-        var url = "/edit/relationship/create?type1=work&entity1=" + work_mbid + "&type0=recording&entity0=" + rec_mbid;
+        var url = "/relationship-editor";
         function post_edit() {
             $(title_link).css("color", "green");
 
