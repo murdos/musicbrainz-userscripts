@@ -14,6 +14,28 @@ scr.textContent = "(" + batch_recording_rels + ")();";
 document.body.appendChild(scr);
 
 function batch_recording_rels() {
+
+    function make_element(el_name, args) {
+        var el = $("<"+el_name+"></"+el_name+">");
+        el.append.apply(el, args);
+        return el;
+    }
+    function td() {
+        return make_element("td", arguments);
+    }
+    function tr() {
+        return make_element("tr", arguments);
+    }
+    function table() {
+        return make_element("table", arguments);
+    }
+    function label() {
+        return make_element("label", arguments);
+    }
+    function goBtn(func) {
+        return $("<button>Go</button>").click(func);
+    }
+
     var $recordings = $("tr:has([href*='musicbrainz.org/recording/'])").data("filtered", false);
 
     if (!$recordings.length) {
@@ -501,51 +523,36 @@ function batch_recording_rels() {
 </select>';
 
     // Add button to manage performance ARs
+    var $relate_table = table(
+        tr(td(label("New work with this title:").attr('for',"bpr-new-work")),
+           td('<input type="text" id="bpr-new-work"/>',
+              goBtn(relate_to_new_titled_work))),
+        tr(td(label("Existing work (URL/MBID):").attr('for',"bpr-existing-work")),
+           td(entity_lookup($('<input type="text" id="bpr-existing-work"/>'), "work"),
+              goBtn(relate_to_existing_work))),
+        tr(td("New works using recording titles"),
+           td(goBtn(relate_to_new_works))),
+        tr(td("Their suggested works"),
+           td(goBtn(relate_to_suggested_works))),
+        tr(td(label("Work type:").attr('for',"bpr-work-type")),
+           td(work_type_options)),
+        tr(td(label("Lyrics language:").attr('for', "bpr-work-language")),
+           td(work_language_options))).hide();
 
-    var $relate_table = $("<table></table>").append(
-        $("<tr></tr>").append(
-            "<td>New work with this title:</td>",
-            $("<td></td>").append(
-                '<input type="text" id="bpr-new-work"/>',
-                $("<button>Go</button>").click(relate_to_new_titled_work))),
-        $("<tr></tr>").append(
-            "<td>Existing work (URL/MBID):</td>",
-            $("<td></td>").append(
-                entity_lookup($('<input type="text" id="bpr-existing-work"/>'), "work"),
-                $("<button>Go</button>").click(relate_to_existing_work))),
-        $("<tr></tr>").append(
-            "<td>New works using recording titles</td>",
-            $("<td></td>").append(
-                $("<button>Go</button>").click(relate_to_new_works))),
-        $("<tr></tr>").append(
-            "<td>Their suggested works</td>",
-            $("<td></td>").append(
-                $("<button>Go</button>").click(relate_to_suggested_works))),
-        $("<tr></tr>").append(
-            '<td><label for="bpr-work-type">Work type:</label></td>',
-            $('<td></td>').append(work_type_options)),
-        $("<tr></tr>").append(
-            '<td><label for="bpr-work-language">Lyrics language:</label></td>',
-            $('<td></td>').append(work_language_options))).hide();
-
-    var $works_table = $("<table></table>").append(
+    var $works_table = table(
         $('<tr id="bpr-works-row"></tr>').append(
-            "<td>Load another artist’s works (URL/MBID):</td>",
-            $("<td></td>").append(
-                entity_lookup($('<input type="text" id="bpr-load-artist"/>'), "artist"),
-                $("<button>Go</button>").click(load_artist_works_btn)))
-        .hide());
+            td(label("Load another artist’s works (URL/MBID):").attr('for', "bpr-load-artist")),
+            td(entity_lookup($('<input type="text" id="bpr-load-artist"/>'), "artist"),
+               goBtn(load_artist_works_btn)))
+            .hide());
 
-    var $container = $("<table></table>").append(
-            $("<tr></tr>").append(
-                "<td><h3>Relate checked recordings to…</h3></td>",
-                $("<td></td>").append(
-                    "<h3>Cached works</h3>",
-                    $("<span>(These are used to auto-suggest works.)</span>")
-                        .css("font-size", "0.9em"))),
-            $("<tr></tr>").append(
-                $("<td></td>").append($relate_table),
-                $("<td></td>").append($works_table)))
+    var $container = table(
+        tr(td("<h3>Relate checked recordings to…</h3>"),
+           td("<h3>Cached works</h3>",
+              $("<span>(These are used to auto-suggest works.)</span>")
+              .css("font-size", "0.9em"))),
+        tr(td($relate_table),
+           td($works_table)))
         .css({"margin": "0.5em", "background": "#F2F2F2", "border": "1px #999 solid"})
         .insertAfter($("div#content h2")[0]);
 
@@ -556,24 +563,21 @@ function batch_recording_rels() {
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
 
-    var $display_table = $("<table></table>").append(
-        $("<tr></tr>").append(
-            $("<td></td>").append(
-                $("<label></label>").append(
-                    "Filter recordings list: ",
+    function make_checkbox(func, default_val, lbl) {
+        var chkbox = $('<input type="checkbox"/>')
+            .bind("change", func)
+            .attr("checked", default_val);
+        return label(chkbox, lbl)
+    }
+
+    var $display_table = table(
+        tr(td(label("Filter recordings list: ",
                     $('<input type="text"/>').bind("input", filter_recordings))),
-            $("<td></td>").append(
-                $("<label></label>").append(
-                    $('<input type="checkbox"/>')
-                        .bind("change", toggle_performed_recordings)
-                        .attr("checked", hide_performed_recs),
-                    "Hide recordings with performance ARs"),
-                "&#160;",
-                $("<label></label>").append(
-                    $('<input type="checkbox"/>')
-                        .bind("change", toggle_pending_edits)
-                        .attr("checked", hide_pending_edits),
-                    "Hide recordings with pending edits"))))
+           td(make_checkbox(toggle_performed_recordings, hide_performed_recs,
+                            "Hide recordings with performance ARs"),
+              "&#160;",
+              make_checkbox(toggle_pending_edits, hide_pending_edits,
+                            "Hide recordings with pending edits"))))
         .css("margin", "0.5em")
         .insertAfter($container);
 
