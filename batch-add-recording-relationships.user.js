@@ -592,25 +592,9 @@ function batch_recording_rels() {
 
     $(".tbl > thead > tr").append("<th>Performance Attributes</th>");
 
-    $recordings.append(
-        $('<td class="bpr_attrs"></td>').append(
-            $('<span class="partial">part.</span>/' +
-              '<span class="live">live</span>/' +
-              '<span class="instrumental">inst.</span>/' +
-              '<span class="cover">cover</span>')
-                .css("cursor", "pointer")
-                .data("checked", false)
-                .click(function () {
-                    var $this = $(this), checked = !$this.data("checked");
-                    $this.data("checked", checked);
-                    if (checked) {
-                        $this.css({"background": "blue", "color": "white"});
-                    } else {
-                        $this.css({"background": "inherit", "color": "black"});
-                    }
-                }), '&#160;<input type="text" class="date"/>'));
-
-    $recordings.find("td.bpr_attrs input.date")
+    var date_element =  $('<input/>')
+        .attr('type', "text")
+        .addClass('date')
         .val("yyyy-mm-dd")
         .css({"color": "#ddd", "width": "7em", "border": "1px #999 solid"})
         .bind("focus", function () {
@@ -625,44 +609,56 @@ function batch_recording_rels() {
             }
         })
         .bind("input", function () {
-            var error = (function ($input) {
-                return function () {
+            var regex_match, date = null,
+            error = (
+                function ($input) {return function () {
                     $input.css("border-color", "#f00");
                     $input.parent().data("date", null);
-                };
-            })($(this));
+                    date = null;
+                };})($(this)),
+            use_if_in_range = function (pos, type, min, max) {
+                var val;
+                if (date != null && regex_match[pos]) {
+                    val = parseInt(regex_match[pos], 10);
+                    if (val < min || val > max) {
+                        error();
+                    } else {
+                        date[type] = val;
+                    }
+                }
+            };
+
+            $(this).css("border-color", "#999");
 
             if (this.value) {
                 $(this).css("color", "#000");
-                var date = this.value.match(/^([0-9]{4})(?:-([0-9]{2})(?:-([0-9]{2}))?)?$/);
-                if (date == null) {
+                regex_match = this.value.match(/^([0-9]{4})(?:-([0-9]{2})(?:-([0-9]{2}))?)?$/);
+                if (regex_match != null) {
+                    date = {"year": parseInt(date[1], 10)};
+                    use_if_in_range(2, 'month', 1, 12)
+                    use_if_in_range(3, 'day', 1, 31);
+                } else {
                     error();
-                    return;
                 }
-                var data = {}, year = date[1], month = date[2], day = date[3];
-                data["year"] = parseInt(year, 10);
-                if (month) {
-                    month = parseInt(month, 10);
-                    if (month < 1 || month > 12) {
-                        error();
-                        return;
-                    }
-                    data["month"] = month;
-                }
-                if (day) {
-                    day = parseInt(day, 10);
-                    if (day < 1 || day > 31) {
-                        error();
-                        return;
-                    }
-                    data["day"] = day;
-                }
-                $(this).parent().data("date", data);
-            } else {
-                $(this).parent().data("date", null);
             }
-            $(this).css("border-color", "#999");
+            $(this).parent().data("date", data);
         });
+
+    $recordings.append(td(
+        $('<span class="partial">part.</span>/' +
+          '<span class="live">live</span>/' +
+          '<span class="instrumental">inst.</span>/' +
+          '<span class="cover">cover</span>')
+            .css("cursor", "pointer")
+            .data("checked", false)
+            .click(function () {
+                var checked = !$this.data("checked");
+                $(this).data("checked", checked)
+                    .css({"background": checked ? "blue": "inherit",
+                          "color": checked ? "white" : "black"});
+            }),
+        '&#160;',
+        date_element).addClass("bpr_attrs"));
 
     // Style buttons
 
