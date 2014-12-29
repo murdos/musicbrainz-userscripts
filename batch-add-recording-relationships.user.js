@@ -546,8 +546,8 @@ function batch_recording_rels() {
     $container.children("tbody").children("tr").children("td")
         .css({"padding": "0.5em", "vertical-align": "top"});
 
-    var hide_performed_recs = readCookie("hide_performed_recs") == "true" ? true : false,
-        hide_pending_edits = readCookie("hide_pending_edits") == "true" ? true : false;
+    var hide_performed_recs = $.cookie('hide_performed_recs') == 'true' ? true : false;
+    var hide_pending_edits = $.cookie('hide_pending_edits') == 'true' ? true : false;
 
     var $display_table = $("<table></table>").append(
         $("<tr></tr>").append(
@@ -1200,14 +1200,14 @@ function batch_recording_rels() {
 
     // Edit creation
 
-    $("#bpr-work-type").val(readCookie("bpr_work_type") || 0)
+    $("#bpr-work-type").val($.cookie("bpr_work_type") || 0)
         .change(function() {
-            createCookie("bpr_work_type", this.value, 1000);
+            $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
         });
 
-    $("#bpr-work-language").val(readCookie("bpr_work_language") || 0)
+    $("#bpr-work-language").val($.cookie("bpr_work_language") || 0)
         .change(function() {
-            createCookie("bpr_work_language", this.value, 1000);
+            $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
         });
 
     function relate_all_to_work(mbid, title, disambig, callback) {
@@ -1518,7 +1518,7 @@ function batch_recording_rels() {
             $performed.filter(function() {return !$(this).data("filtered");}).show();
         }
         restripe_rows();
-        createCookie("hide_performed_recs", "" + hide_performed_recs, 1000);
+        $.cookie('hide_performed_recs', hide_performed_recs.toString(), { path: '/', expires: 1000 });
     }
 
     function toggle_pending_edits(event, checked) {
@@ -1535,7 +1535,7 @@ function batch_recording_rels() {
             $pending.filter(function() {return !$(this).data("filtered");}).show();
         }
         restripe_rows();
-        createCookie("hide_pending_edits", "" + hide_pending_edits, 1000);
+        $.cookie('hide_pending_edits', hide_pending_edits.toString(), { path: '/', expires: 1000 });
     }
     toggle_pending_edits(null, hide_pending_edits);
 
@@ -1641,29 +1641,5 @@ function batch_recording_rels() {
                 setTimeout(function(foo) {foo.next();}, timeout, this);
             }
         }
-    }
-
-    // createCookie and readCookie:
-    // from http://www.quirksmode.org/js/cookies.html
-
-    function createCookie(name, value, days) {
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime()+(days*24*60*60*1000));
-            var expires = "; expires="+date.toGMTString();
-        }
-        else var expires = "";
-        document.cookie = name+"="+value+expires+"; path=/";
-    }
-
-    function readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
     }
 }
