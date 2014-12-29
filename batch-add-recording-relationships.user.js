@@ -682,39 +682,28 @@ function batch_recording_rels() {
             }
         })
         .bind("input", function () {
-            var regex_match, date = null,
-            error = (
-                function ($input) {return function () {
-                    $input.css("border-color", "#f00");
-                    $input.parent().data("date", null);
-                    date = null;
-                };})($(this)),
-            use_if_in_range = function (pos, type, min, max) {
-                var val;
-                if (date != null && regex_match[pos]) {
-                    val = parseInt(regex_match[pos], 10);
-                    if (val < min || val > max) {
-                        error();
-                    } else {
-                        date[type] = val;
-                    }
-                }
-            };
+            var $input = $(this);
+
+            function error() {
+                $input.css("border-color", "#f00");
+                $input.parent().data("date", null);
+            }
 
             $(this).css("border-color", "#999");
 
             if (this.value) {
+                var parsedDate = MB.utility.parseDate(this.value);
+
                 $(this).css("color", "#000");
-                regex_match = this.value.match(/^([0-9]{4})(?:-([0-9]{2})(?:-([0-9]{2}))?)?$/);
-                if (regex_match != null) {
-                    date = {"year": parseInt(date[1], 10)};
-                    use_if_in_range(2, 'month', 1, 12)
-                    use_if_in_range(3, 'day', 1, 31);
-                } else {
+
+                if (!parsedDate.year && !parsedDate.month && !parsedDate.day) {
                     error();
+                } else if (!MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
+                    error();
+                } else {
+                    $(this).parent().data("date", parsedDate);
                 }
             }
-            $(this).parent().data("date", data);
         });
 
     $recordings.append(td(
