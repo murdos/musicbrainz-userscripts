@@ -69,9 +69,9 @@ function batch_recording_rels() {
             var diff = REQUEST_COUNT - 9;
             var timeout = diff * 1000;
 
-            setTimeout(function (foo) { foo.next() }, this.rate + timeout, this);
+            setTimeout(function (self) { self.next() }, this.rate + timeout, this);
         } else {
-            setTimeout(function (foo) { foo.next() }, this.rate, this);
+            setTimeout(function (self) { self.next() }, this.rate, this);
         }
     };
 
@@ -100,7 +100,7 @@ function batch_recording_rels() {
             this.next();
         } else {
             var timeout = this.rate - now + this.last;
-            setTimeout(function (foo) { foo.next() }, timeout, this);
+            setTimeout(function (self) { self.next() }, timeout, this);
         }
     };
 
