@@ -204,8 +204,19 @@ function batch_recording_rels() {
     $.get('/dialog?path=%2Fwork%2Fcreate', function (data) {
         var nodes = $.parseHTML(data);
 
-        $work_type_options.append($('#id-edit-work\\.type_id', nodes).children()).val('');
-        $work_language_options.append($('#id-edit-work\\.language_id', nodes).children()).val('');
+        $work_type_options
+            .append($('#id-edit-work\\.type_id', nodes).children())
+            .val($.cookie('bpr_work_type') || 0)
+            .on('change', function () {
+                $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
+            });
+
+        $work_language_options
+            .append($('#id-edit-work\\.language_id', nodes).children())
+            .val($.cookie('bpr_work_language') || 0)
+            .on('change', function () {
+                $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
+            });
     });
 
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
@@ -842,16 +853,6 @@ function batch_recording_rels() {
     }
 
     // Edit creation
-
-    $work_type_options.val($.cookie("bpr_work_type") || 0)
-        .change(function () {
-            $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
-        });
-
-    $work_language_options.val($.cookie("bpr_work_language") || 0)
-        .change(function () {
-            $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
-        });
 
     function relate_all_to_work(mbid, title, comment) {
         var deferred = $.Deferred();
