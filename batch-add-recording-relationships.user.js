@@ -14,46 +14,53 @@ scr.textContent = "(" + batch_recording_rels + ")();";
 document.body.appendChild(scr);
 
 function batch_recording_rels() {
-
     var $recordings = $("tr:has([href*='musicbrainz.org/recording/'])").data("filtered", false);
-    if ($recordings.length == 0)
+
+    if (!$recordings.length) {
         return;
+    }
 
-    var MBID_REGEX = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/,
-        rec_titles = {}, rec_titles_mbid = {},
-        ascii_punct = {
-            "…": "...",
-            "‘": "'",
-            "’": "'",
-            "‚": "'",
-            "“": "\"",
-            "”": "\"",
-            "„": "\"",
-            "′": "'",
-            "″": "\"",
-            "‹": "<",
-            "›": ">",
-            "‐": "-",
-            "‒": "-",
-            "–": "-",
-            "−": "-",
-            "—": "-",
-            "―": "--"
-        };
+    var MBID_REGEX = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;
 
-    $.each($recordings, function(i, rec) {
-        var $rec = $(rec),
-            $title_span = $rec.find("a[href*='musicbrainz.org/recording/']"),
-            rec_mbid = $title_span.attr("href").match(MBID_REGEX)[0],
-            rec_title = $title_span.text()
-                .toLowerCase()
-                .match(/^(.+?)(?:(?: \([^()]+\))+)?$/)[1]
-                .replace(/ /g, "");
-            for (var punct in ascii_punct) {
-                rec_title = rec_title.replace(new RegExp(punct, "g"), ascii_punct[punct]);
-            }
-            rec_titles[rec_title] = null;
-            rec_titles_mbid[rec_mbid] = rec_title;
+    var RECORDING_TITLES = {};
+
+    var ASCII_PUNCTUATION = [
+        [/…/g, "..."],
+        [/‘/g, "'"],
+        [/’/g, "'"],
+        [/‚/g, "'"],
+        [/“/g, "\""],
+        [/”/g, "\""],
+        [/„/g, "\""],
+        [/′/g, "'"],
+        [/″/g, "\""],
+        [/‹/g, "<"],
+        [/›/g, ">"],
+        [/‐/g, "-"],
+        [/‒/g, "-"],
+        [/–/g, "-"],
+        [/−/g, "-"],
+        [/—/g, "-"],
+        [/―/g, "--"]
+    ];
+
+    function normalizeTitle(title) {
+        title = title.toLowerCase().replace(/\s+/g, '');
+
+        for (var i = 0, len = ASCII_PUNCTUATION.length; i < len; i++) {
+            title = title.replace(ASCII_PUNCTUATION[i][0], ASCII_PUNCTUATION[i][1]);
+        }
+
+        return title;
+    }
+
+    $recordings.each(function (index, row) {
+        var $title = $(row).find("a[href*='musicbrainz.org/recording/']");
+        var mbid = $title.attr('href').match(MBID_REGEX)[0];
+
+        RECORDING_TITLES[mbid] = normalizeTitle(
+            $title.text().match(/^(.+?)(?:(?: \([^()]+\))+)?$/)[1]
+        );
     });
 
     var work_type_options = '\
@@ -546,8 +553,8 @@ function batch_recording_rels() {
     $container.children("tbody").children("tr").children("td")
         .css({"padding": "0.5em", "vertical-align": "top"});
 
-    var hide_performed_recs = $.cookie('hide_performed_recs') == 'true' ? true : false;
-    var hide_pending_edits = $.cookie('hide_pending_edits') == 'true' ? true : false;
+    var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
+    var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
 
     var $display_table = $("<table></table>").append(
         $("<tr></tr>").append(
@@ -588,7 +595,7 @@ function batch_recording_rels() {
               '<span class="cover">cover</span>')
                 .css("cursor", "pointer")
                 .data("checked", false)
-                .click(function() {
+                .click(function () {
                     var $this = $(this), checked = !$this.data("checked");
                     $this.data("checked", checked);
                     if (checked) {
@@ -601,20 +608,20 @@ function batch_recording_rels() {
     $recordings.find("td.bpr_attrs input.date")
         .val("yyyy-mm-dd")
         .css({"color": "#ddd", "width": "7em", "border": "1px #999 solid"})
-        .bind("focus", function() {
-            if (this.value == "yyyy-mm-dd") {
+        .bind("focus", function () {
+            if (this.value === "yyyy-mm-dd") {
                 $(this).val("").css("color", "#000");
             }
         })
-        .bind("blur", function() {
-            if (this.value == "") {
+        .bind("blur", function () {
+            if (this.value === "") {
                 $(this).val("yyyy-mm-dd").css("color", "#ddd");
                 $(this).parent().data("date", null);
             }
         })
-        .bind("input", function() {
-            var error = (function($input) {
-                return function() {
+        .bind("input", function () {
+            var error = (function ($input) {
+                return function () {
                     $input.css("border-color", "#f00");
                     $input.parent().data("date", null);
                 };
@@ -668,7 +675,7 @@ function batch_recording_rels() {
     // Don't check hidden rows when the "select all" checkbox is pressed
 
     $(".tbl > thead input[type=checkbox]")
-        .bind("change", function() {
+        .bind("change", function () {
             if (this.checked)
                 $recordings
                     .filter(":hidden")
@@ -683,7 +690,7 @@ function batch_recording_rels() {
         edit_requests = new RequestManager(1500, 2);
 
     var current_reqs = 0;
-    setInterval(function() {
+    setInterval(function () {
         if (current_reqs > 0) {
             current_reqs -= 1;
         }
@@ -691,7 +698,7 @@ function batch_recording_rels() {
 
     // Load performance relationships
 
-    (function() {
+    (function () {
         var page_numbers = $(".pageselector .sel")[0], not_parsed = $recordings.length;
         if (page_numbers === undefined) {
             var page = 1;
@@ -702,10 +709,10 @@ function batch_recording_rels() {
             total_pages = Math.ceil((total_pages ? parseInt(total_pages[1], 10) : 1) / 2);
         }
 
-        var request_recordings = function(url, callback) {
+        var request_recordings = function (url, callback) {
             var load_trys = 1;
 
-            $.get(url, function(data) {
+            $.get(url, function (data) {
                 var doc = data.documentElement,
                     recs = doc.getElementsByTagName("recording"),
                     cache = {};
@@ -739,12 +746,12 @@ function batch_recording_rels() {
 
                 callback && callback();
             })
-            .success(function() {
+            .done(function () {
                 $recordings_load_msg.parent().remove();
                 $relate_table.show();
                 load_works_init();
             })
-            .error(function() {
+            .fail(function () {
                 $recordings_load_msg
                     .text("Error loading relationships. Retry #" + load_trys + "...")
                     .css("color", "red");
@@ -752,8 +759,8 @@ function batch_recording_rels() {
                 ws_requests.unshift(request_recordings);
             });
         };
-        var queue_recordings_request = function(url) {
-            ws_requests.push(function() {
+        var queue_recordings_request = function (url) {
+            ws_requests.push(function () {
                 request_recordings(url);
             });
         }
@@ -766,8 +773,8 @@ function batch_recording_rels() {
                 (ac_filter ? "creditname:" + encodeURIComponent(ac_filter)+"%20AND%20" : "") +
                 " arid:" + artist_mbid + "&limit=100&offset=" + (page * 100));
 
-            ws_requests.push(function() {
-                $.get(url, function(data) {
+            ws_requests.push(function () {
+                $.get(url, function (data) {
                     var doc = data.documentElement,
                         recs = doc.getElementsByTagName("recording");
                     for (var i = 0; i < recs.length; i++) {
@@ -795,10 +802,11 @@ function batch_recording_rels() {
             var $attrs = $row.children("td.bpr_attrs"), performed = false;
             $attrs.data("checked", false).css("color", "black");
 
-            $.each(rels, function(i, rel) {
+            $.each(rels, function (i, rel) {
                 var $rel = $(rel);
-                if (!$rel.attr("type").match(/performance/))
+                if (!$rel.attr("type").match(/performance/)) {
                     return;
+                }
 
                 if (!performed) {
                     $row.addClass("performed");
@@ -849,16 +857,16 @@ function batch_recording_rels() {
                     var rec_mbid = node.getAttribute("id"),
                         url = "/ws/2/recording/" + rec_mbid + "?inc=releases+release-groups";
 
-                    var request_rec = function() {
-                        $.get(url, function(data) {
+                    var request_rec = function () {
+                        $.get(url, function (data) {
                             var rgs = data.documentElement.getElementsByTagName("release-group");
                             for (var i = 0; i < rgs.length; i++) {
-                                if ($(rgs[i]).attr("type") == "Live") {
+                                if ($(rgs[i]).attr("type") === "Live") {
                                     $attrs.find("span.live").click();
                                     break;
                                 }
                             }
-                        }).error(function() {
+                        }).fail(function () {
                             ws_requests.push(request_rec);
                         });
                     }
@@ -899,28 +907,28 @@ function batch_recording_rels() {
     }
 
     function load_artist_works(mbid, name, callback) {
-        if (loaded_artists.indexOf(mbid) != -1)
+        if (loaded_artists.indexOf(mbid) !== -1)
             return false;
         loaded_artists.push(mbid);
 
         var $table_row = $("<tr></tr>"),
             $button_cell = $("<td></td>").css("display", "none");
 
-        if (mbid == artist_mbid) {
+        if (mbid === artist_mbid) {
             var $msg = $artist_works_msg;
         } else {
             var $msg = $("<td></td>");
 
             $button_cell.append(
                 style_buttons($("<button>Remove</button>"))
-                    .click(function() {
+                    .click(function () {
                         $table_row.remove();
                         remove_artist_works(mbid);
                     }));
         }
 
         var $reload = style_buttons($("<button>Reload</button>"))
-            .click(function() {
+            .click(function () {
                 $button_cell.css("display", "none");
                 $msg.text("Loading works for " + name + "...");
                 load();
@@ -931,8 +939,8 @@ function batch_recording_rels() {
         $table_row.append($msg, $button_cell);
         $("tr#bpr-works-row").css("display", "none").before($table_row);
 
-        var works_date = localStorage.getItem("bpr_works_date " + mbid),
-            result = [];
+        var works_date = localStorage.getItem("bpr_works_date " + mbid);
+        var result = [];
 
         function finished(result) {
             var parsed = load_works_finish(result);
@@ -961,7 +969,7 @@ function batch_recording_rels() {
             localStorage.setItem("bpr_works_date " + mbid, works_date);
             result = [];
 
-            var callback = function(loaded, remaining) {
+            var callback = function (loaded, remaining) {
                 result.push.apply(result, loaded);
                 if (remaining > 0) {
                     $msg.text("Loading " + remaining.toString() + " works for " + name + "...");
@@ -972,7 +980,7 @@ function batch_recording_rels() {
             };
 
             var works_url = "/ws/2/work?artist=" + mbid + "&inc=aliases&limit=50";
-            ws_requests.unshift(function() {
+            ws_requests.unshift(function () {
                 request_works(works_url, 0, -1, callback);
             });
         }
@@ -980,22 +988,26 @@ function batch_recording_rels() {
     }
 
     function load_works_finish(result) {
-        var tmp_mbids = [], tmp_titles = [], tmp_disambigs = [], tmp_norm_titles = [];
+        var tmp_mbids = [];
+        var tmp_titles = [];
+        var tmp_disambigs = [];
+        var tmp_norm_titles = [];
+
         for (var i = 0; i < result.length; i++) {
-            var parts = result[i],
-                mbid = parts.slice(0, 36),
-                index = work_mbids.indexOf(mbid);
-            if (index != -1) {
+            var parts = result[i];
+            var mbid = parts.slice(0, 36);
+            var index = work_mbids.indexOf(mbid);
+
+            if (index !== -1) {
                 work_mbids.splice(index, 1);
                 work_titles.splice(index, 1);
                 norm_work_titles.splice(index, 1);
             }
-            var rest = parts.slice(36).split("\u00a0"),
-                title = rest[0], disambig = rest[1] || "",
-                norm_title = title.toLowerCase().replace(/ /g,"");
-            for (var punct in ascii_punct) {
-                norm_title = norm_title.replace(new RegExp(punct, "g"), ascii_punct[punct]);
-            }
+            var rest = parts.slice(36).split("\u00a0");
+            var title = rest[0];
+            var disambig = rest[1] || "";
+            var norm_title = normalizeTitle(title);
+
             work_mbids.push(mbid);
             work_titles.push(title);
             work_disambigs.push(disambig);
@@ -1009,46 +1021,53 @@ function batch_recording_rels() {
     }
 
     function request_works(url, offset, count, callback) {
-        $.get(url + "&offset=" + offset, function(xml, textStatus, jqXHR) {
-            if (count == -1)
+        $.get(url + "&offset=" + offset, function (xml, textStatus, jqXHR) {
+            if (count === -1) {
                 count = parseInt(xml.getElementsByTagName("work-list")[0].getAttribute("count"));
+            }
 
-            var works = xml.getElementsByTagName("work"), loaded = [];
+            var works = xml.getElementsByTagName("work");
+            var loaded = [];
+
             for (var i = 0; i < works.length; i++) {
-                var work = works[i],
-                    id = work.getAttribute("id"),
-                    title = work.getElementsByTagName("title")[0].textContent,
-                    disambig = work.getElementsByTagName("disambiguation")[0],
-                    disambig = disambig ? disambig.textContent : "";
+                var work = works[i];
+                var id = work.getAttribute("id");
+                var title = work.getElementsByTagName("title")[0].textContent;
+                var disambig = work.getElementsByTagName("disambiguation")[0];
+                var disambig = disambig ? disambig.textContent : "";
+
                 loaded.push(id + title + (disambig ? "\u00a0" + disambig : ""));
             }
+
             callback(loaded, count - offset - works.length);
 
             if (works.length + offset < count) {
-                ws_requests.unshift(function() {
+                ws_requests.unshift(function () {
                     request_works(url, offset + 50, count, callback);
                 });
             }
-        }).error(function() {
-            ws_requests.unshift(function() {
+        }).fail(function () {
+            ws_requests.unshift(function () {
                 request_works(url, offset, count, callback);
             });
         });
     }
 
     function match_works(mbids, titles, disambigs, norm_titles) {
+        if (!mbids.length) {
+            return;
+        }
+
         var $not_performed = $recordings.filter(":not(.performed)");
-        if ($not_performed.length == 0)
+        if (!$not_performed.length) {
             return;
+        }
 
-        if (mbids.length == 0)
-            return;
-
-        var sim = function(r, w) {
+        var sim = function (r, w) {
             return r==w?0:_.str.levenshtein(r,w)/((r.length+w.length)/2);
         }, matches = {};
 
-        var to_recording = function($rec, rec_title) {
+        var to_recording = function ($rec, rec_title) {
             if (rec_title in matches) {
                 var match = matches[rec_title];
                 suggested_work_link($rec, match[0], match[1], match[2], match[3]);
@@ -1065,7 +1084,7 @@ function batch_recording_rels() {
             foo.minscore = 0.250001;
             foo.match = null;
 
-            var done = function() {
+            var done = function () {
                 var match = foo.match;
                 if (match !== null) {
                     matches[rec_title] = match;
@@ -1075,23 +1094,25 @@ function batch_recording_rels() {
                 }
             };
 
-            var iid = setInterval(function() {
-                var j = current++,
-                    norm_work_title = norm_titles[j],
-                    score = sim(rec_title, norm_work_title);
-                if (current % 12 == 0) {
+            var iid = setInterval(function () {
+                var j = current++;
+                var norm_work_title = norm_titles[j];
+                var score = sim(rec_title, norm_work_title);
+
+                if (current % 12 === 0) {
                     $progress.text(current.toString() + "/" + total.toString());
                 }
+
                 if (score < foo.minscore) {
                     foo.match = [mbids[j], titles[j], disambigs[j], norm_work_title];
-                    if (score == 0) {
+                    if (score === 0) {
                         clearInterval(iid);
                         done();
                         return;
                     }
                     foo.minscore = score;
                 }
-                if (j == total - 1) {
+                if (j === total - 1) {
                     clearInterval(iid);
                     done();
                 }
@@ -1099,10 +1120,10 @@ function batch_recording_rels() {
         };
 
         for (var i = 0; i < $not_performed.length; i++) {
-            var $rec = $($not_performed[i]),
-                mbid = $rec.find("a[href*='musicbrainz.org/recording/']")
-                        .attr("href").match(MBID_REGEX)[0];
-            to_recording($rec, rec_titles_mbid[mbid]);
+            var $rec = $not_performed.eq(i);
+            var mbid = $rec.find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0];
+
+            to_recording($rec, RECORDING_TITLES[mbid]);
         }
     }
 
@@ -1124,16 +1145,17 @@ function batch_recording_rels() {
 
     function remove_artist_works(mbid) {
         var index = loaded_artists.indexOf(mbid);
-        if (index == -1)
+        if (index === -1) {
             return;
+        }
         loaded_artists.splice(index, 1);
 
-        var artists = localStorage.getItem("bpr_artists " + artist_mbid).split("\n"),
-            new_artists = [];
+        var artists = localStorage.getItem("bpr_artists " + artist_mbid).split("\n");
+        var new_artists = [];
 
         for (var i = 0; i < artists.length; i++) {
             var _mbid = artists[i].slice(0, 36);
-            if (_mbid != mbid)
+            if (_mbid !== mbid)
                 new_artists.push(_mbid + artists[i].slice(36));
         }
 
@@ -1145,21 +1167,22 @@ function batch_recording_rels() {
         work_mbids.push(mbid);
         work_titles.push(title);
         work_disambigs.push(disambig);
-        var norm_title = title.toLowerCase().replace(/ /g,"");
-        for (var punct in ascii_punct) {
-            norm_title = norm_title.replace(new RegExp(punct, "g"), ascii_punct[punct]);
-        }
-        norm_work_titles.push(norm_title);
         works_load_cache.push(mbid + title + (disambig ? "\u00a0" + disambig : ""));
-        var works_date = localStorage.getItem("bpr_works_date " + artist_mbid),
-            count = $artist_works_msg.data("works_count") + 1;
+
+        var norm_title = normalizeTitle(title);
+        norm_work_titles.push(norm_title);
+
+        var works_date = localStorage.getItem("bpr_works_date " + artist_mbid);
+        var count = $artist_works_msg.data("works_count") + 1;
+
         update_artist_works_msg($artist_works_msg, count, artist_name, works_date);
         match_works([mbid], [title], [disambig], [norm_title]);
     }
 
     function flush_work_cache() {
-        if (works_load_cache.length == 0)
+        if (!works_load_cache.length) {
             return;
+        }
         var works_string = localStorage.getItem("bpr_works " + artist_mbid);
         if (works_string) {
             works_string += "\n" + works_load_cache.join("\n");
@@ -1173,11 +1196,12 @@ function batch_recording_rels() {
     function load_artist_works_btn() {
         var $input = $("#bpr-load-artist");
 
-        if (!$input.data("selected"))
+        if (!$input.data("selected")) {
             return;
+        }
 
-        var mbid = $input.data("mbid"),
-            name = $input.data("name");
+        var mbid = $input.data("mbid");
+        var name = $input.data("name");
 
         if (load_artist_works(mbid, name, false)) {
             var artists_string = localStorage.getItem("bpr_artists " + artist_mbid);
@@ -1191,37 +1215,40 @@ function batch_recording_rels() {
     }
 
     function update_artist_works_msg($msg, count, artist_name, works_date) {
-        $msg.html("").append(
-            count + " works loaded for " + artist_name + "<br/>",
-            $('<span>(cached ' + works_date + ')</span>')
-                .css({"font-size": "0.8em"}))
+        $msg
+            .html("")
+            .append(
+                count + " works loaded for " + artist_name + "<br/>",
+                $('<span>(cached ' + works_date + ')</span>').css({"font-size": "0.8em"})
+            )
             .data("works_count", count);
     }
 
     // Edit creation
 
     $("#bpr-work-type").val($.cookie("bpr_work_type") || 0)
-        .change(function() {
+        .change(function () {
             $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
         });
 
     $("#bpr-work-language").val($.cookie("bpr_work_language") || 0)
-        .change(function() {
+        .change(function () {
             $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
         });
 
     function relate_all_to_work(mbid, title, disambig, callback) {
-        var $rows = checked_recordings(),
-            total = $rows.length;
+        var $rows = checked_recordings();
+        var total = $rows.length;
 
-        if (total == 0) {
-            if (callback)
+        if (!total) {
+            if (callback) {
                 callback();
+            }
             return;
         }
 
         for (var i = 0; i < total; i++) {
-            if (i == total - 1) {
+            if (i === total - 1) {
                 var _callback = callback;
             } else {
                 var _callback = false;
@@ -1235,25 +1262,24 @@ function batch_recording_rels() {
         }
 
         var index = work_mbids.indexOf(mbid);
-        if (index == -1) {
+        if (index === -1) {
             cache_work(mbid, title, disambig);
             flush_work_cache();
         }
     }
 
     function relate_to_new_titled_work() {
-        var $rows = checked_recordings(),
-            total = $rows.length,
-            title = $("#bpr-new-work").val();
+        var $rows = checked_recordings();
+        var total = $rows.length;
+        var title = $("#bpr-new-work").val();
 
-        if (total == 0 || !title)
+        if (!total || !title) {
             return;
+        }
 
         ws_requests.stopped = true;
 
-        var $button = $(this)
-                .attr("disabled", true)
-                .css("color", "#EAEAEA");
+        var $button = $(this).attr("disabled", true).css("color", "#EAEAEA");
 
         function callback() {
             ws_requests.stopped = false;
@@ -1268,8 +1294,8 @@ function batch_recording_rels() {
     }
 
     function relate_to_existing_work() {
-        var $input = $("input#bpr-existing-work"),
-            $button = $(this);
+        var $input = $("input#bpr-existing-work");
+        var $button = $(this);
 
         function callback() {
             ws_requests.stopped = false;
@@ -1284,18 +1310,20 @@ function batch_recording_rels() {
                 $input.data("mbid"),
                 $input.data("name"),
                 $input.data("disambig") || "",
-                callback);
+                callback
+            );
         } else {
             $input.css("background", "#ffaaaa");
         }
     }
 
     function relate_to_new_works() {
-        var $rows = checked_recordings(),
-            total_rows = $rows.length;
+        var $rows = checked_recordings();
+        var total_rows = $rows.length;
 
-        if (total_rows == 0)
+        if (!total_rows) {
             return;
+        }
 
         ws_requests.stopped = true;
 
@@ -1303,17 +1331,17 @@ function batch_recording_rels() {
                 .attr("disabled", true)
                 .css("color", "#EAEAEA");
 
-        $.each($rows, function(i, row) {
-            var $row = $(row),
-                $title_cell = rowTitleCell($row),
-                title = $title_cell.find("a[href*='musicbrainz.org/recording/']").text();
-            $title_cell.css("color", "LightSlateGray")
-                .find("a").css("color", "LightSlateGray");
+        $.each($rows, function (i, row) {
+            var $row = $(row);
+            var $title_cell = rowTitleCell($row);
+            var title = $title_cell.find("a[href*='musicbrainz.org/recording/']").text();
+
+            $title_cell.css("color", "LightSlateGray").find("a").css("color", "LightSlateGray");
 
             create_new_work(title, function (data) {
                 total_rows -= 1;
-                if (total_rows == 0) {
-                    var _callback = function() {
+                if (total_rows === 0) {
+                    var _callback = function () {
                         flush_work_cache();
                         ws_requests.stopped = false;
                         ws_requests.start_queue();
@@ -1330,15 +1358,14 @@ function batch_recording_rels() {
 
     function create_new_work(title, callback) {
         function post_edit() {
-            var data = "edit-work.name=" + title,
-                work_type = $("#bpr-work-type").val(),
-                work_lang = $("#bpr-work-language").val();
+            var data = "edit-work.name=" + title;
+            var work_type = $("#bpr-work-type").val();
+            var work_lang = $("#bpr-work-language").val();
 
             if (work_type) data += "&edit-work.type_id=" + work_type;
             if (work_lang) data += "&edit-work.language_id=" + work_lang;
 
-            $.post("/work/create", data, callback)
-            .error(function() {
+            $.post("/work/create", data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
             });
         }
@@ -1346,13 +1373,14 @@ function batch_recording_rels() {
     }
 
     function relate_to_suggested_works() {
-        var $rows = checked_recordings().filter(function() {
-                return $(this).data("suggested_work_mbid");
-            }),
-            total = $rows.length;
+        var $rows = checked_recordings().filter(function () {
+            return $(this).data("suggested_work_mbid");
+        });
 
-        if (total == 0)
+        var total = $rows.length;
+        if (!total) {
             return;
+        }
 
         ws_requests.stopped = true;
 
@@ -1366,15 +1394,15 @@ function batch_recording_rels() {
             $button.attr("disabled", false).css("color", "#565656");
         };
 
-        $.each($rows, function(i, row) {
-            var $row = $(row),
-                mbid = $row.data("suggested_work_mbid"),
-                title = $row.data("suggested_work_title"),
-                $title_cell = rowTitleCell($row);
-            $title_cell.css("color", "LightSlateGray")
-                .find("a").css("color", "LightSlateGray");
+        $.each($rows, function (i, row) {
+            var $row = $(row);
+            var mbid = $row.data("suggested_work_mbid");
+            var title = $row.data("suggested_work_title");
+            var $title_cell = rowTitleCell($row);
 
-            if (i == total - 1) {
+            $title_cell.css("color", "LightSlateGray").find("a").css("color", "LightSlateGray");
+
+            if (i === total - 1) {
                 var _callback = callback;
             } else {
                 var _callback = false;
@@ -1400,22 +1428,23 @@ function batch_recording_rels() {
     function relate_to_work($row, work_mbid, work_title, work_disambig, check_loaded, callback, priority) {
         var performances = $row.data("performances");
         if (performances) {
-            if (performances.indexOf(work_mbid) == -1) {
+            if (performances.indexOf(work_mbid) === -1) {
                 performances.push(work_mbid);
             } else {
-                if (callback)
+                if (callback) {
                     callback();
+                }
                 return;
             }
         } else {
             $row.data("performances", [work_mbid]);
         }
 
-        var rec_mbid = $row.find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0],
-            $title_cell = rowTitleCell($row),
-            title_link = $title_cell.children("a")[0],
-            $attrs = $row.children("td.bpr_attrs"),
-            attr_string = "";
+        var rec_mbid = $row.find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0];
+        var $title_cell = rowTitleCell($row);
+        var title_link = $title_cell.children("a")[0];
+        var $attrs = $row.children("td.bpr_attrs");
+        var attr_string = "";
 
         function selected(attr) {
             var checked = $attrs.children("span." + attr).data("checked") ? 1 : 0;
@@ -1440,9 +1469,9 @@ function batch_recording_rels() {
         if (selected("instrumental")) attrs.push("c031ed4f-c9bb-4394-8cf5-e8ce4db512ae");
         if (selected("cover")) attrs.push("1e8536bd-6eda-3822-8e78-1c0f4d3d2113");
 
-        for (var i = 0; i <= attrs.length; i++) {
-            data["rel-editor.rels.0.attributes."+i+".type.gid"] = attrs[i];
-        }
+        _.each(attrs, function (attr, index) {
+            data["rel-editor.rels.0.attributes." + index + ".type.gid"] = attr;
+        });
 
         var date = $attrs.data("date");
         if (date != null) {
@@ -1458,7 +1487,7 @@ function batch_recording_rels() {
         function post_edit() {
             $(title_link).css("color", "green");
 
-            $.post(url, data, function() {
+            $.post(url, data, function () {
                 add_work_link($row, work_mbid, work_title, work_disambig, attr_string);
 
                 $(title_link).removeAttr("style");
@@ -1470,9 +1499,10 @@ function batch_recording_rels() {
                     restripeRows();
                 }
 
-                if (callback)
+                if (callback) {
                     callback();
-            }).error(function() {
+                }
+            }).fail(function () {
                 edit_requests.unshift(post_edit);
             });
         }
@@ -1484,8 +1514,9 @@ function batch_recording_rels() {
 
         if (check_loaded) {
             var index = work_mbids.indexOf(work_mbid);
-            if (index == -1)
+            if (index === -1) {
                 cache_work(work_mbid, work_title, work_disambig);
+            }
         }
     }
 
@@ -1493,13 +1524,14 @@ function batch_recording_rels() {
         var string = this.value.toLowerCase();
 
         for (var i = 0; i < $recordings.length; i++) {
-            var $rec = $($recordings[i]),
-                title = $rec.find("a[href*='musicbrainz.org/recording/']").text().toLowerCase();
+            var $rec = $recordings.eq(i);
+            var title = $rec.find("a[href*='musicbrainz.org/recording/']").text().toLowerCase();
 
-            if (title.indexOf(string) != -1) {
+            if (title.indexOf(string) !== -1) {
                 $rec.data("filtered", false);
-                if (!hide_performed_recs || !$rec.hasClass("performed"))
+                if (!hide_performed_recs || !$rec.hasClass("performed")) {
                     $rec.show();
+                }
             } else {
                 $rec.hide().data("filtered", true);
             }
@@ -1515,16 +1547,15 @@ function batch_recording_rels() {
             $performed.find("input[name=add-to-merge]").attr("checked", false);
             $performed.hide();
         } else {
-            $performed.filter(function() {return !$(this).data("filtered");}).show();
+            $performed.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
         $.cookie('hide_performed_recs', hide_performed_recs.toString(), { path: '/', expires: 1000 });
     }
 
     function toggle_pending_edits(event, checked) {
-        var $pending = $recordings.filter(function() {
-            return $(this).find("a[href*='musicbrainz.org/recording/']")
-                .parent().parent().is("span.mp");
+        var $pending = $recordings.filter(function () {
+            return $(this).find("a[href*='musicbrainz.org/recording/']").parent().parent().is("span.mp");
         });
         hide_pending_edits = checked !== undefined ? checked : this.checked;
 
@@ -1532,7 +1563,7 @@ function batch_recording_rels() {
             $pending.find("input[name=add-to-merge]").attr("checked", false);
             $pending.hide();
         } else {
-            $pending.filter(function() {return !$(this).data("filtered");}).show();
+            $pending.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
         $.cookie('hide_pending_edits', hide_pending_edits.toString(), { path: '/', expires: 1000 });
@@ -1542,26 +1573,28 @@ function batch_recording_rels() {
     function checked_recordings() {
         return $recordings
             .filter(":visible")
-            .filter(function() {return $(this).find("input[name=add-to-merge]:checked").length;});
+            .filter(function () { return $(this).find("input[name=add-to-merge]:checked").length });
     }
 
     function entity_lookup($input, entity) {
-        $input.bind("input", function() {
+        $input.bind("input", function () {
             var match = this.value.match(MBID_REGEX);
             $(this).data("selected", false);
             if (match) {
                 var mbid = match[0];
-                ws_requests.unshift(function() {
-                    $.get("/ws/2/" + entity + "/" + mbid, function(data) {
-                        var $doc = $(data.documentElement),
-                            value = ($doc.find("title")[0] || $doc.find("name")[0]).textContent,
-                            disambig = $doc.find("disambiguation")[0],
-                            data = {"selected": true, "mbid": mbid, "name": value};
-                        if (entity == "work" && disambig) {
+                ws_requests.unshift(function () {
+                    $.get("/ws/2/" + entity + "/" + mbid, function (data) {
+                        var $doc = $(data.documentElement);
+                        var value = ($doc.find("title")[0] || $doc.find("name")[0]).textContent;
+                        var disambig = $doc.find("disambiguation")[0];
+                        var data = {"selected": true, "mbid": mbid, "name": value};
+
+                        if (entity === "work" && disambig) {
                             data["disambig"] = disambig;
                         }
+
                         $input.val(value).data(data).css("background", "#bbffbb");
-                    }).error(function() {
+                    }).fail(function () {
                         $input.css("background", "#ffaaaa");
                     });
                 });
@@ -1590,8 +1623,8 @@ function batch_recording_rels() {
         this.active = false;
         this.stopped = false;
 
-        this.next = function() {
-            if (this.stopped || this.queue.length == 0) {
+        this.next = function () {
+            if (this.stopped || !this.queue.length) {
                 this.active = false;
                 return;
             }
@@ -1601,25 +1634,27 @@ function batch_recording_rels() {
             current_reqs += count;
             if (current_reqs >= 10) {
                 var diff = current_reqs - 9, timeout = diff * 1000;
-                setTimeout(function(foo) {foo.next();}, rate + timeout, this);
+                setTimeout(function (foo) { foo.next() }, rate + timeout, this);
             } else {
-                setTimeout(function(foo) {foo.next();}, rate, this);
+                setTimeout(function (foo) { foo.next() }, rate, this);
             }
         }
 
-        this.push = function(req) {
+        this.push = function (req) {
             this.queue.push(req);
-            if (!(this.active || this.stopped))
+            if (!(this.active || this.stopped)) {
                 this.start_queue();
+            }
         }
 
-        this.unshift = function(req) {
+        this.unshift = function (req) {
             this.queue.unshift(req);
-            if (!(this.active || this.stopped))
+            if (!(this.active || this.stopped)) {
                 this.start_queue();
+            }
         }
 
-        this.start_queue = function() {
+        this.start_queue = function () {
             if (this.active) {
                 return;
             }
@@ -1630,7 +1665,7 @@ function batch_recording_rels() {
                 this.next();
             } else {
                 var timeout = rate - now + this.last;
-                setTimeout(function(foo) {foo.next();}, timeout, this);
+                setTimeout(function (foo) { foo.next() }, timeout, this);
             }
         }
     }
