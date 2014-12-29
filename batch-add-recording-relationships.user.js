@@ -734,7 +734,7 @@ function batch_recording_rels() {
 
                 if (hide_performed_recs) {
                     $recordings.filter(".performed").hide();
-                    restripe_rows();
+                    restripeRows();
                 }
 
                 callback && callback();
@@ -1467,7 +1467,7 @@ function batch_recording_rels() {
                 if (hide_performed_recs) {
                     $row.find("input[name=add-to-merge]").attr("checked", false);
                     $row.hide();
-                    restripe_rows();
+                    restripeRows();
                 }
 
                 if (callback)
@@ -1504,7 +1504,7 @@ function batch_recording_rels() {
                 $rec.hide().data("filtered", true);
             }
         }
-        restripe_rows();
+        restripeRows();
     }
 
     function toggle_performed_recordings() {
@@ -1517,7 +1517,7 @@ function batch_recording_rels() {
         } else {
             $performed.filter(function() {return !$(this).data("filtered");}).show();
         }
-        restripe_rows();
+        restripeRows();
         $.cookie('hide_performed_recs', hide_performed_recs.toString(), { path: '/', expires: 1000 });
     }
 
@@ -1534,7 +1534,7 @@ function batch_recording_rels() {
         } else {
             $pending.filter(function() {return !$(this).data("filtered");}).show();
         }
-        restripe_rows();
+        restripeRows();
         $.cookie('hide_pending_edits', hide_pending_edits.toString(), { path: '/', expires: 1000 });
     }
     toggle_pending_edits(null, hide_pending_edits);
@@ -1573,19 +1573,11 @@ function batch_recording_rels() {
         return $input;
     }
 
-    function restripe_rows() {
-        var $rows = $recordings.filter(":visible"),
-            row, even = false;
-
-        for (var i = 0; i < $rows.length; i++) {
-            row = $rows[i];
-            if (even) {
-                $(row).addClass("ev");
-            } else {
-                $(row).removeClass("ev");
-            }
-            even = !even;
-        }
+    function restripeRows() {
+        $recordings.filter(":visible").each(function (index, row) {
+            var even = (index + 1) % 2 === 0;
+            row.className = row.className.replace(even ? 'odd' : 'even', even ? 'even' : 'odd');
+        });
     }
 
     function rowTitleCell($row) {
