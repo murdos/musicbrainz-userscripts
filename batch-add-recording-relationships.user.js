@@ -762,8 +762,8 @@ function batch_recording_rels() {
 
         function get_filtered_page(page) {
             var url = ("/ws/2/recording?query=" +
-                (name_filter ? encodeURIComponent(name_filter) : "") +
-                (ac_filter ? (name_filter ? "%20" : "") + "creditname:" + encodeURIComponent(ac_filter) : "") +
+                (name_filter ? encodeURIComponent(name_filter)+"%20AND%20" : "") +
+                (ac_filter ? "creditname:" + encodeURIComponent(ac_filter)+"%20AND%20" : "") +
                 " arid:" + artist_mbid + "&limit=100&offset=" + (page * 100));
 
             ws_requests.push(function() {
