@@ -665,23 +665,36 @@ function batch_recording_rels() {
 
     $(".tbl > thead > tr").append("<th>Performance Attributes</th>");
 
-    var date_element =  $('<input/>')
-        .attr('type', "text")
+    var $date_element = $('<input />')
+        .attr('type', 'text')
         .addClass('date')
+        .addClass('bpr-date-input')
         .val("yyyy-mm-dd")
-        .css({"color": "#ddd", "width": "7em", "border": "1px #999 solid"})
-        .bind("focus", function () {
+        .css({ color : "#ddd", "width": "7em", border: "1px #999 solid" });
+
+    $recordings.append(td(
+        $('<span class="bpr-attr partial">part.</span>/' +
+          '<span class="bpr-attr live">live</span>/' +
+          '<span class="bpr-attr instrumental">inst.</span>/' +
+          '<span class="bpr-attr cover">cover</span>')
+            .css("cursor", "pointer")
+            .data("checked", false),
+        '&#160;',
+        $date_element).addClass("bpr_attrs"));
+
+    $(document)
+        .on('focus', 'input.bpr-date-input', function () {
             if (this.value === "yyyy-mm-dd") {
                 $(this).val("").css("color", "#000");
             }
         })
-        .bind("blur", function () {
+        .on('blur', 'input.bpr-date-input', function () {
             if (this.value === "") {
                 $(this).val("yyyy-mm-dd").css("color", "#ddd");
                 $(this).parent().data("date", null);
             }
         })
-        .bind("input", function () {
+        .on('input', 'input.bpr-date-input', function () {
             var $input = $(this);
 
             function error() {
@@ -704,23 +717,18 @@ function batch_recording_rels() {
                     $(this).parent().data("date", parsedDate);
                 }
             }
-        });
+        })
+        .on('click', 'span.bpr-attr', function () {
+            var $this = $(this);
+            var checked = !$this.data('checked');
 
-    $recordings.append(td(
-        $('<span class="partial">part.</span>/' +
-          '<span class="live">live</span>/' +
-          '<span class="instrumental">inst.</span>/' +
-          '<span class="cover">cover</span>')
-            .css("cursor", "pointer")
-            .data("checked", false)
-            .click(function () {
-                var checked = !$(this).data("checked");
-                $(this).data("checked", checked)
-                    .css({"background": checked ? "blue": "inherit",
-                          "color": checked ? "white" : "black"});
-            }),
-        '&#160;',
-        date_element).addClass("bpr_attrs"));
+            $this
+                .data('checked', checked)
+                .css({
+                    background: checked ? 'blue': 'inherit',
+                    color: checked ? 'white' : 'black'
+                });
+        })
 
     // Style buttons
 
