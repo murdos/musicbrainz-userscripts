@@ -767,186 +767,184 @@ function batch_recording_rels() {
 
     // Load performance relationships
 
-    (function () {
-        var page_numbers = $(".pageselector .sel")[0], not_parsed = $recordings.length;
-        if (page_numbers === undefined) {
-            var page = 1;
-        } else {
-            var page = parseInt(page_numbers.href.match(/.+\?page=(\d+)/)[1] || "1", 10),
-                total_pages = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
+    var CURRENT_PAGE = 1;
+    var TOTAL_PAGES = 1;
+    var page_numbers = $(".pageselector .sel")[0];
+    var recordings_not_parsed = $recordings.length;
 
-            total_pages = Math.ceil((total_pages ? parseInt(total_pages[1], 10) : 1) / 2);
-        }
+    if (page_numbers !== undefined) {
+        CURRENT_PAGE = parseInt(page_numbers.href.match(/.+\?page=(\d+)/)[1] || "1", 10);
+        TOTAL_PAGES = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
+        TOTAL_PAGES = Math.ceil((TOTAL_PAGES ? parseInt(TOTAL_PAGES[1], 10) : 1) / 2);
+    }
 
-        var request_recordings = function (url, callback) {
-            var load_trys = 1;
+    var NAME_FILTER = $.trim($("#id-filter\\.name").val());
+    var ARTIST_FILTER = $.trim($("#id-filter\\.artist_credit_id").find("option:selected").text());
 
-            $.get(url, function (data) {
-                var recs = data.recordings;
-                var cache = {};
+    if (NAME_FILTER || ARTIST_FILTER) {
+        get_filtered_page(0);
+    } else {
+        queue_recordings_request(
+            "/ws/2/recording?artist=" + ARTIST_MBID +
+            "&inc=work-rels" +
+            "&limit=50" +
+            "&offset=" + ((CURRENT_PAGE - 1) * 50) +
+            "&fmt=json"
+        );
+    }
 
-                for (var i = 0; i < recs.length; i++) {
-                    var node = recs[i];
-                    var row = cache[node.id];
+    function request_recordings(url) {
+        var attempts = 1;
 
-                    if (row === undefined) {
-                        for (var j = 0; j < $recordings.length; j++) {
-                            var row_ = $recordings[j];
-                            var row_id = $(row_).find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
+        $.get(url, function (data) {
+            var recs = data.recordings;
+            var cache = {};
 
-                            if (node.id === row_id) {
-                                row = row_;
-                                break;
-                            } else {
-                                cache[row_id] = row_;
-                            }
+            for (var i = 0; i < recs.length; i++) {
+                var node = recs[i];
+                var row = cache[node.id];
+
+                if (row === undefined) {
+                    for (var j = 0; j < $recordings.length; j++) {
+                        var row_ = $recordings[j];
+                        var row_id = $(row_).find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
+
+                        if (node.id === row_id) {
+                            row = row_;
+                            break;
+                        } else {
+                            cache[row_id] = row_;
                         }
                     }
-                    if (row !== undefined) {
-                        parse_recording(node, $(row));
-                        not_parsed -= 1;
-                    }
                 }
-
-                if (hide_performed_recs) {
-                    $recordings.filter(".performed").hide();
-                    restripeRows();
+                if (row !== undefined) {
+                    parse_recording(node, $(row));
+                    recordings_not_parsed -= 1;
                 }
+            }
 
-                callback && callback();
-            })
-            .done(function () {
-                $recordings_load_msg.parent().remove();
-                $relate_table.show();
-                load_works_init();
-            })
-            .fail(function () {
-                $recordings_load_msg
-                    .text("Error loading relationships. Retry #" + load_trys + "...")
-                    .css("color", "red");
-                load_trys += 1;
-                ws_requests.unshift(request_recordings);
-            });
-        };
-        var queue_recordings_request = function (url) {
-            ws_requests.push(function () {
-                request_recordings(url);
-            });
-        }
-        var name_filter = $.trim($("#id-filter\\.name").val());
-        var ac_filter = $.trim($("#id-filter\\.artist_credit_id").find("option:selected").text());
+            if (hide_performed_recs) {
+                $recordings.filter(".performed").hide();
+                restripeRows();
+            }
+        })
+        .done(function () {
+            $recordings_load_msg.parent().remove();
+            $relate_table.show();
+            load_works_init();
+        })
+        .fail(function () {
+            $recordings_load_msg
+                .text("Error loading relationships. Retry #" + attempts + "...")
+                .css("color", "red");
+            attempts += 1;
+            ws_requests.unshift(request_recordings);
+        });
+    }
 
-        function get_filtered_page(page) {
-            var url = (
-                "/ws/2/recording?query=" +
-                (name_filter ? encodeURIComponent(name_filter) + "%20AND%20" : "") +
-                (ac_filter ? "creditname:" + encodeURIComponent(ac_filter) + "%20AND%20" : "") +
-                " arid:" + ARTIST_MBID +
-                "&limit=100" +
-                "&offset=" + (page * 100) +
-                "&fmt=json"
-            );
+    function queue_recordings_request(url) {
+        ws_requests.push(function () {
+            request_recordings(url);
+        });
+    }
 
-            ws_requests.push(function () {
-                $.get(url, function (data) {
-                    _.each(data.recordings, function (r) {
-                        queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
-                    });
+    function get_filtered_page(page) {
+        var url = (
+            "/ws/2/recording?query=" +
+            (NAME_FILTER ? encodeURIComponent(NAME_FILTER) + "%20AND%20" : "") +
+            (ARTIST_FILTER ? "creditname:" + encodeURIComponent(ARTIST_FILTER) + "%20AND%20" : "") +
+            " arid:" + ARTIST_MBID +
+            "&limit=100" +
+            "&offset=" + (page * 100) +
+            "&fmt=json"
+        );
 
-                    if (not_parsed > 0 && page < total_pages - 1) {
-                        get_filtered_page(page + 1);
-                    }
-                });
-            });
-        }
-
-        if (name_filter || ac_filter) {
-            get_filtered_page(0);
-        } else {
-            queue_recordings_request(
-                "/ws/2/recording?artist=" + ARTIST_MBID +
-                "&inc=work-rels" +
-                "&limit=50" +
-                "&offset=" + ((page - 1) * 50) +
-                "&fmt=json"
-            );
-        }
-
-        function parse_recording(node, $row) {
-            var rels = node.relations;
-            var rec_title = $row.children("td").not(":has(input)").first();
-
-            $row.data("performances", []);
-            var $attrs = $row.children("td.bpr_attrs"), performed = false;
-            $attrs.data("checked", false).css("color", "black");
-
-            _.each(rels, function (rel) {
-                if (!rel.type.match(/performance/)) {
-                    return;
-                }
-
-                if (!performed) {
-                    $row.addClass("performed");
-                    performed = true;
-                }
-
-                var work_mbid = rel.work.id;
-                var work_title = rel.work.title;
-                var work_comment = rel.work.disambiguation;
-                var attrs = [];
-
-                if (rel.begin) {
-                    $attrs.find("input.date").val(rel.begin).trigger("input");
-                }
-
-                _.each(rel.attributes, function (name) {
-                    name = name.toLowerCase();
-                    attrs.push(name);
-
-                    var $button = $attrs.find("span." + name);
-                    if (!$button.data("checked")) {
-                        $button.click();
-                    }
+        ws_requests.push(function () {
+            $.get(url, function (data) {
+                _.each(data.recordings, function (r) {
+                    queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
                 });
 
-                add_work_link($row, work_mbid, work_title, work_comment, attrs);
-                $row.data("performances").push(work_mbid);
-            });
-
-            var comment = node.disambiguation;
-            if (comment) {
-                var date = comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
-                if (date) {
-                    $attrs.find("input.date").val(date[1]).trigger("input");
+                if (recordings_not_parsed > 0 && page < TOTAL_PAGES - 1) {
+                    get_filtered_page(page + 1);
                 }
+            });
+        });
+    }
+
+    function parse_recording(node, $row) {
+        var rels = node.relations;
+        var rec_title = $row.children("td").not(":has(input)").first();
+
+        $row.data("performances", []);
+        var $attrs = $row.children("td.bpr_attrs"), performed = false;
+        $attrs.data("checked", false).css("color", "black");
+
+        _.each(rels, function (rel) {
+            if (!rel.type.match(/performance/)) {
+                return;
             }
 
             if (!performed) {
-                if (node.title.match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
-                    $attrs.find("span.live").click();
-                } else {
-                    var url = "/ws/2/recording/" + node.id + "?inc=releases+release-groups&fmt=json";
+                $row.addClass("performed");
+                performed = true;
+            }
 
-                    var request_rec = function () {
-                        $.get(url, function (data) {
-                            var releases = data.releases;
+            var work_mbid = rel.work.id;
+            var work_title = rel.work.title;
+            var work_comment = rel.work.disambiguation;
+            var attrs = [];
 
-                            for (var i = 0; i < releases.length; i++) {
-                                if (_.contains(releases[i]["release-group"]["secondary-types"], "Live")) {
-                                    $attrs.find("span.live").click();
-                                    break;
-                                }
-                            }
-                        }).fail(function () {
-                            ws_requests.push(request_rec);
-                        });
-                    }
-                    ws_requests.push(request_rec);
+            if (rel.begin) {
+                $attrs.find("input.date").val(rel.begin).trigger("input");
+            }
+
+            _.each(rel.attributes, function (name) {
+                name = name.toLowerCase();
+                attrs.push(name);
+
+                var $button = $attrs.find("span." + name);
+                if (!$button.data("checked")) {
+                    $button.click();
                 }
+            });
+
+            add_work_link($row, work_mbid, work_title, work_comment, attrs);
+            $row.data("performances").push(work_mbid);
+        });
+
+        var comment = node.disambiguation;
+        if (comment) {
+            var date = comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
+            if (date) {
+                $attrs.find("input.date").val(date[1]).trigger("input");
             }
         }
 
-    })();
+        if (!performed) {
+            if (node.title.match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
+                $attrs.find("span.live").click();
+            } else {
+                var url = "/ws/2/recording/" + node.id + "?inc=releases+release-groups&fmt=json";
+
+                var request_rec = function () {
+                    $.get(url, function (data) {
+                        var releases = data.releases;
+
+                        for (var i = 0; i < releases.length; i++) {
+                            if (_.contains(releases[i]["release-group"]["secondary-types"], "Live")) {
+                                $attrs.find("span.live").click();
+                                break;
+                            }
+                        }
+                    }).fail(function () {
+                        ws_requests.push(request_rec);
+                    });
+                }
+                ws_requests.push(request_rec);
+            }
+        }
+    }
 
     // Load works
 
