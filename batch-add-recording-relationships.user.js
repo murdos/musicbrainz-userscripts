@@ -714,7 +714,7 @@ function batch_recording_rels() {
             .css("cursor", "pointer")
             .data("checked", false)
             .click(function () {
-                var checked = !$this.data("checked");
+                var checked = !$(this).data("checked");
                 $(this).data("checked", checked)
                     .css({"background": checked ? "blue": "inherit",
                           "color": checked ? "white" : "black"});
