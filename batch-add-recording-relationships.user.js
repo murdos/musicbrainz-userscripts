@@ -761,9 +761,9 @@ function batch_recording_rels() {
                     .attr("checked", false);
         });
 
-    var artist_mbid = window.location.href.match(MBID_REGEX)[0],
-        artist_name = $("h1 a").text(),
-        $artist_works_msg = $("<td></td>");
+    var ARTIST_MBID = window.location.href.match(MBID_REGEX)[0];
+    var ARTIST_NAME = $("h1 a").text();
+    var $artist_works_msg = $("<td></td>");
 
     // Load performance relationships
 
@@ -833,15 +833,15 @@ function batch_recording_rels() {
                 request_recordings(url);
             });
         }
-        var name_filter = $.trim($("#id-filter\\.name").val()),
-            ac_filter = $.trim($("#id-filter\\.artist_credit_id").find("option:selected").text());
+        var name_filter = $.trim($("#id-filter\\.name").val());
+        var ac_filter = $.trim($("#id-filter\\.artist_credit_id").find("option:selected").text());
 
         function get_filtered_page(page) {
             var url = (
                 "/ws/2/recording?query=" +
                 (name_filter ? encodeURIComponent(name_filter) + "%20AND%20" : "") +
                 (ac_filter ? "creditname:" + encodeURIComponent(ac_filter) + "%20AND%20" : "") +
-                " arid:" + artist_mbid +
+                " arid:" + ARTIST_MBID +
                 "&limit=100" +
                 "&offset=" + (page * 100) +
                 "&fmt=json"
@@ -864,7 +864,7 @@ function batch_recording_rels() {
             get_filtered_page(0);
         } else {
             queue_recordings_request(
-                "/ws/2/recording?artist=" + artist_mbid +
+                "/ws/2/recording?artist=" + ARTIST_MBID +
                 "&inc=work-rels" +
                 "&limit=50" +
                 "&offset=" + ((page - 1) * 50) +
@@ -955,7 +955,7 @@ function batch_recording_rels() {
     var LOADED_ARTISTS = {};
 
     function load_works_init() {
-        var artists_string = localStorage.getItem("bpr_artists " + artist_mbid);
+        var artists_string = localStorage.getItem("bpr_artists " + ARTIST_MBID);
         var artists = [];
 
         if (artists_string) {
@@ -964,16 +964,16 @@ function batch_recording_rels() {
 
         function callback() {
             if (artists.length > 0) {
-                var parts = artists.pop(),
-                    mbid = parts.slice(0, 36),
-                    name = parts.slice(36);
+                var parts = artists.pop();
+                var mbid = parts.slice(0, 36);
+                var name = parts.slice(36);
 
                 if (mbid && name) {
                     load_artist_works(mbid, name, callback);
                 }
             }
         }
-        load_artist_works(artist_mbid, artist_name, callback);
+        load_artist_works(ARTIST_MBID, ARTIST_NAME, callback);
     }
 
     function load_artist_works(mbid, name, callback) {
@@ -986,7 +986,7 @@ function batch_recording_rels() {
         var $table_row = $("<tr></tr>");
         var $button_cell = $("<td></td>").css("display", "none");
 
-        if (mbid === artist_mbid) {
+        if (mbid === ARTIST_MBID) {
             var $msg = $artist_works_msg;
         } else {
             var $msg = $("<td></td>");
@@ -1121,14 +1121,16 @@ function batch_recording_rels() {
             return;
         }
 
-        var sim = function (r, w) {
-            return r==w?0:_.str.levenshtein(r,w)/((r.length+w.length)/2);
-        }, matches = {};
+        function sim(r, w) {
+            return r == w ? 0 : _.str.levenshtein(r, w) / ((r.length + w.length) / 2);
+        }
+
+        var matches = {};
 
         var to_recording = function ($rec, rec_title) {
             if (rec_title in matches) {
                 var match = matches[rec_title];
-                suggested_work_link($rec, match[0], match[1], match[2], match[3]);
+                suggested_work_link($rec, match[0], match[1], match[2]);
                 return;
             }
 
@@ -1138,15 +1140,15 @@ function batch_recording_rels() {
                     $("<span>Looking for matching work…</span>"), "&#160;", $progress)
                         .css({"font-size": "0.9em", "padding": "0.3em", "padding-left": "1em", "color": "orange"}));
 
-            var current = 0, foo = {}, total = mbids.length;
-            foo.minscore = 0.250001;
-            foo.match = null;
+            var current = 0;
+            var context = { minScore: 0.250001, match: null };
+            var total = mbids.length;
 
             var done = function () {
-                var match = foo.match;
+                var match = context.match;
                 if (match !== null) {
                     matches[rec_title] = match;
-                    suggested_work_link($rec, match[0], match[1], match[2], match[3]);
+                    suggested_work_link($rec, match[0], match[1], match[2]);
                 } else {
                     $progress.parent().remove();
                 }
@@ -1161,14 +1163,14 @@ function batch_recording_rels() {
                     $progress.text(current.toString() + "/" + total.toString());
                 }
 
-                if (score < foo.minscore) {
-                    foo.match = [mbids[j], titles[j], comments[j], norm_work_title];
+                if (score < context.minScore) {
+                    context.match = [mbids[j], titles[j], comments[j]];
                     if (score === 0) {
                         clearInterval(iid);
                         done();
                         return;
                     }
-                    foo.minscore = score;
+                    context.minScore = score;
                 }
                 if (j === total - 1) {
                     clearInterval(iid);
@@ -1185,7 +1187,7 @@ function batch_recording_rels() {
         }
     }
 
-    function suggested_work_link($rec, mbid, title, comment, norm_title) {
+    function suggested_work_link($rec, mbid, title, comment) {
         var $title_cell = rowTitleCell($rec);
         $title_cell.children("div.suggested-work").remove();
         $title_cell.append(
@@ -1207,7 +1209,7 @@ function batch_recording_rels() {
         }
         delete LOADED_ARTISTS[mbid];
 
-        var artists = localStorage.getItem("bpr_artists " + artist_mbid).split("\n");
+        var artists = localStorage.getItem("bpr_artists " + ARTIST_MBID).split("\n");
         var new_artists = [];
 
         for (var i = 0; i < artists.length; i++) {
@@ -1217,7 +1219,7 @@ function batch_recording_rels() {
         }
 
         var artists_string = new_artists.join("\n");
-        localStorage.setItem("bpr_artists " + artist_mbid, artists_string)
+        localStorage.setItem("bpr_artists " + ARTIST_MBID, artists_string)
     }
 
     function cache_work(mbid, title, comment) {
@@ -1225,10 +1227,10 @@ function batch_recording_rels() {
         WORKS_LOAD_CACHE.push(mbid + title + (comment ? "\u00a0" + comment : ""));
 
         var norm_title = normalizeTitle(title);
-        var works_date = localStorage.getItem("bpr_works_date " + artist_mbid);
+        var works_date = localStorage.getItem("bpr_works_date " + ARTIST_MBID);
         var count = $artist_works_msg.data("works_count") + 1;
 
-        update_artist_works_msg($artist_works_msg, count, artist_name, works_date);
+        update_artist_works_msg($artist_works_msg, count, ARTIST_NAME, works_date);
         match_works([mbid], [title], [comment], [norm_title]);
     }
 
@@ -1236,13 +1238,13 @@ function batch_recording_rels() {
         if (!WORKS_LOAD_CACHE.length) {
             return;
         }
-        var works_string = localStorage.getItem("bpr_works " + artist_mbid);
+        var works_string = localStorage.getItem("bpr_works " + ARTIST_MBID);
         if (works_string) {
             works_string += "\n" + WORKS_LOAD_CACHE.join("\n");
         } else {
             works_string = WORKS_LOAD_CACHE.join("\n");
         }
-        localStorage.setItem("bpr_works " + artist_mbid, works_string);
+        localStorage.setItem("bpr_works " + ARTIST_MBID, works_string);
         WORKS_LOAD_CACHE = [];
     }
 
@@ -1257,21 +1259,21 @@ function batch_recording_rels() {
         var name = $input.data("name");
 
         if (load_artist_works(mbid, name, false)) {
-            var artists_string = localStorage.getItem("bpr_artists " + artist_mbid);
+            var artists_string = localStorage.getItem("bpr_artists " + ARTIST_MBID);
             if (artists_string) {
                 artists_string += "\n" + mbid + name;
             } else {
                 artists_string = mbid + name;
             }
-            localStorage.setItem("bpr_artists " + artist_mbid, artists_string);
+            localStorage.setItem("bpr_artists " + ARTIST_MBID, artists_string);
         }
     }
 
-    function update_artist_works_msg($msg, count, artist_name, works_date) {
+    function update_artist_works_msg($msg, count, name, works_date) {
         $msg
             .html("")
             .append(
-                count + " works loaded for " + artist_name + "<br/>",
+                count + " works loaded for " + name + "<br/>",
                 $('<span>(cached ' + works_date + ')</span>').css({"font-size": "0.8em"})
             )
             .data("works_count", count);
