@@ -880,7 +880,7 @@ function batch_recording_rels() {
     var works_load_cache = [],
         work_mbids = [],
         work_titles = [],
-        work_disambigs = [],
+        work_comments = [],
         norm_work_titles = [],
         loaded_artists = [];
 
@@ -990,7 +990,7 @@ function batch_recording_rels() {
     function load_works_finish(result) {
         var tmp_mbids = [];
         var tmp_titles = [];
-        var tmp_disambigs = [];
+        var tmp_comments = [];
         var tmp_norm_titles = [];
 
         for (var i = 0; i < result.length; i++) {
@@ -1005,19 +1005,19 @@ function batch_recording_rels() {
             }
             var rest = parts.slice(36).split("\u00a0");
             var title = rest[0];
-            var disambig = rest[1] || "";
+            var comment = rest[1] || "";
             var norm_title = normalizeTitle(title);
 
             work_mbids.push(mbid);
             work_titles.push(title);
-            work_disambigs.push(disambig);
+            work_comments.push(comment);
             norm_work_titles.push(norm_title);
             tmp_mbids.push(mbid);
             tmp_titles.push(title);
-            tmp_disambigs.push(disambig);
+            tmp_comments.push(comment);
             tmp_norm_titles.push(norm_title);
         }
-        return [tmp_mbids, tmp_titles, tmp_disambigs, tmp_norm_titles];
+        return [tmp_mbids, tmp_titles, tmp_comments, tmp_norm_titles];
     }
 
     function request_works(url, offset, count, callback) {
@@ -1048,7 +1048,7 @@ function batch_recording_rels() {
         });
     }
 
-    function match_works(mbids, titles, disambigs, norm_titles) {
+    function match_works(mbids, titles, comments, norm_titles) {
         if (!mbids.length) {
             return;
         }
@@ -1099,7 +1099,7 @@ function batch_recording_rels() {
                 }
 
                 if (score < foo.minscore) {
-                    foo.match = [mbids[j], titles[j], disambigs[j], norm_work_title];
+                    foo.match = [mbids[j], titles[j], comments[j], norm_work_title];
                     if (score === 0) {
                         clearInterval(iid);
                         done();
@@ -1122,7 +1122,7 @@ function batch_recording_rels() {
         }
     }
 
-    function suggested_work_link($rec, mbid, title, disambig, norm_title) {
+    function suggested_work_link($rec, mbid, title, comment, norm_title) {
         var $title_cell = rowTitleCell($rec);
         $title_cell.children("div.suggested-work").remove();
         $title_cell.append(
@@ -1131,8 +1131,8 @@ function batch_recording_rels() {
                 $("<a></a>")
                     .attr("href", "/work/" + mbid)
                     .text(title),
-                    (disambig ? "&#160;" : null),
-                    (disambig ? $("<span></span>").text("(" + disambig + ")") : null))
+                    (comment ? "&#160;" : null),
+                    (comment ? $("<span></span>").text("(" + comment + ")") : null))
                 .css({"font-size": "0.9em", "padding": "0.3em", "padding-left": "1em"}));
         $rec.data("suggested_work_mbid", mbid);
         $rec.data("suggested_work_title", title);
@@ -1158,11 +1158,11 @@ function batch_recording_rels() {
         localStorage.setItem("bpr_artists " + artist_mbid, artists_string)
     }
 
-    function cache_work(mbid, title, disambig) {
+    function cache_work(mbid, title, comment) {
         work_mbids.push(mbid);
         work_titles.push(title);
-        work_disambigs.push(disambig);
-        works_load_cache.push(mbid + title + (disambig ? "\u00a0" + disambig : ""));
+        work_comments.push(comment);
+        works_load_cache.push(mbid + title + (comment ? "\u00a0" + comment : ""));
 
         var norm_title = normalizeTitle(title);
         norm_work_titles.push(norm_title);
@@ -1171,7 +1171,7 @@ function batch_recording_rels() {
         var count = $artist_works_msg.data("works_count") + 1;
 
         update_artist_works_msg($artist_works_msg, count, artist_name, works_date);
-        match_works([mbid], [title], [disambig], [norm_title]);
+        match_works([mbid], [title], [comment], [norm_title]);
     }
 
     function flush_work_cache() {
@@ -1231,7 +1231,7 @@ function batch_recording_rels() {
             $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
         });
 
-    function relate_all_to_work(mbid, title, disambig, callback) {
+    function relate_all_to_work(mbid, title, comment, callback) {
         var $rows = checked_recordings();
         var total = $rows.length;
 
@@ -1253,12 +1253,12 @@ function batch_recording_rels() {
                 .css("color", "LightSlateGray")
                 .find("a").css("color", "LightSlateGray");
 
-            relate_to_work($row, mbid, title, disambig, false, _callback, false);
+            relate_to_work($row, mbid, title, comment, false, _callback, false);
         }
 
         var index = work_mbids.indexOf(mbid);
         if (index === -1) {
-            cache_work(mbid, title, disambig);
+            cache_work(mbid, title, comment);
             flush_work_cache();
         }
     }
@@ -1304,7 +1304,7 @@ function batch_recording_rels() {
             relate_all_to_work(
                 $input.data("mbid"),
                 $input.data("name"),
-                $input.data("disambig") || "",
+                $input.data("comment") || "",
                 callback
             );
         } else {
@@ -1406,7 +1406,7 @@ function batch_recording_rels() {
         });
     }
 
-    function add_work_link($row, mbid, title, disambig, attrs) {
+    function add_work_link($row, mbid, title, comment, attrs) {
         var $title_cell = rowTitleCell($row);
         $title_cell.children("div.suggested-work").remove();
         $row.removeData("suggested_work_mbid").removeData("suggested_work_title");
@@ -1416,11 +1416,11 @@ function batch_recording_rels() {
             .text(attrs.join(' ') + " recording of ")
             .css({"font-size": "0.9em", "padding": "0.3em", "padding-left": "1em"})
             .append($("<a></a>").attr("href", "/work/" + mbid).text(title),
-                (disambig ? "&#160;" : null),
-                (disambig ? $("<span></span>").text("(" + disambig + ")") : null)));
+                (comment ? "&#160;" : null),
+                (comment ? $("<span></span>").text("(" + comment + ")") : null)));
     }
 
-    function relate_to_work($row, work_mbid, work_title, work_disambig, check_loaded, callback, priority) {
+    function relate_to_work($row, work_mbid, work_title, work_comment, check_loaded, callback, priority) {
         var performances = $row.data("performances");
         if (performances) {
             if (performances.indexOf(work_mbid) === -1) {
@@ -1482,7 +1482,7 @@ function batch_recording_rels() {
             $(title_link).css("color", "green");
 
             $.post('/relationship-editor', data, function () {
-                add_work_link($row, work_mbid, work_title, work_disambig, selectedAttrs);
+                add_work_link($row, work_mbid, work_title, work_comment, selectedAttrs);
 
                 $(title_link).removeAttr("style");
                 $row.addClass("performed");
@@ -1509,7 +1509,7 @@ function batch_recording_rels() {
         if (check_loaded) {
             var index = work_mbids.indexOf(work_mbid);
             if (index === -1) {
-                cache_work(work_mbid, work_title, work_disambig);
+                cache_work(work_mbid, work_title, work_comment);
             }
         }
     }
@@ -1579,11 +1579,11 @@ function batch_recording_rels() {
                 ws_requests.unshift(function () {
                     $.get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
                         var value = data.title || data.name;
-                        var disambig = data.disambiguation;
+                        var comment = data.disambiguation;
                         var data = {"selected": true, "mbid": mbid, "name": value};
 
-                        if (entity === "work" && disambig) {
-                            data["disambig"] = disambig;
+                        if (entity === "work" && comment) {
+                            data.comment = comment;
                         }
 
                         $input.val(value).data(data).css("background", "#bbffbb");
