@@ -15,6 +15,8 @@ document.body.appendChild(scr);
 
 function batch_recording_rels() {
 
+    // HTML helpers
+
     function make_element(el_name, args) {
         var el = $("<"+el_name+"></"+el_name+">");
         el.append.apply(el, args);
@@ -36,9 +38,80 @@ function batch_recording_rels() {
         return $("<button>Go</button>").click(func);
     }
 
-    var TITLE_SELECTOR = "a[href*='" + window.location.host + "/recording/']";
+    // Request rate limiting
 
+    var REQUEST_COUNT = 0;
+    setInterval(function () {
+        if (REQUEST_COUNT > 0) {
+            REQUEST_COUNT -= 1;
+        }
+    }, 1000);
+
+    function RequestManager(rate, count) {
+        this.rate = rate;
+        this.count = count;
+        this.queue = [];
+        this.last = 0;
+        this.active = false;
+        this.stopped = false;
+    }
+
+    RequestManager.prototype.next = function () {
+        if (this.stopped || !this.queue.length) {
+            this.active = false;
+            return;
+        }
+        this.queue.shift()();
+        this.last = new Date().getTime();
+
+        REQUEST_COUNT += this.count;
+        if (REQUEST_COUNT >= 10) {
+            var diff = REQUEST_COUNT - 9;
+            var timeout = diff * 1000;
+
+            setTimeout(function (foo) { foo.next() }, this.rate + timeout, this);
+        } else {
+            setTimeout(function (foo) { foo.next() }, this.rate, this);
+        }
+    };
+
+    RequestManager.prototype.push = function (req) {
+        this.queue.push(req);
+        if (!(this.active || this.stopped)) {
+            this.start_queue();
+        }
+    };
+
+    RequestManager.prototype.unshift = function (req) {
+        this.queue.unshift(req);
+        if (!(this.active || this.stopped)) {
+            this.start_queue();
+        }
+    };
+
+    RequestManager.prototype.start_queue = function () {
+        if (this.active) {
+            return;
+        }
+        this.active = true;
+        this.stopped = false;
+        var now = new Date().getTime();
+        if (now - this.last >= this.rate) {
+            this.next();
+        } else {
+            var timeout = this.rate - now + this.last;
+            setTimeout(function (foo) { foo.next() }, timeout, this);
+        }
+    };
+
+    var ws_requests = new RequestManager(1000, 1);
+    var edit_requests = new RequestManager(1500, 2);
+
+    // Get recordings on the page
+
+    var TITLE_SELECTOR = "a[href*='" + window.location.host + "/recording/']";
     var $recordings = $('tr:has(' + TITLE_SELECTOR + ')').data('filtered', false);
+
     if (!$recordings.length) {
         return;
     }
@@ -1592,71 +1665,4 @@ function batch_recording_rels() {
     function rowTitleCell($row) {
         return $row.children('td:has(' + TITLE_SELECTOR + ')');
     }
-
-    // Request rate limiting
-
-    var REQUEST_COUNT = 0;
-    setInterval(function () {
-        if (REQUEST_COUNT > 0) {
-            REQUEST_COUNT -= 1;
-        }
-    }, 1000);
-
-    function RequestManager(rate, count) {
-        this.queue = [];
-        this.last = 0;
-        this.active = false;
-        this.stopped = false;
-    }
-
-    RequestManager.prototype.next = function () {
-        if (this.stopped || !this.queue.length) {
-            this.active = false;
-            return;
-        }
-        this.queue.shift()();
-        this.last = new Date().getTime();
-
-        REQUEST_COUNT += count;
-        if (REQUEST_COUNT >= 10) {
-            var diff = REQUEST_COUNT - 9;
-            var timeout = diff * 1000;
-
-            setTimeout(function (foo) { foo.next() }, rate + timeout, this);
-        } else {
-            setTimeout(function (foo) { foo.next() }, rate, this);
-        }
-    };
-
-    RequestManager.prototype.push = function (req) {
-        this.queue.push(req);
-        if (!(this.active || this.stopped)) {
-            this.start_queue();
-        }
-    };
-
-    RequestManager.prototype.unshift = function (req) {
-        this.queue.unshift(req);
-        if (!(this.active || this.stopped)) {
-            this.start_queue();
-        }
-    };
-
-    RequestManager.prototype.start_queue = function () {
-        if (this.active) {
-            return;
-        }
-        this.active = true;
-        this.stopped = false;
-        var now = new Date().getTime();
-        if (now - this.last >= rate) {
-            this.next();
-        } else {
-            var timeout = rate - now + this.last;
-            setTimeout(function (foo) { foo.next() }, timeout, this);
-        }
-    };
-
-    var ws_requests = new RequestManager(1000, 1);
-    var edit_requests = new RequestManager(1500, 2);
 }
