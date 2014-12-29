@@ -4,10 +4,8 @@
 // @author      Michael Wiencek
 // @include     *://musicbrainz.org/artist/*/recordings*
 // @include     *://*.musicbrainz.org/artist/*/recordings*
-// @include     *://localhost:5000/artist/*/recordings*
 // @match       *://musicbrainz.org/artist/*/recordings*
 // @match       *://*.musicbrainz.org/artist/*/recordings*
-// @match       *://localhost:5000/artist/*/recordings*
 // ==/UserScript==
 //**************************************************************************//
 
@@ -720,19 +718,19 @@ function batch_recording_rels() {
             var load_trys = 1;
 
             $.get(url, function (data) {
-                var doc = data.documentElement,
-                    recs = doc.getElementsByTagName("recording"),
-                    cache = {};
+                var recs = data.recordings;
+                var cache = {};
 
                 for (var i = 0; i < recs.length; i++) {
-                    var node = recs[i], node_id = node.getAttribute("id"),
-                        row = cache[node_id];
+                    var node = recs[i];
+                    var row = cache[node.id];
 
                     if (row === undefined) {
                         for (var j = 0; j < $recordings.length; j++) {
-                            var row_ = $recordings[j],
-                                row_id = $(row_).find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
-                            if (node_id == row_id) {
+                            var row_ = $recordings[j];
+                            var row_id = $(row_).find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
+
+                            if (node.id === row_id) {
                                 row = row_;
                                 break;
                             } else {
@@ -775,22 +773,25 @@ function batch_recording_rels() {
             ac_filter = $.trim($("#id-filter\\.artist_credit_id").find("option:selected").text());
 
         function get_filtered_page(page) {
-            var url = ("/ws/2/recording?query=" +
-                (name_filter ? encodeURIComponent(name_filter)+"%20AND%20" : "") +
-                (ac_filter ? "creditname:" + encodeURIComponent(ac_filter)+"%20AND%20" : "") +
-                " arid:" + artist_mbid + "&limit=100&offset=" + (page * 100));
+            var url = (
+                "/ws/2/recording?query=" +
+                (name_filter ? encodeURIComponent(name_filter) + "%20AND%20" : "") +
+                (ac_filter ? "creditname:" + encodeURIComponent(ac_filter) + "%20AND%20" : "") +
+                " arid:" + artist_mbid +
+                "&limit=100" +
+                "&offset=" + (page * 100) +
+                "&fmt=json"
+            );
 
             ws_requests.push(function () {
                 $.get(url, function (data) {
-                    var doc = data.documentElement,
-                        recs = doc.getElementsByTagName("recording");
-                    for (var i = 0; i < recs.length; i++) {
-                        var node = recs[i], node_id = node.getAttribute("id");
-                        queue_recordings_request("/ws/2/recording/"+node_id+"?inc=work-rels");
-                    }
+                    _.each(data.recordings, function (r) {
+                        queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
+                    });
 
-                    if (not_parsed > 0 && page < total_pages - 1)
+                    if (not_parsed > 0 && page < total_pages - 1) {
                         get_filtered_page(page + 1);
+                    }
                 });
             });
         }
@@ -798,20 +799,25 @@ function batch_recording_rels() {
         if (name_filter || ac_filter) {
             get_filtered_page(0);
         } else {
-            queue_recordings_request("/ws/2/recording?artist=" + artist_mbid + "&inc=work-rels&limit=50&offset=" + ((page - 1) * 50));
+            queue_recordings_request(
+                "/ws/2/recording?artist=" + artist_mbid +
+                "&inc=work-rels" +
+                "&limit=50" +
+                "&offset=" + ((page - 1) * 50) +
+                "&fmt=json"
+            );
         }
 
         function parse_recording(node, $row) {
-            var rels = node.getElementsByTagName("relation"),
-                rec_title = $row.children("td").not(":has(input)").first();
+            var rels = node.relations;
+            var rec_title = $row.children("td").not(":has(input)").first();
 
             $row.data("performances", []);
             var $attrs = $row.children("td.bpr_attrs"), performed = false;
             $attrs.data("checked", false).css("color", "black");
 
-            $.each(rels, function (i, rel) {
-                var $rel = $(rel);
-                if (!$rel.attr("type").match(/performance/)) {
+            _.each(rels, function (rel) {
+                if (!rel.type.match(/performance/)) {
                     return;
                 }
 
@@ -820,55 +826,49 @@ function batch_recording_rels() {
                     performed = true;
                 }
 
-                var work_mbid = $rel.children("target").text(),
-                    work_title = $rel.find("work title").text(),
-                    work_disambig = $rel.find("work disambiguation").text(),
-                    attrs = {partial: "", live: "", instrumental: "", cover: ""},
-                    attr_nodes = $rel.find("attribute"),
-                    begin_node = $rel.children("begin")[0];
+                var work_mbid = rel.work.id;
+                var work_title = rel.work.title;
+                var work_comment = rel.work.disambiguation;
+                var attrs = [];
 
-                if (begin_node) {
-                    $attrs.find("input.date")
-                        .val(begin_node.textContent)
-                        .trigger("input");
+                if (rel.begin) {
+                    $attrs.find("input.date").val(rel.begin).trigger("input");
                 }
 
-                for (var n = 0; n < attr_nodes.length; n++) {
-                    var name = $(attr_nodes[n]).text().toLowerCase(),
-                        $button = $attrs.find("span." + name);
+                _.each(rel.attributes, function (name) {
+                    name = name.toLowerCase();
+                    attrs.push(name);
 
-                    attrs[name] =  name + " ";
-                    if (!$button.data("checked"))
+                    var $button = $attrs.find("span." + name);
+                    if (!$button.data("checked")) {
                         $button.click();
-                }
+                    }
+                });
 
-                var attr_string = attrs.partial + attrs.live + attrs.instrumental + attrs.cover;
-                add_work_link($row, work_mbid, work_title, work_disambig, attr_string);
+                add_work_link($row, work_mbid, work_title, work_comment, attrs);
                 $row.data("performances").push(work_mbid);
             });
 
-            var comment = $(node).children("disambiguation")[0];
+            var comment = node.disambiguation;
             if (comment) {
-                comment = comment.textContent;
                 var date = comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
-                if (date != null)
+                if (date) {
                     $attrs.find("input.date").val(date[1]).trigger("input");
-            } else {
-                comment = "";
+                }
             }
 
             if (!performed) {
-                if ($(node).children("title").text().match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
+                if (node.title.match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
                     $attrs.find("span.live").click();
                 } else {
-                    var rec_mbid = node.getAttribute("id"),
-                        url = "/ws/2/recording/" + rec_mbid + "?inc=releases+release-groups";
+                    var url = "/ws/2/recording/" + node.id + "?inc=releases+release-groups&fmt=json";
 
                     var request_rec = function () {
                         $.get(url, function (data) {
-                            var rgs = data.documentElement.getElementsByTagName("release-group");
-                            for (var i = 0; i < rgs.length; i++) {
-                                if ($(rgs[i]).attr("type") === "Live") {
+                            var releases = data.releases;
+
+                            for (var i = 0; i < releases.length; i++) {
+                                if (_.contains(releases[i]["release-group"]["secondary-types"], "Live")) {
                                     $attrs.find("span.live").click();
                                     break;
                                 }
@@ -894,10 +894,12 @@ function batch_recording_rels() {
         loaded_artists = [];
 
     function load_works_init() {
-        var artists_string = localStorage.getItem("bpr_artists " + artist_mbid),
-            artists = [];
-        if (artists_string)
-            var artists = artists_string.split("\n");
+        var artists_string = localStorage.getItem("bpr_artists " + artist_mbid);
+        var artists = [];
+
+        if (artists_string) {
+            artists = artists_string.split("\n");
+        }
 
         function callback() {
             if (artists.length > 0) {
@@ -986,7 +988,7 @@ function batch_recording_rels() {
                 }
             };
 
-            var works_url = "/ws/2/work?artist=" + mbid + "&inc=aliases&limit=50";
+            var works_url = "/ws/2/work?artist=" + mbid + "&inc=aliases&limit=50&fmt=json";
             ws_requests.unshift(function () {
                 request_works(works_url, 0, -1, callback);
             });
@@ -1028,23 +1030,18 @@ function batch_recording_rels() {
     }
 
     function request_works(url, offset, count, callback) {
-        $.get(url + "&offset=" + offset, function (xml, textStatus, jqXHR) {
-            if (count === -1) {
-                count = parseInt(xml.getElementsByTagName("work-list")[0].getAttribute("count"));
+        $.get(url + "&offset=" + offset, function (data, textStatus, jqXHR) {
+            if (count < 0) {
+                count = data['work-count'];
             }
 
-            var works = xml.getElementsByTagName("work");
+            var works = data.works;
             var loaded = [];
 
-            for (var i = 0; i < works.length; i++) {
-                var work = works[i];
-                var id = work.getAttribute("id");
-                var title = work.getElementsByTagName("title")[0].textContent;
-                var disambig = work.getElementsByTagName("disambiguation")[0];
-                var disambig = disambig ? disambig.textContent : "";
-
-                loaded.push(id + title + (disambig ? "\u00a0" + disambig : ""));
-            }
+            _.each(works, function (work) {
+                var comment = work.disambiguation;
+                loaded.push(work.id + work.title + (comment ? "\u00a0" + comment : ""));
+            });
 
             callback(loaded, count - offset - works.length);
 
@@ -1425,7 +1422,7 @@ function batch_recording_rels() {
         $title_cell
             .removeAttr("style")
             .append($('<div class="work"></div>')
-            .text(attrs + "recording of ")
+            .text(attrs.join(' ') + " recording of ")
             .css({"font-size": "0.9em", "padding": "0.3em", "padding-left": "1em"})
             .append($("<a></a>").attr("href", "/work/" + mbid).text(title),
                 (disambig ? "&#160;" : null),
@@ -1451,12 +1448,12 @@ function batch_recording_rels() {
         var $title_cell = rowTitleCell($row);
         var title_link = $title_cell.children("a")[0];
         var $attrs = $row.children("td.bpr_attrs");
-        var attr_string = "";
+        var selectedAttrs = [];
 
         function selected(attr) {
             var checked = $attrs.children("span." + attr).data("checked") ? 1 : 0;
             if (checked) {
-                attr_string += attr + " ";
+                selectedAttrs.push(attr);
             }
             return checked;
         }
@@ -1490,12 +1487,11 @@ function batch_recording_rels() {
             data["rel-editor.rels.0.period.end_date.day"] = date["day"] || "";
         }
 
-        var url = "/relationship-editor";
         function post_edit() {
             $(title_link).css("color", "green");
 
-            $.post(url, data, function () {
-                add_work_link($row, work_mbid, work_title, work_disambig, attr_string);
+            $.post('/relationship-editor', data, function () {
+                add_work_link($row, work_mbid, work_title, work_disambig, selectedAttrs);
 
                 $(title_link).removeAttr("style");
                 $row.addClass("performed");
@@ -1590,10 +1586,9 @@ function batch_recording_rels() {
             if (match) {
                 var mbid = match[0];
                 ws_requests.unshift(function () {
-                    $.get("/ws/2/" + entity + "/" + mbid, function (data) {
-                        var $doc = $(data.documentElement);
-                        var value = ($doc.find("title")[0] || $doc.find("name")[0]).textContent;
-                        var disambig = $doc.find("disambiguation")[0];
+                    $.get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
+                        var value = data.title || data.name;
+                        var disambig = data.disambiguation;
                         var data = {"selected": true, "mbid": mbid, "name": value};
 
                         if (entity === "work" && disambig) {
