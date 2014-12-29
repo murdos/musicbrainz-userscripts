@@ -721,8 +721,7 @@ function batch_recording_rels() {
                 var recs = data.recordings;
                 var cache = {};
 
-                for (var i = 0; i < recs.length; i++) {
-                    var node = recs[i];
+                function extract_rec(node) {
                     var row = cache[node.id];
 
                     if (row === undefined) {
@@ -743,7 +742,13 @@ function batch_recording_rels() {
                         not_parsed -= 1;
                     }
                 }
-
+                if (recs) {
+                    for (var i = 0; i < recs.length; i++) {
+                        extract_rec(recs[i]);
+                    }
+                } else {
+                    extract_rec(data);
+                }
                 if (hide_performed_recs) {
                     $recordings.filter(".performed").hide();
                     restripeRows();
