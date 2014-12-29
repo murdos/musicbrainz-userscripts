@@ -877,12 +877,9 @@ function batch_recording_rels() {
 
     // Load works
 
-    var works_load_cache = [],
-        work_mbids = [],
-        work_titles = [],
-        work_comments = [],
-        norm_work_titles = [],
-        loaded_artists = [];
+    var WORKS_LOAD_CACHE = [];
+    var LOADED_WORKS = {};
+    var LOADED_ARTISTS = {};
 
     function load_works_init() {
         var artists_string = localStorage.getItem("bpr_artists " + artist_mbid);
@@ -907,12 +904,14 @@ function batch_recording_rels() {
     }
 
     function load_artist_works(mbid, name, callback) {
-        if (loaded_artists.indexOf(mbid) !== -1)
+        if (LOADED_ARTISTS[mbid]) {
             return false;
-        loaded_artists.push(mbid);
+        }
 
-        var $table_row = $("<tr></tr>"),
-            $button_cell = $("<td></td>").css("display", "none");
+        LOADED_ARTISTS[mbid] = true;
+
+        var $table_row = $("<tr></tr>");
+        var $button_cell = $("<td></td>").css("display", "none");
 
         if (mbid === artist_mbid) {
             var $msg = $artist_works_msg;
@@ -996,22 +995,13 @@ function batch_recording_rels() {
         for (var i = 0; i < result.length; i++) {
             var parts = result[i];
             var mbid = parts.slice(0, 36);
-            var index = work_mbids.indexOf(mbid);
 
-            if (index !== -1) {
-                work_mbids.splice(index, 1);
-                work_titles.splice(index, 1);
-                norm_work_titles.splice(index, 1);
-            }
             var rest = parts.slice(36).split("\u00a0");
             var title = rest[0];
             var comment = rest[1] || "";
             var norm_title = normalizeTitle(title);
 
-            work_mbids.push(mbid);
-            work_titles.push(title);
-            work_comments.push(comment);
-            norm_work_titles.push(norm_title);
+            LOADED_WORKS[mbid] = true;
             tmp_mbids.push(mbid);
             tmp_titles.push(title);
             tmp_comments.push(comment);
@@ -1139,11 +1129,10 @@ function batch_recording_rels() {
     }
 
     function remove_artist_works(mbid) {
-        var index = loaded_artists.indexOf(mbid);
-        if (index === -1) {
+        if (!LOADED_ARTISTS[mbid]) {
             return;
         }
-        loaded_artists.splice(index, 1);
+        delete LOADED_ARTISTS[mbid];
 
         var artists = localStorage.getItem("bpr_artists " + artist_mbid).split("\n");
         var new_artists = [];
@@ -1159,14 +1148,10 @@ function batch_recording_rels() {
     }
 
     function cache_work(mbid, title, comment) {
-        work_mbids.push(mbid);
-        work_titles.push(title);
-        work_comments.push(comment);
-        works_load_cache.push(mbid + title + (comment ? "\u00a0" + comment : ""));
+        LOADED_WORKS[mbid] = true;
+        WORKS_LOAD_CACHE.push(mbid + title + (comment ? "\u00a0" + comment : ""));
 
         var norm_title = normalizeTitle(title);
-        norm_work_titles.push(norm_title);
-
         var works_date = localStorage.getItem("bpr_works_date " + artist_mbid);
         var count = $artist_works_msg.data("works_count") + 1;
 
@@ -1175,17 +1160,17 @@ function batch_recording_rels() {
     }
 
     function flush_work_cache() {
-        if (!works_load_cache.length) {
+        if (!WORKS_LOAD_CACHE.length) {
             return;
         }
         var works_string = localStorage.getItem("bpr_works " + artist_mbid);
         if (works_string) {
-            works_string += "\n" + works_load_cache.join("\n");
+            works_string += "\n" + WORKS_LOAD_CACHE.join("\n");
         } else {
-            works_string = works_load_cache.join("\n");
+            works_string = WORKS_LOAD_CACHE.join("\n");
         }
         localStorage.setItem("bpr_works " + artist_mbid, works_string);
-        works_load_cache = [];
+        WORKS_LOAD_CACHE = [];
     }
 
     function load_artist_works_btn() {
@@ -1256,8 +1241,7 @@ function batch_recording_rels() {
             relate_to_work($row, mbid, title, comment, false, _callback, false);
         }
 
-        var index = work_mbids.indexOf(mbid);
-        if (index === -1) {
+        if (!LOADED_WORKS[mbid]) {
             cache_work(mbid, title, comment);
             flush_work_cache();
         }
@@ -1507,8 +1491,7 @@ function batch_recording_rels() {
         }
 
         if (check_loaded) {
-            var index = work_mbids.indexOf(work_mbid);
-            if (index === -1) {
+            if (!LOADED_WORKS[work_mbid]) {
                 cache_work(work_mbid, work_title, work_comment);
             }
         }
