@@ -4,8 +4,10 @@
 // @author      Michael Wiencek
 // @include     *://musicbrainz.org/artist/*/recordings*
 // @include     *://*.musicbrainz.org/artist/*/recordings*
+// @include     *://localhost:5000/artist/*/recordings*
 // @match       *://musicbrainz.org/artist/*/recordings*
 // @match       *://*.musicbrainz.org/artist/*/recordings*
+// @match       *://localhost:5000/artist/*/recordings*
 // ==/UserScript==
 //**************************************************************************//
 
@@ -14,8 +16,9 @@ scr.textContent = "(" + batch_recording_rels + ")();";
 document.body.appendChild(scr);
 
 function batch_recording_rels() {
-    var $recordings = $("tr:has([href*='musicbrainz.org/recording/'])").data("filtered", false);
+    var TITLE_SELECTOR = "a[href*='" + window.location.host + "/recording/']";
 
+    var $recordings = $('tr:has(' + TITLE_SELECTOR + ')').data('filtered', false);
     if (!$recordings.length) {
         return;
     }
@@ -55,7 +58,7 @@ function batch_recording_rels() {
     }
 
     $recordings.each(function (index, row) {
-        var $title = $(row).find("a[href*='musicbrainz.org/recording/']");
+        var $title = $(row).find(TITLE_SELECTOR);
         var mbid = $title.attr('href').match(MBID_REGEX)[0];
 
         RECORDING_TITLES[mbid] = normalizeTitle(
@@ -724,7 +727,7 @@ function batch_recording_rels() {
                     if (row === undefined) {
                         for (var j = 0; j < $recordings.length; j++) {
                             var row_ = $recordings[j],
-                                row_id = $(row_).find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0];
+                                row_id = $(row_).find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
                             if (node_id == row_id) {
                                 row = row_;
                                 break;
@@ -1121,7 +1124,7 @@ function batch_recording_rels() {
 
         for (var i = 0; i < $not_performed.length; i++) {
             var $rec = $not_performed.eq(i);
-            var mbid = $rec.find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0];
+            var mbid = $rec.find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
 
             to_recording($rec, RECORDING_TITLES[mbid]);
         }
@@ -1334,7 +1337,7 @@ function batch_recording_rels() {
         $.each($rows, function (i, row) {
             var $row = $(row);
             var $title_cell = rowTitleCell($row);
-            var title = $title_cell.find("a[href*='musicbrainz.org/recording/']").text();
+            var title = $title_cell.find(TITLE_SELECTOR).text();
 
             $title_cell.css("color", "LightSlateGray").find("a").css("color", "LightSlateGray");
 
@@ -1440,7 +1443,7 @@ function batch_recording_rels() {
             $row.data("performances", [work_mbid]);
         }
 
-        var rec_mbid = $row.find("a[href*='musicbrainz.org/recording/']").attr("href").match(MBID_REGEX)[0];
+        var rec_mbid = $row.find(TITLE_SELECTOR).attr("href").match(MBID_REGEX)[0];
         var $title_cell = rowTitleCell($row);
         var title_link = $title_cell.children("a")[0];
         var $attrs = $row.children("td.bpr_attrs");
@@ -1525,7 +1528,7 @@ function batch_recording_rels() {
 
         for (var i = 0; i < $recordings.length; i++) {
             var $rec = $recordings.eq(i);
-            var title = $rec.find("a[href*='musicbrainz.org/recording/']").text().toLowerCase();
+            var title = $rec.find(TITLE_SELECTOR).text().toLowerCase();
 
             if (title.indexOf(string) !== -1) {
                 $rec.data("filtered", false);
@@ -1555,7 +1558,7 @@ function batch_recording_rels() {
 
     function toggle_pending_edits(event, checked) {
         var $pending = $recordings.filter(function () {
-            return $(this).find("a[href*='musicbrainz.org/recording/']").parent().parent().is("span.mp");
+            return $(this).find(TITLE_SELECTOR).parent().parent().is("span.mp");
         });
         hide_pending_edits = checked !== undefined ? checked : this.checked;
 
@@ -1614,7 +1617,7 @@ function batch_recording_rels() {
     }
 
     function rowTitleCell($row) {
-        return $row.children("td:has([href*='musicbrainz.org/recording/'])");
+        return $row.children('td:has(' + TITLE_SELECTOR + ')');
     }
 
     function RequestManager(rate, count) {
