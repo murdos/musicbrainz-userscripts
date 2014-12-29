@@ -1018,7 +1018,7 @@ function batch_recording_rels() {
 
             $title_cell.css("color", "LightSlateGray").find("a").css("color", "LightSlateGray");
 
-            var promise = relate_to_work($row, mbid, title, "", false, _callback, false);
+            var promise = relate_to_work($row, mbid, title, "", false, callback, false);
             if (i === total - 1) {
                 promise.done(callback);
             }
