@@ -7,7 +7,6 @@
 // @match       *://musicbrainz.org/artist/*/recordings*
 // @match       *://*.musicbrainz.org/artist/*/recordings*
 // ==/UserScript==
-//**************************************************************************//
 
 var scr = document.createElement("script");
 scr.textContent = "(" + batch_recording_rels + ")();";
@@ -117,9 +116,7 @@ function batch_recording_rels() {
     }
 
     var MBID_REGEX = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;
-
-    var RECORDING_TITLES = {};
-
+    var WITHOUT_PAREN_CLAUSES_REGEX = /^(.+?)(?:(?: \([^()]+\))+)?$/;
     var ASCII_PUNCTUATION = [
         [/…/g, "..."],
         [/‘/g, "'"],
@@ -150,14 +147,16 @@ function batch_recording_rels() {
         return title;
     }
 
-    $recordings.each(function (index, row) {
-        var $title = $(row).find(TITLE_SELECTOR);
-        var mbid = $title.attr('href').match(MBID_REGEX)[0];
+    var RECORDING_TITLES = _.chain($recordings)
+        .map(function (row) {
+            var $title = $(row).find(TITLE_SELECTOR),
+            mbid = $title.attr('href').match(MBID_REGEX)[0],
+            norm_title = normalizeTitle($title.text().match(WITHOUT_PAREN_CLAUSES_REGEX)[1]);
 
-        RECORDING_TITLES[mbid] = normalizeTitle(
-            $title.text().match(/^(.+?)(?:(?: \([^()]+\))+)?$/)[1]
-        );
-    });
+            return [mbid, norm_title];
+        })
+        .object()
+        .value();
 
     var $work_type_options = $('<select id="bpr-work-type"></select>');
     var $work_language_options = $('<select id="bpr-work-language"></select>');
