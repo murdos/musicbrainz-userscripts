@@ -140,9 +140,9 @@ function batch_recording_rels() {
     function normalizeTitle(title) {
         title = title.toLowerCase().replace(/\s+/g, '');
 
-        for (var i = 0, len = ASCII_PUNCTUATION.length; i < len; i++) {
-            title = title.replace(ASCII_PUNCTUATION[i][0], ASCII_PUNCTUATION[i][1]);
-        }
+        _.each(ASCII_PUNCTUATION, function (val) {
+            title = title.replace(val[0], val[1]);
+        });
 
         return title;
     }
@@ -392,9 +392,7 @@ function batch_recording_rels() {
             }
 
             if (recs) {
-                for (var i = 0; i < recs.length; i++) {
-                    extract_rec(recs[i]);
-                }
+                _.each(recs, extract_rec);
             } else {
                 extract_rec(data);
             }
@@ -634,21 +632,16 @@ function batch_recording_rels() {
         var tmp_comments = [];
         var tmp_norm_titles = [];
 
-        for (var i = 0; i < result.length; i++) {
-            var parts = result[i];
+        _.each(result, function (parts) {
             var mbid = parts.slice(0, 36);
-
             var rest = parts.slice(36).split("\u00a0");
-            var title = rest[0];
-            var comment = rest[1] || "";
-            var norm_title = normalizeTitle(title);
 
             LOADED_WORKS[mbid] = true;
             tmp_mbids.push(mbid);
-            tmp_titles.push(title);
-            tmp_comments.push(comment);
-            tmp_norm_titles.push(norm_title);
-        }
+            tmp_titles.push(rest[0]);
+            tmp_comments.push(rest[1] || "");
+            tmp_norm_titles.push(normalizeTitle(rest[0]));
+        });
         return [tmp_mbids, tmp_titles, tmp_comments, tmp_norm_titles];
     }
 
@@ -778,17 +771,12 @@ function batch_recording_rels() {
         }
         delete LOADED_ARTISTS[mbid];
 
-        var artists = localStorage.getItem("bpr_artists " + ARTIST_MBID).split("\n");
-        var new_artists = [];
-
-        for (var i = 0; i < artists.length; i++) {
-            var _mbid = artists[i].slice(0, 36);
-            if (_mbid !== mbid)
-                new_artists.push(_mbid + artists[i].slice(36));
-        }
-
-        var artists_string = new_artists.join("\n");
-        localStorage.setItem("bpr_artists " + ARTIST_MBID, artists_string)
+        var item_key = "bpr_artists " + ARTIST_MBID;
+        localStorage.setItem(
+            item_key,
+            _.filter(localStorage.getItem(item_key).split("\n"),
+                     function (artist) { return artist.slice(0, 36) !== mbid; })
+                .join("\n"));
     }
 
     function cache_work(mbid, title, comment) {
