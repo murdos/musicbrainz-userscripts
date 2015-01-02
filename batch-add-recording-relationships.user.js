@@ -199,25 +199,25 @@ function batch_recording_rels() {
     $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
 
     // Get actual work types/languages
+    ws_requests.unshift(function () {
+        $.get('/dialog?path=%2Fwork%2Fcreate', function (data) {
+            var nodes = $.parseHTML(data);
 
-    $.get('/dialog?path=%2Fwork%2Fcreate', function (data) {
-        var nodes = $.parseHTML(data);
+            $work_type_options
+                .append($('#id-edit-work\\.type_id', nodes).children())
+                .val($.cookie('bpr_work_type') || 0)
+                .on('change', function () {
+                    $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
+                });
 
-        $work_type_options
-            .append($('#id-edit-work\\.type_id', nodes).children())
-            .val($.cookie('bpr_work_type') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
-            });
-
-        $work_language_options
-            .append($('#id-edit-work\\.language_id', nodes).children())
-            .val($.cookie('bpr_work_language') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
-            });
+            $work_language_options
+                .append($('#id-edit-work\\.language_id', nodes).children())
+                .val($.cookie('bpr_work_language') || 0)
+                .on('change', function () {
+                    $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
+                });
+        });
     });
-
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
 
