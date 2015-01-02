@@ -288,6 +288,8 @@ function batch_recording_rels() {
                     parsedDate = null;
                 }
                 $input.parent().data("date", parsedDate);
+            } else {
+                $input.css("color", "#ddd");
             }
         })
         .on('click', 'span.bpr-attr', function () {
