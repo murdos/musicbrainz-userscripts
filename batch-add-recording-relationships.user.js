@@ -167,8 +167,10 @@ function batch_recording_rels() {
         .object()
         .value();
 
-    var $work_type_options = $('<select id="bpr-work-type"></select>');
-    var $work_language_options = $('<select id="bpr-work-language"></select>');
+    var $work_options = _.chain(['type', 'language'])
+        .map(function (kind) { return [kind, $('<select id="bpr-work-' + kind + '"></select>')]; })
+        .object()
+        .value();
 
     // Add button to manage performance ARs
     var $relate_table = table(
@@ -183,9 +185,9 @@ function batch_recording_rels() {
         tr(td("Their suggested works"),
            td(goBtn(relate_to_suggested_works))),
         tr(td(label("Work type:").attr('for',"bpr-work-type")),
-           td($work_type_options)),
+           td($work_options['type'])),
         tr(td(label("Lyrics language:").attr('for', "bpr-work-language")),
-           td($work_language_options))).hide();
+           td($work_options['language']))).hide();
 
     var $works_table = table(
         $('<tr id="bpr-works-row"></tr>').append(
@@ -210,20 +212,15 @@ function batch_recording_rels() {
     // Get actual work types/languages
     ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
         var nodes = $.parseHTML(data);
-
-        $work_type_options
-            .append($('#id-edit-work\\.type_id', nodes).children())
-            .val($.cookie('bpr_work_type') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
-            });
-
-        $work_language_options
-            .append($('#id-edit-work\\.language_id', nodes).children())
-            .val($.cookie('bpr_work_language') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
-            });
+        function populate($obj, kind) {
+            $obj
+                .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
+                .val($.cookie('bpr_work_'+ kind) || 0)
+                .on('change', function () {
+                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
+                });
+        }
+        _.each($work_options, populate);
     });
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
@@ -965,11 +962,11 @@ function batch_recording_rels() {
     function create_new_work(title, callback) {
         function post_edit() {
             var data = "edit-work.name=" + title;
-            var work_type = $work_type_options.val();
-            var work_lang = $work_language_options.val();
-
-            if (work_type) data += "&edit-work.type_id=" + work_type;
-            if (work_lang) data += "&edit-work.language_id=" + work_lang;
+            _.each($work_options, function($obj, kind) {
+                if ($obj.val()) {
+                    data += "&edit-work." + kind + "_id=" + $obj.val();
+                }
+            });
 
             $.post("/work/create", data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
