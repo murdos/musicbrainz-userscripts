@@ -74,20 +74,29 @@ function batch_recording_rels() {
         }
     };
 
+    RequestManager.prototype.push_get = function (url, cb) {
+        this.push(function () {$.get(url, cb);});
+    };
+
+    RequestManager.prototype.unshift_get = function (url, cb) {
+        this.unshift(function () {$.get(url, cb);});
+    };
+
     RequestManager.prototype.push = function (req) {
         this.queue.push(req);
-        if (!(this.active || this.stopped)) {
-            this.start_queue();
-        }
+        this.maybe_start_queue();
     };
 
     RequestManager.prototype.unshift = function (req) {
         this.queue.unshift(req);
+        this.maybe_start_queue();
+    };
+
+    RequestManager.prototype.maybe_start_queue = function () {
         if (!(this.active || this.stopped)) {
             this.start_queue();
         }
     };
-
     RequestManager.prototype.start_queue = function () {
         if (this.active) {
             return;
@@ -199,24 +208,22 @@ function batch_recording_rels() {
     $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
 
     // Get actual work types/languages
-    ws_requests.unshift(function () {
-        $.get('/dialog?path=%2Fwork%2Fcreate', function (data) {
-            var nodes = $.parseHTML(data);
+    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
+        var nodes = $.parseHTML(data);
 
-            $work_type_options
-                .append($('#id-edit-work\\.type_id', nodes).children())
-                .val($.cookie('bpr_work_type') || 0)
-                .on('change', function () {
-                    $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
-                });
+        $work_type_options
+            .append($('#id-edit-work\\.type_id', nodes).children())
+            .val($.cookie('bpr_work_type') || 0)
+            .on('change', function () {
+                $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
+            });
 
-            $work_language_options
-                .append($('#id-edit-work\\.language_id', nodes).children())
-                .val($.cookie('bpr_work_language') || 0)
-                .on('change', function () {
-                    $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
-                });
-        });
+        $work_language_options
+            .append($('#id-edit-work\\.language_id', nodes).children())
+            .val($.cookie('bpr_work_language') || 0)
+            .on('change', function () {
+                $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
+            });
     });
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
@@ -433,16 +440,14 @@ function batch_recording_rels() {
             "&fmt=json"
         );
 
-        ws_requests.push(function () {
-            $.get(url, function (data) {
-                _.each(data.recordings, function (r) {
-                    queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
-                });
-
-                if (recordings_not_parsed > 0 && page < TOTAL_PAGES - 1) {
-                    get_filtered_page(page + 1);
-                }
+        ws_requests.push_get(url, function (data) {
+            _.each(data.recordings, function (r) {
+                queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
             });
+
+            if (recordings_not_parsed > 0 && page < TOTAL_PAGES - 1) {
+                get_filtered_page(page + 1);
+            }
         });
     }
 
@@ -1174,19 +1179,17 @@ function batch_recording_rels() {
             $(this).data("selected", false);
             if (match) {
                 var mbid = match[0];
-                ws_requests.unshift(function () {
-                    $.get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
-                        var value = data.title || data.name;
-                        var out_data = {"selected": true, "mbid": mbid, "name": value};
+                ws_requests.unshift_get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
+                    var value = data.title || data.name;
+                    var out_data = {"selected": true, "mbid": mbid, "name": value};
 
-                        if (entity === "work" && data.disambiguation) {
-                            out_data.comment = data.disambiguation;
-                        }
+                    if (entity === "work" && data.disambiguation) {
+                        out_data.comment = data.disambiguation;
+                    }
 
-                        $input.val(value).data(out_data).css("background", "#bbffbb");
-                    }).fail(function () {
-                        $input.css("background", "#ffaaaa");
-                    });
+                    $input.val(value).data(out_data).css("background", "#bbffbb");
+                }).fail(function () {
+                    $input.css("background", "#ffaaaa");
                 });
             } else {
                 $input.css("background", "#ffaaaa");
