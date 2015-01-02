@@ -167,7 +167,7 @@ function batch_recording_rels() {
            td('<input type="text" id="bpr-new-work"/>',
               goBtn(relate_to_new_titled_work))),
         tr(td(label("Existing work (URL/MBID):").attr('for',"bpr-existing-work")),
-           td(entity_lookup($('<input type="text" id="bpr-existing-work"/>'), "work"),
+           td(entity_lookup('existing-work', "work"),
               goBtn(relate_to_existing_work))),
         tr(td("New works using recording titles"),
            td(goBtn(relate_to_new_works))),
@@ -181,7 +181,7 @@ function batch_recording_rels() {
     var $works_table = table(
         $('<tr id="bpr-works-row"></tr>').append(
             td(label("Load another artist’s works (URL/MBID):").attr('for', "bpr-load-artist")),
-            td(entity_lookup($('<input type="text" id="bpr-load-artist"/>'), "artist"),
+            td(entity_lookup('load-artist', "artist"),
                goBtn(load_artist_works_btn)))
             .hide());
 
@@ -1167,7 +1167,8 @@ function batch_recording_rels() {
             .filter(function () { return $(this).find("input[name=add-to-merge]:checked").length });
     }
 
-    function entity_lookup($input, entity) {
+    function entity_lookup(id_suffix, entity) {
+        var $input = $('<input type="text" id="bpr-' + id_suffix + '"/>')
         $input.on("input", function () {
             var match = this.value.match(MBID_REGEX);
             $(this).data("selected", false);
@@ -1176,14 +1177,13 @@ function batch_recording_rels() {
                 ws_requests.unshift(function () {
                     $.get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
                         var value = data.title || data.name;
-                        var comment = data.disambiguation;
-                        var data = {"selected": true, "mbid": mbid, "name": value};
+                        var out_data = {"selected": true, "mbid": mbid, "name": value};
 
-                        if (entity === "work" && comment) {
-                            data.comment = comment;
+                        if (entity === "work" && data.disambiguation) {
+                            out_data.comment = data.disambiguation;
                         }
 
-                        $input.val(value).data(data).css("background", "#bbffbb");
+                        $input.val(value).data(out_data).css("background", "#bbffbb");
                     }).fail(function () {
                         $input.css("background", "#ffaaaa");
                     });
