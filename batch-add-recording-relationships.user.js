@@ -206,22 +206,6 @@ function batch_recording_rels() {
         .css({"margin": "0.5em", "background": "#F2F2F2", "border": "1px #999 solid"})
         .insertAfter($("div#content h2")[0]);
 
-    $container.find("table").find("td").css("width", "auto");
-    $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
-
-    // Get actual work types/languages
-    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
-        var nodes = $.parseHTML(data);
-        function populate($obj, kind) {
-            $obj
-                .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
-                .val($.cookie('bpr_work_'+ kind) || 0)
-                .on('change', function () {
-                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
-                });
-        }
-        _.each($work_options, populate);
-    });
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
 
@@ -244,6 +228,23 @@ function batch_recording_rels() {
         .insertAfter($container);
 
     var $recordings_load_msg = $("<span>Loading performance relationships…</span>");
+
+    $container.find("table").find("td").css("width", "auto");
+    $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
+
+    // Get actual work types/languages
+    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
+        var nodes = $.parseHTML(data);
+        function populate($obj, kind) {
+            $obj
+                .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
+                .val($.cookie('bpr_work_'+ kind) || 0)
+                .on('change', function () {
+                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
+                });
+        }
+        _.each($work_options, populate);
+    });
 
     $("<span></span>")
         .append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg)
@@ -274,25 +275,19 @@ function batch_recording_rels() {
         .on('input', 'input.bpr-date-input', function () {
             var $input = $(this);
 
-            function error() {
-                $input.css("border-color", "#f00");
-                $input.parent().data("date", null);
-            }
-
-            $(this).css("border-color", "#999");
+            $input.css("border-color", "#999");
 
             if (this.value) {
+                $input.css("color", "#000");
+
                 var parsedDate = MB.utility.parseDate(this.value);
-
-                $(this).css("color", "#000");
-
-                if (!parsedDate.year && !parsedDate.month && !parsedDate.day) {
-                    error();
-                } else if (!MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
-                    error();
+                if ((parsedDate.year || parsedDate.month || parsedDate.day) &&
+                    MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
                 } else {
-                    $(this).parent().data("date", parsedDate);
+                    $input.css("border-color", "#f00");
+                    parsedDate = null;
                 }
+                $input.parent().data("date", parsedDate);
             }
         })
         .on('click', 'span.bpr-attr', function () {
