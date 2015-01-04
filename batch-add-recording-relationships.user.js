@@ -446,9 +446,8 @@ function batch_recording_rels() {
     }
 
     function parse_recording(node, $row) {
-        var
-        $attrs = $row.children("td.bpr_attrs"),
-        performed = false;
+        var $attrs = $row.children("td.bpr_attrs");
+        var performed = false;
 
         $row.data("performances", []);
         $attrs.data("checked", false).css("color", "black");
@@ -466,9 +465,8 @@ function batch_recording_rels() {
 
                 var attrs = [];
                 _.each(rel.attributes, function (name) {
-                    var
-                    cannonical_name = name.toLowerCase(),
-                    $button = $attrs.find("span." + cannonical_name)
+                    var cannonical_name = name.toLowerCase();
+                    var $button = $attrs.find("span." + cannonical_name);
 
                     attrs.push(cannonical_name);
                     if (!$button.data("checked")) {
