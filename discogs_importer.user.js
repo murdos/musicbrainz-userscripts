@@ -45,14 +45,9 @@ $(document).ready(function(){
         var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
         var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
 
-        // Swith JQuery to MB's one, and save GreaseMonkey one
-        var GM_JQuery = $;
-        $ = unsafeWindow.$;
-
         $.ajax({
             url: discogsWsUrl,
-            dataType: 'jsonp',
-            headers: { 'Accept-Encoding': 'gzip',  'User-Agent': 'MBDiscosgImporter/0.1 +http://userscripts.org/scripts/show/36376' },
+            dataType: 'json',
             crossDomain: true,
             success: function (data, textStatus, jqXHR) {
                 //mylog(data);
@@ -64,9 +59,6 @@ $(document).ready(function(){
                 mylog("AJAX error thrown:" + errorThrown);
             }
         });
-
-        // Back to GreaseMonkey's JQuery
-        $ = GM_JQuery;
 
     }
 });
@@ -245,7 +237,7 @@ function insertLink(release) {
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
 
-    var discogsRelease = data.data;
+    var discogsRelease = data;
 
     var release = new Object();
     release.discs = [];
