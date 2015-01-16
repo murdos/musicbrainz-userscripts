@@ -371,6 +371,10 @@ function parseDiscogsRelease(data) {
         // Track position and release number
         var trackPosition = discogsTrack.position;
 
+        if (trackPosition == "" && discogsTrack.sub_tracks) {
+            trackPosition = discogsTrack.sub_tracks[0].position;
+        }
+
         // Skip special tracks
         if (trackPosition.toLowerCase().match("^(video|mp3)")) {
             trackPosition = "";
