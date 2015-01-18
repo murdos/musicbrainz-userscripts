@@ -1,7 +1,7 @@
-// ==UserScript==
+﻿// ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2014.09.27.0
+// @version        2015.01.18.0
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -17,6 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var unsafeWindow = unsafeWindow || window;
+/*
+ * Test cases:
+ * - http://www.discogs.com/release/1566223 : Artist credit of tracks contains an ending ',' join phrase
+ */
 
 $(document).ready(function(){
 
@@ -366,6 +370,10 @@ function parseDiscogsRelease(data) {
                 };
                 track.artist_credit.push(ac);
             });
+            // Fix some odd Discogs release (e.g. http://api.discogs.com/releases/1566223) that have a ',' join phrase after the last artist
+            if (track.artist_credit[track.artist_credit.length-1].joinphrase == ", ") {
+                track.artist_credit[track.artist_credit.length-1].joinphrase = "";
+            }
         }
 
         // Track position and release number
@@ -446,8 +454,11 @@ function decodeDiscogsJoinphrase(join) {
 
 function mylog(obj) {
     var DEBUG = true;
-    if (DEBUG && unsafeWindow.console) {
-        unsafeWindow.console.log(obj);
+    if (DEBUG) {
+        var window = unsafeWindow || window;
+        if (window.console) {
+            window.console.log(obj);
+        }
     }
 }
 
