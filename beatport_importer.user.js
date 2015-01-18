@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Import from Beatport
-// @version        2014.09.29.0
+// @version        2015.01.18.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http*://www.beatport.com/release/*
@@ -8,6 +8,7 @@
 // @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/dateFormat.js
 // @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
@@ -65,14 +66,14 @@ function retrieveReleaseInfo() {
       });
     }
   );
-  mylog(tracks);
+  LOGGER.debug("tracks: ", tracks);
   release.discs = [];
   release.discs.push( {
     'tracks': tracks,
     'format': "Digital Media"
   } );
 
-  mylog(release);
+  LOGGER.info("Parsed release: ", release);
   return release;
 }
 
@@ -85,11 +86,4 @@ function insertLink(release) {
     var tr = $("<tr><td span='2' /></tr>");
     tr.find('td').append(innerHTML);
     $("table.meta-data tbody").append(tr);
-}
-
-function mylog(obj) {
-    var DEBUG = true;
-    if (DEBUG && unsafeWindow.console) {
-        unsafeWindow.console.log(obj);
-    }
 }

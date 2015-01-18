@@ -3,13 +3,14 @@
 // @author         VxJasonxV
 // @description    One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
 // @sourceURL      https://github.com/VxJasonxV/musicbrainz-userscripts/blob/master/beatport_pro_importer.user.js
-// @version        2014.10.03.0
+// @version        2015.01.18.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @include        http://pro.beatport.com/release/*
 // @include        https://pro.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 // @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
@@ -80,7 +81,7 @@ function retrieveReleaseInfo() {
     'format': "Digital Media"
   } );
 
-  mylog(release);
+  LOGGER.info("Parsed release: ", release);
   return release;
 }
 
@@ -92,11 +93,4 @@ function insertLink(release) {
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
 
     $(".interior-release-chart-content-list").append(innerHTML);
-}
-
-function mylog(obj) {
-    var DEBUG = true;
-    if (DEBUG && unsafeWindow.console) {
-        unsafeWindow.console.log(obj);
-    }
 }

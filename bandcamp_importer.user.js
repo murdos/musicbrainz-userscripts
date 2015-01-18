@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2014.10.18.1
+// @version        2015.01.18.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -8,6 +8,7 @@
 // @include        http*://*.bandcamp.com/track/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
@@ -134,7 +135,7 @@ function retrieveReleaseInfo() {
         });
     }
 
-    mylog(release);
+    LOGGER.info("Parsed release: ", release);
     return release;
 
 }
@@ -143,20 +144,9 @@ function retrieveReleaseInfo() {
 function insertLink(release) {
 
     if(release.type == "single" && typeof release.parent_album != "undefined") {
-        mylog("This is part of an album, not continuing.");
+        LOGGER.info("This is part of an album, not continuing.");
         return false;
     }
-
-    /*
-    var mbUI = document.createElement('div');
-    mbUI.innerHTML = "<h3>MusicBrainz</h3>";
-    mbUI.className = "section";
-
-
-    var mbContentBlock = document.createElement('div');
-    mbContentBlock.className = "section_content";
-    mbUI.appendChild(mbContentBlock);
-    */
 
     // Form parameters
     var edit_note = 'Imported from ' + window.location.href;
@@ -169,12 +159,5 @@ function insertLink(release) {
 
     $('h2.trackTitle').append(innerHTML);
 
-}
-
-function mylog(obj) {
-    var DEBUG = true;
-    if (DEBUG && unsafeWindow.console) {
-        unsafeWindow.console.log(obj);
-    }
 }
 

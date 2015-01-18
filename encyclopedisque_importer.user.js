@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2014.02.22.1
+// @version        2015.01.18.0
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
@@ -9,6 +9,7 @@
 // @include        http://www.encyclopedisque.fr/artiste/*.html
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
 $(document).ready(function() {
@@ -254,7 +255,7 @@ function parseEncyclopedisquePage() {
         release.no_barcode = '1';
     }
 
-    console.log(release);
+    LOGGER.info("Parsed release: ", release);
 
     return release;
 }
