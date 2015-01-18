@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2015.01.18.0
+// @version        2015.01.18.1
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -12,11 +12,11 @@
 // @exclude        http://www.discogs.com/release/add
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
+// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var unsafeWindow = unsafeWindow || window;
 /*
  * Test cases:
  * - http://www.discogs.com/release/1566223 : Artist credit of tracks contains an ending ',' join phrase
@@ -54,13 +54,13 @@ $(document).ready(function(){
             dataType: 'json',
             crossDomain: true,
             success: function (data, textStatus, jqXHR) {
-                //mylog(data);
+                LOGGER.debug("Discogs JSON Data from API:", data);
                 var release = parseDiscogsRelease(data);
                 insertLink(release);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                mylog("AJAX Status:" + textStatus);
-                mylog("AJAX error thrown:" + errorThrown);
+                LOGGER.error("AJAX Status: ", textStatus);
+                LOGGER.error("AJAX error thrown: ", errorThrown);
             }
         });
 
@@ -438,7 +438,7 @@ function parseDiscogsRelease(data) {
 
     });
 
-    mylog(release);
+    LOGGER.info("Parsed release: ", release);
     return release;
 }
 
@@ -450,16 +450,6 @@ function decodeDiscogsJoinphrase(join) {
     joinphrase += trimedjoin;
     joinphrase += " ";
     return joinphrase;
-}
-
-function mylog(obj) {
-    var DEBUG = true;
-    if (DEBUG) {
-        var window = unsafeWindow || window;
-        if (window.console) {
-            window.console.log(obj);
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
