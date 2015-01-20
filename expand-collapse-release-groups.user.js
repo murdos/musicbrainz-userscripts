@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.1.1
+// @version       6.1.2
 // @license       GPL
 // @include       *://musicbrainz.org/artist/*
 // @include       *://musicbrainz.org/label/*
@@ -27,19 +27,16 @@
 
 var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/,
     entity = window.location.pathname.match(/\/(artist|label|release-group)\/.+/)[1],
-    theads = document.getElementsByTagName("thead");
+    firstThead = document.querySelector("table.tbl > thead");
 
-if (theads.length > 0) {
+if (firstThead) {
 
-    var ths = theads[0].getElementsByTagName("th"),
-        trs = document.getElementsByTagName("tr"),
+    var ths = firstThead.getElementsByTagName("th"),
+        trs = document.querySelectorAll("table.tbl > tbody > tr:not(.subh)"),
         col = 0;
 
     if (entity == "artist") {
-        var current_tab = document.getElementsByClassName("tabs")[0]
-                                  .getElementsByClassName("sel")[0]
-                                  .getElementsByTagName("a")[0]
-                                  .textContent;
+        var current_tab = document.querySelector(".tabs .sel a").textContent;
     }
 
     if (entity == "artist" && current_tab == "Overview") {
@@ -57,29 +54,16 @@ if (theads.length > 0) {
             if (ths[col].textContent == "Release")
                 break;
 
-        var table = theads[0].parentNode,
-            cols = theads[0].getElementsByTagName("th").length;
-
-        for (var i = 0; i < trs.length; i += 1) {
+        for (var i = 0; i < trs.length; i++) {
             if (/\/release\/[a-z\d\-]+/.test(trs[i].innerHTML)) {
-                var row = table.insertRow(i + 1),
-                    table_parent = document.createElement("td"),
-                    release_table = document.createElement("table"),
-                    mbid = trs[i].getElementsByTagName("a")[0].href.match(MBID_REGEX)[0];
-                table_parent.colSpan = cols;
-                row.appendChild(table_parent);
-                row.className = trs[i].className;
-                release_table.style.marginBottom = "0.5em";
-                release_table.style.marginLeft = "3em";
-                inject_release_button(trs[i].getElementsByTagName("td")[col], table_parent, release_table, mbid);
-                i += 1;
+                inject_release_button(trs[i].getElementsByTagName("td")[col]);
             }
         }
     }
 }
 
 function inject_release_group_button(parent) {
-    var mbid = parent.getElementsByTagName("a")[0].href.match(MBID_REGEX),
+    var mbid = parent.querySelector("a").href.match(MBID_REGEX),
         table = document.createElement("table");
 
     table.style.marginTop = "1em";
@@ -102,15 +86,18 @@ function inject_release_group_button(parent) {
     parent.insertBefore(button, parent.firstChild);
 }
 
-function inject_release_button(parent, table_parent, table, mbid) {
-    var row = table_parent.parentNode;
-    row.style.display = "none";
-    table_parent.appendChild(table);
+function inject_release_button(parent, _table_parent, _table, _mbid) {
+    var mbid = _mbid || parent.querySelector("a").href.match(MBID_REGEX),
+        table = _table || document.createElement("table");
+
+    table.style.marginTop = "1em";
+    table.style.marginLeft = "1em";
+    table.style.paddingLeft = "1em";
 
     var button = create_button(
         "/ws/2/release/" + mbid + "?inc=media+recordings+artist-credits&fmt=json",
         function(toggled) {
-            row.style.display = toggled ? "table-row" : "none";
+            if (toggled) parent.appendChild(table); else parent.removeChild(table);
         },
         function(json) {
             parse_release(json, table);
