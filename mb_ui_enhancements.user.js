@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2014.12.25.1
+// @version        2015.02.14.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -54,18 +54,18 @@ function main() {
         });
     }
 
-	// Fix for http://tickets.musicbrainz.org/browse/MBS-750
+    // Fix for http://tickets.musicbrainz.org/browse/MBS-750
     re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
     if (window.location.href.match(re)) {
-        if ( $("tr.subh").length == 1 ) {
-            var text = $.trim($("tr.subh:eq(0)").text());
+        if ($("table.medium thead").length == 1) {
+            var text = $.trim($("table.medium thead").text());
             if (text.match(/ 1$/)) {
-                $("tr.subh:eq(0) a").text(text.replace(/ 1$/, ''));
+                $("table.medium thead a").text(text.replace(/ 1$/, ''));
             }
         }
     }
 
-	// Better fix for http://tickets.musicbrainz.org/browse/MBS-1943
+    // Better fix for http://tickets.musicbrainz.org/browse/MBS-1943
     re = new RegExp("musicbrainz\.org\/(artist|release-group|release|recording|work|label)\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
     if (window.location.href.match(re)) {
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('External links')"));
@@ -123,7 +123,7 @@ function main() {
         }
     }
 
-	// When attaching CDTOC, autoselect artist when there's only one result
+    // When attaching CDTOC, autoselect artist when there's only one result
     re = new RegExp("musicbrainz\.org\/cdtoc\/attach.*&filter-artist.query=.*","i");
     if (window.location.href.match(re)) {
         $artists = $('ul.radio-list li');
@@ -166,12 +166,12 @@ function main() {
         // Get ISRC data from webservice
         var wsurl = "/ws/2/release/" + mbid + "?inc=isrcs+recordings";
         $.getJSON(wsurl, function(data) {
-            // Table header
-            $("table.tbl thead th:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<th> ISRC </th>");
-            // Extend colspan for medium table row
-            $("table.tbl tbody tr.subh").each(function() {
-                $(this).find("td:eq(1)").attr("colspan", $(this).find("td:eq(1)").attr("colspan")+1);
+            // Extend colspan for medium table header
+            $("table.medium thead tr").each(function() {
+                $(this).find("th:eq(0)").attr("colspan", $(this).find("th:eq(0)").attr("colspan")+1);
             });
+            // Table sub-header
+            $("table.medium tbody tr.subh th:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<th style='width: 150px;' class='c'> ISRC </th>");
 
             $.each(data.media, function(index, medium) {
                 $.each(medium.tracks, function(i, track) {
@@ -188,13 +188,13 @@ function main() {
                         });
                         isrcsLinks = links.join(", ");
                     }
-                    $('#'+track.id).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc'><small>"+isrcsLinks+"</small></td>");
+                    $('#'+track.id).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc c'><small>"+isrcsLinks+"</small></td>");
                 });
             });
         });
     }
 
-	// Discogs link rollover
+    // Discogs link rollover
     // TODO...
 
     // -------------- End of script ------------------------
