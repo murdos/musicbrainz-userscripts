@@ -78,7 +78,7 @@ function setRecordingComments() {
         $(this).css("border-color", this.value === $(this).data("old") ? "#999" : "red");
     });
 
-    var $container = $("<div></div>").insertBefore("table.tbl");
+    var $container = $("<div></div>").insertAfter("h2.tracklist");
 
     $("<button>Edit recording comments</button>")
         .addClass("styled-button")
