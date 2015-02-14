@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2015.02.14.1
+// @version        2015.02.14.2
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -159,39 +159,72 @@ function main() {
     }
 
     // Display ISRCs and recording comment on release tracklisting
-    re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
+    re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$","i");
     if (window.location.href.match(re)) {
         var ISRC_COLUMN_POSITION = 2;
         var mbid = window.location.href.match(re)[1];
-        // Get ISRC data from webservice
+        // Get tracks data from webservice
         var wsurl = "/ws/2/release/" + mbid + "?inc=isrcs+recordings";
         $.getJSON(wsurl, function(data) {
+            // Store tracks data from webservice in a hash table
+            var tracks = {};
+            $.each(data.media, function(index, medium) {
+                $.each(medium.tracks, function(i, track) {
+                    tracks[track.id] = track;
+                });
+            });
+            // Different behavior depending on the number of mediums
+            if ($('table.medium').length < 10) {
+                // All mediums are already displayed: handle them now
+                $("table.medium").each(function() {
+                    handleMedium($(this), tracks)
+                });
+            } else {
+                // Each medium will be handled when it's loaded
+                var HANDLED_ATTRIBUTE = 'ui_enh_isrcs_handled';
+                $('table.medium').attr(HANDLED_ATTRIBUTE, 'no');
+                $('table.medium').bind("DOMNodeInserted", function(event) {
+                    $target = $(event.target);
+                    if ($target.prop('nodeName') == 'TBODY' && $target.parent().attr(HANDLED_ATTRIBUTE) == 'no' && $target.find('tr.subh').length > 0) {
+                        $medium = $target.parent();
+                        $medium.attr(HANDLED_ATTRIBUTE, 'pending');
+                        handleMedium($medium, tracks);
+                        $medium.attr(HANDLED_ATTRIBUTE, 'done');
+                    }
+                });
+            }
+        });
+
+        function handleMedium($medium, ws_tracks) {
             // Extend colspan for medium table header
-            $("table.medium thead tr").each(function() {
+            $medium.find("thead tr").each(function() {
                 $(this).find("th:eq(0)").attr("colspan", $(this).find("th:eq(0)").attr("colspan")+1);
             });
             // Table sub-header
-            $("table.medium tbody tr.subh th:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<th style='width: 150px;' class='c'> ISRC </th>");
+            $medium.find("tbody tr.subh th:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<th style='width: 150px;' class='c'> ISRC </th>");
 
-            $.each(data.media, function(index, medium) {
-                $.each(medium.tracks, function(i, track) {
+            // Handle each track
+            $medium.find("tbody tr[id]").each(function(index, medium_track) {
+                track_mbid = $(medium_track).attr('id');
+                var isrcsLinks = "";
+                if (ws_tracks.hasOwnProperty(track_mbid)) {
+                    track = ws_tracks[track_mbid];
                     var recording = track.recording;
                     // Recording comment
                     if (recording.disambiguation != "") {
-                        $("#"+track.id).find("td:eq(1) a:eq(0)").after(' <span class="comment">(' + recording.disambiguation + ')</span>');
+                        $("#"+track_mbid).find("td:eq(1) a:eq(0)").after(' <span class="comment">(' + recording.disambiguation + ')</span>');
                     }
                     // ISRCS
-                    var isrcsLinks = "";
                     if (recording.isrcs.length != 0) {
                         var links = jQuery.map(recording.isrcs, function(isrc, i) {
                             return ("<a href='/isrc/" + isrc + "'>" + isrc + "</a>");
                         });
                         isrcsLinks = links.join(", ");
                     }
-                    $('#'+track.id).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc c'><small>"+isrcsLinks+"</small></td>");
-                });
+                }
+                $('#'+track_mbid).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc c'><small>"+isrcsLinks+"</small></td>");
             });
-        });
+        }
     }
 
     // Discogs link rollover
