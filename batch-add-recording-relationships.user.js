@@ -7,7 +7,6 @@
 // @match       *://musicbrainz.org/artist/*/recordings*
 // @match       *://*.musicbrainz.org/artist/*/recordings*
 // ==/UserScript==
-//**************************************************************************//
 
 var scr = document.createElement("script");
 scr.textContent = "(" + batch_recording_rels + ")();";
@@ -75,20 +74,29 @@ function batch_recording_rels() {
         }
     };
 
+    RequestManager.prototype.push_get = function (url, cb) {
+        this.push(function () {$.get(url, cb);});
+    };
+
+    RequestManager.prototype.unshift_get = function (url, cb) {
+        this.unshift(function () {$.get(url, cb);});
+    };
+
     RequestManager.prototype.push = function (req) {
         this.queue.push(req);
-        if (!(this.active || this.stopped)) {
-            this.start_queue();
-        }
+        this.maybe_start_queue();
     };
 
     RequestManager.prototype.unshift = function (req) {
         this.queue.unshift(req);
+        this.maybe_start_queue();
+    };
+
+    RequestManager.prototype.maybe_start_queue = function () {
         if (!(this.active || this.stopped)) {
             this.start_queue();
         }
     };
-
     RequestManager.prototype.start_queue = function () {
         if (this.active) {
             return;
@@ -117,9 +125,7 @@ function batch_recording_rels() {
     }
 
     var MBID_REGEX = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;
-
-    var RECORDING_TITLES = {};
-
+    var WITHOUT_PAREN_CLAUSES_REGEX = /^(.+?)(?:(?: \([^()]+\))+)?$/;
     var ASCII_PUNCTUATION = [
         [/…/g, "..."],
         [/‘/g, "'"],
@@ -143,24 +149,28 @@ function batch_recording_rels() {
     function normalizeTitle(title) {
         title = title.toLowerCase().replace(/\s+/g, '');
 
-        for (var i = 0, len = ASCII_PUNCTUATION.length; i < len; i++) {
-            title = title.replace(ASCII_PUNCTUATION[i][0], ASCII_PUNCTUATION[i][1]);
-        }
+        _.each(ASCII_PUNCTUATION, function (val) {
+            title = title.replace(val[0], val[1]);
+        });
 
         return title;
     }
 
-    $recordings.each(function (index, row) {
-        var $title = $(row).find(TITLE_SELECTOR);
-        var mbid = $title.attr('href').match(MBID_REGEX)[0];
+    var RECORDING_TITLES = _.chain($recordings)
+        .map(function (row) {
+            var $title = $(row).find(TITLE_SELECTOR),
+            mbid = $title.attr('href').match(MBID_REGEX)[0],
+            norm_title = normalizeTitle($title.text().match(WITHOUT_PAREN_CLAUSES_REGEX)[1]);
 
-        RECORDING_TITLES[mbid] = normalizeTitle(
-            $title.text().match(/^(.+?)(?:(?: \([^()]+\))+)?$/)[1]
-        );
-    });
+            return [mbid, norm_title];
+        })
+        .object()
+        .value();
 
-    var $work_type_options = $('<select id="bpr-work-type"></select>');
-    var $work_language_options = $('<select id="bpr-work-language"></select>');
+    var $work_options = _.chain(['type', 'language'])
+        .map(function (kind) { return [kind, $('<select id="bpr-work-' + kind + '"></select>')]; })
+        .object()
+        .value();
 
     // Add button to manage performance ARs
     var $relate_table = table(
@@ -168,21 +178,21 @@ function batch_recording_rels() {
            td('<input type="text" id="bpr-new-work"/>',
               goBtn(relate_to_new_titled_work))),
         tr(td(label("Existing work (URL/MBID):").attr('for',"bpr-existing-work")),
-           td(entity_lookup($('<input type="text" id="bpr-existing-work"/>'), "work"),
+           td(entity_lookup('existing-work', "work"),
               goBtn(relate_to_existing_work))),
         tr(td("New works using recording titles"),
            td(goBtn(relate_to_new_works))),
         tr(td("Their suggested works"),
            td(goBtn(relate_to_suggested_works))),
         tr(td(label("Work type:").attr('for',"bpr-work-type")),
-           td($work_type_options)),
+           td($work_options['type'])),
         tr(td(label("Lyrics language:").attr('for', "bpr-work-language")),
-           td($work_language_options))).hide();
+           td($work_options['language']))).hide();
 
     var $works_table = table(
         $('<tr id="bpr-works-row"></tr>').append(
             td(label("Load another artist’s works (URL/MBID):").attr('for', "bpr-load-artist")),
-            td(entity_lookup($('<input type="text" id="bpr-load-artist"/>'), "artist"),
+            td(entity_lookup('load-artist', "artist"),
                goBtn(load_artist_works_btn)))
             .hide());
 
@@ -195,29 +205,6 @@ function batch_recording_rels() {
            td($works_table)))
         .css({"margin": "0.5em", "background": "#F2F2F2", "border": "1px #999 solid"})
         .insertAfter($("div#content h2")[0]);
-
-    $container.find("table").find("td").css("width", "auto");
-    $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
-
-    // Get actual work types/languages
-
-    $.get('/dialog?path=%2Fwork%2Fcreate', function (data) {
-        var nodes = $.parseHTML(data);
-
-        $work_type_options
-            .append($('#id-edit-work\\.type_id', nodes).children())
-            .val($.cookie('bpr_work_type') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_type', this.value, { path: '/', expires: 1000 });
-            });
-
-        $work_language_options
-            .append($('#id-edit-work\\.language_id', nodes).children())
-            .val($.cookie('bpr_work_language') || 0)
-            .on('change', function () {
-                $.cookie('bpr_work_language', this.value, { path: '/', expires: 1000 });
-            });
-    });
 
     var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
     var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
@@ -241,6 +228,23 @@ function batch_recording_rels() {
         .insertAfter($container);
 
     var $recordings_load_msg = $("<span>Loading performance relationships…</span>");
+
+    $container.find("table").find("td").css("width", "auto");
+    $container.children("tbody").children("tr").children("td").css({ padding: "0.5em", "vertical-align": "top" });
+
+    // Get actual work types/languages
+    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
+        var nodes = $.parseHTML(data);
+        function populate($obj, kind) {
+            $obj
+                .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
+                .val($.cookie('bpr_work_'+ kind) || 0)
+                .on('change', function () {
+                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
+                });
+        }
+        _.each($work_options, populate);
+    });
 
     $("<span></span>")
         .append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg)
@@ -271,25 +275,21 @@ function batch_recording_rels() {
         .on('input', 'input.bpr-date-input', function () {
             var $input = $(this);
 
-            function error() {
-                $input.css("border-color", "#f00");
-                $input.parent().data("date", null);
-            }
-
-            $(this).css("border-color", "#999");
+            $input.css("border-color", "#999");
 
             if (this.value) {
+                $input.css("color", "#000");
+
                 var parsedDate = MB.utility.parseDate(this.value);
-
-                $(this).css("color", "#000");
-
-                if (!parsedDate.year && !parsedDate.month && !parsedDate.day) {
-                    error();
-                } else if (!MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
-                    error();
+                if ((parsedDate.year || parsedDate.month || parsedDate.day) &&
+                    MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
                 } else {
-                    $(this).parent().data("date", parsedDate);
+                    $input.css("border-color", "#f00");
+                    parsedDate = null;
                 }
+                $input.parent().data("date", parsedDate);
+            } else {
+                $input.css("color", "#ddd");
             }
         })
         .on('click', 'span.bpr-attr', function () {
@@ -343,8 +343,8 @@ function batch_recording_rels() {
 
     if (page_numbers !== undefined) {
         CURRENT_PAGE = parseInt(page_numbers.href.match(/.+\?page=(\d+)/)[1] || "1", 10);
-        TOTAL_PAGES = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
-        TOTAL_PAGES = Math.ceil((TOTAL_PAGES ? parseInt(TOTAL_PAGES[1], 10) : 1) / 2);
+        var re_match = $("a[rel=xhv\\:last]:first").next("em").text().match(/Page \d+ of (\d+)/);
+        TOTAL_PAGES = Math.ceil((re_match ? parseInt(re_match[1], 10) : 1) / 2);
     }
 
     var NAME_FILTER = $.trim($("#id-filter\\.name").val());
@@ -393,9 +393,7 @@ function batch_recording_rels() {
             }
 
             if (recs) {
-                for (var i = 0; i < recs.length; i++) {
-                    extract_rec(recs[i]);
-                }
+                _.each(recs, extract_rec);
             } else {
                 extract_rec(data);
             }
@@ -436,70 +434,61 @@ function batch_recording_rels() {
             "&fmt=json"
         );
 
-        ws_requests.push(function () {
-            $.get(url, function (data) {
-                _.each(data.recordings, function (r) {
-                    queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
-                });
-
-                if (recordings_not_parsed > 0 && page < TOTAL_PAGES - 1) {
-                    get_filtered_page(page + 1);
-                }
+        ws_requests.push_get(url, function (data) {
+            _.each(data.recordings, function (r) {
+                queue_recordings_request("/ws/2/recording/" + r.id + "?inc=work-rels&fmt=json");
             });
+
+            if (recordings_not_parsed > 0 && page < TOTAL_PAGES - 1) {
+                get_filtered_page(page + 1);
+            }
         });
     }
 
     function parse_recording(node, $row) {
-        var rels = node.relations;
-        var rec_title = $row.children("td").not(":has(input)").first();
+        var $attrs = $row.children("td.bpr_attrs");
+        var performed = false;
 
         $row.data("performances", []);
-        var $attrs = $row.children("td.bpr_attrs"), performed = false;
         $attrs.data("checked", false).css("color", "black");
 
-        _.each(rels, function (rel) {
-            if (!rel.type.match(/performance/)) {
-                return;
-            }
-
-            if (!performed) {
-                $row.addClass("performed");
-                performed = true;
-            }
-
-            var work_mbid = rel.work.id;
-            var work_title = rel.work.title;
-            var work_comment = rel.work.disambiguation;
-            var attrs = [];
-
-            if (rel.begin) {
-                $attrs.find("input.date").val(rel.begin).trigger("input");
-            }
-
-            _.each(rel.attributes, function (name) {
-                name = name.toLowerCase();
-                attrs.push(name);
-
-                var $button = $attrs.find("span." + name);
-                if (!$button.data("checked")) {
-                    $button.click();
+        _.each(node.relations, function (rel) {
+            if (rel.type.match(/performance/)) {
+                if (!performed) {
+                    $row.addClass("performed");
+                    performed = true;
                 }
-            });
 
-            add_work_link($row, work_mbid, work_title, work_comment, attrs);
-            $row.data("performances").push(work_mbid);
+                if (rel.begin) {
+                    $attrs.find("input.date").val(rel.begin).trigger("input");
+                }
+
+                var attrs = [];
+                _.each(rel.attributes, function (name) {
+                    var cannonical_name = name.toLowerCase();
+                    var $button = $attrs.find("span." + cannonical_name);
+
+                    attrs.push(cannonical_name);
+                    if (!$button.data("checked")) {
+                        $button.click();
+                    }
+                });
+
+                add_work_link($row, rel.work.id, rel.work.title, rel.work.disambiguation, attrs);
+                $row.data("performances").push(rel.work.id);
+            }
         });
 
+        //Use the dates in "live YYYY-MM-DD" disambiguation comments
+
         var comment = node.disambiguation;
-        if (comment) {
-            var date = comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
-            if (date) {
-                $attrs.find("input.date").val(date[1]).trigger("input");
-            }
+        var date = comment && comment.match && comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
+        if (date) {
+            $attrs.find("input.date").val(date[1]).trigger("input");
         }
 
         if (!performed) {
-            if (node.title.match(/.+\(live.*\)/) || comment.match(/^live.*/)) {
+            if (node.title.match(/.+\(live.*\)/) || (comment && comment.match && comment.match(/^live.*/))) {
                 $attrs.find("span.live").click();
             } else {
                 var url = "/ws/2/recording/" + node.id + "?inc=releases+release-groups&fmt=json";
@@ -640,21 +629,16 @@ function batch_recording_rels() {
         var tmp_comments = [];
         var tmp_norm_titles = [];
 
-        for (var i = 0; i < result.length; i++) {
-            var parts = result[i];
+        _.each(result, function (parts) {
             var mbid = parts.slice(0, 36);
-
             var rest = parts.slice(36).split("\u00a0");
-            var title = rest[0];
-            var comment = rest[1] || "";
-            var norm_title = normalizeTitle(title);
 
             LOADED_WORKS[mbid] = true;
             tmp_mbids.push(mbid);
-            tmp_titles.push(title);
-            tmp_comments.push(comment);
-            tmp_norm_titles.push(norm_title);
-        }
+            tmp_titles.push(rest[0]);
+            tmp_comments.push(rest[1] || "");
+            tmp_norm_titles.push(normalizeTitle(rest[0]));
+        });
         return [tmp_mbids, tmp_titles, tmp_comments, tmp_norm_titles];
     }
 
@@ -784,17 +768,12 @@ function batch_recording_rels() {
         }
         delete LOADED_ARTISTS[mbid];
 
-        var artists = localStorage.getItem("bpr_artists " + ARTIST_MBID).split("\n");
-        var new_artists = [];
-
-        for (var i = 0; i < artists.length; i++) {
-            var _mbid = artists[i].slice(0, 36);
-            if (_mbid !== mbid)
-                new_artists.push(_mbid + artists[i].slice(36));
-        }
-
-        var artists_string = new_artists.join("\n");
-        localStorage.setItem("bpr_artists " + ARTIST_MBID, artists_string)
+        var item_key = "bpr_artists " + ARTIST_MBID;
+        localStorage.setItem(
+            item_key,
+            _.filter(localStorage.getItem(item_key).split("\n"),
+                     function (artist) { return artist.slice(0, 36) !== mbid; })
+                .join("\n"));
     }
 
     function cache_work(mbid, title, comment) {
@@ -978,11 +957,11 @@ function batch_recording_rels() {
     function create_new_work(title, callback) {
         function post_edit() {
             var data = "edit-work.name=" + title;
-            var work_type = $work_type_options.val();
-            var work_lang = $work_language_options.val();
-
-            if (work_type) data += "&edit-work.type_id=" + work_type;
-            if (work_lang) data += "&edit-work.language_id=" + work_lang;
+            _.each($work_options, function($obj, kind) {
+                if ($obj.val()) {
+                    data += "&edit-work." + kind + "_id=" + $obj.val();
+                }
+            });
 
             $.post("/work/create", data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
@@ -1018,7 +997,7 @@ function batch_recording_rels() {
 
             $title_cell.css("color", "LightSlateGray").find("a").css("color", "LightSlateGray");
 
-            var promise = relate_to_work($row, mbid, title, "", false, _callback, false);
+            var promise = relate_to_work($row, mbid, title, "", false, false);
             if (i === total - 1) {
                 promise.done(callback);
             }
@@ -1185,26 +1164,24 @@ function batch_recording_rels() {
             .filter(function () { return $(this).find("input[name=add-to-merge]:checked").length });
     }
 
-    function entity_lookup($input, entity) {
+    function entity_lookup(id_suffix, entity) {
+        var $input = $('<input type="text" id="bpr-' + id_suffix + '"/>')
         $input.on("input", function () {
             var match = this.value.match(MBID_REGEX);
             $(this).data("selected", false);
             if (match) {
                 var mbid = match[0];
-                ws_requests.unshift(function () {
-                    $.get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
-                        var value = data.title || data.name;
-                        var comment = data.disambiguation;
-                        var data = {"selected": true, "mbid": mbid, "name": value};
+                ws_requests.unshift_get("/ws/2/" + entity + "/" + mbid + "?fmt=json", function (data) {
+                    var value = data.title || data.name;
+                    var out_data = {"selected": true, "mbid": mbid, "name": value};
 
-                        if (entity === "work" && comment) {
-                            data.comment = comment;
-                        }
+                    if (entity === "work" && data.disambiguation) {
+                        out_data.comment = data.disambiguation;
+                    }
 
-                        $input.val(value).data(data).css("background", "#bbffbb");
-                    }).fail(function () {
-                        $input.css("background", "#ffaaaa");
-                    });
+                    $input.val(value).data(out_data).css("background", "#bbffbb");
+                }).fail(function () {
+                    $input.css("background", "#ffaaaa");
                 });
             } else {
                 $input.css("background", "#ffaaaa");
