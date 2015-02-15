@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @version        2014-11-11
 // @author         Michael Wiencek
@@ -31,7 +31,7 @@ function setRecordingComments() {
         if ($("th.video").length > 0) {
             nameColumn = 2;
         }
-        $tracks = $(".tbl tbody tr[data-bind*='even:']");
+        $tracks = $(".medium tbody tr[id]");
 
         if ($tracks.length) {
             clearInterval(delay);
@@ -43,7 +43,7 @@ function setRecordingComments() {
             var $td = $(this).children("td").eq(nameColumn),
                 node = ($td.find(".mp")[0] ||
                         $td.find(".name-variation")[0] ||
-                        $td.find("a[href^=\\/recording\\/]")[0]),
+                        $td.find("a[href*=\\/recording\\/]")[0]),
                 $input = $("<input />").addClass("recording-comment").insertAfter(node);
 
             if (!editing) {
@@ -78,7 +78,7 @@ function setRecordingComments() {
         $(this).css("border-color", this.value === $(this).data("old") ? "#999" : "red");
     });
 
-    var $container = $("<div></div>").insertBefore("table.tbl");
+    var $container = $("<div></div>").insertAfter("h2.tracklist");
 
     $("<button>Edit recording comments</button>")
         .addClass("styled-button")
@@ -142,7 +142,7 @@ function setRecordingComments() {
                     $input.css("border-color", "red").prop("disabled", false);
                 });
 
-            var link = $(track).children("td").eq(nameColumn).find("a[href^=\\/recording\\/]")[0],
+            var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
                 mbid = link.href.match(MBID_REGEX)[0];
 
             editData.push(MB.edit.recordingEdit({ to_edit: mbid, comment: comment }, {}));
