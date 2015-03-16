@@ -338,7 +338,7 @@ function batch_recording_rels() {
 
     var CURRENT_PAGE = 1;
     var TOTAL_PAGES = 1;
-    var page_numbers = $(".pageselector .sel")[0];
+    var page_numbers = $(".pagination .sel")[0];
     var recordings_not_parsed = $recordings.length;
 
     if (page_numbers !== undefined) {
