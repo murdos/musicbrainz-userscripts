@@ -1,6 +1,6 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2014-11-11
+// @version        2015-04-07
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @include        *://musicbrainz.org/release/*
@@ -17,13 +17,10 @@ scr.textContent = "$(" + setRecordingComments + ");";
 document.body.appendChild(scr);
 
 function setRecordingComments() {
-    _.each(["/static/lib/sha1/sha1.js", "/static/scripts/edit/MB/edit.js"], function (src) {
-        var script = document.createElement("script");
-        script.src = src;
-        document.head.appendChild(script);
-    });
-
-    var $tracks, $inputs = $(), nameColumn = 1;
+    var $tracks;
+    var $inputs = $();
+    var nameColumn = 1;
+    var EDIT_RECORDING_EDIT = 72;
 
     $("head").append($("<style></style>").text("input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }"));
 
@@ -145,7 +142,7 @@ function setRecordingComments() {
             var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
                 mbid = link.href.match(MBID_REGEX)[0];
 
-            editData.push(MB.edit.recordingEdit({ to_edit: mbid, comment: comment }, {}));
+            editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
         });
 
         if (editData.length === 0) {
@@ -153,7 +150,13 @@ function setRecordingComments() {
         } else {
             var editNote = $("#recording-comments-edit-note").val();
 
-            activeRequest = MB.edit.create({ edits: editData, editNote: editNote })
+            activeRequest = $.ajax({
+                    type: 'POST',
+                    url: '/ws/js/edit/create',
+                    dataType: 'json',
+                    data: JSON.stringify({edits: editData, editNote: editNote}),
+                    contentType: 'application/json; charset=utf-8',
+                })
                 .always(function () {
                     $submitButton.prop("disabled", false).text("Submit changes (marked red)");
                 })
