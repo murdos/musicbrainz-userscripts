@@ -9,6 +9,9 @@
 // @match          *://musicbrainz.org/release/*
 // @match          *://beta.musicbrainz.org/release/*
 // @match          *://*.mbsandbox.org/release/*
+// @exclude        *://musicbrainz.org/release/*/*
+// @exclude        *://beta.musicbrainz.org/release/*/*
+// @exclude        *://*.mbsandbox.org/release/*/*
 // @grant          none
 // ==/UserScript==
 
