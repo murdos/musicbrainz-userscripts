@@ -5,6 +5,8 @@
 // @author        Michael Wiencek <mwtuea@gmail.com>
 // @version       6.1.2
 // @license       GPL
+// @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
+// @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @include       *://musicbrainz.org/artist/*
 // @include       *://musicbrainz.org/label/*
 // @include       *://musicbrainz.org/release-group/*

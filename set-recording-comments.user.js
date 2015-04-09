@@ -3,6 +3,8 @@
 // @version        2015-04-07
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
+// @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
+// @updateURL      https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
 // @include        *://musicbrainz.org/release/*
 // @include        *://beta.musicbrainz.org/release/*
 // @include        *://*.mbsandbox.org/release/*
