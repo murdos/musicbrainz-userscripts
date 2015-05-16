@@ -20,6 +20,11 @@ $(document).ready(function(){
 
     // append a comma after each tag to ease cut'n'paste to MB
     $("div.tralbum-tags a:not(:last-child)").after(",");
+
+    // append a link to the full size image
+    fullsizeimageurl=$("div#tralbumArt a").attr("href").replace('_10', '_0');
+    $("div#tralbumArt a").after("<div id='bci_link'><a class='custom-color' href='"+fullsizeimageurl+"' title='Link to the original image (Bandcamp importer)'>Original image</a></div>");
+
 });
 
 // Analyze Bandcamp data and return a release object
