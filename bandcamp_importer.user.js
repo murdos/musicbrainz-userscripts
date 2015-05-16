@@ -18,6 +18,8 @@ $(document).ready(function(){
     var release = retrieveReleaseInfo();
     insertLink(release);
 
+    // append a comma after each tag to ease cut'n'paste to MB
+    $("div.tralbum-tags a:not(:last-child)").after(",");
 });
 
 // Analyze Bandcamp data and return a release object
