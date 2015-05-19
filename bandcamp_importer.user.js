@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2015.01.18.0
+// @version        2015.05.16.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -17,6 +17,13 @@ $(document).ready(function(){
 
     var release = retrieveReleaseInfo();
     insertLink(release);
+
+    // append a comma after each tag to ease cut'n'paste to MB
+    $("div.tralbum-tags a:not(:last-child)").after(",");
+
+    // append a link to the full size image
+    fullsizeimageurl=$("div#tralbumArt a").attr("href").replace('_10', '_0');
+    $("div#tralbumArt a").after("<div id='bci_link'><a class='custom-color' href='"+fullsizeimageurl+"' title='Link to the original image (Bandcamp importer)'>Original image</a></div>");
 
 });
 
