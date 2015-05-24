@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2015.05.16.0
+// @version        2015.05.20.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -140,6 +140,16 @@ function retrieveReleaseInfo() {
             'url': $("div#license a.cc-icons").attr("href"),
             'link_type': LINK_LICENSE
         });
+    }
+
+    // Check if album has a back link to a label
+    label = $("a.back-to-label-link span.back-to-label-name").text();
+    if (label != "") {
+      release.labels.push({
+        'name': label,
+        'mbid': '',
+        'catno': 'none'
+      });
     }
 
     LOGGER.info("Parsed release: ", release);
