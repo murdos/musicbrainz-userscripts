@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
-// @version        2015.05.20.0
+// @version        2015.05.25.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -11,170 +11,174 @@
 // @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
 
+
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function(){
+var BandcampImport = {
 
-    var release = retrieveReleaseInfo();
-    insertLink(release);
-
-    // append a comma after each tag to ease cut'n'paste to MB
-    $("div.tralbum-tags a:not(:last-child)").after(",");
-
-    // append a link to the full size image
-    fullsizeimageurl=$("div#tralbumArt a").attr("href").replace('_10', '_0');
-    $("div#tralbumArt a").after("<div id='bci_link'><a class='custom-color' href='"+fullsizeimageurl+"' title='Link to the original image (Bandcamp importer)'>Original image</a></div>");
-
-});
-
-// Analyze Bandcamp data and return a release object
-function retrieveReleaseInfo() {
-    var release = new Object();
-    release.discs = [];
+  // Analyze Bandcamp data and return a release object
+  retrieveReleaseInfo: function () {
 
     var bandcampAlbumData = unsafeWindow.TralbumData;
     var bandcampEmbedData = unsafeWindow.EmbedData;
 
+    var release = {
+      discs: [],
+      artist_credit: [],
+      title: '',
+      year: 0,
+      month: 0,
+      day: 0,
+      parent_album: '',
+      labels: [],
+      format: 'Digital Media',
+      country: 'XW',
+      type: '',
+      status: 'official',
+      packaging: 'None',
+      language: 'eng',
+      script: 'Latn',
+      urls: []
+    };
+
     // Release artist credit
-    release.artist_credit = [ { artist_name: bandcampAlbumData.artist } ];
+    release.artist_credit = [{
+      artist_name: bandcampAlbumData.artist
+    }];
 
     // Grab release title
     release.title = bandcampAlbumData.current.title;
 
     // Grab release event information
-    var date = convdate(bandcampAlbumData.current.release_date);
+    var date = this.convdate(bandcampAlbumData.current.release_date);
     if (date) {
       if (!(date.year > 2008 || (date.year == 2008 && date.month >= 9))) {
         // use publish date if release date is before Bandcamp launch (2008-09)
-        var pdate = convdate(bandcampAlbumData.current.publish_date);
-        if (pdate) date = pdate;
-      }
-      release.year = date.year
-      release.month = date.month
-      release.day = date.day
-    }
-
-    function convdate(date) {
-      if (typeof date != "undefined" && date != "") {
-        var d = new Date(date);
-
-        return {
-          "year": d.getUTCFullYear(),
-          "month": d.getUTCMonth() + 1,
-          "day": d.getUTCDate()
+        var pdate = this.convdate(bandcampAlbumData.current.publish_date);
+        if (pdate) {
+          date = pdate;
         }
       }
-      return false;
+      release.year = date.year;
+      release.month = date.month;
+      release.day = date.day;
     }
 
-    if(bandcampEmbedData.album_title) {
-        release.parent_album = bandcampEmbedData.album_title;
+    if (bandcampEmbedData.album_title) {
+      release.parent_album = bandcampEmbedData.album_title;
     }
 
-    release.labels = new Array();
-    release.format = "Digital Media";
-    release.country = "XW"; // Worldwide
     // FIXME: implement a mapping between bandcamp release types and MB ones
     release.type = bandcampAlbumData.current.type;
-    release.status = 'official';
-    release.packaging = 'none';
-    release.language = 'eng';
-    release.script = 'Latn';
-
     // map Bandcamp single tracks to singles
-    if(release.type == "track")
-    { release.type = "single"; }
+    if (release.type == "track") {
+      release.type = "single";
+    }
 
     // Tracks
-    var disc = new Object();
-    disc.tracks = new Array();
-    disc.format = release.format;
+    var disc = {
+      tracks: [],
+      format: release.format
+    };
     release.discs.push(disc);
-    $.each(bandcampAlbumData.trackinfo, function(index, bctrack) {
-        var track = {
-            'title': bctrack.title,
-            'duration': Math.round(bctrack.duration*1000),
-            'artist_credit': []
-        }
-        disc.tracks.push(track);
+    $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
+      var track = {
+        'title': bctrack.title,
+        'duration': Math.round(bctrack.duration * 1000),
+        'artist_credit': []
+      };
+      disc.tracks.push(track);
     });
 
     // URLs
-    // link_type mapping:
-    // - 74: purchase for download
-    // - 75: download for free
-    // - 85: stream {video} for free
-    // - 301: license
-    LINK_PURCHASE_FOR_DOWNLOAD = 74
-    LINK_DOWNLOAD_FOR_FREE = 75
-    LINK_STREAM_FOR_FREE = 85
-    LINK_LICENSE = 301
-    release.urls = new Array();
+    var link_type = {
+      purchase_for_download: 74,
+      download_for_free: 75,
+      stream_for_free: 85,
+      license: 301
+    };
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
-        if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
-            bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)) {
-            release.urls.push({
-                'url': window.location.href,
-                'link_type': LINK_DOWNLOAD_FOR_FREE
-            });
-        }
-        if (bandcampAlbumData.current.download_pref === 2) {
-            // - 74: purchase for download
-            release.urls.push({
-                'url': window.location.href,
-                'link_type': LINK_PURCHASE_FOR_DOWNLOAD
-            });
-        }
+      if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
+          bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)) {
+        release.urls.push({
+          'url': window.location.href,
+          'link_type': link_type.download_for_free
+        });
+      }
+      if (bandcampAlbumData.current.download_pref === 2) {
+        release.urls.push({
+          'url': window.location.href,
+          'link_type': link_type.purchase_for_download
+        });
+      }
     }
     // Check if the release is streamable
     if (bandcampAlbumData.hasAudio) {
-        release.urls.push({
-            'url': window.location.href,
-            'link_type': LINK_STREAM_FOR_FREE
-        });
+      release.urls.push({
+        'url': window.location.href,
+        'link_type': link_type.stream_for_free
+      });
     }
     // Check if release is Creative Commons licensed
     if ($("div#license a.cc-icons").length > 0) {
-        release.urls.push({
-            'url': $("div#license a.cc-icons").attr("href"),
-            'link_type': LINK_LICENSE
-        });
+      release.urls.push({
+        'url': $("div#license a.cc-icons").attr("href"),
+        'link_type': link_type.license
+      });
     }
-
     // Check if album has a back link to a label
-    label = $("a.back-to-label-link span.back-to-label-name").text();
-    if (label != "") {
+    var label = $("a.back-to-label-link span.back-to-label-name").text();
+    if (label) {
       release.labels.push({
         'name': label,
         'mbid': '',
         'catno': 'none'
       });
     }
-
-    LOGGER.info("Parsed release: ", release);
     return release;
+  },
 
-}
-
-// Insert links in page
-function insertLink(release) {
-
-    if(release.type == "single" && typeof release.parent_album != "undefined") {
-        LOGGER.info("This is part of an album, not continuing.");
-        return false;
+  // Insert links in page
+  insertLink: function (release) {
+    if (release.type == "single" && typeof release.parent_album != "undefined") {
+      return false;
     }
-
     // Form parameters
     var edit_note = 'Imported from ' + window.location.href;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
-
     // Build form
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    // Append search link
-    //innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
-
+    // Append MB import link
     $('h2.trackTitle').append(innerHTML);
+  },
 
-}
+  // helper to convert bandcamp date to MB date
+  convdate: function (date) {
+    if (typeof date != "undefined" && date !== "") {
+      var d = new Date(date);
+      return {
+        "year": d.getUTCFullYear(),
+        "month": d.getUTCMonth() + 1,
+        "day": d.getUTCDate()
+      };
+    }
+    return false;
+  }
+};
 
+$(document).ready(function () {
+
+  var release = BandcampImport.retrieveReleaseInfo();
+  LOGGER.info("Parsed release: ", release);
+  BandcampImport.insertLink(release);
+
+  // append a comma after each tag to ease cut'n'paste to MB
+  $("div.tralbum-tags a:not(:last-child)").after(",");
+
+  // append a link to the full size image
+  var fullsizeimageurl = $("div#tralbumArt a").attr("href").replace('_10', '_0');
+  $("div#tralbumArt a").after("<div id='bci_link'><a class='custom-color' href='" + fullsizeimageurl +
+    "' title='Link to the original image (Bandcamp importer)'>Original image</a></div>");
+
+});
