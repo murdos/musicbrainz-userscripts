@@ -2,6 +2,8 @@
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @version     2014-12-28
 // @author      Michael Wiencek
+// @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
+// @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
 // @include     *://musicbrainz.org/artist/*/recordings*
 // @include     *://*.musicbrainz.org/artist/*/recordings*
 // @match       *://musicbrainz.org/artist/*/recordings*
