@@ -2,7 +2,7 @@
 // @name        Import CD1D releases into MB
 // @namespace   http://userscripts.org/users/517952
 // @include     http://cd1d.com/*/album/*
-// @version     2015.05.27.0
+// @version     2015.05.27.1
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
@@ -10,18 +10,14 @@
 // @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // @grant       none
 // ==/UserScript==
-
 /* Import releases from http://cd1d.com to MusicBrainz */
-
-
 if (!unsafeWindow) unsafeWindow = window;
 
 var CD1DImporter = {
-  _releaseobj: null,
 
   getFormats: function () {
     // get a list of existing formats, return id of the fragment and name
-    var formats = $('#container-1 ul li.ui-state-default').map(function (item) {
+    var formats = $('#container-1 ul li.ui-state-default').map(function () {
       return {
         id: $(this).find('a:first').attr('href').split('#')[1].split('-'),
         name: $(this).find('span:first').text()
@@ -41,7 +37,7 @@ var CD1DImporter = {
           }
         }
       }
-    };
+    }
     var cleanformats = [];
     for (var i = 0; i < formats.length; i++) {
       if (!formats[i].toremove) {
@@ -70,7 +66,7 @@ var CD1DImporter = {
         duration = 60 * parseInt(duration[0]) + parseInt(duration[1]); // convert MM:SS to seconds
 
         // drop track number prefix (A A2 C3 01 05 etc...)
-        var title = row.find('td.tracklist-content-title').text().replace(/^[0-9A-F][0-9]* /, '')
+        var title = row.find('td.tracklist-content-title').text().replace(/^[0-9A-F][0-9]* /, '');
         return {
           title: title,
           duration: duration * 1000 // milliseconds in MB
@@ -84,7 +80,7 @@ var CD1DImporter = {
   getArtists: function () {
     // get artists
     var artists = $('div.infos-releasegrp div.list-artist a').map(function () {
-      return $(this).text()
+      return $(this).text();
     }).get();
     artists = artists.map(function (item) {
       return {
@@ -130,7 +126,7 @@ var CD1DImporter = {
 
   getReleaseDate: function () {
     // get release date and convert it to object
-    var text = $('div.infos-releasegrp div.row-date').text()
+    var text = $('div.infos-releasegrp div.row-date').text();
     if (text == 'yesterday') {
       return this.fromCurrentTime(-24 * 60 * 60);
     }
@@ -174,7 +170,7 @@ var CD1DImporter = {
     return window.location.href.replace(/\/[a-z]{2}\/album\//i, '/album/').split('#')[0];
   },
 
-  retrieveReleaseInfo: function () {
+  retrieveReleaseInfo: function (format) {
     // Analyze CD1D data and return a release object
     var release = {
       artist_credit: this.getArtists(),
@@ -203,27 +199,21 @@ var CD1DImporter = {
       purchase_for_mail_order: 79
     };
 
-    /* CD1D uses same page with hidden tabs for all formats */
-    var formats = this.getFormats();
-    //LOGGER.info('Formats:', formats);
-    var formatindex = 0; // TODO: handle submission of selected format
-    var formatname = formats[formatindex].name;
-
-    if (formatname.match(/vinyl|lp/i)) {
+    if (format.name.match(/vinyl|lp/i)) {
       release.country = 'FR';
       release.format = "Vinyl";
       release.urls.push({
         'url': this.currentURL(),
         'link_type': link_type.purchase_for_mail_order
       });
-    } else if (formatname.match(/cd/i)) {
+    } else if (format.name.match(/cd/i)) {
       release.country = 'FR';
       release.format = 'CD';
       release.urls.push({
         'url': this.currentURL(),
         'link_type': link_type.purchase_for_mail_order
       });
-    } else if (formatname.match(/digital|mp3|flac|ogg|wav/i)) {
+    } else if (format.name.match(/digital|mp3|flac|ogg|wav/i)) {
       release.country = 'XW';
       release.packaging = 'None';
       release.format = "Digital Media";
@@ -231,7 +221,7 @@ var CD1DImporter = {
         'url': this.currentURL(),
         'link_type': link_type.purchase_for_download
       });
-    };
+    }
 
     release.labels = $('div.infos-details div.row-structure').map(function () {
         return {
@@ -243,48 +233,47 @@ var CD1DImporter = {
       .get();
 
     // Tracks
-    $.each(this.getTracks(formats[formatindex].id), function (tndisc, tdisc) {
-      var disc = {
+    $.each(this.getTracks(format.id), function (ndisc, disc) {
+      var thisdisc = {
         tracks: [],
         format: release.format
       };
-      release.discs.push(disc);
-      $.each(tdisc, function (index, track) {
-        var track = {
+      release.discs.push(thisdisc);
+      $.each(this, function (ntrack, track) {
+        disc.tracks.push({
           'title': track.title,
           'duration': track.duration,
           'artist_credit': []
-        }
-        disc.tracks.push(track);
+        });
       });
     });
 
-    LOGGER.info("Parsed release: ", release);
-    this._releaseobj = release;
+    LOGGER.info("Parsed release: ", format.name, release);
     return release;
   },
 
-  insertLink: function (release) {
+  insertLink: function (release, where, formatname) {
     // Insert links in page
-    if (typeof release === 'undefined') {
-      if (this._releaseobj) {
-        release = this._releaseobj;
-      } else {
-        release = this.retrieveReleaseInfo();
-      }
-    }
-
+    LOGGER.info('insert ', where);
     // Form parameters
-    var edit_note = 'Imported from ' + this.currentURL();
+    var edit_note = 'Imported from ' + this.currentURL() + ' (' + formatname + ')';
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    $('div.pane-service-links-service-links h2.pane-title').append(innerHTML);
+    $(where).append(innerHTML);
 
   }
 };
 
 $(document).ready(function () {
-  CD1DImporter.insertLink();
+
+  /* CD1D uses same page with hidden tabs for all formats */
+  var formats = CD1DImporter.getFormats();
+  //LOGGER.info('Formats:', formats);
+
+  for (var i = 0; i < formats.length; i++) {
+    var release = CD1DImporter.retrieveReleaseInfo(formats[i]);
+    CD1DImporter.insertLink(release, 'div#' + formats[i].id, formats[i].name);
+  }
 });
