@@ -1,71 +1,66 @@
 MusicBrainz UserScripts
 =======================
 
-###  Import Bandcamp releases into MB
+* [Import Bandcamp releases into MB](#bandcamp_importer)
+* [Bandcamp Importer Album Link Helper](#bandcamp_importer_helper)
+* [MusicBrainz: Import from Beatport](#beatport_importer)
+* [MusicBrainz: Import from Beatport Pro](#beatport_pro_importer)
+* [Import CD1D releases into MB](#cd1d_importer)
+* [Import Discogs releases to MusicBrainz](#discogs_importer)
+* [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+* [Musicbrainz DiscIds Detector](#mb_discids_detector)
+* [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
-  + **filename**: `bandcamp_importer.user.js` [download](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
-    + **include**
-      + `http*://*.bandcamp.com/album/*`
-      + `http*://*.bandcamp.com/track/*`
+### <a name="bandcamp_importer"</a> Import Bandcamp releases into MB
 
-###  Bandcamp Importer Album Link Helper
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
 
-  + **filename**: `bandcamp_importer_helper.user.js` [download](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js)
-    + **exclude**
-      + `http*://*.bandcamp.com/*/*`
-    + **include**
-      + `http*://*.bandcamp.com/`
-      + `http*://*.bandcamp.com/releases`
+### <a name="bandcamp_importer_helper"</a> Bandcamp Importer Album Link Helper
 
-###  MusicBrainz: Import from Beatport
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer_helper.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js)
 
-  + **filename**: `beatport_importer.user.js` [download](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
-    + **include**
-      + `http*://www.beatport.com/release/*`
+### <a name="beatport_importer"</a> MusicBrainz: Import from Beatport
 
-###  MusicBrainz: Import from Beatport Pro
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
 
-  + **filename**: `beatport_pro_importer.user.js` [download](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js)
-    + **include**
-      + `http://pro.beatport.com/release/*`
-      + `https://pro.beatport.com/release/*`
+### <a name="beatport_pro_importer"</a> MusicBrainz: Import from Beatport Pro
 
-###  Import CD1D releases into MB
+One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
 
-  + **filename**: `cd1d_importer.user.js` [download](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
-    + **include**
-      + `http://cd1d.com/*/album/*`
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_pro_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js)
 
-###  Import Discogs releases to MusicBrainz
+### <a name="cd1d_importer"</a> Import CD1D releases into MB
 
-  + **filename**: `discogs_importer.user.js` [download](https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
-    + **exclude**
-      + `http://*.discogs.com/*release/*?f=xml*`
-      + `http://www.discogs.com/release/add`
-    + **include**
-      + `http://www.discogs.com/*`
-      + `http://*.discogs.com/*release/*`
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
 
-###  Import Encyclopedisque releases to MusicBrainz
+### <a name="discogs_importer"</a> Import Discogs releases to MusicBrainz
 
-  + **filename**: `encyclopedisque_importer.user.js` [download](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
-    + **include**
-      + `http://www.encyclopedisque.fr/disque/*.html`
-      + `http://www.encyclopedisque.fr/artiste/*.html`
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
 
-###  Musicbrainz DiscIds Detector
+### <a name="encyclopedisque_importer"</a> Import Encyclopedisque releases to MusicBrainz
 
-  + **filename**: `mb_discids_detector.user.js` [download](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js)
-    + **include**
-      + `http://avaxhome.ws/music/*`
-      + `http*://what.cd/torrents.php?id=*`
-      + `https://ssl.what.cd/torrents.php?id=*`
-      + `http*://lztr.us/torrents.php?id=*`
-      + `http*://mutracker.org/torrents.php?id=*`
+Easily import Encyclopedisque releases into MusicBrainz
 
-###  Musicbrainz UI enhancements
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
 
-  + **filename**: `mb_ui_enhancements.user.js` [download](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js)
-    + **include**
-      + `http*://*musicbrainz.org/*`
+### <a name="mb_discids_detector"</a> Musicbrainz DiscIds Detector
+
+Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_discids_detector.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js)
+
+### <a name="mb_ui_enhancements"</a> Musicbrainz UI enhancements
+
+Various UI enhancements for Musicbrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_ui_enhancements.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js)
 

@@ -38,7 +38,8 @@ for jsfilename in sorted(glob.glob('*.user.js')):
             key, value = m.groups()
             d[key.lower()].append(value)
         if d:
-            items.append(dict(jsfile=jsfilename, header=d))
+            shortname = jsfilename.replace('.user.js', '')
+            items.append(dict(jsfile=jsfilename, shortname=shortname, header=d))
 
 doctitle = "MusicBrainz UserScripts"
 print(doctitle)
@@ -46,17 +47,21 @@ print('=' * len(doctitle))
 print()
 
 for item in items:
-    print('### ', item['header']['name'][0])
+    print('* [%s](#%s)' % (item['header']['name'][0], item['shortname']))
+print()
+
+install_button_url = 'https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png'
+source_button_url = 'https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png'
+source_base_url = 'https://github.com/murdos/musicbrainz-userscripts/blob/master'
+
+for item in items:
+    print('### <a name="%s"</a> %s' % (item['shortname'], item['header']['name'][0]))
     print()
+    if (item['header']['description']):
+        print(item['header']['description'][0])
+        print()
+    print('[![Source](%s)](%s/%s)' % (source_button_url, source_base_url, item['jsfile']))
     if item['header']['downloadurl']:
-        downloadlink = ' [download](%s)' % item['header']['downloadurl'][0]
-    else:
-        downloadlink = ''
-    print('  + **filename**: `%s`%s' % (item['jsfile'], downloadlink))
-    for key in item['header']:
-        if key not in ('include', 'exclude'):
-            continue
-        print("    + **%s**" % key)
-        for value in item['header'][key]:
-            print("      + `%s`" % value)
+        downloadlink = '[![Install](%s)](%s)' % (install_button_url, item['header']['downloadurl'][0])
+        print(downloadlink)
     print()
