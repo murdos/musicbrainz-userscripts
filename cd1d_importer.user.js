@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name        Import CD1D releases into MB
+// @description Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
 // @namespace   http://userscripts.org/users/517952
 // @include     http://cd1d.com/*/album/*
-// @version     2015.05.27.1
+// @version     2015.05.28.0
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js

@@ -13,10 +13,14 @@ MusicBrainz UserScripts
 
 ### <a name="bandcamp_importer"</a> Import Bandcamp releases into MB
 
+Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
+
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
 
 ### <a name="bandcamp_importer_helper"</a> Bandcamp Importer Album Link Helper
+
+Add a link to Bandcamp's album canonical URL on pages without /album/, for one to import the release into MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer_helper.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js)
@@ -34,6 +38,8 @@ One-click importing of releases from pro.beatport.com/release pages into MusicBr
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js)
 
 ### <a name="cd1d_importer"</a> Import CD1D releases into MB
+
+Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
