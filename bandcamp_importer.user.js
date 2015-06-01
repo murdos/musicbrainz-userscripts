@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases into MB
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2015.05.28.0
+// @version        2015.05.29.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -91,6 +91,36 @@ var BandcampImport = {
       disc.tracks.push(track);
     });
 
+    // Check for hidden tracks (more tracks in the download than shown for streaming ie.)
+    var showntracks = bandcampAlbumData.trackinfo.length;
+    var numtracks = -1;
+    var nostream = false;
+    // album description indicates number of tracks in the download
+    var match = /^\d+ track album$/.exec($("meta[property='og:description']").attr("content"));
+    if (match) {
+      numtracks = parseInt(match);
+    }
+    if (numtracks > 0 && numtracks > showntracks) {
+      // display a warning if tracks in download differs from tracks shown
+      $('h2.trackTitle').append(
+        '<p style="font-size:70%; font-style: italic; margin: 0.1em 0;">' +
+          'Warning: ' + numtracks + ' vs ' + showntracks + ' tracks' +
+        '</p>'
+      );
+
+      // append unknown tracks to the release
+      for (var i = 0; i < numtracks - showntracks; i++) {
+        var track = {
+          'title': '[unknown]',
+          'duration': null,
+          'artist_credit': []
+        };
+        disc.tracks.push(track);
+      }
+      // disable stream link as only part of the album can be streamed
+      nostream = true;
+    }
+
     // URLs
     var link_type = {
       purchase_for_download: 74,
@@ -115,7 +145,7 @@ var BandcampImport = {
       }
     }
     // Check if the release is streamable
-    if (bandcampAlbumData.hasAudio) {
+    if (bandcampAlbumData.hasAudio && !nostream) {
       release.urls.push({
         'url': window.location.href,
         'link_type': link_type.stream_for_free
