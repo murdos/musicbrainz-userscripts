@@ -349,10 +349,17 @@ function parseDiscogsRelease(data) {
     // Inspect tracks
     var tracks = [];
 
+    var heading = "";
     var releaseNumber = 1;
     var lastPosition = 0;
     $.each(discogsRelease.tracklist, function(index, discogsTrack) {
-        // TODO: dectect disc title and set disc.title
+
+        if (discogsTrack.type_ == 'heading') {
+          heading = discogsTrack.title;
+          return;
+        } else if (discogsTrack.type_ != 'track') {
+          return;
+        }
 
         var track = new Object();
 
@@ -424,6 +431,10 @@ function parseDiscogsRelease(data) {
             release.discs.push(new Object());
             release.discs[releaseNumber-1].tracks = [];
             release.discs[releaseNumber-1].format = release_formats[releaseNumber-1];
+            if (heading) {
+              release.discs[releaseNumber-1].title = heading;
+              heading = "";
+            }
         }
 
         // Track number (only for Vinyl and Cassette)
