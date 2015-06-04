@@ -357,7 +357,7 @@ function parseDiscogsRelease(data) {
         if (discogsTrack.type_ == 'heading') {
           heading = discogsTrack.title;
           return;
-        } else if (discogsTrack.type_ != 'track') {
+        } else if (discogsTrack.type_ != 'track' && discogsTrack.type_ != 'index') {
           return;
         }
 
@@ -385,6 +385,29 @@ function parseDiscogsRelease(data) {
 
         // Track position and release number
         var trackPosition = discogsTrack.position;
+
+        // Handle sub-tracks
+        if (trackPosition == "" && discogsTrack.sub_tracks) {
+            trackPosition = discogsTrack.sub_tracks[0].position;
+            // Append titles of sub-tracks to main track title
+            var subtrack_titles = [];
+            $.each(discogsTrack.sub_tracks, function(subtrack_index, subtrack) {
+              if (subtrack.type_ != 'track') {
+                return;
+              }
+              if (subtrack.title) {
+                subtrack_titles.push(subtrack.title);
+              } else {
+                subtrack_titles.push('[unknown]');
+              }
+            });
+            if (subtrack_titles.length) {
+              if (track.title) {
+                track.title += ': ';
+              }
+              track.title += subtrack_titles.join(' / ');
+            }
+        }
 
         // Skip special tracks
         if (trackPosition.toLowerCase().match("^(video|mp3)")) {
