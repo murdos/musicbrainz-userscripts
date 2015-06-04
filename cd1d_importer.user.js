@@ -6,13 +6,17 @@
 // @version     2015.05.28.0
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @require     http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
 // @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // @grant       none
 // ==/UserScript==
+
 /* Import releases from http://cd1d.com to MusicBrainz */
 if (!unsafeWindow) unsafeWindow = window;
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
 
 var CD1DImporter = {
 
