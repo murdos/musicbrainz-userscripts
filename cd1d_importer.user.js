@@ -241,7 +241,7 @@ var CD1DImporter = {
       };
       release.discs.push(thisdisc);
       $.each(this, function (ntrack, track) {
-        disc.tracks.push({
+        thisdisc.tracks.push({
           'title': track.title,
           'duration': track.duration,
           'artist_credit': []
