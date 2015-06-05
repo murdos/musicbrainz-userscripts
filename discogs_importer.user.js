@@ -117,8 +117,6 @@ function magnifyLinks(rootNode) {
         return;
     rootNode.setAttribute('discogsLinksMagnified', true);
 
-    var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
-
     var elems = rootNode.getElementsByTagName('a');
     for (var i = 0; i < elems.length; i++) {
         var elem = elems[i];
