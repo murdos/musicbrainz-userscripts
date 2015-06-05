@@ -238,6 +238,32 @@ function insertLink(release) {
 //                                               Parsing of Discogs data                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO: move utility functions to lib
+// convert HH:MM:SS or MM:SS to seconds
+function hmsToSeconds(str) {
+    var t = str.split(':');
+    var s = 0;
+    var m = 1;
+    while (t.length > 0) {
+        s += m * parseInt(t.pop());
+        m *= 60;
+    }
+    return s;
+}
+
+// convert seconds to H:M:S or M:SS
+function secondsToHms(secs) {
+    var sep = ':';
+    var h = parseInt(secs/3600) % 24;
+    var m = parseInt(secs/60) % 60;
+    var s = secs % 60;
+    var r = "";
+    if (h > 0) {
+        return h + sep + (m < 10 ? "0" + m : m) + sep + (s  < 10 ? "0" + s : s);
+    }
+    return m + sep + (s  < 10 ? "0" + s : s);
+}
+
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
 
@@ -391,9 +417,13 @@ function parseDiscogsRelease(data) {
             trackPosition = discogsTrack.sub_tracks[0].position;
             // Append titles of sub-tracks to main track title
             var subtrack_titles = [];
+            var subtrack_total_duration = 0;
             $.each(discogsTrack.sub_tracks, function(subtrack_index, subtrack) {
               if (subtrack.type_ != 'track') {
                 return;
+              }
+              if (subtrack.duration) {
+                subtrack_total_duration += hmsToSeconds(subtrack.duration);
               }
               if (subtrack.title) {
                 subtrack_titles.push(subtrack.title);
@@ -406,6 +436,9 @@ function parseDiscogsRelease(data) {
                 track.title += ': ';
               }
               track.title += subtrack_titles.join(' / ');
+            }
+            if (!track.duration && subtrack_total_duration) {
+              track.duration = secondsToHms(subtrack_total_duration);
             }
         }
 
