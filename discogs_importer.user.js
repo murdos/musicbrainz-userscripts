@@ -86,6 +86,10 @@ function insertMBLinks($root) {
         $root = $('body');
     }
 
+    $root.find('h1#profile_title').each(function() {
+        searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+    });
+
     $root.find('tr.master').each(function() {
         searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
     });
