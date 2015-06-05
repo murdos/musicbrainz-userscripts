@@ -11,8 +11,8 @@
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        lib/import_functions.js
+// @require        lib/logger.js
 // ==/UserScript==
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
