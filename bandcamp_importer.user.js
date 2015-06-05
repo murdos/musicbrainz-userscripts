@@ -7,11 +7,16 @@
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include        http*://*.bandcamp.com/album/*
 // @include        http*://*.bandcamp.com/track/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require        lib/import_functions.js
+// @require        lib/logger.js
+// @require        lib/mblinks.js
+// @grant          None
 // ==/UserScript==
 
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
@@ -199,6 +204,14 @@ var BandcampImport = {
 };
 
 $(document).ready(function () {
+
+  var mblinks = new MBLinks('BCI_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
+
+  var artist_link = 'http://' + window.location.href.match( /^https?:\/\/(.*)\/album\/.+$/i)[1];
+  mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+
+  var album_link = 'http://' + window.location.href.match( /^https?:\/\/(.*\/album\/.+)$/i)[1];
+  mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
 
   var release = BandcampImport.retrieveReleaseInfo();
   LOGGER.info("Parsed release: ", release);
