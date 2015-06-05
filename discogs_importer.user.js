@@ -131,10 +131,10 @@ function magnifyLinks(rootNode) {
 
 // Normalize Discogs URL by removing title from URL
 function magnifyLink(url) {
-    var re = /^http:\/\/www\.discogs\.com\/(.*)\/(master|release)\/(\d+)$/i;
+    var re = /^http:\/\/www\.discogs\.com\/(?:.+\/)?(master|release|artist)\/(\d+)(?:-[^\/#?]+)?$/i;
     if (m = re.exec(url)) {
-        var type = m[2];
-        var id = m[3];
+        var type = m[1];
+        var id = m[2];
         return "http://www.discogs.com/" + type + "/" + id;
     }
     return url;
