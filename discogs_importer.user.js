@@ -77,6 +77,10 @@ function insertMBLinks($root) {
     function searchAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
         $tr.find('a[href*="http://www.discogs.com/'+discogs_type+'/"]').each(function() {
             var $link = $(this);
+            // ensure we do it only once per link
+            var done = $link.attr('mblink');
+            if (done) return;
+            $link.attr('mblink', true);
             var discogs_url = $link.attr('href');
             mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
         });
