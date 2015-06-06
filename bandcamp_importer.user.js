@@ -212,11 +212,21 @@ $(document).ready(function () {
   LOGGER.info("Parsed release: ", release);
   BandcampImport.insertLink(release);
 
-  var artist_link = 'http://' + window.location.href.match( /^https?:\/\/(.*)\/album\/.+$/i)[1];
+  // add MB artist link
+  var artist_link = release.url.match(/^(http:\/\/[^\/]+)/)[1];
   mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
 
-  var album_link = 'http://' + window.location.href.match( /^https?:\/\/(.*\/album\/.+)$/i)[1];
-  mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
+  if (release.type != 'single') {
+    // add MB release links
+    var album_link = release.url;
+    mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
+
+  } else {
+    if (release.parent_album) {
+      // add MB album links
+      mblinks.searchAndDisplayMbLink(release.parent_album, 'release', function (link) { $('div#name-section span[itemprop="inAlbum"] a:first').before(link); } );
+    }
+  }
 
   // append a comma after each tag to ease cut'n'paste to MB
   $("div.tralbum-tags a:not(:last-child)").after(",");
