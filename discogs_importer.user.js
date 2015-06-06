@@ -10,11 +10,20 @@
 // @include        http://*.discogs.com/*release/*
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/import_functions.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
+// @grant          None
 // ==/UserScript==
+
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
+
+if (!unsafeWindow) unsafeWindow = window;
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
