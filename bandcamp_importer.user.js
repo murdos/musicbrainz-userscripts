@@ -71,15 +71,17 @@ var BandcampImport = {
       release.day = date.day;
     }
 
-    if (bandcampEmbedData.album_embed_data) {
-      release.parent_album_url = bandcampEmbedData.album_embed_data.linkback;
-    }
-
     // FIXME: implement a mapping between bandcamp release types and MB ones
-    release.type = bandcampAlbumData.current.type;
-    // map Bandcamp single tracks to singles
-    if (release.type == "track") {
+    if (bandcampAlbumData.current.type == "track") {
+      // map Bandcamp single tracks to singles
       release.type = "single";
+      // if track belongs to an album, get its url.
+      if (bandcampEmbedData.album_embed_data) {
+        release.parent_album_url = bandcampEmbedData.album_embed_data.linkback;
+        release.type = 'track'; // <-- no import
+      }
+    } else {
+      release.type = 'album';
     }
 
     // Tracks
@@ -178,7 +180,8 @@ var BandcampImport = {
 
   // Insert links in page
   insertLink: function (release) {
-    if (release.type == "single" && release.parent_album_url != "") {
+    if (release.type == "track") {
+      // only import album or single, tracks belong to an album
       return false;
     }
     // Form parameters
@@ -216,16 +219,12 @@ $(document).ready(function () {
   var artist_link = release.url.match(/^(http:\/\/[^\/]+)/)[1];
   mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
 
-  if (release.type != 'single') {
-    // add MB release links
-    var album_link = release.url;
-    mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
-
+  if (release.type == 'track') {
+    // add MB links to parent album
+    mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) { $('div#name-section span[itemprop="inAlbum"] a:first').before(link); } );
   } else {
-    if (release.parent_album_url) {
-      // add MB album links
-      mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) { $('div#name-section span[itemprop="inAlbum"] a:first').before(link); } );
-    }
+    // add MB release links to album or single
+    mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
   }
 
   // append a comma after each tag to ease cut'n'paste to MB
