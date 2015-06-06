@@ -71,8 +71,8 @@ var BandcampImport = {
       release.day = date.day;
     }
 
-    if (bandcampEmbedData.album_title) {
-      release.parent_album = bandcampEmbedData.album_title;
+    if (bandcampEmbedData.album_embed_data) {
+      release.parent_album = bandcampEmbedData.album_embed_data.linkback;
     }
 
     // FIXME: implement a mapping between bandcamp release types and MB ones
