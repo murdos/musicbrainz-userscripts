@@ -44,7 +44,8 @@ var BandcampImport = {
       packaging: 'None',
       language: 'eng',
       script: 'Latn',
-      urls: []
+      urls: [],
+      url: bandcampAlbumData.url
     };
 
     // Release artist credit
@@ -138,13 +139,13 @@ var BandcampImport = {
       if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
           bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)) {
         release.urls.push({
-          'url': window.location.href,
+          'url': release.url,
           'link_type': link_type.download_for_free
         });
       }
       if (bandcampAlbumData.current.download_pref === 2) {
         release.urls.push({
-          'url': window.location.href,
+          'url': release.url,
           'link_type': link_type.purchase_for_download
         });
       }
@@ -152,7 +153,7 @@ var BandcampImport = {
     // Check if the release is streamable
     if (bandcampAlbumData.hasAudio && !nostream) {
       release.urls.push({
-        'url': window.location.href,
+        'url': release.url,
         'link_type': link_type.stream_for_free
       });
     }
@@ -181,7 +182,7 @@ var BandcampImport = {
       return false;
     }
     // Form parameters
-    var edit_note = 'Imported from ' + window.location.href;
+    var edit_note = 'Imported from ' + release.url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
     // Build form
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
