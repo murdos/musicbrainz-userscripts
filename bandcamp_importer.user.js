@@ -35,7 +35,7 @@ var BandcampImport = {
       year: 0,
       month: 0,
       day: 0,
-      parent_album: '',
+      parent_album_url: '',
       labels: [],
       format: 'Digital Media',
       country: 'XW',
@@ -72,7 +72,7 @@ var BandcampImport = {
     }
 
     if (bandcampEmbedData.album_embed_data) {
-      release.parent_album = bandcampEmbedData.album_embed_data.linkback;
+      release.parent_album_url = bandcampEmbedData.album_embed_data.linkback;
     }
 
     // FIXME: implement a mapping between bandcamp release types and MB ones
@@ -178,7 +178,7 @@ var BandcampImport = {
 
   // Insert links in page
   insertLink: function (release) {
-    if (release.type == "single" && release.parent_album != "") {
+    if (release.type == "single" && release.parent_album_url != "") {
       return false;
     }
     // Form parameters
@@ -222,9 +222,9 @@ $(document).ready(function () {
     mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
 
   } else {
-    if (release.parent_album) {
+    if (release.parent_album_url) {
       // add MB album links
-      mblinks.searchAndDisplayMbLink(release.parent_album, 'release', function (link) { $('div#name-section span[itemprop="inAlbum"] a:first').before(link); } );
+      mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) { $('div#name-section span[itemprop="inAlbum"] a:first').before(link); } );
     }
   }
 
