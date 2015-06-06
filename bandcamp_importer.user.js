@@ -208,15 +208,15 @@ $(document).ready(function () {
 
   var mblinks = new MBLinks('BCI_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
 
+  var release = BandcampImport.retrieveReleaseInfo();
+  LOGGER.info("Parsed release: ", release);
+  BandcampImport.insertLink(release);
+
   var artist_link = 'http://' + window.location.href.match( /^https?:\/\/(.*)\/album\/.+$/i)[1];
   mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
 
   var album_link = 'http://' + window.location.href.match( /^https?:\/\/(.*\/album\/.+)$/i)[1];
   mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) { $('div#name-section span[itemprop="byArtist"]').after(link); } );
-
-  var release = BandcampImport.retrieveReleaseInfo();
-  LOGGER.info("Parsed release: ", release);
-  BandcampImport.insertLink(release);
 
   // append a comma after each tag to ease cut'n'paste to MB
   $("div.tralbum-tags a:not(:last-child)").after(",");
