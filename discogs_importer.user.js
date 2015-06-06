@@ -34,10 +34,10 @@ $(document).ready(function(){
     insertMBLinks();
 
     // Handle page navigation on artist page for the first two features
-    $("#releases").bind("DOMNodeInserted",function(event) {
+    $("#releases").bind("DOMNodeInserted DOMSubtreeModified",function(event) {
         // Only child of $("#releases") are of interest
         if (event.target.parentNode.id == 'releases') {
-            magnifyLinks(event.target);
+            magnifyLinks(event.target, true);
             insertMBLinks($(event.target));
         }
     });
@@ -114,14 +114,14 @@ function insertMBLinks($root) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Normalize Discogs URLs in a DOM tree
-function magnifyLinks(rootNode) {
+function magnifyLinks(rootNode, force) {
 
     if (!rootNode) {
         rootNode = document.body;
     }
 
     // Check if we already added links for this content
-    if (rootNode.hasAttribute('discogsLinksMagnified'))
+    if (!force && rootNode.hasAttribute('discogsLinksMagnified'))
         return;
     rootNode.setAttribute('discogsLinksMagnified', true);
 
