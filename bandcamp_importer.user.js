@@ -177,7 +177,7 @@ var BandcampImport = {
 
   // Insert links in page
   insertLink: function (release) {
-    if (release.type == "single" && typeof release.parent_album != "undefined") {
+    if (release.type == "single" && release.parent_album != "") {
       return false;
     }
     // Form parameters
