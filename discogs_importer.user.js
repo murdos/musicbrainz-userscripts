@@ -103,16 +103,26 @@ function insertMBLinks($root) {
         searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
     });
 
-    $root.find('tr.master').each(function() {
+    $root.find('tr.tracklist_track').each(function() {
+        searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+    });
+
+    $root.find('div.profile').each(function() {
+        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
+
+    $root.find('div.section_content').each(function() {
         searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
     });
 
+    // Discography on artist/label pages
+    $root.find('tr.master').each(function() {
+        searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
     $root.find('tr.release').each(function() {
         searchAndDisplayMbLinkInSection($(this), 'release', 'release');
-    });
-
-    $root.find('tr.hidden.r_tr').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'release', 'release');
+        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
     });
 
 }
@@ -148,7 +158,7 @@ function magnifyLinks(rootNode, force) {
 
 // Normalize Discogs URL by removing title from URL
 function magnifyLink(url) {
-    var re = /^http:\/\/www\.discogs\.com\/(?:.+\/)?(master|release|artist)\/(\d+)(?:-[^\/#?]+)?$/i;
+    var re = /^http:\/\/www\.discogs\.com\/(?:.+\/)?(master|release|artist|label)\/(\d+)(?:-[^\/#?]+)?$/i;
     if (m = re.exec(url)) {
         var type = m[1];
         var id = m[2];
