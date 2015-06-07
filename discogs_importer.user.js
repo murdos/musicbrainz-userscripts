@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
-// @version        2015.06.06.0
+// @version        2015.06.07.0
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
