@@ -14,7 +14,6 @@
 // @require        lib/import_functions.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
-// @grant          None
 // ==/UserScript==
 
 

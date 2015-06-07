@@ -8,7 +8,6 @@
 // @include     http*://*.bandcamp.com/
 // @include     http*://*.bandcamp.com/releases
 // @exclude     http*://*.bandcamp.com/*/*
-// @grant       none
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
 // ==/UserScript==
