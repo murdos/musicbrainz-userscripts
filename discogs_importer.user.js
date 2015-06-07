@@ -158,10 +158,10 @@ function magnifyLinks(rootNode, force) {
 
 // Normalize Discogs URL by removing title from URL
 function magnifyLink(url) {
-    var re = /^http:\/\/www\.discogs\.com\/(?:.+\/)?(master|release|artist|label)\/(\d+)(?:-[^\/#?]+)?$/i;
+    var re = /^http:\/\/(www|api)\.discogs\.com\/(?:.+\/)?(master|release|artist|label)s?\/(\d+)(?:-[^\/#?]+)?$/i;
     if (m = re.exec(url)) {
-        var type = m[1];
-        var id = m[2];
+        var type = m[2];
+        var id = m[3];
         return "http://www.discogs.com/" + type + "/" + id;
     }
     return url;
@@ -243,10 +243,14 @@ function parseDiscogsRelease(data) {
         var ac = {
             'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
             'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
-            'joinphrase': decodeDiscogsJoinphrase(artist.join)
+            'joinphrase': decodeDiscogsJoinphrase(artist.join),
+            'mbid': mblinks.resolveMBID(magnifyLink(artist.resource_url))
         };
         release.artist_credit.push(ac);
     });
+
+    // ReleaseGroup
+    release.release_group_mbid = mblinks.resolveMBID(magnifyLink(discogsRelease.master_url));
 
     // Release title
     release.title = discogsRelease.title;
@@ -276,7 +280,11 @@ function parseDiscogsRelease(data) {
     release.labels = new Array();
     if (discogsRelease.labels) {
         $.each(discogsRelease.labels, function(index, label) {
-            release.labels.push( { name: label.name, catno: (label.catno == "none" ? "[none]" : label.catno) } );
+            release.labels.push({
+                name: label.name,
+                catno: (label.catno == "none" ? "[none]" : label.catno),
+                mbid: mblinks.resolveMBID(magnifyLink(label.resource_url))
+            });
         });
     }
 
@@ -364,7 +372,8 @@ function parseDiscogsRelease(data) {
                 var ac = {
                     'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
                     'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
-                    'joinphrase': decodeDiscogsJoinphrase(artist.join)
+                    'joinphrase': decodeDiscogsJoinphrase(artist.join),
+                    'mbid': mblinks.resolveMBID(magnifyLink(artist.resource_url))
                 };
                 track.artist_credit.push(ac);
             });
