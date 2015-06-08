@@ -110,7 +110,7 @@ function insertMBLinks($root) {
         searchAndDisplayMbLinkInSection($(this), 'label', 'label');
     });
 
-    $root.find('div.section_content').each(function() {
+    $root.find('div.section:not(.marketplace_box_links)').each(function() {
         searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
     });
 
