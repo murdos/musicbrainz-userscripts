@@ -56,7 +56,7 @@ source_button_url = 'https://github.com/jerone/UserScripts/blob/master/_resource
 source_base_url = 'https://github.com/murdos/musicbrainz-userscripts/blob/master'
 
 for item in items:
-    print('### <a name="%s"></a> %s' % (item['shortname'], item['header']['name'][0]))
+    print('## <a name="%s"></a> %s' % (item['shortname'], item['header']['name'][0]))
     print()
     if (item['header']['description']):
         print(item['header']['description'][0])
