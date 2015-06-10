@@ -67,7 +67,7 @@ var CD1DImporter = {
         //  describes the first and second <td> in the row.
         var duration = row.find('td.tracklist-content-length').text().replace('"', '').replace('\' ', ':').split(
           ':');
-        duration = 60 * parseInt(duration[0]) + parseInt(duration[1]); // convert MM:SS to seconds
+        duration = 60 * parseInt(duration[0], 10) + parseInt(duration[1], 10); // convert MM:SS to seconds
 
         // drop track number prefix (A A2 C3 01 05 etc...)
         var title = row.find('td.tracklist-content-title').text().replace(/^[0-9A-F][0-9]* /, '');
@@ -164,9 +164,9 @@ var CD1DImporter = {
       .replace('December', '12')
       .split(' ');
     return {
-      'year': parseInt(date[2]),
-      'month': parseInt(date[1]),
-      'day': parseInt(date[0])
+      'year': parseInt(date[2], 10),
+      'month': parseInt(date[1], 10),
+      'day': parseInt(date[0], 10)
     };
   },
 

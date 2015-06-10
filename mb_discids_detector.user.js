@@ -246,7 +246,7 @@ var log_input_to_entries = function(text) {
         var m = toc_entry_matcher.exec(value);
         if (m) {
             // New disc
-            if (parseInt(m[1]) == 1) {
+            if (parseInt(m[1], 10) == 1) {
                 if (entries.length > 0) { discs.push(entries); }
                 entries = [];
             }
@@ -272,7 +272,7 @@ var log_input_to_entries = function(text) {
 var get_layout_type = function(entries) {
     var type = "standard";
     for (var i=0; i<entries.length-1; i++) {
-        var gap = parseInt(entries[i+1][4]) - parseInt(entries[i][5]) - 1;
+        var gap = parseInt(entries[i+1][4], 10) - parseInt(entries[i][5], 10) - 1;
         if (gap != 0) {
             if (i == entries.length-2 && gap == DATA_TRACK_GAP) {
                 type = "with_data";
@@ -290,10 +290,10 @@ var calculate_mb_toc_numbers = function(entries) {
         return null;
     }
 
-    var leadout_offset = parseInt(entries[entries.length - 1][5]) + PREGAP + 1;
+    var leadout_offset = parseInt(entries[entries.length - 1][5], 10) + PREGAP + 1;
 
     var offsets = $.map(entries, function(entry) {
-        return parseInt(entry[4]) + PREGAP;
+        return parseInt(entry[4], 10) + PREGAP;
     })
     return [1, entries.length, leadout_offset].concat(offsets);
 }
@@ -317,11 +317,11 @@ var calculate_cddb_id = function(entries) {
         return number.toString(16).toUpperCase();
     }
 
-    var length_seconds = Math.floor((parseInt(entries[entries.length-1][5]) - parseInt(entries[0][4]) + 1)
+    var length_seconds = Math.floor((parseInt(entries[entries.length-1][5], 10) - parseInt(entries[0][4], 10) + 1)
         / SECTORS_PER_SECOND);
     var checksum = 0;
     $.each(entries, function(index, entry) {
-        checksum += sum_of_digits(Math.floor((parseInt(entry[4]) + PREGAP) / SECTORS_PER_SECOND));
+        checksum += sum_of_digits(Math.floor((parseInt(entry[4], 10) + PREGAP) / SECTORS_PER_SECOND));
     })
 
     var xx = checksum % 255;

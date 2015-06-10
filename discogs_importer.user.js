@@ -210,7 +210,7 @@ function hmsToSeconds(str) {
     var s = 0;
     var m = 1;
     while (t.length > 0) {
-        s += m * parseInt(t.pop());
+        s += m * parseInt(t.pop(), 10);
         m *= 60;
     }
     return s;
@@ -219,8 +219,8 @@ function hmsToSeconds(str) {
 // convert seconds to H:M:S or M:SS
 function secondsToHms(secs) {
     var sep = ':';
-    var h = parseInt(secs/3600) % 24;
-    var m = parseInt(secs/60) % 60;
+    var h = parseInt(secs/3600, 10) % 24;
+    var m = parseInt(secs/60, 10) % 60;
     var s = secs % 60;
     var r = "";
     if (h > 0) {

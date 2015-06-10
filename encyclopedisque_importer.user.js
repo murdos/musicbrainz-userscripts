@@ -250,7 +250,7 @@ function parseEncyclopedisquePage() {
     }
 
     // Barcode ?
-    if (parseInt(release.year) <= 1982) {
+    if (parseInt(release.year, 10) <= 1982) {
         // FIXME: not working
         release.no_barcode = '1';
     }

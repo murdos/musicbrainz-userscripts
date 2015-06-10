@@ -105,7 +105,7 @@ var BandcampImport = {
     // album description indicates number of tracks in the download
     var match = /^\d+ track album$/.exec($("meta[property='og:description']").attr("content"));
     if (match) {
-      numtracks = parseInt(match);
+      numtracks = parseInt(match, 10);
     }
     if (numtracks > 0 && numtracks > showntracks) {
       // display a warning if tracks in download differs from tracks shown
