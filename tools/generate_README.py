@@ -44,9 +44,7 @@ for jsfilename in sorted(glob.glob('*.user.js')):
 
 items.sort(key=lambda elem: elem['header']['name'])
 
-doctitle = "MusicBrainz UserScripts"
-print(doctitle)
-print('=' * len(doctitle))
+print("# MusicBrainz UserScripts")
 print()
 
 for item in items:
