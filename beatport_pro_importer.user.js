@@ -3,7 +3,7 @@
 // @author         VxJasonxV
 // @description    One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
 // @sourceURL      https://github.com/VxJasonxV/musicbrainz-userscripts/blob/master/beatport_pro_importer.user.js
-// @version        2015.01.18.0
+// @version        2015.06.10.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @include        http://pro.beatport.com/release/*
