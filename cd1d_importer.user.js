@@ -131,10 +131,10 @@ var CD1DImporter = {
   getReleaseDate: function () {
     // get release date and convert it to object
     var text = $('div.infos-releasegrp div.row-date').text();
-    if (text == 'yesterday') {
+    if (text == 'yesterday' || text == 'hier') {
       return this.fromCurrentTime(-24 * 60 * 60);
     }
-    if (text == 'today') {
+    if (text == 'today' || text == 'aujourd\'hui') {
       return this.fromCurrentTime(0);
     }
     var date = text
