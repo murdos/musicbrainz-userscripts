@@ -258,7 +258,7 @@ var CD1DImporter = {
 
   insertLink: function (release, where, formatname) {
     // Insert links in page
-    LOGGER.info('insert ', where);
+
     // Form parameters
     var edit_note = 'Imported from ' + this.currentURL() + ' (' + formatname + ')';
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
