@@ -51,11 +51,11 @@ function avaxHomePageHandler() {
         var discs = analyze_log_files($eacLog);
 
         // Check and display
-        check_and_display_discs(artistName, releaseName, discs, 
-            function(mb_toc_numbers, discid, discNumber) { 
+        check_and_display_discs(artistName, releaseName, discs,
+            function(mb_toc_numbers, discid, discNumber) {
                 $eacLog.parents('div.spoiler').prevAll('div.center:first').append('<br /><strong>' + (discs.length > 1 ? 'Disc '+discNumber+': ' : '' ) + 'MB DiscId </strong><span id="'+discid+'" />');
             },
-            function(mb_toc_numbers, discid, discNumber, found) { 
+            function(mb_toc_numbers, discid, discNumber, found) {
                 var url = computeAttachURL(mb_toc_numbers, artistName, releaseName);
                 var html = '<a href="'+url+'">' + discid + '</a>';
 				if (found) { html = html + '<img src="' + CHECK_IMAGE + '" />'; }
@@ -86,7 +86,7 @@ function gazellePageHandler() {
 	texts.each(function(i) {
 		if (i < texts.length-1) { artistName = artistName + ((this.nodeType == 3) ? this.textContent : $(this).text()); }
 	});
-	
+
     var releaseName = texts[texts.length-1].textContent.replace(/\s\[.*\]$/, '');
     releaseName = releaseName.substring(artistName.length > 0 ? 3 : 0, releaseName.length).replace(/ \[.*\]/g, "").replace("Various Artists - ", "");
 */
@@ -100,13 +100,13 @@ function gazellePageHandler() {
 			.filter( function(index) { return $(this).attr("href").match(/action=viewlog/) || $(this).text().contains("View Log"); })
 			.each(function() {
 
-                // What.CD way                
+                // What.CD way
                 if ($(this).attr("href").match(/action=viewlog/)) {
                     var blockquote = $(this).parents('blockquote');
                     var torrentId = /torrentid=(\d+)/.exec($(this).attr('href'))[1];
 				    var url = '/' + $(this).attr('href');
                 }
-                // LzTR way  
+                // LzTR way
                 else if ($(this).text().contains("View Log")) {
                     var blockquote = $(this).parents('div.linkbox');
                     var torrentId = $(this).parents("tr.pad").attr("id").match(/torrent_(\d+)/)[1];
@@ -116,21 +116,21 @@ function gazellePageHandler() {
                 }
 
                 // Get log content
-			    $.get(url, 
+			    $.get(url,
 				    function(data) {
 				        mylog($(data).find('pre'));
                         var discs = analyze_log_files( $(data).find('pre') );
                         mylog(discs.length);
-                        check_and_display_discs(artistName, releaseName, discs, 
+                        check_and_display_discs(artistName, releaseName, discs,
                             function(mb_toc_numbers, discid, discNumber) {
                                 blockquote.append('<br /><strong>' + (discs.length > 1 ? 'Disc '+discNumber+': ' : '' ) + 'MB DiscId: </strong><span id="' + torrentId + '_disc' + discNumber +'" />');
                             },
-                            function(mb_toc_numbers, discid, discNumber, found) { 
-                                
+                            function(mb_toc_numbers, discid, discNumber, found) {
+
 					            var url = computeAttachURL(mb_toc_numbers, artistName, releaseName);
 					            var html = '<a href="'+url+'">' + discid + '</a>';
 					            if (found) { html = html + '<img src="' + CHECK_IMAGE + '" />'; }
-                                $('#'+torrentId+'_disc'+discNumber).html(html); 
+                                $('#'+torrentId+'_disc'+discNumber).html(html);
                             }
                         );
 			        }
@@ -202,13 +202,13 @@ var check_and_display_discs = function(artistName, releaseName, discs, displayDi
                         'Accept': 'application/atom+xml,application/xml,text/xml',
                     },
                     onload: function(responseDetails) {
-      
+
                         displayResultHandler(mb_toc_numbers, discid, discNumber, responseDetails.responseText != EMPTY_WS_RESPONSE);
 
                     }
                 });
             })(discid, discNumber, mb_toc_numbers);
-        } 
+        }
      }
 
 }
@@ -254,7 +254,7 @@ var log_input_to_entries = function(text) {
         }
     });
     if (entries.length > 0) { discs.push(entries); }
-	
+
     for (var i = 0; i < discs.length ; i++) {
         var entries = discs[i];
 	    var layout_type = get_layout_type(entries);
@@ -265,7 +265,7 @@ var log_input_to_entries = function(text) {
 		    entries_audio = entries;
 	    }
         discs[i] = entries_audio;
-    }	
+    }
     return discs;
 }
 
@@ -360,11 +360,11 @@ var hex_left_pad = function(input, totalChars) {
 			input = padWith + input;
 		}
 	} else {}
- 
+
 		if (input.length > totalChars) { //if padWith was a multiple character string and num was overpadded
 		input = input.substring((input.length - totalChars), totalChars);
 		} else {}
- 
+
 	return input;
 
 }
