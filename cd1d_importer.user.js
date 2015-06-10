@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Import CD1D releases into MB
+// @name        Import CD1D releases to MusicBrainz
 // @description Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
 // @namespace   http://userscripts.org/users/517952
 // @include     http://cd1d.com/*/album/*

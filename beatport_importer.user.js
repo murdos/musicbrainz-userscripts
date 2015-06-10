@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           MusicBrainz: Import from Beatport
+// @name           Import Beatport releases to MusicBrainz
 // @version        2015.01.18.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
