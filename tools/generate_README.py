@@ -41,6 +41,9 @@ for jsfilename in sorted(glob.glob('*.user.js')):
             shortname = jsfilename.replace('.user.js', '')
             items.append(dict(jsfile=jsfilename, shortname=shortname, header=d))
 
+
+items.sort(key=lambda elem: elem['header']['name'])
+
 doctitle = "MusicBrainz UserScripts"
 print(doctitle)
 print('=' * len(doctitle))
