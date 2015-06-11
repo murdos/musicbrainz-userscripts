@@ -379,7 +379,9 @@ function parseDiscogsRelease(data) {
     });
 
     // ReleaseGroup
-    release.release_group_mbid = MBIDfromUrl(discogsRelease.master_url, 'master');
+    if (discogsRelease.master_url) {
+      release.release_group_mbid = MBIDfromUrl(discogsRelease.master_url, 'master');
+    }
 
     // Release title
     release.title = discogsRelease.title;
