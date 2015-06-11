@@ -193,7 +193,7 @@ function insertMBLinks($root) {
     n++;
     $root.find('div#companies').each(function() {
       debug_color(this, n);
-      //searchAndDisplayMbLinkInSection($(this), 'place', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'place', 'label');
       searchAndDisplayMbLinkInSection($(this), 'label', 'label');
     });
 
