@@ -23,7 +23,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-//LOGGER.setLevel('debug');
+var DEBUG = false;
+//DEBUG = true;
+if (DEBUG) {
+  LOGGER.setLevel('debug');
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -102,32 +106,111 @@ function insertMBLinks($root) {
         $root = $('body');
     }
 
-    $root.find('h1#profile_title').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
+    function debug_color(what, n) {
+      var colors = [
+        '#B3C6FF',
+        '#C6B3FF',
+        '#ECB3FF',
+        '#FFB3EC',
+        '#FFB3C6',
+        '#FFC6B3',
+        '#FFECB3',
+        '#ECFFB3',
+        '#C6FFB3',
+        '#B3FFC6',
+        '#B3FFEC',
+        '#B3ECFF',
+        '#7598FF',
+      ];
+      if (DEBUG) {
+        $(what).css('border', '2px dotted ' + colors[n%colors.length]);
+        var debug_attr = $(what).attr('debug_discogs');
+        if (debug_attr) {
+          $(what).attr('debug_discogs', debug_attr + ',' + n);
+        } else {
+          $(what).attr('debug_discogs', n);
+        }
+      }
+    }
 
-    $root.find('tr.tracklist_track').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
-
+    var n = 0;
     $root.find('div.profile').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
     });
 
-    $root.find('div.section:not(.marketplace_box_links)').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+    n++;
+    $root.find('div.profile').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
     });
 
-    // Discography on artist/label pages
-    $root.find('tr.master').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
-        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
-    $root.find('tr.release').each(function() {
-        searchAndDisplayMbLinkInSection($(this), 'release', 'release');
-        searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    n++;
+    $root.find('tr[data-object-type="release"] td.artist,td.title').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
     });
 
+    n++;
+    $root.find('tr[data-object-type="release"] td.title').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'release', 'release');
+    });
+
+    n++;
+    $root.find('tr[data-object-type="release"]').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
+
+    n++;
+    $root.find('tr[data-object-type~="master"]').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+    });
+
+    n++;
+    $root.find('tr[data-object-type~="master"]').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+    });
+
+    n++;
+    $root.find('tr[data-object-type~="master"]').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
+
+    n++;
+    $root.find('div#tracklist').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+    });
+
+    n++;
+    $root.find('div#companies').each(function() {
+      debug_color(this, n);
+      //searchAndDisplayMbLinkInSection($(this), 'place', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
+
+    n++;
+    $root.find('div#credits').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+    });
+
+    n++;
+    $root.find('div#credits').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+    });
+
+    n++;
+    $root.find('div#page_aside div.section_content:first').each(function() {
+      debug_color(this, n);
+      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+    });
 }
 
 
