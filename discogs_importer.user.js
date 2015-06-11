@@ -92,9 +92,12 @@ function insertMBLinks($root) {
             var $link = $(this);
             var mlink = $link.attr('mlink');
             // ensure we do it only once per link
-            var done = $link.attr('mlink_done');
-            if (done) return;
-            $link.attr('mlink_done', true);
+            var done = ($link.attr('mlink_done') || "").split(",");
+            for (var i=0; i<done.length; i++) {
+              if (mb_type == done[i]) return;
+            }
+            done.push(mb_type);
+            $link.attr('mlink_done', done.filter(function(e) { return (e!="");}).join(','));
             if (link_infos[mlink] && link_infos[mlink].type == discogs_type) {
               var discogs_url = link_infos[mlink].clean_url;
               mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
