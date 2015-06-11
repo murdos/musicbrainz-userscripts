@@ -23,7 +23,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-
+//LOGGER.setLevel('debug');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -84,14 +84,17 @@ $(document).ready(function(){
 function insertMBLinks($root) {
 
     function searchAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
-        $tr.find('a[href*="http://www.discogs.com/'+discogs_type+'/"]').each(function() {
+        $tr.find('a[mlink^="' + discogs_type + '/"]').each(function() {
             var $link = $(this);
+            var mlink = $link.attr('mlink');
             // ensure we do it only once per link
-            var done = $link.attr('mblink');
+            var done = $link.attr('mlink_done');
             if (done) return;
-            $link.attr('mblink', true);
-            var discogs_url = $link.attr('href');
-            mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
+            $link.attr('mlink_done', true);
+            if (link_infos[mlink] && link_infos[mlink].type == discogs_type) {
+              var discogs_url = link_infos[mlink].clean_url;
+              mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
+            }
         });
     }
 
@@ -151,22 +154,59 @@ function magnifyLinks(rootNode, force) {
         // Ignore empty links
         if (!elem.href || $.trim(elem.textContent) == '' || elem.textContent.substring(4,0) == 'http')
             continue;
-
-        elem.href = magnifyLink(elem.href);
+        if (!elem.hasAttribute('mlink')) {
+          elem.setAttribute('mlink', getDiscogsLinkKey(elem.href));
+        }
     }
 }
 
-// Normalize Discogs URL by removing title from URL
-function magnifyLink(url) {
-    var re = /^http:\/\/(www|api)\.discogs\.com\/(?:.+\/)?(master|release|artist|label)s?\/(\d+)(?:-[^\/#?]+)?$/i;
+// contains infos for each link key
+var link_infos = {};
+
+// Parse discogs url to extract info, returns a key and set link_infos for this key
+// the key is in the form discogs_type/discogs_id
+function getDiscogsLinkKey(url) {
+    var re = /^http:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^\?#])*$/i;
     if (m = re.exec(url)) {
-        var type = m[2];
-        var id = m[3];
-        return "http://www.discogs.com/" + type + "/" + id;
+      var key = m[1] + '/' + m[2];
+      if (!link_infos[key]) {
+        link_infos[key] = {
+          type: m[1],
+          id: m[2],
+          clean_url: 'http://www.discogs.com/' + m[1] + '/' + m[2]
+        }
+        LOGGER.debug('getDiscogsLinkKey:' + url + ' --> ' + key);
+      } else {
+        LOGGER.debug('getDiscogsLinkKey:' + url + ' --> ' + key + ' (key exists)');
+      }
+      return key;
     }
-    return url;
+    LOGGER.debug('getDiscogsLinkKey:' + url + ' ?');
+    return false;
 }
 
+function getCleanUrl(url, discogs_type) {
+  try {
+    var key = getDiscogsLinkKey(url);
+    if (key) {
+      if (!discogs_type || link_infos[key].type == discogs_type) {
+        LOGGER.debug('getCleanUrl: ' + key + ', ' + url + ' --> ' + link_infos[key].clean_url);
+        return link_infos[key].clean_url;
+      } else {
+        LOGGER.debug('getCleanUrl: ' + key + ', ' + url + ' --> unmatched type: ' + discogs_type);
+      }
+    }
+  }
+  catch (err) {
+    LOGGER.error(err);
+  }
+  LOGGER.debug('getCleanUrl: ' + url + ' (' + discogs_type + ') failed');
+  return false;
+}
+
+function MBIDfromUrl(url, discogs_type) {
+  return mblinks.resolveMBID(getCleanUrl(url, discogs_type));
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                             Insert MusicBrainz section into Discogs page                                           //
@@ -195,8 +235,11 @@ function insertLink(release) {
     prevNode.before(mbUI);
 
     // Find MB release(s) linked to this Discogs release
-    var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
-    mblinks.searchAndDisplayMbLink(magnifyLink(window.location.href), 'release', mbLinkInsert);
+    var clean_url = getCleanUrl(window.location.href, 'release');
+    if (clean_url) {
+      var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
+      mblinks.searchAndDisplayMbLink(clean_url, 'release', mbLinkInsert);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,13 +287,13 @@ function parseDiscogsRelease(data) {
             'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
             'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
             'joinphrase': decodeDiscogsJoinphrase(artist.join),
-            'mbid': mblinks.resolveMBID(magnifyLink(artist.resource_url))
+            'mbid': MBIDfromUrl(artist.resource_url, 'artist')
         };
         release.artist_credit.push(ac);
     });
 
     // ReleaseGroup
-    release.release_group_mbid = mblinks.resolveMBID(magnifyLink(discogsRelease.master_url));
+    release.release_group_mbid = MBIDfromUrl(discogsRelease.master_url, 'master');
 
     // Release title
     release.title = discogsRelease.title;
@@ -280,17 +323,21 @@ function parseDiscogsRelease(data) {
     release.labels = new Array();
     if (discogsRelease.labels) {
         $.each(discogsRelease.labels, function(index, label) {
-            release.labels.push({
-                name: label.name,
-                catno: (label.catno == "none" ? "[none]" : label.catno),
-                mbid: mblinks.resolveMBID(magnifyLink(label.resource_url))
-            });
+          var labelinfo = {
+            name: label.name,
+            catno: (label.catno == "none" ? "[none]" : label.catno),
+            mbid: MBIDfromUrl(label.resource_url, 'label')
+          };
+          release.labels.push(labelinfo);
         });
     }
 
     // Release URL
     release.urls = new Array();
-    release.urls.push( { url: window.location.href, link_type: 76 } );
+    var clean_url = getCleanUrl(window.location.href, 'release');
+    if (clean_url) {
+      release.urls.push( { url: clean_url, link_type: 76 } );
+    }
 
     // Release format
     var release_formats = new Array();
@@ -373,7 +420,7 @@ function parseDiscogsRelease(data) {
                     'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
                     'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
                     'joinphrase': decodeDiscogsJoinphrase(artist.join),
-                    'mbid': mblinks.resolveMBID(magnifyLink(artist.resource_url))
+                    'mbid': MBIDfromUrl(artist.resource_url, 'artist')
                 };
                 track.artist_credit.push(ac);
             });
