@@ -25,30 +25,35 @@ $(document).ready(function(){
 });
 
 function retrieveReleaseInfo(release_url) {
-  var release = {};
+  var releaseDate = $( ".category:contains('Release Date')" ).next().text().split("-");
 
   // Release information global to all Beatport releases
-  release.packaging = 'None';
-  release.country = "XW";
-  release.status = 'official';
+  var release = {
+    artist_credit: [],
+    title: $( "h3.interior-type:contains('Release')" ).next().text().trim(),
+    year: releaseDate[0],
+    month: releaseDate[1],
+    day: releaseDate[2],
+    format: 'Digital Media',
+    packaging: 'None',
+    country: 'XW',
+    status: 'official',
+    language: 'eng',
+    script: 'Latn',
+    type: '',
+    urls: [],
+    labels: [],
+    discs: [],
+  };
 
-  release.title = $( "h3.interior-type:contains('Release')" ).next().text().trim();
-
-  var releaseDate = $( ".category:contains('Release Date')" ).next().text().split("-");
-  release.year = releaseDate[0];
-  release.month = releaseDate[1];
-  release.day = releaseDate[2];
   var release_id = $( "span.playable-play-all[data-release]" ).attr('data-release');
 
   // URLs
-  release.urls = [];
-
   release.urls.push({
     'url': release_url,
     'link_type': MBReleaseImportHelper.URL_TYPES.purchase_for_download
   });
 
-  release.labels = [];
   release.labels.push(
     {
       name: $( ".category:contains('Labels')" ).next().text().trim(),
@@ -90,6 +95,7 @@ function retrieveReleaseInfo(release_url) {
       });
     }
   );
+
   var unique_artists = [];
   $.each(release_artists, function(i, el){
     if ($.inArray(el, unique_artists) === -1) {
@@ -98,10 +104,9 @@ function retrieveReleaseInfo(release_url) {
   });
 
   release.artist_credit = MBReleaseImportHelper.makeArtistCredits(unique_artists);
-  release.discs = [];
   release.discs.push( {
     'tracks': tracks,
-    'format': "Digital Media"
+    'format': release.format
   } );
 
   LOGGER.info("Parsed release: ", release);
