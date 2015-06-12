@@ -359,10 +359,11 @@ function insertLink(release) {
     prevNode.before(mbUI);
 
     // Find MB release(s) linked to this Discogs release
-    var clean_url = getCleanUrl(window.location.href, 'release');
-    if (clean_url) {
+    var top_url_key = getDiscogsLinkKey(window.location.href);
+    if (top_url_key) {
       var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
-      mblinks.searchAndDisplayMbLink(clean_url, 'release', mbLinkInsert);
+      var cachekey = getCacheKeyFromInfo(top_url_key, 'release');
+      mblinks.searchAndDisplayMbLink(link_infos[top_url_key].clean_url, 'release', mbLinkInsert, cachekey);
     }
 }
 
