@@ -326,8 +326,10 @@ function getCacheKeyFromUrl(url, discogs_type, mb_type) {
   return false;
 }
 
-function MBIDfromUrl(url, discogs_type) {
-  return mblinks.resolveMBID(getCleanUrl(url, discogs_type));
+function MBIDfromUrl(url, discogs_type, mb_type) {
+  var cachekey = getCacheKeyFromUrl(url, discogs_type, mb_type);
+  if (!cachekey) return '';
+  return mblinks.resolveMBID(cachekey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
