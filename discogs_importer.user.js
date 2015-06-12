@@ -91,6 +91,7 @@ function insertMBLinks($root) {
         if (!mb_type) mb_type = defaultMBtype(discogs_type);
         $tr.find('a[mlink^="' + discogs_type + '/"]').each(function() {
             var $link = $(this);
+            if ($link.attr('mlink_stop')) return; // for places
             var mlink = $link.attr('mlink');
             // ensure we do it only once per link
             var done = ($link.attr('mlink_done') || "").split(",");
@@ -101,7 +102,13 @@ function insertMBLinks($root) {
             $link.attr('mlink_done', done.filter(function(e) { return (e!="");}).join(','));
             if (link_infos[mlink] && link_infos[mlink].type == discogs_type) {
               var discogs_url = link_infos[mlink].clean_url;
-              mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
+              var cachekey = getCacheKeyFromInfo(mlink, mb_type);
+              var insert_func = function (link) { $link.before(link); }
+              if (mb_type == 'place') {
+                // if a place link was added we stop, we don't want further queries for this 'label'
+                insert_func = function (link) { $link.before(link); $link.attr('mlink_stop', true); }
+              }
+              mblinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
             }
         });
     }
