@@ -429,7 +429,7 @@ function parseDiscogsRelease(data) {
     // Release URL
     release.urls = new Array();
     var release_url = getCleanUrl(discogsRelease.uri, 'release');
-    release.urls.push( { url: release_url, link_type: 76 } );
+    release.urls.push( { url: release_url, link_type: MBReleaseImportHelper.URL_TYPES.discogs } );
 
     // Release format
     var release_formats = new Array();
