@@ -40,6 +40,9 @@ var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60, '1'); // force refre
 
 $(document).ready(function(){
 
+    var current_page_key = getDiscogsLinkKey(window.location.href.replace(/\?.*$/, '').replace(/#.*$/, ''));
+    if (!current_page_key) return;
+
     // disable evil pjax (used for artist page navigation)
     // it causes various annoying issues with our code;
     // it should be possible to react to pjax events
@@ -48,12 +51,12 @@ $(document).ready(function(){
     // Display links of equivalent MusicBrainz entities for masters and releases
     insertMBLinks();
 
-    // Feature #3: Add an import button in a new section in sidebar, if we're on a release page?
-    if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
+    // Add an import button in a new section in sidebar, if we're on a release page?
+    var current_page_info = link_infos[current_page_key];
+    if (current_page_info.type == 'release') {
 
         // Discogs Webservice URL
-        var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
-        var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
+        var discogsWsUrl = 'http://api.discogs.com/releases/' + current_page_info.id;
 
         $.ajax({
             url: discogsWsUrl,
@@ -62,7 +65,7 @@ $(document).ready(function(){
             success: function (data, textStatus, jqXHR) {
                 LOGGER.debug("Discogs JSON Data from API:", data);
                 var release = parseDiscogsRelease(data);
-                insertLink(release);
+                insertLink(release, current_page_key);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 LOGGER.error("AJAX Status: ", textStatus);
@@ -303,7 +306,8 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Insert links in Discogs page
-function insertLink(release) {
+function insertLink(release, current_page_key) {
+    var current_page_info = link_infos[current_page_key];
 
     var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>');
 
@@ -311,7 +315,7 @@ function insertLink(release) {
     mbUI.append(mbContentBlock);
 
     // Form parameters
-    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
+    var edit_note = 'Imported from ' + current_page_info.clean_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
@@ -325,12 +329,9 @@ function insertLink(release) {
     prevNode.before(mbUI);
 
     // Find MB release(s) linked to this Discogs release
-    var top_url_key = getDiscogsLinkKey(window.location.href);
-    if (top_url_key) {
-      var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
-      var cachekey = getCacheKeyFromInfo(top_url_key, 'release');
-      mblinks.searchAndDisplayMbLink(link_infos[top_url_key].clean_url, 'release', mbLinkInsert, cachekey);
-    }
+    var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
+    var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
+    mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,10 +428,8 @@ function parseDiscogsRelease(data) {
 
     // Release URL
     release.urls = new Array();
-    var clean_url = getCleanUrl(discogsRelease.uri, 'release');
-    if (clean_url) {
-      release.urls.push( { url: clean_url, link_type: 76 } );
-    }
+    var release_url = getCleanUrl(discogsRelease.uri, 'release');
+    release.urls.push( { url: release_url, link_type: 76 } );
 
     // Release format
     var release_formats = new Array();
