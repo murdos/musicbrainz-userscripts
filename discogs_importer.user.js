@@ -490,6 +490,8 @@ function parseDiscogsRelease(data) {
     var heading = "";
     var releaseNumber = 1;
     var lastPosition = 0;
+    var total_tracks = 0;
+    var total_duration = 0;
     $.each(discogsRelease.tracklist, function(index, discogsTrack) {
 
         if (discogsTrack.type_ == 'heading') {
@@ -502,7 +504,7 @@ function parseDiscogsRelease(data) {
         var track = new Object();
 
         track.title = discogsTrack.title;
-        track.duration = discogsTrack.duration;
+        track.duration = hmsToSeconds(discogsTrack.duration) * 1000; // MB in milliseconds
 
         // Track artist credit
         track.artist_credit = new Array();
@@ -536,7 +538,7 @@ function parseDiscogsRelease(data) {
                 return;
               }
               if (subtrack.duration) {
-                subtrack_total_duration += hmsToSeconds(subtrack.duration);
+                subtrack_total_duration += hmsToSeconds(subtrack.duration) * 1000;
               }
               if (subtrack.title) {
                 subtrack_titles.push(subtrack.title);
@@ -551,7 +553,7 @@ function parseDiscogsRelease(data) {
               track.title += subtrack_titles.join(' / ');
             }
             if (!track.duration && subtrack_total_duration) {
-              track.duration = secondsToHms(subtrack_total_duration);
+              track.duration = subtrack_total_duration;
             }
         }
 
@@ -613,10 +615,16 @@ function parseDiscogsRelease(data) {
         }
 
         // Trackposition is empty e.g. for release title
-        if (trackPosition != "" && trackPosition != null)
+        if (trackPosition != "" && trackPosition != null) {
             release.discs[releaseNumber-1].tracks.push(track);
-
+            total_tracks += 1;
+            total_duration += track.duration;
+        }
     });
+
+    if (!release.type) {
+      release.type = MBReleaseImportHelper.guessReleaseType(release.title, total_tracks, total_duration / 1000);
+    }
 
     LOGGER.info("Parsed release: ", release);
     return release;
