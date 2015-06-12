@@ -312,7 +312,6 @@ function getCacheKeyFromInfo(info_key, mb_type) {
 function getCacheKeyFromUrl(url, discogs_type, mb_type) {
   try {
     var key = getDiscogsLinkKey(url);
-    console.log(link_infos[key]);
     if (key) {
       if (!discogs_type || link_infos[key].type == discogs_type) {
         var cachekey = getCacheKeyFromInfo(key, mb_type);
