@@ -31,7 +31,6 @@ function retrieveReleaseInfo(release_url) {
   release.packaging = 'None';
   release.country = "XW";
   release.status = 'official';
-  release.id = $( "span.playable-play-all[data-release]" ).attr('data-release');
 
   release.title = $( "h3.interior-type:contains('Release')" ).next().text().trim();
 
@@ -39,6 +38,7 @@ function retrieveReleaseInfo(release_url) {
   release.year = releaseDate[0];
   release.month = releaseDate[1];
   release.day = releaseDate[2];
+  var release_id = $( "span.playable-play-all[data-release]" ).attr('data-release');
 
   // URLs
   release.urls = [];
@@ -63,7 +63,7 @@ function retrieveReleaseInfo(release_url) {
   var release_artists = [];
   $.each(the_tracks,
     function (idx, track) {
-      if (track.release.id != release.id) {
+      if (track.release.id != release_id) {
         return;
       }
       if (seen_tracks[track.id]) {
