@@ -129,12 +129,7 @@ var BandcampImport = {
     }
 
     // URLs
-    var link_type = {
-      purchase_for_download: 74,
-      download_for_free: 75,
-      stream_for_free: 85,
-      license: 301
-    };
+    var link_type = MBReleaseImportHelper.URL_TYPES;
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
       if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
