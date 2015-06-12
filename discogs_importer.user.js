@@ -36,31 +36,27 @@ if (DEBUG) {
  * - http://www.discogs.com/release/1566223 : Artist credit of tracks contains an ending ',' join phrase
  */
 
-var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
+var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60, '1'); // force refresh of cached links once a week
 
 $(document).ready(function(){
 
-    // Feature #1: Normalize Discogs links on current page by removing title from URL
-    magnifyLinks();
+    var current_page_key = getDiscogsLinkKey(window.location.href.replace(/\?.*$/, '').replace(/#.*$/, ''));
+    if (!current_page_key) return;
 
-    // Feature #2: Display links of equivalent MusicBrainz entities for masters and releases
+    // disable evil pjax (used for artist page navigation)
+    // it causes various annoying issues with our code;
+    // it should be possible to react to pjax events
+    $("div#pjax_container").attr('id', 'pjax_disabled');
+
+    // Display links of equivalent MusicBrainz entities for masters and releases
     insertMBLinks();
 
-    // Handle page navigation on artist page for the first two features
-    $("#releases").bind("DOMNodeInserted DOMSubtreeModified",function(event) {
-        // Only child of $("#releases") are of interest
-        if (event.target.parentNode.id == 'releases') {
-            magnifyLinks(event.target, true);
-            insertMBLinks($(event.target));
-        }
-    });
-
-    // Feature #3: Add an import button in a new section in sidebar, if we're on a release page?
-    if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
+    // Add an import button in a new section in sidebar, if we're on a release page?
+    var current_page_info = link_infos[current_page_key];
+    if (current_page_info.type == 'release') {
 
         // Discogs Webservice URL
-        var discogsReleaseId = window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/)[2];
-        var discogsWsUrl = 'http://api.discogs.com/releases/' + discogsReleaseId;
+        var discogsWsUrl = 'http://api.discogs.com/releases/' + current_page_info.id;
 
         $.ajax({
             url: discogsWsUrl,
@@ -69,7 +65,7 @@ $(document).ready(function(){
             success: function (data, textStatus, jqXHR) {
                 LOGGER.debug("Discogs JSON Data from API:", data);
                 var release = parseDiscogsRelease(data);
-                insertLink(release);
+                insertLink(release, current_page_key);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 LOGGER.error("AJAX Status: ", textStatus);
@@ -87,9 +83,11 @@ $(document).ready(function(){
 // Insert MusicBrainz links in a section of the page
 function insertMBLinks($root) {
 
-    function searchAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
+    function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type) {
+        if (!mb_type) mb_type = defaultMBtype(discogs_type);
         $tr.find('a[mlink^="' + discogs_type + '/"]').each(function() {
             var $link = $(this);
+            if ($link.attr('mlink_stop')) return; // for places
             var mlink = $link.attr('mlink');
             // ensure we do it only once per link
             var done = ($link.attr('mlink_done') || "").split(",");
@@ -100,7 +98,13 @@ function insertMBLinks($root) {
             $link.attr('mlink_done', done.filter(function(e) { return (e!="");}).join(','));
             if (link_infos[mlink] && link_infos[mlink].type == discogs_type) {
               var discogs_url = link_infos[mlink].clean_url;
-              mblinks.searchAndDisplayMbLink(discogs_url, mb_type, function (link) { $link.before(link);  });
+              var cachekey = getCacheKeyFromInfo(mlink, mb_type);
+              var insert_func = function (link) { $link.before(link); }
+              if (mb_type == 'place') {
+                // if a place link was added we stop, we don't want further queries for this 'label'
+                insert_func = function (link) { $link.before(link); $link.attr('mlink_stop', true); }
+              }
+              mblinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
             }
         });
     }
@@ -109,7 +113,7 @@ function insertMBLinks($root) {
         $root = $('body');
     }
 
-    function debug_color(what, n) {
+    function debug_color(what, n, id) {
       var colors = [
         '#B3C6FF',
         '#C6B3FF',
@@ -128,110 +132,77 @@ function insertMBLinks($root) {
       if (DEBUG) {
         $(what).css('border', '2px dotted ' + colors[n%colors.length]);
         var debug_attr = $(what).attr('debug_discogs');
+        if (!id) id = '';
         if (debug_attr) {
-          $(what).attr('debug_discogs', debug_attr + ',' + n);
+          $(what).attr('debug_discogs', debug_attr + ' || ' + id + '(' + n + ')');
         } else {
-          $(what).attr('debug_discogs', n);
+          $(what).attr('debug_discogs', id + '(' + n + ')');
         }
       }
     }
 
-    var n = 0;
-    $root.find('div.profile').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
+    var add_mblinks_counter = 0;
+    function add_mblinks(_root, selector, types) {
+      // types can be:
+      // 'discogs type 1'
+      // ['discogs_type 1', 'discogs_type 2']
+      // [['discogs_type 1', 'mb type 1'], 'discogs_type 2']
+      // etc.
+      if (!$.isArray(types)) {
+        // just one string
+        types = [types];
+      }
+      $.each(types,
+        function (idx, val) {
+          if (!$.isArray(val)) {
+            types[idx] = [val, undefined];
+          }
+        }
+      );
 
-    n++;
-    $root.find('div.profile').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
+      LOGGER.debug('add_mblinks: ' + selector + ' / ' + JSON.stringify(types));
 
-    n++;
-    $root.find('tr[data-object-type="release"] td.artist,td.title').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
+      _root.find(selector).each(function() {
+          var node = $(this).get(0);
+          magnifyLinks(node);
+          debug_color(this, ++add_mblinks_counter, selector);
+          var that = this;
+          $.each(types, function (idx, val) {
+            var discogs_type = val[0];
+            var mb_type = val[1];
+            searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type);
+          });
+      });
+    }
 
-    n++;
-    $root.find('tr[data-object-type="release"] td.title').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release', 'release');
-    });
-
-    n++;
-    $root.find('tr[data-object-type="release"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
-
-    n++;
-    $root.find('div#tracklist').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
-
-    n++;
-    $root.find('div#companies').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'place', 'label');
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
-
-    n++;
-    $root.find('div#credits').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
-    });
-
-    n++;
-    $root.find('div#credits').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
-    });
-
-    n++;
-    $root.find('div#page_aside div.section_content:first').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
-    });
+    add_mblinks($root, 'div.profile', ['artist', 'label']);
+    add_mblinks($root, 'tr[data-object-type="release"] td.artist,td.title', 'artist');
+    add_mblinks($root, 'tr[data-object-type="release"] td.title', 'release');
+    add_mblinks($root, 'tr[data-object-type="release"]', 'label');
+    add_mblinks($root, 'tr[data-object-type~="master"]', ['master', 'artist', 'label']);
+    add_mblinks($root, 'div#tracklist', 'artist');
+    add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
+    add_mblinks($root, 'div#credits', ['label', 'artist']);
+    add_mblinks($root, 'div#page_aside div.section_content:first', 'master');
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                 Normalize Discogs URLs in a DOM tree                                               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var mlink_processed = 0;
 
 // Normalize Discogs URLs in a DOM tree
-function magnifyLinks(rootNode, force) {
+function magnifyLinks(rootNode) {
 
     if (!rootNode) {
         rootNode = document.body;
     }
 
     // Check if we already added links for this content
-    if (!force && rootNode.hasAttribute('discogsLinksMagnified'))
+    if (rootNode.hasAttribute('mlink_processed'))
         return;
-    rootNode.setAttribute('discogsLinksMagnified', true);
+    rootNode.setAttribute('mlink_processed', ++mlink_processed);
 
     var elems = rootNode.getElementsByTagName('a');
     for (var i = 0; i < elems.length; i++) {
@@ -252,7 +223,7 @@ var link_infos = {};
 // Parse discogs url to extract info, returns a key and set link_infos for this key
 // the key is in the form discogs_type/discogs_id
 function getDiscogsLinkKey(url) {
-    var re = /^http:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^\?#])*$/i;
+    var re = /^http:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^\?#]*)(?:\?noanv=1|\?anv=[^=]+)?$/i;
     if (m = re.exec(url)) {
       var key = m[1] + '/' + m[2];
       if (!link_infos[key]) {
@@ -290,8 +261,44 @@ function getCleanUrl(url, discogs_type) {
   return false;
 }
 
-function MBIDfromUrl(url, discogs_type) {
-  return mblinks.resolveMBID(getCleanUrl(url, discogs_type));
+function defaultMBtype(discogs_type) {
+  if (discogs_type == 'master') return 'release-group';
+  return discogs_type;
+}
+
+function getCacheKeyFromInfo(info_key, mb_type) {
+  var inf = link_infos[info_key];
+  if (inf) {
+    if (!mb_type) mb_type = defaultMBtype(inf.type);
+    return inf.type + '/' + inf.id + '/' + mb_type;
+  }
+  return '';
+}
+
+function getCacheKeyFromUrl(url, discogs_type, mb_type) {
+  try {
+    var key = getDiscogsLinkKey(url);
+    if (key) {
+      if (!discogs_type || link_infos[key].type == discogs_type) {
+        var cachekey = getCacheKeyFromInfo(key, mb_type);
+        LOGGER.debug('getCacheKeyFromUrl: ' + key + ', ' + url + ' --> ' + cachekey);
+        return cachekey;
+      } else {
+        LOGGER.debug('getCacheKeyFromUrl: ' + key + ', ' + url + ' --> unmatched type: ' + discogs_type);
+      }
+    }
+  }
+  catch (err) {
+    LOGGER.error(err);
+  }
+  LOGGER.debug('getCacheKeyFromUrl: ' + url + ' (' + discogs_type + ') failed');
+  return false;
+}
+
+function MBIDfromUrl(url, discogs_type, mb_type) {
+  var cachekey = getCacheKeyFromUrl(url, discogs_type, mb_type);
+  if (!cachekey) return '';
+  return mblinks.resolveMBID(cachekey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +306,8 @@ function MBIDfromUrl(url, discogs_type) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Insert links in Discogs page
-function insertLink(release) {
+function insertLink(release, current_page_key) {
+    var current_page_info = link_infos[current_page_key];
 
     var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>');
 
@@ -307,7 +315,7 @@ function insertLink(release) {
     mbUI.append(mbContentBlock);
 
     // Form parameters
-    var edit_note = 'Imported from ' + window.location.href.replace(/http:\/\/(www\.|)discogs\.com\/(.*\/|)release\//, 'http://www.discogs.com/release/');
+    var edit_note = 'Imported from ' + current_page_info.clean_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
@@ -321,11 +329,9 @@ function insertLink(release) {
     prevNode.before(mbUI);
 
     // Find MB release(s) linked to this Discogs release
-    var clean_url = getCleanUrl(window.location.href, 'release');
-    if (clean_url) {
-      var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
-      mblinks.searchAndDisplayMbLink(clean_url, 'release', mbLinkInsert);
-    }
+    var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
+    var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
+    mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,10 +428,8 @@ function parseDiscogsRelease(data) {
 
     // Release URL
     release.urls = new Array();
-    var clean_url = getCleanUrl(window.location.href, 'release');
-    if (clean_url) {
-      release.urls.push( { url: clean_url, link_type: 76 } );
-    }
+    var release_url = getCleanUrl(discogsRelease.uri, 'release');
+    release.urls.push( { url: release_url, link_type: 76 } );
 
     // Release format
     var release_formats = new Array();
