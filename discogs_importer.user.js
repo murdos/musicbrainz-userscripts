@@ -36,7 +36,7 @@ if (DEBUG) {
  * - http://www.discogs.com/release/1566223 : Artist credit of tracks contains an ending ',' join phrase
  */
 
-var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
+var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60, '1'); // force refresh of cached links once a week
 
 $(document).ready(function(){
 
