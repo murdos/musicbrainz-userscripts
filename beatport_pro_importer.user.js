@@ -66,6 +66,7 @@ function retrieveReleaseInfo(release_url) {
   var the_tracks = unsafeWindow.Playables.tracks;
   var seen_tracks = {}; // to shoot duplicates ...
   var release_artists = [];
+  var total_duration = 0;
   $.each(the_tracks,
     function (idx, track) {
       if (track.release.id != release_id) {
@@ -93,6 +94,7 @@ function retrieveReleaseInfo(release_url) {
         'title': title,
         'duration': track.duration.minutes
       });
+      total_duration += track.duration.milliseconds;
     }
   );
 
@@ -109,6 +111,7 @@ function retrieveReleaseInfo(release_url) {
     'format': release.format
   } );
 
+  release.type = MBReleaseImportHelper.guessReleaseType(release.title, tracks.length, total_duration/1000);
   LOGGER.info("Parsed release: ", release);
   return release;
 }
