@@ -200,13 +200,7 @@ var CD1DImporter = {
     release.month = releasedate.month;
     release.day = releasedate.day;
 
-    var link_type = {
-      purchase_for_download: 74,
-      download_for_free: 75,
-      stream_for_free: 85,
-      license: 301,
-      purchase_for_mail_order: 79
-    };
+    var link_type = MBReleaseImportHelper.URL_TYPES;
 
     if (format.name.match(/vinyl|lp/i)) {
       release.country = 'FR';
