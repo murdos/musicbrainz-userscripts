@@ -296,6 +296,36 @@ function defaultMBtype(discogs_type) {
   return discogs_type;
 }
 
+function getCacheKeyFromInfo(info_key, mb_type) {
+  var inf = link_infos[info_key];
+  if (inf) {
+    if (!mb_type) mb_type = defaultMBtype(inf.type);
+    return inf.type + '/' + inf.id + '/' + mb_type;
+  }
+  return '';
+}
+
+function getCacheKeyFromUrl(url, discogs_type, mb_type) {
+  try {
+    var key = getDiscogsLinkKey(url);
+    console.log(link_infos[key]);
+    if (key) {
+      if (!discogs_type || link_infos[key].type == discogs_type) {
+        var cachekey = getCacheKeyFromInfo(key, mb_type);
+        LOGGER.debug('getCacheKeyFromUrl: ' + key + ', ' + url + ' --> ' + cachekey);
+        return cachekey;
+      } else {
+        LOGGER.debug('getCacheKeyFromUrl: ' + key + ', ' + url + ' --> unmatched type: ' + discogs_type);
+      }
+    }
+  }
+  catch (err) {
+    LOGGER.error(err);
+  }
+  LOGGER.debug('getCacheKeyFromUrl: ' + url + ' (' + discogs_type + ') failed');
+  return false;
+}
+
 function MBIDfromUrl(url, discogs_type) {
   return mblinks.resolveMBID(getCleanUrl(url, discogs_type));
 }
