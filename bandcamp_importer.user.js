@@ -79,8 +79,6 @@ var BandcampImport = {
         release.parent_album_url = bandcampEmbedData.album_embed_data.linkback;
         release.type = 'track'; // <-- no import
       }
-    } else {
-      release.type = 'album';
     }
 
     // Tracks
@@ -89,6 +87,7 @@ var BandcampImport = {
       format: release.format
     };
     release.discs.push(disc);
+    var total_duration = 0;
     $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
       var track = {
         'title': bctrack.title,
@@ -96,6 +95,7 @@ var BandcampImport = {
         'artist_credit': []
       };
       disc.tracks.push(track);
+      total_duration += bctrack.duration;
     });
 
     // Check for hidden tracks (more tracks in the download than shown for streaming ie.)
@@ -169,6 +169,11 @@ var BandcampImport = {
         'catno': 'none'
       });
     }
+
+    if (!release.type) {
+      release.type = MBReleaseImportHelper.guessReleaseType(release.title, disc.tracks.length, total_duration);
+    }
+
     return release;
   },
 
