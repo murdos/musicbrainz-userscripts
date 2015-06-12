@@ -40,20 +40,15 @@ var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60, '1'); // force refre
 
 $(document).ready(function(){
 
+    // disable evil pjax (used for artist page navigation)
+    // it causes various annoying issues with our code;
+    // it should be possible to react to pjax events
+    $("div#pjax_container").attr('id', 'pjax_disabled');
     // Feature #1: Normalize Discogs links on current page by removing title from URL
     magnifyLinks();
 
     // Feature #2: Display links of equivalent MusicBrainz entities for masters and releases
     insertMBLinks();
-
-    // Handle page navigation on artist page for the first two features
-    $("#releases").bind("DOMNodeInserted DOMSubtreeModified",function(event) {
-        // Only child of $("#releases") are of interest
-        if (event.target.parentNode.id == 'releases') {
-            magnifyLinks(event.target, true);
-            insertMBLinks($(event.target));
-        }
-    });
 
     // Feature #3: Add an import button in a new section in sidebar, if we're on a release page?
     if (window.location.href.match( /discogs\.com\/(.*\/?)release\/(\d+)$/) ) {
