@@ -185,7 +185,7 @@ var CD1DImporter = {
       artist_credit: this.getArtists(),
       title: this.getAlbum(),
       country: "", // Worldwide
-      type: 'album',
+      type: '',
       status: 'official',
       language: 'eng',
       script: 'latn',
@@ -242,6 +242,8 @@ var CD1DImporter = {
       .get();
 
     // Tracks
+    var total_duration = 0;
+    var total_tracks = 0;
     $.each(this.getTracks(format.id), function (ndisc, disc) {
       var thisdisc = {
         tracks: [],
@@ -249,6 +251,8 @@ var CD1DImporter = {
       };
       release.discs.push(thisdisc);
       $.each(this, function (ntrack, track) {
+        total_duration += track.duration / 1000;
+        total_tracks += 1;
         thisdisc.tracks.push({
           'title': track.title,
           'duration': track.duration,
@@ -256,6 +260,10 @@ var CD1DImporter = {
         });
       });
     });
+
+    if (!release.type) {
+      release.type = MBReleaseImportHelper.guessReleaseType(release.title, total_tracks, total_duration);
+    }
 
     LOGGER.info("Parsed release: ", format.name, release);
     return release;
