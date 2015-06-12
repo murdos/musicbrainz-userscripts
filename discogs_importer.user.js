@@ -224,18 +224,19 @@ function insertMBLinks($root) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                 Normalize Discogs URLs in a DOM tree                                               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var mlink_processed = 0;
 
 // Normalize Discogs URLs in a DOM tree
-function magnifyLinks(rootNode, force) {
+function magnifyLinks(rootNode) {
 
     if (!rootNode) {
         rootNode = document.body;
     }
 
     // Check if we already added links for this content
-    if (!force && rootNode.hasAttribute('discogsLinksMagnified'))
+    if (rootNode.hasAttribute('mlink_processed'))
         return;
-    rootNode.setAttribute('discogsLinksMagnified', true);
+    rootNode.setAttribute('mlink_processed', ++mlink_processed);
 
     var elems = rootNode.getElementsByTagName('a');
     for (var i = 0; i < elems.length; i++) {
