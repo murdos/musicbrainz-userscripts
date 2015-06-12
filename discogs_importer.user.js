@@ -44,10 +44,8 @@ $(document).ready(function(){
     // it causes various annoying issues with our code;
     // it should be possible to react to pjax events
     $("div#pjax_container").attr('id', 'pjax_disabled');
-    // Feature #1: Normalize Discogs links on current page by removing title from URL
-    magnifyLinks();
 
-    // Feature #2: Display links of equivalent MusicBrainz entities for masters and releases
+    // Display links of equivalent MusicBrainz entities for masters and releases
     insertMBLinks();
 
     // Feature #3: Add an import button in a new section in sidebar, if we're on a release page?
@@ -173,84 +171,16 @@ function insertMBLinks($root) {
           });
       });
     }
-    var n = 0;
-    $root.find('div.profile').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist');
-    });
 
-    n++;
-    $root.find('div.profile').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label');
-    });
-
-    n++;
-    $root.find('tr[data-object-type="release"] td.artist,td.title').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist');
-    });
-
-    n++;
-    $root.find('tr[data-object-type="release"] td.title').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release');
-    });
-
-    n++;
-    $root.find('tr[data-object-type="release"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'master');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist');
-    });
-
-    n++;
-    $root.find('tr[data-object-type~="master"]').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label');
-    });
-
-    n++;
-    $root.find('div#tracklist').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist');
-    });
-
-    n++;
-    $root.find('div#companies').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'place');
-      searchAndDisplayMbLinkInSection($(this), 'label');
-    });
-
-    n++;
-    $root.find('div#credits').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label');
-    });
-
-    n++;
-    $root.find('div#credits').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist');
-    });
-
-    n++;
-    $root.find('div#page_aside div.section_content:first').each(function() {
-      debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'master');
-    });
+    add_mblinks($root, 'div.profile', ['artist', 'label']);
+    add_mblinks($root, 'tr[data-object-type="release"] td.artist,td.title', 'artist');
+    add_mblinks($root, 'tr[data-object-type="release"] td.title', 'release');
+    add_mblinks($root, 'tr[data-object-type="release"]', 'label');
+    add_mblinks($root, 'tr[data-object-type~="master"]', ['master', 'artist', 'label']);
+    add_mblinks($root, 'div#tracklist', 'artist');
+    add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
+    add_mblinks($root, 'div#credits', ['label', 'artist']);
+    add_mblinks($root, 'div#page_aside div.section_content:first', 'master');
 }
 
 
