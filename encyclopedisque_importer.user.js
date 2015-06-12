@@ -140,7 +140,7 @@ function parseEncyclopedisquePage() {
 
     // Release URL
     release.urls = new Array();
-    release.urls.push( { 'url': window.location.href, 'link_type': 82 } );
+    release.urls.push( { 'url': window.location.href, 'link_type': MBReleaseImportHelper.URL_TYPES.other_databases } );
 
     // Parse other infos
     var releaseInfos = document.body.querySelectorAll("div.main tr");
