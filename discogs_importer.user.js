@@ -140,6 +140,39 @@ function insertMBLinks($root) {
       }
     }
 
+    var add_mblinks_counter = 0;
+    function add_mblinks(_root, selector, types) {
+      // types can be:
+      // 'discogs type 1'
+      // ['discogs_type 1', 'discogs_type 2']
+      // [['discogs_type 1', 'mb type 1'], 'discogs_type 2']
+      // etc.
+      if (!$.isArray(types)) {
+        // just one string
+        types = [types];
+      }
+      $.each(types,
+        function (idx, val) {
+          if (!$.isArray(val)) {
+            types[idx] = [val, undefined];
+          }
+        }
+      );
+
+      LOGGER.debug('add_mblinks: ' + selector + ' / ' + JSON.stringify(types));
+
+      _root.find(selector).each(function() {
+          var node = $(this).get(0);
+          magnifyLinks(node);
+          debug_color(this, ++add_mblinks_counter, selector);
+          var that = this;
+          $.each(types, function (idx, val) {
+            var discogs_type = val[0];
+            var mb_type = val[1];
+            searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type);
+          });
+      });
+    }
     var n = 0;
     $root.find('div.profile').each(function() {
       debug_color(this, n);
