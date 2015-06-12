@@ -112,7 +112,7 @@ function insertMBLinks($root) {
         $root = $('body');
     }
 
-    function debug_color(what, n) {
+    function debug_color(what, n, id) {
       var colors = [
         '#B3C6FF',
         '#C6B3FF',
@@ -131,10 +131,11 @@ function insertMBLinks($root) {
       if (DEBUG) {
         $(what).css('border', '2px dotted ' + colors[n%colors.length]);
         var debug_attr = $(what).attr('debug_discogs');
+        if (!id) id = '';
         if (debug_attr) {
-          $(what).attr('debug_discogs', debug_attr + ',' + n);
+          $(what).attr('debug_discogs', debug_attr + ' || ' + id + '(' + n + ')');
         } else {
-          $(what).attr('debug_discogs', n);
+          $(what).attr('debug_discogs', id + '(' + n + ')');
         }
       }
     }
