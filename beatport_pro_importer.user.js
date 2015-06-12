@@ -19,20 +19,18 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
-  var release = retrieveReleaseInfo();
-  insertLink(release);
+  var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
+  var release = retrieveReleaseInfo(release_url);
+  insertLink(release, release_url);
 });
 
-
-function retrieveReleaseInfo() {
+function retrieveReleaseInfo(release_url) {
   var release = {};
 
   // Release information global to all Beatport releases
   release.packaging = 'None';
   release.country = "XW";
   release.status = 'official';
-  release.urls = [];
-  release.urls.push( { 'url': window.location.href } );
   release.id = $( "span.playable-play-all[data-release]" ).attr('data-release');
 
   release.title = $( "h3.interior-type:contains('Release')" ).next().text().trim();
@@ -41,6 +39,14 @@ function retrieveReleaseInfo() {
   release.year = releaseDate[0];
   release.month = releaseDate[1];
   release.day = releaseDate[2];
+
+  // URLs
+  release.urls = [];
+
+  release.urls.push({
+    'url': release_url,
+    'link_type': MBReleaseImportHelper.URL_TYPES.purchase_for_download
+  });
 
   release.labels = [];
   release.labels.push(
@@ -120,8 +126,8 @@ function retrieveReleaseInfo() {
 }
 
 // Insert button into page under label information
-function insertLink(release) {
-    var edit_note = 'Imported from ' + window.location.href;
+function insertLink(release, release_url) {
+    var edit_note = 'Imported from ' + release_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
