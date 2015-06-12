@@ -220,7 +220,7 @@ var link_infos = {};
 // Parse discogs url to extract info, returns a key and set link_infos for this key
 // the key is in the form discogs_type/discogs_id
 function getDiscogsLinkKey(url) {
-    var re = /^http:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^\?#])*$/i;
+    var re = /^http:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^\?#]*)(?:\?noanv=1)?$/i;
     if (m = re.exec(url)) {
       var key = m[1] + '/' + m[2];
       if (!link_infos[key]) {
