@@ -87,7 +87,8 @@ $(document).ready(function(){
 // Insert MusicBrainz links in a section of the page
 function insertMBLinks($root) {
 
-    function searchAndDisplayMbLinkInSection($tr, mb_type, discogs_type) {
+    function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type) {
+        if (!mb_type) mb_type = defaultMBtype(discogs_type);
         $tr.find('a[mlink^="' + discogs_type + '/"]').each(function() {
             var $link = $(this);
             var mlink = $link.attr('mlink');
@@ -139,80 +140,80 @@ function insertMBLinks($root) {
     var n = 0;
     $root.find('div.profile').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+      searchAndDisplayMbLinkInSection($(this), 'artist');
     });
 
     n++;
     $root.find('div.profile').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label');
     });
 
     n++;
     $root.find('tr[data-object-type="release"] td.artist,td.title').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+      searchAndDisplayMbLinkInSection($(this), 'artist');
     });
 
     n++;
     $root.find('tr[data-object-type="release"] td.title').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release', 'release');
+      searchAndDisplayMbLinkInSection($(this), 'release');
     });
 
     n++;
     $root.find('tr[data-object-type="release"]').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label');
     });
 
     n++;
     $root.find('tr[data-object-type~="master"]').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+      searchAndDisplayMbLinkInSection($(this), 'master');
     });
 
     n++;
     $root.find('tr[data-object-type~="master"]').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+      searchAndDisplayMbLinkInSection($(this), 'artist');
     });
 
     n++;
     $root.find('tr[data-object-type~="master"]').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label');
     });
 
     n++;
     $root.find('div#tracklist').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+      searchAndDisplayMbLinkInSection($(this), 'artist');
     });
 
     n++;
     $root.find('div#companies').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'place', 'label');
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label', 'place');
+      searchAndDisplayMbLinkInSection($(this), 'label');
     });
 
     n++;
     $root.find('div#credits').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'label', 'label');
+      searchAndDisplayMbLinkInSection($(this), 'label');
     });
 
     n++;
     $root.find('div#credits').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'artist', 'artist');
+      searchAndDisplayMbLinkInSection($(this), 'artist');
     });
 
     n++;
     $root.find('div#page_aside div.section_content:first').each(function() {
       debug_color(this, n);
-      searchAndDisplayMbLinkInSection($(this), 'release-group', 'master');
+      searchAndDisplayMbLinkInSection($(this), 'master');
     });
 }
 
@@ -288,6 +289,11 @@ function getCleanUrl(url, discogs_type) {
   }
   LOGGER.debug('getCleanUrl: ' + url + ' (' + discogs_type + ') failed');
   return false;
+}
+
+function defaultMBtype(discogs_type) {
+  if (discogs_type == 'master') return 'release-group';
+  return discogs_type;
 }
 
 function MBIDfromUrl(url, discogs_type) {
