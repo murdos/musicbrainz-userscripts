@@ -2,7 +2,6 @@
 // @name           Import Beatport Pro releases to MusicBrainz
 // @author         VxJasonxV
 // @description    One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
-// @sourceURL      https://github.com/VxJasonxV/musicbrainz-userscripts/blob/master/beatport_pro_importer.user.js
 // @version        2015.06.10.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
