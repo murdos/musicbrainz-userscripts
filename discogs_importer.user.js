@@ -427,7 +427,7 @@ function parseDiscogsRelease(data) {
 
     // Release URL
     release.urls = new Array();
-    var clean_url = getCleanUrl(window.location.href, 'release');
+    var clean_url = getCleanUrl(discogsRelease.uri, 'release');
     if (clean_url) {
       release.urls.push( { url: clean_url, link_type: 76 } );
     }
