@@ -74,9 +74,7 @@ function retrieveReleaseInfo(release_url) {
       var artists = [];
       $.each(track.artists,
         function (idx2,  artist) {
-          artists.push({
-            'artist_name': artist.name
-          });
+          artists.push(artist.name);
           release_artists.push(artist.name);
         }
       );
@@ -86,7 +84,7 @@ function retrieveReleaseInfo(release_url) {
         title += ' (' + track.mix + ')';
       }
       tracks.push({
-        'artist_credit': artists,
+        'artist_credit': MBReleaseImportHelper.makeArtistCredits(artists),
         'title': title,
         'duration': track.duration.minutes
       });
@@ -99,22 +97,7 @@ function retrieveReleaseInfo(release_url) {
     }
   });
 
-  var artists = unique_artists.map(function(item) { return {artist_name: item}; });
-  if (artists.length > 2) {
-    var last = artists.pop();
-    last.joinphrase = '';
-    var prev = artists.pop();
-    prev.joinphrase = ' & ';
-    for (var i = 0; i < artists.length; i++) {
-      artists[i].joinphrase = ', ';
-    }
-    artists.push(prev);
-    artists.push(last);
-  } else if (artists.length == 2) {
-    artists[0].joinphrase = ' & ';
-  }
-
-  release.artist_credit = artists;
+  release.artist_credit = MBReleaseImportHelper.makeArtistCredits(unique_artists);
   release.discs = [];
   release.discs.push( {
     'tracks': tracks,
