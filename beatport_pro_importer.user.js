@@ -105,6 +105,9 @@ function retrieveReleaseInfo(release_url) {
     }
   });
 
+  if (unique_artists.length > 4) {
+    unique_artists = [ 'Various Artists' ];
+  }
   release.artist_credit = MBReleaseImportHelper.makeArtistCredits(unique_artists);
   release.discs.push( {
     'tracks': tracks,
