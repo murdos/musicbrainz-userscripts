@@ -89,25 +89,7 @@ var CD1DImporter = {
     var artists = $('div.infos-releasegrp div.list-artist a').map(function () {
       return $(this).text();
     }).get();
-    artists = artists.map(function (item) {
-      return {
-        artist_name: item
-      };
-    });
-    if (artists.length > 2) {
-      var last = artists.pop();
-      last.joinphrase = '';
-      var prev = artists.pop();
-      prev.joinphrase = ' & ';
-      for (var i = 0; i < artists.length; i++) {
-        artists[i].joinphrase = ', ';
-      }
-      artists.push(prev);
-      artists.push(last);
-    } else if (artists.length == 2) {
-      artists[0].joinphrase = ' & ';
-    }
-    return artists;
+    return MBReleaseImportHelper.makeArtistCredits(artists);
   },
 
   getAlbum: function () {
