@@ -12,8 +12,8 @@
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
-// @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require     lib/import_functions.js
+// @require     lib/logger.js
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */
