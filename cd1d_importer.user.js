@@ -70,15 +70,13 @@ var CD1DImporter = {
 
         // For each row that's "mapped", return an object that
         //  describes the first and second <td> in the row.
-        var duration = row.find('td.tracklist-content-length').text().replace('"', '').replace('\' ', ':').split(
-          ':');
-        duration = 60 * parseInt(duration[0], 10) + parseInt(duration[1], 10); // convert MM:SS to seconds
+        var duration = row.find('td.tracklist-content-length').text().replace('"', '').replace('\' ', ':')
 
         // drop track number prefix (A A2 C3 01 05 etc...)
         var title = row.find('td.tracklist-content-title').text().replace(/^[0-9A-F][0-9]* /, '');
         return {
           title: title,
-          duration: duration * 1000 // milliseconds in MB
+          duration: MBReleaseImportHelper.hmsToMilliSeconds(duration)
         };
       }).get();
       discs.push(disc);
@@ -236,8 +234,6 @@ var CD1DImporter = {
       .get();
 
     // Tracks
-    var total_duration = 0;
-    var total_tracks = 0;
     $.each(this.getTracks(format.id), function (ndisc, disc) {
       var thisdisc = {
         tracks: [],
@@ -245,8 +241,6 @@ var CD1DImporter = {
       };
       release.discs.push(thisdisc);
       $.each(this, function (ntrack, track) {
-        total_duration += track.duration / 1000;
-        total_tracks += 1;
         thisdisc.tracks.push({
           'title': track.title,
           'duration': track.duration,
@@ -254,10 +248,6 @@ var CD1DImporter = {
         });
       });
     });
-
-    if (!release.type) {
-      release.type = MBReleaseImportHelper.guessReleaseType(release.title, total_tracks, total_duration);
-    }
 
     LOGGER.info("Parsed release: ", format.name, release);
     return release;
