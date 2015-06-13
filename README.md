@@ -7,6 +7,7 @@
 * [Import CD1D releases to MusicBrainz](#cd1d_importer)
 * [Import Discogs releases to MusicBrainz](#discogs_importer)
 * [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+* [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 * [Musicbrainz DiscIds Detector](#mb_discids_detector)
 * [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
@@ -58,6 +59,13 @@ Easily import Encyclopedisque releases into MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
+
+## <a name="juno_download_importer"></a> Import Juno Download releases to MusicBrainz
+
+One-click importing of releases from junodownload.com/products pages into MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/juno_download_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js)
 
 ## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
 
