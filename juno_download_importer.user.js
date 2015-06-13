@@ -52,7 +52,7 @@ function parseReleaseDate(rdate) {
 
 function retrieveReleaseInfo(release_url) {
 
-  // Release information global to all Beatport releases
+  // Release defaults
   var release = {
     artist_credit: [],
     title: $("#product_heading_title").text().trim(),
