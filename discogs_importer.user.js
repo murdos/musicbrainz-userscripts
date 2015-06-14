@@ -311,6 +311,8 @@ function insertLink(release, current_page_key) {
 
     var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
 
+    if (DEBUG) mbUI.css({'border': '1px dotted red'});
+
     var mbContentBlock = $('<div class="section_content"></div>');
     mbUI.append(mbContentBlock);
 
