@@ -309,7 +309,7 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 function insertLink(release, current_page_key) {
     var current_page_info = link_infos[current_page_key];
 
-    var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>');
+    var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
 
     var mbContentBlock = $('<div class="section_content"></div>');
     mbUI.append(mbContentBlock);
@@ -332,6 +332,7 @@ function insertLink(release, current_page_key) {
     var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
     var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
     mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
+    mbUI.slideDown();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
