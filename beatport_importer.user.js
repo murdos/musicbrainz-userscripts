@@ -8,8 +8,8 @@
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 // @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/dateFormat.js
 // @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        lib/import_functions.js
+// @require        lib/logger.js
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
