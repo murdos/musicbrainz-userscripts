@@ -6,8 +6,6 @@
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http*://www.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-// @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/dateFormat.js
-// @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
 // @require        lib/import_functions.js
 // @require        lib/logger.js
 // ==/UserScript==
