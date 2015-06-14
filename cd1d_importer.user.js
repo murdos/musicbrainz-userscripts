@@ -8,7 +8,7 @@
 // @include     http://1d-paysdelaloire.com/*/album/*
 // @include     http://1d-rhonealpes.com/*/album/*
 // @include     http://cd1d.com/*/album/*
-// @version     2015.06.13.0
+// @version     2015.06.14.0
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
