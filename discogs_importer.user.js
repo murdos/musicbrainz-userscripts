@@ -40,7 +40,7 @@ var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', 7*24*60, '1'); // force refre
 
 $(document).ready(function(){
 
-    var current_page_key = getDiscogsLinkKey(window.location.href.replace(/\?.*$/, '').replace(/#.*$/, ''));
+    var current_page_key = getDiscogsLinkKey(window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/'));
     if (!current_page_key) return;
 
     // disable evil pjax (used for artist page navigation)
