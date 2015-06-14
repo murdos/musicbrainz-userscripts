@@ -314,22 +314,29 @@ function insertLink(release, current_page_key) {
     var mbContentBlock = $('<div class="section_content"></div>');
     mbUI.append(mbContentBlock);
 
+    var mbLinked = $('<p><small>MusicBrainz release(s) linked to this page: </small></p>').hide();
+    mbContentBlock.prepend(mbLinked);
+
     // Form parameters
     var edit_note = 'Imported from ' + current_page_info.clean_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
-    var innerHTML = "MusicBrainz release(s) linked to this release: <span></span><br /><br />";
-    innerHTML += MBReleaseImportHelper.buildFormHTML(parameters);
+    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
     // Append search link
     innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
 
-    mbContentBlock.html(innerHTML);
+    mbContentBlock.append(innerHTML);
     var prevNode = $("div.section.social");
     prevNode.before(mbUI);
 
     // Find MB release(s) linked to this Discogs release
-    var mbLinkInsert = function (link) { $("div.section.musicbrainz div.section_content span").before(link); }
+    var mbLinkInsert = function (link) {
+      var sel = "div.section.musicbrainz div.section_content p";
+      $(sel).append(link);
+      $(sel).find('img').css({'vertical-align': 'text-top'});
+      mbLinked.show();
+    }
     var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
     mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
     mbUI.slideDown();
