@@ -51,17 +51,15 @@ function setupImportUI(release) {
 
 function insertMBLinks() {
 
-    $('body').find('div.v7P, div.v12P').each(function() {
-        $(this).find('a[href*="/disque/"]').each(function() {
-            var $link = $(this);
-            var external_url = 'http://www.encyclopedisque.fr' + $link.attr('href');
-            mblinks.searchAndDisplayMbLink(external_url, 'release', function (link) { $link.after(link).after('<br />') } );
-        });
+    $('div.v7P, div.v12P').find('a[href*="/disque/"]').each(function() {
+        var $link = $(this);
+        var external_url = window.location.origin + $link.attr('href');
+        mblinks.searchAndDisplayMbLink(external_url, 'release', function (link) { $link.after(link).after('<br />') } );
     });
 
     $('h2, div.main').find('a[href*="/artiste/"]').each(function() {
         var $link = $(this);
-        var external_url = 'http://www.encyclopedisque.fr' + $link.attr('href');
+        var external_url = window.location.origin + $link.attr('href');
         mblinks.searchAndDisplayMbLink(external_url, 'artist', function (link) { $link.before(link); } );
     });
 
