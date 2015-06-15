@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2015.06.15.0
+// @version        2015.06.15.1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
