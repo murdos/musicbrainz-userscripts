@@ -51,6 +51,13 @@ function setupImportUI(release) {
 
 function insertMBLinks() {
 
+    var current_url = window.location.href;
+    if (current_url.match(/\/disque\//)) {
+        mblinks.searchAndDisplayMbLink(current_url, 'release', function (link) { $('h2 span').before(link); } );
+    } else if (current_url.match(/\/artiste\//)) {
+        mblinks.searchAndDisplayMbLink(current_url, 'artist', function (link) { $('h2').prepend(link); } );
+    }
+
     $('div.v7P, div.v12P').find('a[href*="/disque/"]').each(function() {
         var $link = $(this);
         var external_url = window.location.origin + $link.attr('href');
@@ -211,4 +218,3 @@ function parseEncyclopedisquePage() {
 
     return release;
 }
-
