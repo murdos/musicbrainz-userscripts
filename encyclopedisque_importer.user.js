@@ -59,6 +59,12 @@ function insertMBLinks() {
         });
     });
 
+    $('h2, div.main').find('a[href*="/artiste/"]').each(function() {
+        var $link = $(this);
+        var external_url = 'http://www.encyclopedisque.fr' + $link.attr('href');
+        mblinks.searchAndDisplayMbLink(external_url, 'artist', function (link) { $link.before(link); } );
+    });
+
 }
 
 // Analyze Encyclopedisque data and prepare to release object
