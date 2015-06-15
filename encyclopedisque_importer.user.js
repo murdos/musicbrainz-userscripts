@@ -10,9 +10,11 @@
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require        lib/import_functions.js
 // @require        lib/logger.js
+// @require        lib/mbimportstyle.js
 // ==/UserScript==
 
 $(document).ready(function() {
+    MBImportStyle();
 
     if (window.location.href.match( /encyclopedisque\.fr\/disque\/(\d+)/) ) {
         var release = parseEncyclopedisquePage();

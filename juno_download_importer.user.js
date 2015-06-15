@@ -10,6 +10,7 @@
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/import_functions.js
 // @require        lib/logger.js
+// @require        lib/mbimportstyle.js
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -18,6 +19,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
+  MBImportStyle();
   var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
   var release = retrieveReleaseInfo(release_url);
   insertLink(release, release_url);

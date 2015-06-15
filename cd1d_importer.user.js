@@ -14,6 +14,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     lib/import_functions.js
 // @require     lib/logger.js
+// @require     lib/mbimportstyle.js
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */
@@ -250,7 +251,7 @@ var CD1DImporter = {
 };
 
 $(document).ready(function () {
-
+  MBImportStyle();
   /* CD1D uses same page with hidden tabs for all formats */
   var formats = CD1DImporter.getFormats();
   //LOGGER.info('Formats:', formats);

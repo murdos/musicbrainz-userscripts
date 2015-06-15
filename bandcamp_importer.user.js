@@ -11,6 +11,7 @@
 // @require        lib/import_functions.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
+// @require        lib/mbimportstyle.js
 // ==/UserScript==
 
 
@@ -201,6 +202,7 @@ var BandcampImport = {
 };
 
 $(document).ready(function () {
+  MBImportStyle();
 
   var mblinks = new MBLinks('BCI_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
 
