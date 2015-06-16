@@ -67,8 +67,21 @@ $(document).ready(function(){
             crossDomain: true,
             success: function (data, textStatus, jqXHR) {
                 LOGGER.debug("Discogs JSON Data from API:", data);
-                var release = parseDiscogsRelease(data);
-                insertLink(release, current_page_key);
+                try {
+                  var release = parseDiscogsRelease(data);
+                  insertLink(release, current_page_key);
+                } catch (e) {
+                  $('div.musicbrainz').remove();
+                  var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
+                  var mbContentBlock = $('<div class="section_content"></div>');
+                  mbUI.append(mbContentBlock);
+                  var mbError = $('<p><small>' + e + '<br /><b>Please <a href="https://github.com/murdos/musicbrainz-userscripts/issues">report</a> this error, along the current page URL.</b></small></p>');
+                  mbContentBlock.prepend(mbError);
+                  $("div.section.social").before(mbUI);
+                  mbError.css({'background-color': '#fbb', 'margin-top': '4px', 'margin-bottom': '4px'});
+                  mbUI.slideDown();
+                  throw e;
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 LOGGER.error("AJAX Status: ", textStatus);
