@@ -39,14 +39,10 @@ function setupImportUI(release) {
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-
-    // Append search link
-    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
-
-    var importLink = $("<li>"+ innerHTML + "</li>");
-    importLink.appendTo("#menu ul");
-
+    var mbUI = $(MBReleaseImportHelper.buildFormHTML(parameters) + MBReleaseImportHelper.buildSearchButton(release)).hide();
+    $('#recherchebox').append(mbUI);
+    $('form.musicbrainz_import button').css({width: '100%'});
+    mbUI.slideDown();
 }
 
 function insertMBLinks() {

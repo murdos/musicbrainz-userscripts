@@ -244,9 +244,14 @@ var CD1DImporter = {
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    $(where).append(innerHTML);
-
+    var mbUI = $('<div id="mb_buttons">'
+      + MBReleaseImportHelper.buildFormHTML(parameters)
+      + MBReleaseImportHelper.buildSearchButton(release)
+      + '</div>').hide();
+    $(where).append(mbUI);
+    $('#mb_buttons').css({'margin-top': '6px'});
+    $('form.musicbrainz_import').css({display: 'inline-block'});
+    mbUI.slideDown();
   }
 };
 

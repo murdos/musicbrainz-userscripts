@@ -326,12 +326,13 @@ function insertLink(release, current_page_key) {
     var edit_note = 'Imported from ' + current_page_info.clean_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
-    // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    // Append search link
-    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
-
+    // Build form + search button
+    var innerHTML = '<div id="mb_buttons">'
+      + MBReleaseImportHelper.buildFormHTML(parameters)
+      + MBReleaseImportHelper.buildSearchButton(release)
+      + '</div>';
     mbContentBlock.append(innerHTML);
+
     var prevNode = $("div.section.social");
     prevNode.before(mbUI);
 
@@ -344,6 +345,15 @@ function insertLink(release, current_page_key) {
     }
     var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
     mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
+
+    $('#mb_buttons').css({
+      display: 'inline-block',
+      width: '100%'
+    });
+    $('form.musicbrainz_import').css({width: '48%', display:'inline-block'});
+    $('form.musicbrainz_import_search').css({'margin-left': '3%'})
+    $('form.musicbrainz_import > button').css({width: '100%', 'box-sizing': 'padding-box'});
+
     mbUI.slideDown();
 }
 

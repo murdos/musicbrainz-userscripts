@@ -182,9 +182,16 @@ var BandcampImport = {
     var edit_note = 'Imported from ' + release.url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
     // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var mbUI = $('<div id="mb_buttons">'
+        + MBReleaseImportHelper.buildFormHTML(parameters)
+        + MBReleaseImportHelper.buildSearchButton(release)
+        + '</div>').hide();
+
     // Append MB import link
-    $('h2.trackTitle').append(innerHTML);
+    $('#name-section').append(mbUI);
+    $('#mb_buttons').css({'margin-top': '6px'});
+    $('form.musicbrainz_import').css({display: 'inline-block'});
+    mbUI.slideDown();
   },
 
   // helper to convert bandcamp date to MB date

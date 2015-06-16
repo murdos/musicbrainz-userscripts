@@ -124,8 +124,13 @@ function insertLink(release, release_url) {
     var edit_note = 'Imported from ' + release_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var mbUI = $('<li class="interior-release-chart-content-item musicbrainz-import">'
+        + MBReleaseImportHelper.buildFormHTML(parameters)
+        + MBReleaseImportHelper.buildSearchButton(release)
+        + '</li>').hide();
 
-    $(".interior-release-chart-content-list").append('<li class="interior-release-chart-content-item musicbrainz-import">' + innerHTML + '</li>');
-    $('.musicbrainz-import input[type="submit"]').css('background', '#eee');
+    $(".interior-release-chart-content-list").append(mbUI);
+    $('form.musicbrainz_import').css({'display': 'inline-block', 'margin-left': '5px'});
+    $('form.musicbrainz_import button').css({'width': '120px'});
+    mbUI.slideDown();
 }
