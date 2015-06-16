@@ -5,8 +5,7 @@
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
-// @include        http*://*.bandcamp.com/album/*
-// @include        http*://*.bandcamp.com/track/*
+// @include        /^https?://[^/]+/(?:album|track)/[^/]+$/
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/import_functions.js
 // @require        lib/logger.js
@@ -209,6 +208,14 @@ var BandcampImport = {
 };
 
 $(document).ready(function () {
+  /* keep the following line as first, it is required to skip
+   * pages which aren't actually a bandcamp page, since we support
+   * bandcamp pages under third-party domains.
+   * see @include
+   */
+  if (!unsafeWindow.TralbumData) return;
+  /***/
+
   MBImportStyle();
 
   var mblinks = new MBLinks('BCI_MBLINKS_CACHE');
