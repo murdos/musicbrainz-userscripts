@@ -214,12 +214,20 @@ $(document).ready(function () {
   var mblinks = new MBLinks('BCI_MBLINKS_CACHE');
 
   var release = BandcampImport.retrieveReleaseInfo();
-  LOGGER.info("Parsed release: ", release);
-  BandcampImport.insertLink(release);
 
   // add MB artist link
   var artist_link = release.url.match(/^(http:\/\/[^\/]+)/)[1];
   mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+
+  if (release.artist_credit.length == 1) {
+    // try to get artist's mbid from cache
+    var artist_mbid = mblinks.resolveMBID(artist_link);
+    if (artist_mbid) {
+      release.artist_credit[0].mbid = artist_mbid;
+    }
+  }
+  BandcampImport.insertLink(release);
+  LOGGER.info("Parsed release: ", release);
 
   if (release.type == 'track') {
     // add MB links to parent album
