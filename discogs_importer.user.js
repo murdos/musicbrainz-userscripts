@@ -576,6 +576,9 @@ function parseDiscogsRelease(data) {
         {
             tmp[1] = parseInt(tmp[1], 10);
             var trackNumber = 1;
+            var buggyTrackNumber = false;
+            var prevReleaseNumber = releaseNumber;
+
             if(tmp[2]) // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
             {
                 releaseNumber = tmp[1];
@@ -593,6 +596,12 @@ function parseDiscogsRelease(data) {
                 }
                 releaseNumber = (code-code%2)/2+1;
             }
+            else if(trackPosition.match(/^[A-Za-z]+\d*$/)) // Vinyl or cassette, handle it specially
+            {
+                // something like AA1, exemple : http://www.discogs.com/release/73531
+                // TODO: find a better fix
+                buggyTrackNumber = true;
+            }
             else if(tmp[1] <= lastPosition) // 1, 2, 3, ... - We've moved onto a new medium
             {
                 releaseNumber++;
@@ -603,7 +612,17 @@ function parseDiscogsRelease(data) {
                 trackNumber = tmp[1];
             }
 
-            lastPosition = trackNumber;
+            if (releaseNumber > release_formats.length) {
+                // something went wrong in track position parsing
+                buggyTrackNumber = true;
+                releaseNumber = prevReleaseNumber;
+            }
+            if (buggyTrackNumber) {
+              // well, it went wrong so ...
+              lastPosition++;
+            } else {
+              lastPosition = trackNumber;
+            }
         }
 
         // Create release if needed
@@ -618,8 +637,8 @@ function parseDiscogsRelease(data) {
         }
 
         // Track number (only for Vinyl and Cassette)
-        if ( release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
-            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/) ){
+        if (buggyTrackNumber || (release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
+            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/)) ){
             track.number = discogsTrack.position;
         }
 
