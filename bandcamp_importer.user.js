@@ -204,7 +204,7 @@ var BandcampImport = {
 $(document).ready(function () {
   MBImportStyle();
 
-  var mblinks = new MBLinks('BCI_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
+  var mblinks = new MBLinks('BCI_MBLINKS_CACHE');
 
   var release = BandcampImport.retrieveReleaseInfo();
   LOGGER.info("Parsed release: ", release);

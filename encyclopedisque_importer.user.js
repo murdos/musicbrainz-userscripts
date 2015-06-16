@@ -14,7 +14,7 @@
 // @require        lib/mbimportstyle.js
 // ==/UserScript==
 
-var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE', 7*24*60); // force refresh of cached links once a week
+var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
 $(document).ready(function() {
     MBImportStyle();
