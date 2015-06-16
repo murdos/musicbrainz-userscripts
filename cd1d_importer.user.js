@@ -250,7 +250,7 @@ var CD1DImporter = {
       + '</div>').hide();
     $(where).append(mbUI);
     $('#mb_buttons').css({'margin-top': '6px'});
-    $('form.musicbrainz_import').css({display: 'inline-block'});
+    $('form.musicbrainz_import').css({display: 'inline-block', 'margin-right': '5px'});
     mbUI.slideDown();
   }
 };
