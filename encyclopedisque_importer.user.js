@@ -8,7 +8,7 @@
 // @include        http://www.encyclopedisque.fr/disque/*.html
 // @include        http://www.encyclopedisque.fr/artiste/*.html
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/mblinks.js
 // @require        lib/logger.js
 // @require        lib/mbimportstyle.js
@@ -35,11 +35,11 @@ $(document).ready(function() {
 function setupImportUI(release) {
 
     // Form parameters
-    var edit_note = MBReleaseImportHelper.makeEditNote(window.location.href, 'Encyclopedisque');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(window.location.href, 'Encyclopedisque');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form
-    var mbUI = $(MBReleaseImportHelper.buildFormHTML(parameters) + MBReleaseImportHelper.buildSearchButton(release)).hide();
+    var mbUI = $(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release)).hide();
     $('#recherchebox').append(mbUI);
     $('form.musicbrainz_import button').css({width: '100%'});
     mbUI.slideDown();
@@ -95,7 +95,7 @@ function parseEncyclopedisquePage() {
 
     // Release URL
     release.urls = new Array();
-    release.urls.push( { 'url': window.location.href, 'link_type': MBReleaseImportHelper.URL_TYPES.other_databases } );
+    release.urls.push( { 'url': window.location.href, 'link_type': MBImport.URL_TYPES.other_databases } );
 
     // Parse other infos
     var releaseInfos = document.body.querySelectorAll("div.main tr");

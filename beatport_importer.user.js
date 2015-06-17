@@ -6,7 +6,7 @@
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http*://www.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
 // ==/UserScript==
 
@@ -79,9 +79,9 @@ function retrieveReleaseInfo() {
 // Insert button into page under label information
 function insertLink(release) {
     var edit_note = 'Imported from ' + window.location.href;
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var innerHTML = MBImport.buildFormHTML(parameters);
     var tr = $("<tr><td span='2' /></tr>");
     tr.find('td').append(innerHTML);
     $("table.meta-data tbody").append(tr);

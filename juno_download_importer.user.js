@@ -8,7 +8,7 @@
 // @include        http*://www.junodownload.com/products/*
 // @include        http*://secure.junodownload.com/products/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mbimportstyle.js
 // ==/UserScript==
@@ -84,7 +84,7 @@ function retrieveReleaseInfo(release_url) {
   // URLs
   release.urls.push({
     'url': release_url,
-    'link_type': MBReleaseImportHelper.URL_TYPES.purchase_for_download
+    'link_type': MBImport.URL_TYPES.purchase_for_download
   });
 
   release.labels.push(
@@ -107,7 +107,7 @@ function retrieveReleaseInfo(release_url) {
       trackname = m[2];
     }
     tracks.push({
-        'artist_credit': MBReleaseImportHelper.makeArtistCredits(artists),
+        'artist_credit': MBImport.makeArtistCredits(artists),
         'title': trackname,
         'duration': tracklength
       });
@@ -118,7 +118,7 @@ function retrieveReleaseInfo(release_url) {
     parsed_release_artist = 'Various Artists';
   }
   var release_artists = [ parsed_release_artist ];
-  release.artist_credit = MBReleaseImportHelper.makeArtistCredits(release_artists);
+  release.artist_credit = MBImport.makeArtistCredits(release_artists);
   release.discs.push( {
     'tracks': tracks,
     'format': release.format
@@ -130,12 +130,12 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBReleaseImportHelper.makeEditNote(release_url, 'Juno Download');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(release_url, 'Juno Download');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
     var mbUI = $('<div id="mb_buttons">'
-        + MBReleaseImportHelper.buildFormHTML(parameters)
-        + MBReleaseImportHelper.buildSearchButton(release)
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
         + '</div>').hide();
 
     $("div.sociald").before(mbUI);

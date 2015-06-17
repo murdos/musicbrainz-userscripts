@@ -7,7 +7,7 @@
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js
 // @include        /^https?:\/\/(?:www\.)?(?:last\.fm|lastfm\.(?:com\.br|com\.tr|at|com|de|es|fr|it|jp|pl|pt|ru|se))\/music\/[^\/]+/[^+][^\/]+/
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mbimportstyle.js
 // ==/UserScript==
@@ -35,7 +35,7 @@ function retrieveReleaseInfo(release_url) {
 
   // Release defaults
   var release = {
-    artist_credit: MBReleaseImportHelper.makeArtistCredits([artist]),
+    artist_credit: MBImport.makeArtistCredits([artist]),
     title: $("h1[itemprop='name']").text().trim(),
     year: 0,
     month: 0,
@@ -82,7 +82,7 @@ function retrieveReleaseInfo(release_url) {
       artists = ['[unknown]'];
     }
     tracks.push({
-        'artist_credit': MBReleaseImportHelper.makeArtistCredits(artists),
+        'artist_credit': MBImport.makeArtistCredits(artists),
         'title': trackname,
         'duration': tracklength
       });
@@ -99,10 +99,10 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBReleaseImportHelper.makeEditNote(release_url, 'Last.fm');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(release_url, 'Last.fm');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var innerHTML = MBImport.buildFormHTML(parameters);
 
     var mbUI = $('<div id="musicbrainz-import">' + innerHTML + '</div>').hide();
     mbUI.css({'margin-bottom': '6px', 'padding': '2px', 'background-color': '#444', 'text-align': 'center'});

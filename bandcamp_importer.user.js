@@ -7,7 +7,7 @@
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include        /^https?://[^/]+/(?:album|track)/[^/]+$/
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
 // @require        lib/mbimportstyle.js
@@ -127,7 +127,7 @@ var BandcampImport = {
     }
 
     // URLs
-    var link_type = MBReleaseImportHelper.URL_TYPES;
+    var link_type = MBImport.URL_TYPES;
     // Download for free vs. for purchase
     if (bandcampAlbumData.current.download_pref !== null) {
       if (bandcampAlbumData.freeDownloadPage !== null || bandcampAlbumData.current.download_pref === 1 || (
@@ -178,12 +178,12 @@ var BandcampImport = {
       return false;
     }
     // Form parameters
-    var edit_note = MBReleaseImportHelper.makeEditNote(release.url, 'Bandcamp');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(release.url, 'Bandcamp');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
     // Build form
     var mbUI = $('<div id="mb_buttons">'
-        + MBReleaseImportHelper.buildFormHTML(parameters)
-        + MBReleaseImportHelper.buildSearchButton(release)
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
         + '</div>').hide();
 
     // Append MB import link

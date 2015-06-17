@@ -12,7 +12,7 @@
 // @exclude        http://*.discogs.com/*release/*?f=xml*
 // @exclude        http://www.discogs.com/release/add
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
 // @require        lib/mbimportstyle.js
@@ -135,7 +135,7 @@ function insertMBLinks($root) {
                   mark = entities[mb_type].mark;
                   entity_name = mb_type.replace(/[_-]/g, ' ');
                 }
-                $link.closest('span.mb_wrapper').prepend('<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this '+ entity_name + ' on MusicBrainz (open in a new tab)" href="' + MBReleaseImportHelper.searchUrlFor(mb_type, $link.text()) + '"><small>'+mark+'</small>?</a></span>');
+                $link.closest('span.mb_wrapper').prepend('<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this '+ entity_name + ' on MusicBrainz (open in a new tab)" href="' + MBImport.searchUrlFor(mb_type, $link.text()) + '"><small>'+mark+'</small>?</a></span>');
               }
               var insert_normal = function (link) {
                 $link.closest('span.mb_valign').before('<span class="mb_valign">'+link+'</span>');
@@ -384,13 +384,13 @@ function insertLink(release, current_page_key) {
     }
 
     // Form parameters
-    var edit_note = MBReleaseImportHelper.makeEditNote(current_page_info.clean_url, 'Discogs');
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(current_page_info.clean_url, 'Discogs');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form + search button
     var innerHTML = '<div id="mb_buttons">'
-      + MBReleaseImportHelper.buildFormHTML(parameters)
-      + MBReleaseImportHelper.buildSearchButton(release)
+      + MBImport.buildFormHTML(parameters)
+      + MBImport.buildSearchButton(release)
       + '</div>';
     mbContentBlock.append(innerHTML);
 
@@ -490,7 +490,7 @@ function parseDiscogsRelease(data) {
     // Release URL
     release.urls = [];
     var release_url = getCleanUrl(discogsRelease.uri, 'release');
-    release.urls.push( { url: release_url, link_type: MBReleaseImportHelper.URL_TYPES.discogs } );
+    release.urls.push( { url: release_url, link_type: MBImport.URL_TYPES.discogs } );
 
     // Release format
     var release_formats = [];
@@ -566,7 +566,7 @@ function parseDiscogsRelease(data) {
         var track = new Object();
 
         track.title = discogsTrack.title;
-        track.duration = MBReleaseImportHelper.hmsToMilliSeconds(discogsTrack.duration); // MB in milliseconds
+        track.duration = MBImport.hmsToMilliSeconds(discogsTrack.duration); // MB in milliseconds
 
         // Track artist credit
         track.artist_credit = [];
@@ -600,7 +600,7 @@ function parseDiscogsRelease(data) {
                 return;
               }
               if (subtrack.duration) {
-                subtrack_total_duration += MBReleaseImportHelper.hmsToMilliSeconds(subtrack.duration);
+                subtrack_total_duration += MBImport.hmsToMilliSeconds(subtrack.duration);
               }
               if (subtrack.title) {
                 subtrack_titles.push(subtrack.title);
