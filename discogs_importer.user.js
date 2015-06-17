@@ -78,7 +78,7 @@ $(document).ready(function(){
                   mbUI.append(mbContentBlock);
                   var mbError = $('<p><small>' + e + '<br /><b>Please <a href="https://github.com/murdos/musicbrainz-userscripts/issues">report</a> this error, along the current page URL.</b></small></p>');
                   mbContentBlock.prepend(mbError);
-                  $("div.section.social").before(mbUI);
+                  insertMbUI(mbUI);
                   mbError.css({'background-color': '#fbb', 'margin-top': '4px', 'margin-bottom': '4px'});
                   mbUI.slideDown();
                   throw e;
@@ -353,6 +353,17 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 //                             Insert MusicBrainz section into Discogs page                                           //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function insertMbUI(mbUI) {
+  var e;
+  if ((e = $("div.section.social")) && e.length) {
+    e.before(mbUI);
+  } else if ((e = $('#statistics')) && e.length) {
+    e.before(mbUI);
+  } else if ((e = $("div.marketplace_box_links")) && e.length) {
+    e.after(mbUI);
+  }
+}
+
 // Insert links in Discogs page
 function insertLink(release, current_page_key) {
     var current_page_info = link_infos[current_page_key];
@@ -383,8 +394,7 @@ function insertLink(release, current_page_key) {
       + '</div>';
     mbContentBlock.append(innerHTML);
 
-    var prevNode = $("div.section.social");
-    prevNode.before(mbUI);
+    insertMbUI(mbUI);
 
     // Find MB release(s) linked to this Discogs release
     var mbLinkInsert = function (link) {
