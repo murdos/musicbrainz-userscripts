@@ -499,8 +499,11 @@ function parseDiscogsRelease(data) {
     if (discogsRelease.formats.length > 0) {
         for(var i = 0; i < discogsRelease.formats.length; i++)
         {
-            for(var j = 0; j < discogsRelease.formats[i].qty; j++)
-                release_formats.push(MediaTypes[ discogsRelease.formats[i].name ]);
+            for(var j = 0; j < discogsRelease.formats[i].qty; j++) {
+                if (discogsRelease.formats[i].name in MediaTypes) {
+                    release_formats.push(MediaTypes[discogsRelease.formats[i].name]);
+                }
+            }
 
             if (discogsRelease.formats[i].descriptions) {
                 $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
