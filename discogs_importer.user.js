@@ -427,14 +427,14 @@ function parseDiscogsRelease(data) {
 
     var discogsRelease = data;
 
-    var release = new Object();
+    var release = {};
     release.discs = [];
 
     //buggy tracklist indicator, used to warn user
     release.maybe_buggy = false;
 
     // Release artist credit
-    release.artist_credit = new Array();
+    release.artist_credit = [];
     $.each(discogsRelease.artists, function(index, artist) {
         var ac = {
             'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
@@ -471,11 +471,11 @@ function parseDiscogsRelease(data) {
 
     // Release country
     if (discogsRelease.country) {
-        release.country = Countries[ discogsRelease.country ];
+        release.country = Countries[discogsRelease.country];
     }
 
     // Release labels
-    release.labels = new Array();
+    release.labels = [];
     if (discogsRelease.labels) {
         $.each(discogsRelease.labels, function(index, label) {
           var labelinfo = {
@@ -488,18 +488,18 @@ function parseDiscogsRelease(data) {
     }
 
     // Release URL
-    release.urls = new Array();
+    release.urls = [];
     var release_url = getCleanUrl(discogsRelease.uri, 'release');
     release.urls.push( { url: release_url, link_type: MBReleaseImportHelper.URL_TYPES.discogs } );
 
     // Release format
-    var release_formats = new Array();
-    release.secondary_types = new Array();
+    var release_formats = [];
+    release.secondary_types = [];
 
     if (discogsRelease.formats.length > 0) {
-        for(var i = 0; i < discogsRelease.formats.length; i++)
-        {
-            for(var j = 0; j < discogsRelease.formats[i].qty; j++) {
+        for (var i = 0; i < discogsRelease.formats.length; i++) {
+
+            for (var j = 0; j < discogsRelease.formats[i].qty; j++) {
                 if (discogsRelease.formats[i].name in MediaTypes) {
                     release_formats.push(MediaTypes[discogsRelease.formats[i].name]);
                 }
@@ -569,7 +569,7 @@ function parseDiscogsRelease(data) {
         track.duration = MBReleaseImportHelper.hmsToMilliSeconds(discogsTrack.duration); // MB in milliseconds
 
         // Track artist credit
-        track.artist_credit = new Array();
+        track.artist_credit = [];
         if (discogsTrack.artists) {
             $.each(discogsTrack.artists, function(index, artist) {
                 var ac = {
@@ -625,20 +625,16 @@ function parseDiscogsRelease(data) {
         }
 
         var tmp = trackPosition.match(/(\d+)(?:[\.-](\d+))?/);
-        if(tmp)
-        {
+        if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
             var trackNumber = 1;
             var buggyTrackNumber = false;
             var prevReleaseNumber = releaseNumber;
 
-            if(tmp[2]) // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
-            {
+            if (tmp[2]) { // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
                 releaseNumber = tmp[1];
                 trackNumber = parseInt(tmp[2], 10);
-            }
-            else if(trackPosition.match(/^[A-Za-z]\d*$/)) // Vinyl or cassette, handle it specially
-            {
+            } else if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
                 var code = trackPosition.charCodeAt(0);
                 // A-Z
                 if (65 <= code && code <= 90) {
@@ -648,20 +644,14 @@ function parseDiscogsRelease(data) {
                     code = code - (65 + 32);
                 }
                 releaseNumber = (code-code%2)/2+1;
-            }
-            else if(trackPosition.match(/^[A-Za-z]+\d*$/)) // Vinyl or cassette, handle it specially
-            {
+            } else if (trackPosition.match(/^[A-Za-z]+\d*$/)) { // Vinyl or cassette, handle it specially
                 // something like AA1, exemple : http://www.discogs.com/release/73531
                 // TODO: find a better fix
                 buggyTrackNumber = true;
-            }
-            else if(tmp[1] <= lastPosition) // 1, 2, 3, ... - We've moved onto a new medium
-            {
+            } else if (tmp[1] <= lastPosition) { // 1, 2, 3, ... - We've moved onto a new medium
                 releaseNumber++;
                 trackNumber = tmp[1];
-            }
-            else
-            {
+            } else {
                 trackNumber = tmp[1];
             }
 
@@ -679,7 +669,7 @@ function parseDiscogsRelease(data) {
         }
 
         // Create release if needed
-        if ( !release.discs[releaseNumber-1] ) {
+        if (!release.discs[releaseNumber-1]) {
             release.discs.push(new Object());
             release.discs[releaseNumber-1].tracks = [];
             release.discs[releaseNumber-1].format = release_formats[releaseNumber-1];
@@ -691,7 +681,7 @@ function parseDiscogsRelease(data) {
 
         // Track number (only for Vinyl and Cassette)
         if (buggyTrackNumber || (release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
-            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/)) ){
+            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/))) {
             track.number = discogsTrack.position;
         }
 
@@ -723,305 +713,307 @@ function decodeDiscogsJoinphrase(join) {
 //                                   Discogs -> MusicBrainz mapping                                                   //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var MediaTypes = new Array();
-MediaTypes["8-Track Cartridge"] = "Cartridge";
-MediaTypes["Acetate"] = "Vinyl";
-MediaTypes["Betamax"] = "Betamax";
-MediaTypes["Blu-ray"] = "Blu-ray";
-MediaTypes["Blu-ray-R"] = "Blu-ray";
-MediaTypes["Cassette"] = "Cassette";
-MediaTypes["CD"] = "CD";
-MediaTypes["CDr"] = "CD-R";
-MediaTypes["CDV"] = "CDV";
-MediaTypes["CD+G"] = "CD+G";
-MediaTypes["Cylinder"] = "Wax Cylinder";
-MediaTypes["DAT"] = "DAT";
-MediaTypes["Datassette"] = "Other";
-MediaTypes["DCC"] = "DCC";
-MediaTypes["DVD"] = "DVD";
-MediaTypes["DVDr"] = "DVD";
-MediaTypes["DVD-Audio"] = "DVD-Audio";
-MediaTypes["DVD-Video"] = "DVD-Video";
-MediaTypes["Edison Disc"] = "Vinyl";
-MediaTypes["File"] = "Digital Media";
-MediaTypes["Flexi-disc"] = "Vinyl";
-MediaTypes["Floppy Disk"] = "Other";
-MediaTypes["HDCD"] = "HDCD";
-MediaTypes["HD DVD"] = "HD-DVD";
-MediaTypes["HD DVD-R"] = "HD-DVD";
-MediaTypes["Hybrid"] = "Other";
-MediaTypes["Laserdisc"] = "LaserDisc";
-MediaTypes["Memory Stick"] = "Other";
-MediaTypes["Microcassette"] = "Other";
-MediaTypes["Minidisc"] = "MiniDisc";
-MediaTypes["MVD"] = "Other";
-MediaTypes["Reel-To-Reel"] = "Reel-to-reel";
-MediaTypes["SelectaVision"] = "Other";
-MediaTypes["Shellac"] = "Vinyl";
-MediaTypes["SVCD"] = "SVCD";
-MediaTypes["UMD"] = "UMD";
-MediaTypes["VCD"] = "VCD";
-MediaTypes["VHS"] = "VHS";
-MediaTypes["Video 2000"] = "Other";
-MediaTypes["Vinyl"] = "Vinyl";
-MediaTypes['7"'] = '7" Vinyl';
-MediaTypes['10"'] = '10" Vinyl';
-MediaTypes['12"'] = '12" Vinyl';
+var MediaTypes = {
+    "8-Track Cartridge": "Cartridge",
+    "Acetate": "Vinyl",
+    "Betamax": "Betamax",
+    "Blu-ray": "Blu-ray",
+    "Blu-ray-R": "Blu-ray",
+    "Cassette": "Cassette",
+    "CD": "CD",
+    "CDr": "CD-R",
+    "CDV": "CDV",
+    "CD+G": "CD+G",
+    "Cylinder": "Wax Cylinder",
+    "DAT": "DAT",
+    "Datassette": "Other",
+    "DCC": "DCC",
+    "DVD": "DVD",
+    "DVDr": "DVD",
+    "DVD-Audio": "DVD-Audio",
+    "DVD-Video": "DVD-Video",
+    "Edison Disc": "Vinyl",
+    "File": "Digital Media",
+    "Flexi-disc": "Vinyl",
+    "Floppy Disk": "Other",
+    "HDCD": "HDCD",
+    "HD DVD": "HD-DVD",
+    "HD DVD-R": "HD-DVD",
+    "Hybrid": "Other",
+    "Laserdisc": "LaserDisc",
+    "Memory Stick": "Other",
+    "Microcassette": "Other",
+    "Minidisc": "MiniDisc",
+    "MVD": "Other",
+    "Reel-To-Reel": "Reel-to-reel",
+    "SelectaVision": "Other",
+    "Shellac": "Vinyl",
+    "SVCD": "SVCD",
+    "UMD": "UMD",
+    "VCD": "VCD",
+    "VHS": "VHS",
+    "Video 2000": "Other",
+    "Vinyl": "Vinyl",
+    '7"': '7" Vinyl',
+    '10"': '10" Vinyl',
+    '12"': '12" Vinyl'
+};
 
-var Countries = new Array();
-Countries["Afghanistan"] = "AF";
-Countries["Albania"] = "AL";
-Countries["Algeria"] = "DZ";
-Countries["American Samoa"] = "AS";
-Countries["Andorra"] = "AD";
-Countries["Angola"] = "AO";
-Countries["Anguilla"] = "AI";
-Countries["Antarctica"] = "AQ";
-Countries["Antigua and Barbuda"] = "AG";
-Countries["Argentina"] = "AR";
-Countries["Armenia"] = "AM";
-Countries["Aruba"] = "AW";
-Countries["Australia"] = "AU";
-Countries["Austria"] = "AT";
-Countries["Azerbaijan"] = "AZ";
-Countries["Bahamas"] = "BS";
-Countries["Bahrain"] = "BH";
-Countries["Bangladesh"] = "BD";
-Countries["Barbados"] = "BB";
-Countries["Belarus"] = "BY";
-Countries["Belgium"] = "BE";
-Countries["Belize"] = "BZ";
-Countries["Benin"] = "BJ";
-Countries["Bermuda"] = "BM";
-Countries["Bhutan"] = "BT";
-Countries["Bolivia"] = "BO";
-Countries["Croatia"] = "HR";
-Countries["Botswana"] = "BW";
-Countries["Bouvet Island"] = "BV";
-Countries["Brazil"] = "BR";
-Countries["British Indian Ocean Territory"] = "IO";
-Countries["Brunei Darussalam"] = "BN";
-Countries["Bulgaria"] = "BG";
-Countries["Burkina Faso"] = "BF";
-Countries["Burundi"] = "BI";
-Countries["Cambodia"] = "KH";
-Countries["Cameroon"] = "CM";
-Countries["Canada"] = "CA";
-Countries["Cape Verde"] = "CV";
-Countries["Cayman Islands"] = "KY";
-Countries["Central African Republic"] = "CF";
-Countries["Chad"] = "TD";
-Countries["Chile"] = "CL";
-Countries["China"] = "CN";
-Countries["Christmas Island"] = "CX";
-Countries["Cocos (Keeling) Islands"] = "CC";
-Countries["Colombia"] = "CO";
-Countries["Comoros"] = "KM";
-Countries["Congo"] = "CG";
-Countries["Cook Islands"] = "CK";
-Countries["Costa Rica"] = "CR";
-Countries["Virgin Islands, British"] = "VG";
-Countries["Cuba"] = "CU";
-Countries["Cyprus"] = "CY";
-Countries["Czech Republic"] = "CZ";
-Countries["Denmark"] = "DK";
-Countries["Djibouti"] = "DJ";
-Countries["Dominica"] = "DM";
-Countries["Dominican Republic"] = "DO";
-Countries["Ecuador"] = "EC";
-Countries["Egypt"] = "EG";
-Countries["El Salvador"] = "SV";
-Countries["Equatorial Guinea"] = "GQ";
-Countries["Eritrea"] = "ER";
-Countries["Estonia"] = "EE";
-Countries["Ethiopia"] = "ET";
-Countries["Falkland Islands (Malvinas)"] = "FK";
-Countries["Faroe Islands"] = "FO";
-Countries["Fiji"] = "FJ";
-Countries["Finland"] = "FI";
-Countries["France"] = "FR";
-Countries["French Guiana"] = "GF";
-Countries["French Polynesia"] = "PF";
-Countries["French Southern Territories"] = "TF";
-Countries["Gabon"] = "GA";
-Countries["Gambia"] = "GM";
-Countries["Georgia"] = "GE";
-Countries["Germany"] = "DE";
-Countries["Ghana"] = "GH";
-Countries["Gibraltar"] = "GI";
-Countries["Greece"] = "GR";
-Countries["Greenland"] = "GL";
-Countries["Grenada"] = "GD";
-Countries["Guadeloupe"] = "GP";
-Countries["Guam"] = "GU";
-Countries["Guatemala"] = "GT";
-Countries["Guinea"] = "GN";
-Countries["Guinea-Bissau"] = "GW";
-Countries["Guyana"] = "GY";
-Countries["Haiti"] = "HT";
-Countries["Virgin Islands, U.S."] = "VI";
-Countries["Honduras"] = "HN";
-Countries["Hong Kong"] = "HK";
-Countries["Hungary"] = "HU";
-Countries["Iceland"] = "IS";
-Countries["India"] = "IN";
-Countries["Indonesia"] = "ID";
-Countries["Wallis and Futuna"] = "WF";
-Countries["Iraq"] = "IQ";
-Countries["Ireland"] = "IE";
-Countries["Israel"] = "IL";
-Countries["Italy"] = "IT";
-Countries["Jamaica"] = "JM";
-Countries["Japan"] = "JP";
-Countries["Jordan"] = "JO";
-Countries["Kazakhstan"] = "KZ";
-Countries["Kenya"] = "KE";
-Countries["Kiribati"] = "KI";
-Countries["Kuwait"] = "KW";
-Countries["Kyrgyzstan"] = "KG";
-Countries["Lao People's Democratic Republic"] = "LA";
-Countries["Latvia"] = "LV";
-Countries["Lebanon"] = "LB";
-Countries["Lesotho"] = "LS";
-Countries["Liberia"] = "LR";
-Countries["Libyan Arab Jamahiriya"] = "LY";
-Countries["Liechtenstein"] = "LI";
-Countries["Lithuania"] = "LT";
-Countries["Luxembourg"] = "LU";
-Countries["Montserrat"] = "MS";
-Countries["Macedonia, The Former Yugoslav Republic of"] = "MK";
-Countries["Madagascar"] = "MG";
-Countries["Malawi"] = "MW";
-Countries["Malaysia"] = "MY";
-Countries["Maldives"] = "MV";
-Countries["Mali"] = "ML";
-Countries["Malta"] = "MT";
-Countries["Marshall Islands"] = "MH";
-Countries["Martinique"] = "MQ";
-Countries["Mauritania"] = "MR";
-Countries["Mauritius"] = "MU";
-Countries["Mayotte"] = "YT";
-Countries["Mexico"] = "MX";
-Countries["Micronesia, Federated States of"] = "FM";
-Countries["Morocco"] = "MA";
-Countries["Monaco"] = "MC";
-Countries["Mongolia"] = "MN";
-Countries["Mozambique"] = "MZ";
-Countries["Myanmar"] = "MM";
-Countries["Namibia"] = "NA";
-Countries["Nauru"] = "NR";
-Countries["Nepal"] = "NP";
-Countries["Netherlands"] = "NL";
-Countries["Netherlands Antilles"] = "AN";
-Countries["New Caledonia"] = "NC";
-Countries["New Zealand"] = "NZ";
-Countries["Nicaragua"] = "NI";
-Countries["Niger"] = "NE";
-Countries["Nigeria"] = "NG";
-Countries["Niue"] = "NU";
-Countries["Norfolk Island"] = "NF";
-Countries["Northern Mariana Islands"] = "MP";
-Countries["Norway"] = "NO";
-Countries["Oman"] = "OM";
-Countries["Pakistan"] = "PK";
-Countries["Palau"] = "PW";
-Countries["Panama"] = "PA";
-Countries["Papua New Guinea"] = "PG";
-Countries["Paraguay"] = "PY";
-Countries["Peru"] = "PE";
-Countries["Philippines"] = "PH";
-Countries["Pitcairn"] = "PN";
-Countries["Poland"] = "PL";
-Countries["Portugal"] = "PT";
-Countries["Puerto Rico"] = "PR";
-Countries["Qatar"] = "QA";
-Countries["Reunion"] = "RE";
-Countries["Romania"] = "RO";
-Countries["Russian Federation"] = "RU";
-Countries["Russia"] = "RU";
-Countries["Rwanda"] = "RW";
-Countries["Saint Kitts and Nevis"] = "KN";
-Countries["Saint Lucia"] = "LC";
-Countries["Saint Vincent and The Grenadines"] = "VC";
-Countries["Samoa"] = "WS";
-Countries["San Marino"] = "SM";
-Countries["Sao Tome and Principe"] = "ST";
-Countries["Saudi Arabia"] = "SA";
-Countries["Senegal"] = "SN";
-Countries["Seychelles"] = "SC";
-Countries["Sierra Leone"] = "SL";
-Countries["Singapore"] = "SG";
-Countries["Slovenia"] = "SI";
-Countries["Solomon Islands"] = "SB";
-Countries["Somalia"] = "SO";
-Countries["South Africa"] = "ZA";
-Countries["Spain"] = "ES";
-Countries["Sri Lanka"] = "LK";
-Countries["Sudan"] = "SD";
-Countries["Suriname"] = "SR";
-Countries["Swaziland"] = "SZ";
-Countries["Sweden"] = "SE";
-Countries["Switzerland"] = "CH";
-Countries["Syrian Arab Republic"] = "SY";
-Countries["Tajikistan"] = "TJ";
-Countries["Tanzania, United Republic of"] = "TZ";
-Countries["Thailand"] = "TH";
-Countries["Togo"] = "TG";
-Countries["Tokelau"] = "TK";
-Countries["Tonga"] = "TO";
-Countries["Trinidad and Tobago"] = "TT";
-Countries["Tunisia"] = "TN";
-Countries["Turkey"] = "TR";
-Countries["Turkmenistan"] = "TM";
-Countries["Turks and Caicos Islands"] = "TC";
-Countries["Tuvalu"] = "TV";
-Countries["Uganda"] = "UG";
-Countries["Ukraine"] = "UA";
-Countries["United Arab Emirates"] = "AE";
-Countries["UK"] = "GB";
-Countries["US"] = "US";
-Countries["United States Minor Outlying Islands"] = "UM";
-Countries["Uruguay"] = "UY";
-Countries["Uzbekistan"] = "UZ";
-Countries["Vanuatu"] = "VU";
-Countries["Vatican City State (Holy See)"] = "VA";
-Countries["Venezuela"] = "VE";
-Countries["Viet Nam"] = "VN";
-Countries["Western Sahara"] = "EH";
-Countries["Yemen"] = "YE";
-Countries["Zambia"] = "ZM";
-Countries["Zimbabwe"] = "ZW";
-Countries["Taiwan"] = "TW";
-Countries["[Worldwide]"] = "XW";
-Countries["Europe"] = "XE";
-Countries["Soviet Union (historical, 1922-1991)"] = "SU";
-Countries["East Germany (historical, 1949-1990)"] = "XG";
-Countries["Czechoslovakia (historical, 1918-1992)"] = "XC";
-Countries["Congo, The Democratic Republic of the"] = "CD";
-Countries["Slovakia"] = "SK";
-Countries["Bosnia and Herzegovina"] = "BA";
-Countries["Korea (North), Democratic People's Republic of"] = "KP";
-Countries["North Korea"] = "KP";
-Countries["Korea (South), Republic of"] = "KR";
-Countries["South Korea"] = "KR";
-Countries["Montenegro"] = "ME";
-Countries["South Georgia and the South Sandwich Islands"] = "GS";
-Countries["Palestinian Territory"] = "PS";
-Countries["Macao"] = "MO";
-Countries["Timor-Leste"] = "TL";
-Countries["<85>land Islands"] = "AX";
-Countries["Guernsey"] = "GG";
-Countries["Isle of Man"] = "IM";
-Countries["Jersey"] = "JE";
-Countries["Serbia"] = "RS";
-Countries["Saint Barthélemy"] = "BL";
-Countries["Saint Martin"] = "MF";
-Countries["Moldova"] = "MD";
-Countries["Yugoslavia (historical, 1918-2003)"] = "YU";
-Countries["Serbia and Montenegro (historical, 2003-2006)"] = "CS";
-Countries["Côte d'Ivoire"] = "CI";
-Countries["Heard Island and McDonald Islands"] = "HM";
-Countries["Iran, Islamic Republic of"] = "IR";
-Countries["Saint Pierre and Miquelon"] = "PM";
-Countries["Saint Helena"] = "SH";
-Countries["Svalbard and Jan Mayen"] = "SJ";
+var Countries = {
+    "Afghanistan": "AF",
+    "Albania": "AL",
+    "Algeria": "DZ",
+    "American Samoa": "AS",
+    "Andorra": "AD",
+    "Angola": "AO",
+    "Anguilla": "AI",
+    "Antarctica": "AQ",
+    "Antigua and Barbuda": "AG",
+    "Argentina": "AR",
+    "Armenia": "AM",
+    "Aruba": "AW",
+    "Australia": "AU",
+    "Austria": "AT",
+    "Azerbaijan": "AZ",
+    "Bahamas": "BS",
+    "Bahrain": "BH",
+    "Bangladesh": "BD",
+    "Barbados": "BB",
+    "Belarus": "BY",
+    "Belgium": "BE",
+    "Belize": "BZ",
+    "Benin": "BJ",
+    "Bermuda": "BM",
+    "Bhutan": "BT",
+    "Bolivia": "BO",
+    "Croatia": "HR",
+    "Botswana": "BW",
+    "Bouvet Island": "BV",
+    "Brazil": "BR",
+    "British Indian Ocean Territory": "IO",
+    "Brunei Darussalam": "BN",
+    "Bulgaria": "BG",
+    "Burkina Faso": "BF",
+    "Burundi": "BI",
+    "Cambodia": "KH",
+    "Cameroon": "CM",
+    "Canada": "CA",
+    "Cape Verde": "CV",
+    "Cayman Islands": "KY",
+    "Central African Republic": "CF",
+    "Chad": "TD",
+    "Chile": "CL",
+    "China": "CN",
+    "Christmas Island": "CX",
+    "Cocos (Keeling) Islands": "CC",
+    "Colombia": "CO",
+    "Comoros": "KM",
+    "Congo": "CG",
+    "Cook Islands": "CK",
+    "Costa Rica": "CR",
+    "Virgin Islands, British": "VG",
+    "Cuba": "CU",
+    "Cyprus": "CY",
+    "Czech Republic": "CZ",
+    "Denmark": "DK",
+    "Djibouti": "DJ",
+    "Dominica": "DM",
+    "Dominican Republic": "DO",
+    "Ecuador": "EC",
+    "Egypt": "EG",
+    "El Salvador": "SV",
+    "Equatorial Guinea": "GQ",
+    "Eritrea": "ER",
+    "Estonia": "EE",
+    "Ethiopia": "ET",
+    "Falkland Islands (Malvinas)": "FK",
+    "Faroe Islands": "FO",
+    "Fiji": "FJ",
+    "Finland": "FI",
+    "France": "FR",
+    "French Guiana": "GF",
+    "French Polynesia": "PF",
+    "French Southern Territories": "TF",
+    "Gabon": "GA",
+    "Gambia": "GM",
+    "Georgia": "GE",
+    "Germany": "DE",
+    "Ghana": "GH",
+    "Gibraltar": "GI",
+    "Greece": "GR",
+    "Greenland": "GL",
+    "Grenada": "GD",
+    "Guadeloupe": "GP",
+    "Guam": "GU",
+    "Guatemala": "GT",
+    "Guinea": "GN",
+    "Guinea-Bissau": "GW",
+    "Guyana": "GY",
+    "Haiti": "HT",
+    "Virgin Islands, U.S.": "VI",
+    "Honduras": "HN",
+    "Hong Kong": "HK",
+    "Hungary": "HU",
+    "Iceland": "IS",
+    "India": "IN",
+    "Indonesia": "ID",
+    "Wallis and Futuna": "WF",
+    "Iraq": "IQ",
+    "Ireland": "IE",
+    "Israel": "IL",
+    "Italy": "IT",
+    "Jamaica": "JM",
+    "Japan": "JP",
+    "Jordan": "JO",
+    "Kazakhstan": "KZ",
+    "Kenya": "KE",
+    "Kiribati": "KI",
+    "Kuwait": "KW",
+    "Kyrgyzstan": "KG",
+    "Lao People's Democratic Republic": "LA",
+    "Latvia": "LV",
+    "Lebanon": "LB",
+    "Lesotho": "LS",
+    "Liberia": "LR",
+    "Libyan Arab Jamahiriya": "LY",
+    "Liechtenstein": "LI",
+    "Lithuania": "LT",
+    "Luxembourg": "LU",
+    "Montserrat": "MS",
+    "Macedonia, The Former Yugoslav Republic of": "MK",
+    "Madagascar": "MG",
+    "Malawi": "MW",
+    "Malaysia": "MY",
+    "Maldives": "MV",
+    "Mali": "ML",
+    "Malta": "MT",
+    "Marshall Islands": "MH",
+    "Martinique": "MQ",
+    "Mauritania": "MR",
+    "Mauritius": "MU",
+    "Mayotte": "YT",
+    "Mexico": "MX",
+    "Micronesia, Federated States of": "FM",
+    "Morocco": "MA",
+    "Monaco": "MC",
+    "Mongolia": "MN",
+    "Mozambique": "MZ",
+    "Myanmar": "MM",
+    "Namibia": "NA",
+    "Nauru": "NR",
+    "Nepal": "NP",
+    "Netherlands": "NL",
+    "Netherlands Antilles": "AN",
+    "New Caledonia": "NC",
+    "New Zealand": "NZ",
+    "Nicaragua": "NI",
+    "Niger": "NE",
+    "Nigeria": "NG",
+    "Niue": "NU",
+    "Norfolk Island": "NF",
+    "Northern Mariana Islands": "MP",
+    "Norway": "NO",
+    "Oman": "OM",
+    "Pakistan": "PK",
+    "Palau": "PW",
+    "Panama": "PA",
+    "Papua New Guinea": "PG",
+    "Paraguay": "PY",
+    "Peru": "PE",
+    "Philippines": "PH",
+    "Pitcairn": "PN",
+    "Poland": "PL",
+    "Portugal": "PT",
+    "Puerto Rico": "PR",
+    "Qatar": "QA",
+    "Reunion": "RE",
+    "Romania": "RO",
+    "Russian Federation": "RU",
+    "Russia": "RU",
+    "Rwanda": "RW",
+    "Saint Kitts and Nevis": "KN",
+    "Saint Lucia": "LC",
+    "Saint Vincent and The Grenadines": "VC",
+    "Samoa": "WS",
+    "San Marino": "SM",
+    "Sao Tome and Principe": "ST",
+    "Saudi Arabia": "SA",
+    "Senegal": "SN",
+    "Seychelles": "SC",
+    "Sierra Leone": "SL",
+    "Singapore": "SG",
+    "Slovenia": "SI",
+    "Solomon Islands": "SB",
+    "Somalia": "SO",
+    "South Africa": "ZA",
+    "Spain": "ES",
+    "Sri Lanka": "LK",
+    "Sudan": "SD",
+    "Suriname": "SR",
+    "Swaziland": "SZ",
+    "Sweden": "SE",
+    "Switzerland": "CH",
+    "Syrian Arab Republic": "SY",
+    "Tajikistan": "TJ",
+    "Tanzania, United Republic of": "TZ",
+    "Thailand": "TH",
+    "Togo": "TG",
+    "Tokelau": "TK",
+    "Tonga": "TO",
+    "Trinidad and Tobago": "TT",
+    "Tunisia": "TN",
+    "Turkey": "TR",
+    "Turkmenistan": "TM",
+    "Turks and Caicos Islands": "TC",
+    "Tuvalu": "TV",
+    "Uganda": "UG",
+    "Ukraine": "UA",
+    "United Arab Emirates": "AE",
+    "UK": "GB",
+    "US": "US",
+    "United States Minor Outlying Islands": "UM",
+    "Uruguay": "UY",
+    "Uzbekistan": "UZ",
+    "Vanuatu": "VU",
+    "Vatican City State (Holy See)": "VA",
+    "Venezuela": "VE",
+    "Viet Nam": "VN",
+    "Western Sahara": "EH",
+    "Yemen": "YE",
+    "Zambia": "ZM",
+    "Zimbabwe": "ZW",
+    "Taiwan": "TW",
+    "[Worldwide]": "XW",
+    "Europe": "XE",
+    "Soviet Union (historical, 1922-1991)": "SU",
+    "East Germany (historical, 1949-1990)": "XG",
+    "Czechoslovakia (historical, 1918-1992)": "XC",
+    "Congo, The Democratic Republic of the": "CD",
+    "Slovakia": "SK",
+    "Bosnia and Herzegovina": "BA",
+    "Korea (North), Democratic People's Republic of": "KP",
+    "North Korea": "KP",
+    "Korea (South), Republic of": "KR",
+    "South Korea": "KR",
+    "Montenegro": "ME",
+    "South Georgia and the South Sandwich Islands": "GS",
+    "Palestinian Territory": "PS",
+    "Macao": "MO",
+    "Timor-Leste": "TL",
+    "<85>land Islands": "AX",
+    "Guernsey": "GG",
+    "Isle of Man": "IM",
+    "Jersey": "JE",
+    "Serbia": "RS",
+    "Saint Barthélemy": "BL",
+    "Saint Martin": "MF",
+    "Moldova": "MD",
+    "Yugoslavia (historical, 1918-2003)": "YU",
+    "Serbia and Montenegro (historical, 2003-2006)": "CS",
+    "Côte d'Ivoire": "CI",
+    "Heard Island and McDonald Islands": "HM",
+    "Iran, Islamic Republic of": "IR",
+    "Saint Pierre and Miquelon": "PM",
+    "Saint Helena": "SH",
+    "Svalbard and Jan Mayen": "SJ"
+};
