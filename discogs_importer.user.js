@@ -410,9 +410,9 @@ function insertLink(release, current_page_key) {
       display: 'inline-block',
       width: '100%'
     });
-    $('form.musicbrainz_import').css({width: '48%', display:'inline-block'});
-    $('form.musicbrainz_import_search').css({'margin-left': '3%'})
-    $('form.musicbrainz_import > button').css({width: '100%', 'box-sizing': 'padding-box'});
+    $('form.musicbrainz_import').css({width: '49%', display:'inline-block'});
+    $('form.musicbrainz_import_search').css({'float': 'right'})
+    $('form.musicbrainz_import > button').css({width: '100%', 'box-sizing': 'border-box'});
 
     mbUI.slideDown();
 }
