@@ -2,7 +2,7 @@
 // @name           Import Last.fm releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from last.fm into MusicBrainz. PLEASE import releases from more reliable sources if possible.
-// @version        2015.06.15.0
+// @version        2015.06.17.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js
 // @include        /^https?:\/\/(?:www\.)?(?:last\.fm|lastfm\.(?:com\.br|com\.tr|at|com|de|es|fr|it|jp|pl|pt|ru|se))\/music\/[^\/]+/[^+][^\/]+/

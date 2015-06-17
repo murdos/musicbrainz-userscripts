@@ -2,7 +2,7 @@
 // @name           Import Juno Download releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from junodownload.com/products pages into MusicBrainz
-// @version        2015.06.16.0
+// @version        2015.06.17.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @include        http*://www.junodownload.com/products/*
