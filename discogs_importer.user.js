@@ -335,6 +335,11 @@ function insertLink(release, current_page_key) {
     var mbLinked = $('<p><small>MusicBrainz release(s) linked to this page: </small></p>').hide();
     mbContentBlock.prepend(mbLinked);
 
+    if (release.maybe_buggy) {
+      var warning_buggy = $('<p><small><b>Warning</b>: this release has perhaps a buggy tracklist, please check twice the data you import.</small><p').css({'color': 'red', 'margin-top': '4px', 'margin-bottom': '4px'});
+      mbContentBlock.prepend(warning_buggy);
+    }
+
     // Form parameters
     var edit_note = 'Imported from ' + current_page_info.clean_url;
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
@@ -382,6 +387,9 @@ function parseDiscogsRelease(data) {
 
     var release = new Object();
     release.discs = [];
+
+    //buggy tracklist indicator, used to warn user
+    release.maybe_buggy = false;
 
     // Release artist credit
     release.artist_credit = new Array();
@@ -645,6 +653,10 @@ function parseDiscogsRelease(data) {
         // Trackposition is empty e.g. for release title
         if (trackPosition != "" && trackPosition != null) {
             release.discs[releaseNumber-1].tracks.push(track);
+        }
+
+        if (buggyTrackNumber && !release.maybe_buggy) {
+          release.maybe_buggy = true;
         }
     });
 
