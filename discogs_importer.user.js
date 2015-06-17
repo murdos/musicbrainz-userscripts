@@ -42,6 +42,7 @@ var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', '1');
 $(document).ready(function(){
 
     MBImportStyle();
+    MBSearchItStyle();
 
     var current_page_key = getDiscogsLinkKey(window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/'));
     if (!current_page_key) return;
@@ -99,7 +100,7 @@ $(document).ready(function(){
 // Insert MusicBrainz links in a section of the page
 function insertMBLinks($root) {
 
-    function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type) {
+    function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type, nosearch) {
         if (!mb_type) mb_type = defaultMBtype(discogs_type);
         $tr.find('a[mlink^="' + discogs_type + '/"]').each(function() {
             var $link = $(this);
@@ -115,10 +116,41 @@ function insertMBLinks($root) {
             if (link_infos[mlink] && link_infos[mlink].type == discogs_type) {
               var discogs_url = link_infos[mlink].clean_url;
               var cachekey = getCacheKeyFromInfo(mlink, mb_type);
-              var insert_func = function (link) { $link.before(link); }
+              var has_wrapper = $link.closest('span.mb_wrapper').length;
+              if (!has_wrapper) {
+                $link.wrap('<span class="mb_wrapper"><span class="mb_valign"></span></span>');
+              }
+              if (!nosearch) {
+                // add search link for the current link text
+                var entities = {
+                  'artist': { mark: 'A'},
+                  'release': { mark: 'R'},
+                  'release-group': { mark: 'G'},
+                  'place': { mark: 'P'},
+                  'label': { mark: 'L'}
+                }
+                var mark = '';
+                var entity_name = 'entity';
+                if (mb_type in entities) {
+                  mark = entities[mb_type].mark;
+                  entity_name = mb_type.replace(/[_-]/g, ' ');
+                }
+                $link.closest('span.mb_wrapper').prepend('<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this '+ entity_name + ' on MusicBrainz (open in a new tab)" href="' + MBReleaseImportHelper.searchUrlFor(mb_type, $link.text()) + '"><small>'+mark+'</small>?</a></span>');
+              }
+              var insert_normal = function (link) {
+                $link.closest('span.mb_valign').before('<span class="mb_valign">'+link+'</span>');
+                $link.closest('span.mb_wrapper').find('.mb_searchit').remove();
+              };
+
+              var insert_stop = function (link) {
+                insert_normal(link);
+                $link.attr('mlink_stop', true);
+              };
+
+              var insert_func = insert_normal;
               if (mb_type == 'place') {
                 // if a place link was added we stop, we don't want further queries for this 'label'
-                insert_func = function (link) { $link.before(link); $link.attr('mlink_stop', true); }
+                insert_func = insert_stop;
               }
               mblinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
             }
@@ -158,7 +190,7 @@ function insertMBLinks($root) {
     }
 
     var add_mblinks_counter = 0;
-    function add_mblinks(_root, selector, types) {
+    function add_mblinks(_root, selector, types, nosearch) {
       // types can be:
       // 'discogs type 1'
       // ['discogs_type 1', 'discogs_type 2']
@@ -186,7 +218,7 @@ function insertMBLinks($root) {
           $.each(types, function (idx, val) {
             var discogs_type = val[0];
             var mb_type = val[1];
-            searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type);
+            searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type, nosearch);
           });
       });
     }
@@ -199,7 +231,7 @@ function insertMBLinks($root) {
     add_mblinks($root, 'div#tracklist', 'artist');
     add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
     add_mblinks($root, 'div#credits', ['label', 'artist']);
-    add_mblinks($root, 'div#page_aside div.section_content:first', 'master');
+    add_mblinks($root, 'div#page_aside div.section_content:first', 'master', true);
 }
 
 
