@@ -178,7 +178,7 @@ var BandcampImport = {
       return false;
     }
     // Form parameters
-    var edit_note = 'Imported from ' + release.url;
+    var edit_note = MBReleaseImportHelper.makeEditNote(release.url, 'Bandcamp');
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
     // Build form
     var mbUI = $('<div id="mb_buttons">'

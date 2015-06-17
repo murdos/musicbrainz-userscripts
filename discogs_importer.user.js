@@ -384,7 +384,7 @@ function insertLink(release, current_page_key) {
     }
 
     // Form parameters
-    var edit_note = 'Imported from ' + current_page_info.clean_url;
+    var edit_note = MBReleaseImportHelper.makeEditNote(current_page_info.clean_url, 'Discogs');
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form + search button

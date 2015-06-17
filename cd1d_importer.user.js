@@ -240,7 +240,7 @@ var CD1DImporter = {
     // Insert links in page
 
     // Form parameters
-    var edit_note = 'Imported from ' + this.currentURL() + ' (' + formatname + ')';
+    var edit_note = MBReleaseImportHelper.makeEditNote(this.currentURL(), 'CD1D', formatname);
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form

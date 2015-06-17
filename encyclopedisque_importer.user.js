@@ -35,7 +35,7 @@ $(document).ready(function() {
 function setupImportUI(release) {
 
     // Form parameters
-    var edit_note = 'Imported from ' + window.location.href;
+    var edit_note = MBReleaseImportHelper.makeEditNote(window.location.href, 'Encyclopedisque');
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     // Build form

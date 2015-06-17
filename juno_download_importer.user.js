@@ -130,7 +130,7 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = 'Imported from ' + release_url;
+    var edit_note = MBReleaseImportHelper.makeEditNote(release_url, 'Juno Download');
     var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
 
     var mbUI = $('<div id="mb_buttons">'
