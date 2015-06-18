@@ -52,10 +52,10 @@ $(document).ready(function(){
     // it should be possible to react to pjax events
     $("div#pjax_container").attr('id', 'pjax_disabled');
 
-    // Display links of equivalent MusicBrainz entities for masters and releases
+    // Display links of equivalent MusicBrainz entities
     insertMBLinks(current_page_key);
 
-    // Add an import button in a new section in sidebar, if we're on a release page?
+    // Add an import button in a new section in sidebar, if we're on a release page
     var current_page_info = link_infos[current_page_key];
     if (current_page_info.type == 'release') {
 
@@ -94,7 +94,7 @@ $(document).ready(function(){
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                 Display links of equivalent MusicBrainz entities for masters and releases                          //
+//                              Display links of equivalent MusicBrainz entities                                      //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Insert MusicBrainz links in a section of the page
