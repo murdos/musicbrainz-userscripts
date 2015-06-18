@@ -70,7 +70,7 @@ $(document).ready(function(){
                 LOGGER.debug("Discogs JSON Data from API:", data);
                 try {
                   var release = parseDiscogsRelease(data);
-                  insertLink(release, current_page_key);
+                  insertMBSection(release, current_page_key);
                 } catch (e) {
                   $('div.musicbrainz').remove();
                   var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
@@ -378,7 +378,7 @@ function insertMbUI(mbUI) {
 }
 
 // Insert links in Discogs page
-function insertLink(release, current_page_key) {
+function insertMBSection(release, current_page_key) {
     var current_page_info = link_infos[current_page_key];
 
     var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
