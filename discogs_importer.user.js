@@ -53,7 +53,7 @@ $(document).ready(function(){
     $("div#pjax_container").attr('id', 'pjax_disabled');
 
     // Display links of equivalent MusicBrainz entities for masters and releases
-    insertMBLinks();
+    insertMBLinks(current_page_key);
 
     // Add an import button in a new section in sidebar, if we're on a release page?
     var current_page_info = link_infos[current_page_key];
@@ -98,7 +98,7 @@ $(document).ready(function(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Insert MusicBrainz links in a section of the page
-function insertMBLinks($root) {
+function insertMBLinks(current_page_key) {
 
     function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type, nosearch) {
         if (!mb_type) mb_type = defaultMBtype(discogs_type);
@@ -155,10 +155,6 @@ function insertMBLinks($root) {
               mblinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
             }
         });
-    }
-
-    if (!$root) {
-        $root = $('body');
     }
 
     function debug_color(what, n, id) {
@@ -223,6 +219,22 @@ function insertMBLinks($root) {
       });
     }
 
+    // Find MB link for the current page and display it next to page title
+    var mbLinkInsert = function (link) {
+      var $h1 = $('h1');
+      var $titleSpan = $h1.children('span[itemprop="name"]');
+      if ($titleSpan.length > 0) {
+        $titleSpan.before(link);
+      } else {
+        $h1.prepend(link);
+      }
+    }
+    var current_page_info = link_infos[current_page_key];
+    var mb_type = defaultMBtype(current_page_info.type);
+    var cachekey = getCacheKeyFromInfo(current_page_key, mb_type);
+    mblinks.searchAndDisplayMbLink(current_page_info.clean_url, mb_type, mbLinkInsert, cachekey);
+
+    var $root = $('body');
     add_mblinks($root, 'div.profile', ['artist', 'label']);
     add_mblinks($root, 'tr[data-object-type="release"] td.artist,td.title', 'artist');
     add_mblinks($root, 'tr[data-object-type="release"] td.title', 'release');
@@ -232,6 +244,7 @@ function insertMBLinks($root) {
     add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
     add_mblinks($root, 'div#credits', ['label', 'artist']);
     add_mblinks($root, 'div#page_aside div.section_content:first', 'master', true);
+
 }
 
 
@@ -375,9 +388,6 @@ function insertLink(release, current_page_key) {
     var mbContentBlock = $('<div class="section_content"></div>');
     mbUI.append(mbContentBlock);
 
-    var mbLinked = $('<p><small>MusicBrainz release(s) linked to this page: </small></p>').hide();
-    mbContentBlock.prepend(mbLinked);
-
     if (release.maybe_buggy) {
       var warning_buggy = $('<p><small><b>Warning</b>: this release has perhaps a buggy tracklist, please check twice the data you import.</small><p').css({'color': 'red', 'margin-top': '4px', 'margin-bottom': '4px'});
       mbContentBlock.prepend(warning_buggy);
@@ -395,16 +405,6 @@ function insertLink(release, current_page_key) {
     mbContentBlock.append(innerHTML);
 
     insertMbUI(mbUI);
-
-    // Find MB release(s) linked to this Discogs release
-    var mbLinkInsert = function (link) {
-      var sel = "div.section.musicbrainz div.section_content p";
-      $(sel).append(link);
-      $(sel).find('img').css({'vertical-align': 'text-top'});
-      mbLinked.show();
-    }
-    var cachekey = getCacheKeyFromInfo(current_page_key, 'release');
-    mblinks.searchAndDisplayMbLink(current_page_info.clean_url, 'release', mbLinkInsert, cachekey);
 
     $('#mb_buttons').css({
       display: 'inline-block',
