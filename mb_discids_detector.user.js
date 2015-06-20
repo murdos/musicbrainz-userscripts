@@ -218,6 +218,10 @@ function check_and_display_discs(artistName, releaseName, discs, displayDiscHand
 
 /* -------------------------------------------- */
 
+// MBDiscid code comes from https://gist.github.com/kolen/766668
+// Copyright 2010, kolen
+// Released under the MIT License
+
 var MBDiscid = (function () {
 
     this.SECTORS_PER_SECOND = 75;
