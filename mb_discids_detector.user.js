@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version	       2015.06.10.0
+// @version        2015.06.10.0
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -165,7 +165,7 @@
     var analyze_log_files = function (log_files) {
         var discs = [];
         $.each(log_files, function (i, log_file) {
-            var discsInLog = log_input_to_entries($(log_file).text());
+            var discsInLog = MBDiscid.log_input_to_entries($(log_file).text());
             for (var i = 0; i < discsInLog.length; i++) {
                 discs.push(discsInLog[i]);
             }
@@ -175,7 +175,7 @@
         var keys = new Object();
         var uniqueDiscs = new Array();
         for (var i = 0; i < discs.length; i++) {
-            var discid = calculate_mb_discid(discs[i]);
+            var discid = MBDiscid.calculate_mb_discid(discs[i]);
             if (discid in keys) {
                 continue;
             } else {
@@ -195,8 +195,8 @@
             var discNumber = i + 1;
             if (entries.length > 0) {
 
-                var mb_toc_numbers = calculate_mb_toc_numbers(entries);
-                var discid = calculate_mb_discid(entries);
+                var mb_toc_numbers = MBDiscid.calculate_mb_toc_numbers(entries);
+                var discid = MBDiscid.calculate_mb_discid(entries);
                 LOGGER.info("Computed discid :" + discid);
                 displayDiscHandler(mb_toc_numbers, discid, discNumber);
 
@@ -219,156 +219,157 @@
 
     /* -------------------------------------------- */
 
-    var SECTORS_PER_SECOND = 75
-    var PREGAP = 150
-    var DATA_TRACK_GAP = 11400
+    var MBDiscid = (function () {
 
-    var toc_entry_matcher = new RegExp(
-        "^\\s*" +
-        "(\\d+)" +  // 1 - track number
-        "\\s*\\|\\s*" +
-        "([0-9:.]+)" + // 2 - time start
-        "\\s*\\|\\s*" +
-        "([0-9:.]+)" + // 3 - time length
-        "\\s*\\|\\s*" +
-        "(\\d+)" + // 4 - start sector
-        "\\s*\\|\\s*" +
-        "(\\d+)" + // 5 - end sector
-        "\\s*$"
-    )
-    var log_input_to_entries = function (text) {
-        var discs = [];
-        var entries = [];
-        $.each(text.split("\n"), function (index, value) {
-            var m = toc_entry_matcher.exec(value);
-            if (m) {
-                // New disc
-                if (parseInt(m[1], 10) == 1) {
-                    if (entries.length > 0) {
-                        discs.push(entries);
+        this.SECTORS_PER_SECOND = 75;
+        this.PREGAP = 150;
+        this.DATA_TRACK_GAP = 11400;
+
+        this.toc_entry_matcher = new RegExp(
+            "^\\s*" +
+            "(\\d+)" +  // 1 - track number
+            "\\s*\\|\\s*" +
+            "([0-9:.]+)" + // 2 - time start
+            "\\s*\\|\\s*" +
+            "([0-9:.]+)" + // 3 - time length
+            "\\s*\\|\\s*" +
+            "(\\d+)" + // 4 - start sector
+            "\\s*\\|\\s*" +
+            "(\\d+)" + // 5 - end sector
+            "\\s*$"
+        );
+        this.log_input_to_entries = function (text) {
+            var discs = [];
+            var entries = [];
+            $.each(text.split("\n"), function (index, value) {
+                var m = toc_entry_matcher.exec(value);
+                if (m) {
+                    // New disc
+                    if (parseInt(m[1], 10) == 1) {
+                        if (entries.length > 0) {
+                            discs.push(entries);
+                        }
+                        entries = [];
                     }
-                    entries = [];
+                    entries.push(m);
                 }
-                entries.push(m);
+            });
+            if (entries.length > 0) {
+                discs.push(entries);
             }
-        });
-        if (entries.length > 0) {
-            discs.push(entries);
-        }
 
-        for (var i = 0; i < discs.length; i++) {
-            var entries = discs[i];
-            var layout_type = get_layout_type(entries);
-            var entries_audio;
-            if (layout_type == "with_data") {
-                entries_audio = entries.slice(0, entries.length - 1);
-            } else {
-                entries_audio = entries;
-            }
-            discs[i] = entries_audio;
-        }
-        return discs;
-    }
-
-    var get_layout_type = function (entries) {
-        var type = "standard";
-        for (var i = 0; i < entries.length - 1; i++) {
-            var gap = parseInt(entries[i + 1][4], 10) - parseInt(entries[i][5], 10) - 1;
-            if (gap != 0) {
-                if (i == entries.length - 2 && gap == DATA_TRACK_GAP) {
-                    type = "with_data";
+            for (var i = 0; i < discs.length; i++) {
+                var entries = discs[i];
+                var layout_type = get_layout_type(entries);
+                var entries_audio;
+                if (layout_type == "with_data") {
+                    entries_audio = entries.slice(0, entries.length - 1);
                 } else {
-                    type = "unknown";
-                    break;
+                    entries_audio = entries;
+                }
+                discs[i] = entries_audio;
+            }
+            return discs;
+        };
+
+        this.get_layout_type = function (entries) {
+            var type = "standard";
+            for (var i = 0; i < entries.length - 1; i++) {
+                var gap = parseInt(entries[i + 1][4], 10) - parseInt(entries[i][5], 10) - 1;
+                if (gap != 0) {
+                    if (i == entries.length - 2 && gap == DATA_TRACK_GAP) {
+                        type = "with_data";
+                    } else {
+                        type = "unknown";
+                        break;
+                    }
                 }
             }
-        }
-        return type;
-    }
+            return type;
+        };
 
-    var calculate_mb_toc_numbers = function (entries) {
-        if (entries.length == 0) {
-            return null;
-        }
-
-        var leadout_offset = parseInt(entries[entries.length - 1][5], 10) + PREGAP + 1;
-
-        var offsets = $.map(entries, function (entry) {
-            return parseInt(entry[4], 10) + PREGAP;
-        })
-        return [1, entries.length, leadout_offset].concat(offsets);
-    }
-
-    var calculate_cddb_id = function (entries) {
-        var sum_of_digits = function (n) {
-            var sum = 0;
-            while (n > 0) {
-                sum = sum + (n % 10);
-                n = Math.floor(n / 10);
-            }
-            return sum;
-        }
-
-        var decimalToHexString = function (number) {
-            if (number < 0) {
-                number = 0xFFFFFFFF + number + 1;
+        this.calculate_mb_toc_numbers = function (entries) {
+            if (entries.length == 0) {
+                return null;
             }
 
-            return number.toString(16).toUpperCase();
-        }
+            var leadout_offset = parseInt(entries[entries.length - 1][5], 10) + PREGAP + 1;
 
-        var length_seconds = Math.floor((parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1)
-        / SECTORS_PER_SECOND);
-        var checksum = 0;
-        $.each(entries, function (index, entry) {
-            checksum += sum_of_digits(Math.floor((parseInt(entry[4], 10) + PREGAP) / SECTORS_PER_SECOND));
-        })
+            var offsets = $.map(entries, function (entry) {
+                return parseInt(entry[4], 10) + PREGAP;
+            })
+            return [1, entries.length, leadout_offset].concat(offsets);
+        };
 
-        var xx = checksum % 255;
-        var discid_num = (xx << 24) | (length_seconds << 8) | entries.length;
-        //return discid_num
-        return decimalToHexString(discid_num);
-    }
-
-    var calculate_mb_discid = function (entries) {
-
-        var mb_toc_numbers = calculate_mb_toc_numbers(entries);
-        var message = "";
-        var first_track = mb_toc_numbers[0];
-        var last_track = mb_toc_numbers[1];
-        var leadout_offset = mb_toc_numbers[2];
-        message = message + hex_left_pad(first_track, 2);
-        message = message + hex_left_pad(last_track, 2);
-        message = message + hex_left_pad(leadout_offset, 8);
-        for (var i = 0; i < 99; i++) {
-            var offset = (i + 3 < mb_toc_numbers.length) ? mb_toc_numbers[i + 3] : 0;
-            message = message + hex_left_pad(offset, 8);
-        }
-
-        b64pad = "=";
-        var discid = b64_sha1(message);
-        discid = discid.replace(/\+/g, ".").replace(/\//g, "_").replace(/=/g, "-");
-        return discid;
-    }
-
-    var hex_left_pad = function (input, totalChars) {
-
-        input = '' + parseInt(input, 10).toString(16).toUpperCase();
-        var padWith = "0";
-        if (input.length < totalChars) {
-            while (input.length < totalChars) {
-                input = padWith + input;
+        this.calculate_cddb_id = function (entries) {
+            var sum_of_digits = function (n) {
+                var sum = 0;
+                while (n > 0) {
+                    sum = sum + (n % 10);
+                    n = Math.floor(n / 10);
+                }
+                return sum;
             }
-        } else {
-        }
 
-        if (input.length > totalChars) { //if padWith was a multiple character string and num was overpadded
-            input = input.substring((input.length - totalChars), totalChars);
-        } else {
-        }
+            var decimalToHexString = function (number) {
+                if (number < 0) {
+                    number = 0xFFFFFFFF + number + 1;
+                }
 
-        return input;
+                return number.toString(16).toUpperCase();
+            }
 
-    }
+            var length_seconds = Math.floor((parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1) / SECTORS_PER_SECOND);
+            var checksum = 0;
+            $.each(entries, function (index, entry) {
+                checksum += sum_of_digits(Math.floor((parseInt(entry[4], 10) + PREGAP) / SECTORS_PER_SECOND));
+            })
+
+            var xx = checksum % 255;
+            var discid_num = (xx << 24) | (length_seconds << 8) | entries.length;
+            //return discid_num
+            return decimalToHexString(discid_num);
+        };
+
+        this.calculate_mb_discid = function (entries) {
+
+            var hex_left_pad = function (input, totalChars) {
+                input = '' + parseInt(input, 10).toString(16).toUpperCase();
+                var padWith = "0";
+                if (input.length < totalChars) {
+                    while (input.length < totalChars) {
+                        input = padWith + input;
+                    }
+                } else {
+                }
+                if (input.length > totalChars) { //if padWith was a multiple character string and num was overpadded
+                    input = input.substring((input.length - totalChars), totalChars);
+                } else {
+                }
+
+                return input;
+            };
+
+            var mb_toc_numbers = calculate_mb_toc_numbers(entries);
+            var message = "";
+            var first_track = mb_toc_numbers[0];
+            var last_track = mb_toc_numbers[1];
+            var leadout_offset = mb_toc_numbers[2];
+            message = message + hex_left_pad(first_track, 2);
+            message = message + hex_left_pad(last_track, 2);
+            message = message + hex_left_pad(leadout_offset, 8);
+            for (var i = 0; i < 99; i++) {
+                var offset = (i + 3 < mb_toc_numbers.length) ? mb_toc_numbers[i + 3] : 0;
+                message = message + hex_left_pad(offset, 8);
+            }
+
+            b64pad = "=";
+            var discid = b64_sha1(message);
+            discid = discid.replace(/\+/g, ".").replace(/\//g, "_").replace(/=/g, "-");
+            return discid;
+        };
+
+        return this;
+    })();
 
 })();
