@@ -12,6 +12,7 @@
 // @include        http*://mutracker.org/torrents.php?id=*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require        http://pajhome.org.uk/crypt/md5/sha1.js
+// @require        lib/logger.js
 // ==/UserScript==
 
 (function () {
@@ -116,9 +117,9 @@ function gazellePageHandler() {
                 // Get log content
 			    $.get(url,
 				    function(data) {
-				        mylog($(data).find('pre'));
+				        LOGGER.debug("Log content", $(data).find('pre'));
                         var discs = analyze_log_files( $(data).find('pre') );
-                        mylog(discs.length);
+                        LOGGER.debug("Number of disc found", discs.length);
                         check_and_display_discs(artistName, releaseName, discs,
                             function(mb_toc_numbers, discid, discNumber) {
                                 blockquote.append('<br /><strong>' + (discs.length > 1 ? 'Disc '+discNumber+': ' : '' ) + 'MB DiscId: </strong><span id="' + torrentId + '_disc' + discNumber +'" />');
@@ -165,7 +166,6 @@ var analyze_log_files = function(log_files) {
 	var uniqueDiscs = new Array();
 	for (var i = 0; i < discs.length ; i++) {
 		var discid = calculate_mb_discid(discs[i]);
-		mylog(discid);
 		if (discid in keys) {
 			continue;
 		} else {
@@ -187,7 +187,7 @@ var check_and_display_discs = function(artistName, releaseName, discs, displayDi
 
 	        var mb_toc_numbers = calculate_mb_toc_numbers(entries);
             var discid = calculate_mb_discid(entries);
-            mylog(discid);
+            LOGGER.info("Computed discid :" + discid);
             displayDiscHandler(mb_toc_numbers, discid, discNumber);
 
             // Now check if this discid is known by MusicBrainz
@@ -205,13 +205,6 @@ var check_and_display_discs = function(artistName, releaseName, discs, displayDi
         }
      }
 
-}
-
-function mylog(text) {
-    var DEBUG = true;
-    if (DEBUG && unsafeWindow.console) {
-        unsafeWindow.console.log(text);
-    }
 }
 
 /* -------------------------------------------- */
