@@ -12,7 +12,6 @@
 // @include        http*://mutracker.org/torrents.php?id=*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require        http://pajhome.org.uk/crypt/md5/sha1.js
-// @grant          GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
@@ -195,19 +194,11 @@ var check_and_display_discs = function(artistName, releaseName, discs, displayDi
 
             // Now check if this discid is known by MusicBrainz
             (function(discid, discNumber, mb_toc_numbers) {
-                GM_xmlhttpRequest({
-                    method: 'GET',
-                    url: 'http://musicbrainz.org/ws/2/discid/'+discid+'?cdstubs=no',
-                    headers: {
-                        'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
-                        'Accept': 'application/atom+xml,application/xml,text/xml',
-                    },
-                    onload: function(responseDetails) {
-
+                $.get('//musicbrainz.org/ws/2/discid/'+discid+'?cdstubs=no',
+                    function(responseDetails) {
                         displayResultHandler(mb_toc_numbers, discid, discNumber, responseDetails.responseText != EMPTY_WS_RESPONSE);
-
                     }
-                });
+                );
             })(discid, discNumber, mb_toc_numbers);
         }
      }
