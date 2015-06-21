@@ -421,6 +421,14 @@ function insertMBSection(release, current_page_key) {
 //                                               Parsing of Discogs data                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function cleanup_discogs_artist_credit(obj) {
+      // Fix some odd Discogs release (e.g. http://api.discogs.com/releases/1566223) that have a ',' join phrase after the last artist
+      // Discogs set a join phrase even there's only one artist or when extraartists is set (ie. remix)
+      var last = obj.artist_credit.length-1;
+      if (last == 0 || obj.artist_credit[last].joinphrase == ", ") {
+          obj.artist_credit[last].joinphrase = "";
+      }
+}
 
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
@@ -444,6 +452,7 @@ function parseDiscogsRelease(data) {
         };
         release.artist_credit.push(ac);
     });
+    cleanup_discogs_artist_credit(release);
 
     // ReleaseGroup
     if (discogsRelease.master_url) {
@@ -580,10 +589,7 @@ function parseDiscogsRelease(data) {
                 };
                 track.artist_credit.push(ac);
             });
-            // Fix some odd Discogs release (e.g. http://api.discogs.com/releases/1566223) that have a ',' join phrase after the last artist
-            if (track.artist_credit[track.artist_credit.length-1].joinphrase == ", ") {
-                track.artist_credit[track.artist_credit.length-1].joinphrase = "";
-            }
+            cleanup_discogs_artist_credit(track);
         }
 
         // Track position and release number
