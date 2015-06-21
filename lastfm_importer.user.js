@@ -108,10 +108,20 @@ function insertLink(release, release_url) {
     var edit_note = MBImport.makeEditNote(release_url, 'Last.fm');
     var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBImport.buildFormHTML(parameters);
+    $("div.g4").prepend(
+        $('<div id="mb_buttons">'
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
+        + '</div>').hide()
+    );
+    $('#mb_buttons').css({
+      'margin-bottom': '5px',
+      'padding': '2%',
+      'background-color': '#444'
+    });
+    $('form.musicbrainz_import').css({width: '48%', display:'inline-block'});
+    $('form.musicbrainz_import_search').css({'float': 'right'})
+    $('form.musicbrainz_import > button').css({width: '100%', 'box-sizing': 'border-box'});
 
-    var mbUI = $('<div id="musicbrainz-import">' + innerHTML + '</div>').hide();
-    mbUI.css({'margin-bottom': '6px', 'padding': '2px', 'background-color': '#444', 'text-align': 'center'});
-    $("div.g4").prepend(mbUI);
-    $('#musicbrainz-import').slideDown();
+    $('#mb_buttons').slideDown();
 }
