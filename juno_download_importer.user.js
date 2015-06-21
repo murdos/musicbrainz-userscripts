@@ -115,10 +115,10 @@ function retrieveReleaseInfo(release_url) {
 
   var parsed_release_artist = $("#product_heading_artist").text().trim();
   if (parsed_release_artist == 'VARIOUS') {
-    parsed_release_artist = 'Various Artists';
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits([ parsed_release_artist ]);
   }
-  var release_artists = [ parsed_release_artist ];
-  release.artist_credit = MBImport.makeArtistCredits(release_artists);
   release.discs.push( {
     'tracks': tracks,
     'format': release.format

@@ -29,13 +29,10 @@ $(document).ready(function(){
 
 function retrieveReleaseInfo(release_url) {
 
-  // Release artist
-  var artist = $("article span[itemprop='byArtist'] meta[itemprop='name']").attr('content').trim();
-  var various_artists = (artist == 'Various Artists');
 
   // Release defaults
   var release = {
-    artist_credit: MBImport.makeArtistCredits([artist]),
+    artist_credit: '',
     title: $("h1[itemprop='name']").text().trim(),
     year: 0,
     month: 0,
@@ -51,6 +48,15 @@ function retrieveReleaseInfo(release_url) {
     labels: [],
     discs: [],
   };
+
+  // Release artist
+  var artist = $("article span[itemprop='byArtist'] meta[itemprop='name']").attr('content').trim();
+  var various_artists = (artist == 'Various Artists');
+  if (various_artists) {
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits([artist]);
+  }
 
   // Tracks
   var tracks = [];
@@ -75,17 +81,17 @@ function retrieveReleaseInfo(release_url) {
         track_artists.push($(this).text().trim());
       }
     );
-    if (track_artists) {
-      artists = track_artists;
-    }
-    if (!artists.length && various_artists) {
-      artists = ['[unknown]'];
-    }
-    tracks.push({
-        'artist_credit': MBImport.makeArtistCredits(artists),
+    var ac = {
+        'artist_credit': '',
         'title': trackname,
         'duration': tracklength
-      });
+    };
+    if (!track_artists.length && various_artists) {
+      ac.artist_credit = [ MBImport.specialArtist('unknown') ];
+    } else {
+      ac.artist_credit = MBImport.makeArtistCredits(track_artists);
+    }
+    tracks.push(ac);
   });
 
   release.discs.push( {
