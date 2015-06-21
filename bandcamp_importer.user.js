@@ -47,10 +47,6 @@ var BandcampImport = {
       url: bandcampAlbumData.url
     };
 
-    // Release artist credit
-    release.artist_credit = [{
-      artist_name: bandcampAlbumData.artist
-    }];
 
     // Grab release title
     release.title = bandcampAlbumData.current.title;
@@ -87,11 +83,40 @@ var BandcampImport = {
       format: release.format
     };
     release.discs.push(disc);
+
+    // attempt to detect multiple artists tracks
+    // bandcamp formats them as 'artist - tracktitle'
+    // only set to true if ALL tracks are formatted like this
+    var various_artists = true;
+    for (var i=0; i < bandcampAlbumData.trackinfo.length; i++) {
+      if (!bandcampAlbumData.trackinfo[i].title.match(/ - /)) {
+        various_artists = false;
+        break;
+      }
+    }
+
+    // Release artist credit
+    if (bandcampAlbumData.artist.match(/^various(?: artists)?$/i)
+        && various_artists) {
+        release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+    } else {
+        release.artist_credit = MBImport.makeArtistCredits([bandcampAlbumData.artist]);
+    };
+
     $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
+      var title = bctrack.title;
+      var artist = [];
+      if (various_artists) {
+        var m = bctrack.title.match(/^(.+) - (.+)$/);
+        if (m) {
+          title = m[2];
+          artist = [m[1]];
+        }
+      }
       var track = {
-        'title': bctrack.title,
+        'title': title,
         'duration': Math.round(bctrack.duration * 1000),
-        'artist_credit': []
+        'artist_credit': MBImport.makeArtistCredits(artist)
       };
       disc.tracks.push(track);
     });
