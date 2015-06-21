@@ -98,7 +98,7 @@ var BandcampImport = {
     // Release artist credit
     if (bandcampAlbumData.artist.match(/^various(?: artists)?$/i)
         && various_artists) {
-        release.artist_credit = MBImport.makeArtistCredits(['Various Artists']);
+        release.artist_credit = [ MBImport.specialArtist('various_artists') ];
     } else {
         release.artist_credit = MBImport.makeArtistCredits([bandcampAlbumData.artist]);
     };
