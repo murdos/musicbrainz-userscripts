@@ -641,35 +641,44 @@ function parseDiscogsRelease(data) {
             trackPosition = "";
         }
 
-        var tmp = trackPosition.match(/(\d+)(?:[\.-](\d+))?/);
+        // Possible track position:
+        // A1 or A    => Vinyl or Cassette : guess releaseNumber from vinyl side
+        // 1-1 or 1.1 => releaseNumber.trackNumber
+        // 1          => trackNumber
+        var tmp = trackPosition.match(/(\d+|[A-Za-z])(?:[\.-](\d+))?/);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
             var trackNumber = 1;
             var buggyTrackNumber = false;
             var prevReleaseNumber = releaseNumber;
 
-            if (tmp[2]) { // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
-                releaseNumber = tmp[1];
-                trackNumber = parseInt(tmp[2], 10);
-            } else if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
-                var code = trackPosition.charCodeAt(0);
-                // A-Z
-                if (65 <= code && code <= 90) {
-                    code = code - 65;
-                } else if (97 <= code && code <= 122) {
-                // a-z
-                    code = code - (65 + 32);
-                }
-                releaseNumber = (code-code%2)/2+1;
-            } else if (trackPosition.match(/^[A-Za-z]+\d*$/)) { // Vinyl or cassette, handle it specially
-                // something like AA1, exemple : http://www.discogs.com/release/73531
-                // TODO: find a better fix
-                buggyTrackNumber = true;
-            } else if (tmp[1] <= lastPosition) { // 1, 2, 3, ... - We've moved onto a new medium
-                releaseNumber++;
-                trackNumber = tmp[1];
+            if (Number.isInteger(tmp[1])) {
+              if (tmp[2]) { // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
+                  releaseNumber = tmp[1];
+                  trackNumber = parseInt(tmp[2], 10);
+              }  else if (tmp[1] <= lastPosition) { // 1, 2, 3, ... - We've moved onto a new medium
+                  releaseNumber++;
+                  trackNumber = tmp[1];
+              } else {
+                  trackNumber = tmp[1];
+              }
             } else {
-                trackNumber = tmp[1];
+              if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
+                  var code = trackPosition.charCodeAt(0);
+                  // A-Z
+                  if (65 <= code && code <= 90) {
+                      code = code - 65;
+                  } else if (97 <= code && code <= 122) {
+                  // a-z
+                      code = code - (65 + 32);
+                  }
+                  releaseNumber = (code-code%2)/2+1;
+                  lastPosition++;
+              } else if (trackPosition.match(/^[A-Za-z]+\d*$/)) { // Vinyl or cassette, handle it specially
+                  // something like AA1, exemple : http://www.discogs.com/release/73531
+                  // TODO: find a better fix
+                  buggyTrackNumber = true;
+              }
             }
 
             if (releaseNumber > release_formats.length) {
