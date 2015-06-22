@@ -663,13 +663,10 @@ function parseDiscogsRelease(data) {
               }
             } else {
               if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
-                  var code = trackPosition.charCodeAt(0);
+                  var code = trackPosition.toUpperCase().charCodeAt(0);
                   // A-Z
                   if (65 <= code && code <= 90) {
                       code = code - 65;
-                  } else if (97 <= code && code <= 122) {
-                  // a-z
-                      code = code - (65 + 32);
                   }
                   releaseNumber = (code-code%2)/2+1;
                   lastPosition++;
