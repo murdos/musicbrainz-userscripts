@@ -663,12 +663,8 @@ function parseDiscogsRelease(data) {
               }
             } else {
               if (trackPosition.match(/^[A-Z]\d*$/i)) { // Vinyl or cassette, handle it specially
-                  var code = trackPosition.toUpperCase().charCodeAt(0);
-                  // A-Z
-                  if (65 <= code && code <= 90) {
-                      code = code - 65;
-                  }
-                  releaseNumber = (code-code%2)/2+1;
+                  // A,B -> 1; C,D -> 2; E,F -> 3, etc...
+                  releaseNumber = ((32|trackPosition.charCodeAt(0))-97>>1)+1;
                   lastPosition++;
               } else if (trackPosition.match(/^[A-Z]+\d*$/i)) { // Vinyl or cassette, handle it specially
                   // something like AA1, exemple : http://www.discogs.com/release/73531
