@@ -637,7 +637,7 @@ function parseDiscogsRelease(data) {
         }
 
         // Skip special tracks
-        if (trackPosition.toLowerCase().match("^(video|mp3)")) {
+        if (trackPosition.match(/^(?:video|mp3)/i)) {
             trackPosition = "";
         }
 
@@ -645,7 +645,7 @@ function parseDiscogsRelease(data) {
         // A1 or A    => Vinyl or Cassette : guess releaseNumber from vinyl side
         // 1-1 or 1.1 => releaseNumber.trackNumber
         // 1          => trackNumber
-        var tmp = trackPosition.match(/(\d+|[A-Za-z])(?:[\.-](\d+))?/);
+        var tmp = trackPosition.match(/(\d+|[A-Z])(?:[\.-](\d+))?/i);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
             var buggyTrackNumber = false;
@@ -662,7 +662,7 @@ function parseDiscogsRelease(data) {
                   lastPosition = tmp[1];
               }
             } else {
-              if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
+              if (trackPosition.match(/^[A-Z]\d*$/i)) { // Vinyl or cassette, handle it specially
                   var code = trackPosition.toUpperCase().charCodeAt(0);
                   // A-Z
                   if (65 <= code && code <= 90) {
@@ -670,7 +670,7 @@ function parseDiscogsRelease(data) {
                   }
                   releaseNumber = (code-code%2)/2+1;
                   lastPosition++;
-              } else if (trackPosition.match(/^[A-Za-z]+\d*$/)) { // Vinyl or cassette, handle it specially
+              } else if (trackPosition.match(/^[A-Z]+\d*$/i)) { // Vinyl or cassette, handle it specially
                   // something like AA1, exemple : http://www.discogs.com/release/73531
                   // TODO: find a better fix
                   buggyTrackNumber = true;
@@ -701,7 +701,7 @@ function parseDiscogsRelease(data) {
 
         // Track number (only for Vinyl and Cassette)
         if (buggyTrackNumber || (release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
-            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/))) {
+            && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/i))) {
             track.number = discogsTrack.position;
         }
 
