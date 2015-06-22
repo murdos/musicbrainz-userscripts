@@ -511,20 +511,23 @@ function parseDiscogsRelease(data) {
     if (discogsRelease.formats.length > 0) {
         for (var i = 0; i < discogsRelease.formats.length; i++) {
 
-            for (var j = 0; j < discogsRelease.formats[i].qty; j++) {
-                if (discogsRelease.formats[i].name in MediaTypes) {
-                    release_formats.push(MediaTypes[discogsRelease.formats[i].name]);
-                }
+            // Release format
+            var discogs_format = discogsRelease.formats[i].name;
+            var mb_format = undefined;
+            if (discogs_format in MediaTypes) {
+                mb_format = MediaTypes[discogs_format];
             }
 
             if (discogsRelease.formats[i].descriptions) {
                 $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
-                    // Release format: special handling of vinyl 7", 10" and 12" and other more specific CD/DVD formats
-                    if (desc.match(/7"|10"|12"|^VCD|SVCD|CD\+G|HDCD|DVD-Audio|DVD-Video/)) release_formats[release_formats.length-1] = MediaTypes[desc];
+                    if (!(discogs_format in ['Box Set'])) {
+                        // Release format: special handling of vinyl 7", 10" and 12" and other more specific CD/DVD formats
+                        if (desc.match(/7"|10"|12"|^VCD|SVCD|CD\+G|HDCD|DVD-Audio|DVD-Video/) && (desc in MediaTypes)) mb_format = MediaTypes[desc];
+                    }
                     // Release format: special handling of Vinyl, LP == 12" (http://www.discogs.com/help/submission-guidelines-release-format.html#LP)
-                    if (discogsRelease.formats[i].name == "Vinyl" && desc == "LP") release_formats[release_formats.length-1] = '12" Vinyl';
+                    if (discogs_format == "Vinyl" && desc == "LP") mb_format = '12" Vinyl';
                     // Release format: special handling of CD, Mini == 8cm CD
-                    if (discogsRelease.formats[i].name == "CD" && desc == "Mini") release_formats[release_formats.length-1] = '8cm CD';
+                    if (discogs_format == "CD" && desc == "Mini") mb_format = '8cm CD';
                     // Release status
                     if (desc.match(/Promo|Smplr/)) release.status = "promotion";
                     if (desc.match(/Unofficial Release/)) release.status = "bootleg";
@@ -533,8 +536,13 @@ function parseDiscogsRelease(data) {
                     if (desc.match(/^Album/)) release.type = "album";
                     if (desc.match(/Single/)) release.type = "single";
                     if (desc.match(/EP|Mini-Album/)) release.type = "ep";
-
                 });
+            }
+
+            if (mb_format) {
+                for (var j = 0; j < discogsRelease.formats[i].qty; j++) {
+                    release_formats.push(mb_format);
+                }
             }
 
             // Release packaging
