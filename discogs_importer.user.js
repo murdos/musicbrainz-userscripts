@@ -648,19 +648,18 @@ function parseDiscogsRelease(data) {
         var tmp = trackPosition.match(/(\d+|[A-Za-z])(?:[\.-](\d+))?/);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
-            var trackNumber = 1;
             var buggyTrackNumber = false;
             var prevReleaseNumber = releaseNumber;
 
             if (Number.isInteger(tmp[1])) {
               if (tmp[2]) { // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
                   releaseNumber = tmp[1];
-                  trackNumber = parseInt(tmp[2], 10);
+                  lastPosition = parseInt(tmp[2], 10);
               }  else if (tmp[1] <= lastPosition) { // 1, 2, 3, ... - We've moved onto a new medium
                   releaseNumber++;
-                  trackNumber = tmp[1];
+                  lastPosition = tmp[1];
               } else {
-                  trackNumber = tmp[1];
+                  lastPosition = tmp[1];
               }
             } else {
               if (trackPosition.match(/^[A-Za-z]\d*$/)) { // Vinyl or cassette, handle it specially
@@ -689,8 +688,6 @@ function parseDiscogsRelease(data) {
             if (buggyTrackNumber) {
               // well, it went wrong so ...
               lastPosition++;
-            } else {
-              lastPosition = trackNumber;
             }
         }
 
