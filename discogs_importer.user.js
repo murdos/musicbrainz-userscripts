@@ -685,25 +685,26 @@ function parseDiscogsRelease(data) {
         }
 
         // Create release if needed
-        if (!release.discs[releaseNumber-1]) {
+        var discindex = releaseNumber-1;
+        if (!release.discs[discindex]) {
             release.discs.push(new Object());
-            release.discs[releaseNumber-1].tracks = [];
-            release.discs[releaseNumber-1].format = release_formats[releaseNumber-1];
+            release.discs[discindex].tracks = [];
+            release.discs[discindex].format = release_formats[discindex];
             if (heading) {
-              release.discs[releaseNumber-1].title = heading;
+              release.discs[discindex].title = heading;
               heading = "";
             }
         }
 
         // Track number (only for Vinyl and Cassette)
-        if (buggyTrackNumber || (release.discs[releaseNumber-1].format.match(/(Vinyl|Cassette)/)
+        if (buggyTrackNumber || (release.discs[discindex].format.match(/(Vinyl|Cassette)/)
             && discogsTrack.position.match(/^[A-Z]+[\.-]?\d*/i))) {
             track.number = discogsTrack.position;
         }
 
         // Trackposition is empty e.g. for release title
         if (trackPosition != "" && trackPosition != null) {
-            release.discs[releaseNumber-1].tracks.push(track);
+            release.discs[discindex].tracks.push(track);
         }
 
         if (buggyTrackNumber && !release.maybe_buggy) {
