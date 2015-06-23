@@ -559,9 +559,9 @@ function parseDiscogsRelease(data) {
             if (discogsRelease.formats[i].text) {
                 var freetext = discogsRelease.formats[i].text.toLowerCase().replace(/[\s-]/g, '');
                 if (freetext.match(/cardboard|paper/)) release.packaging = "cardboard/paper sleeve";
-                if (freetext.match(/digipak/)) release.packaging = "digipak";
-                if (freetext.match(/keepcase/)) release.packaging = "keep case";
-                if (freetext.match(/jewel/)) {
+                else if (freetext.match(/digipak/)) release.packaging = "digipak";
+                else if (freetext.match(/keepcase/)) release.packaging = "keep case";
+                else if (freetext.match(/jewel/)) {
                     release.packaging = freetext.match(/slim/) ? "slim jewel case" : "jewel case";
                 }
             }
