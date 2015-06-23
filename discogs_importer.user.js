@@ -512,9 +512,7 @@ function parseDiscogsRelease(data) {
     }
 
     // Release URL
-    release.urls = [];
-    var release_url = getCleanUrl(discogsRelease.uri, 'release');
-    release.urls.push( { url: release_url, link_type: MBImport.URL_TYPES.discogs } );
+    release.urls = [ { url: getCleanUrl(discogsRelease.uri, 'release'), link_type: MBImport.URL_TYPES.discogs } ];
 
     // Release format
     var release_formats = [];
