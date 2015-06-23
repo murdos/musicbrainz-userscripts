@@ -557,7 +557,7 @@ function parseDiscogsRelease(data) {
 
             // Release packaging
             if (discogsRelease.formats[i].text) {
-                var freetext = discogsRelease.formats[i].text.toLowerCase().replace(/-/g, '').replace(/ /g, '');
+                var freetext = discogsRelease.formats[i].text.toLowerCase().replace(/[\s-]/g, '');
                 if (freetext.match(/cardboard|paper/)) release.packaging = "cardboard/paper sleeve";
                 if (freetext.match(/digipak/)) release.packaging = "digipak";
                 if (freetext.match(/keepcase/)) release.packaging = "keep case";
