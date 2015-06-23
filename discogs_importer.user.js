@@ -430,6 +430,12 @@ function cleanup_discogs_artist_credit(obj) {
       }
 }
 
+// Returns the name without the numerical suffic Discogs adds as disambiguation
+// ie. "ABC (123)" -> "ABC"
+function artistNoNum(artist_name) {
+  return artist_name.replace(/ \(\d+\)$/, "");
+}
+
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
 
@@ -445,8 +451,8 @@ function parseDiscogsRelease(data) {
     release.artist_credit = [];
     $.each(discogsRelease.artists, function(index, artist) {
         var ac = {
-            'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
-            'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
+            'artist_name': artistNoNum(artist.name),
+            'credited_name': (artist.anv != "" ? artist.anv : artistNoNum(artist.name)),
             'joinphrase': decodeDiscogsJoinphrase(artist.join),
             'mbid': MBIDfromUrl(artist.resource_url, 'artist')
         };
@@ -593,8 +599,8 @@ function parseDiscogsRelease(data) {
         if (discogsTrack.artists) {
             $.each(discogsTrack.artists, function(index, artist) {
                 var ac = {
-                    'artist_name': artist.name.replace(/ \(\d+\)$/, ""),
-                    'credited_name': (artist.anv != "" ? artist.anv : artist.name.replace(/ \(\d+\)$/, "")),
+                    'artist_name': artistNoNum(artist.name),
+                    'credited_name': (artist.anv != "" ? artist.anv : artistNoNum(artist.name)),
                     'joinphrase': decodeDiscogsJoinphrase(artist.join),
                     'mbid': MBIDfromUrl(artist.resource_url, 'artist')
                 };
