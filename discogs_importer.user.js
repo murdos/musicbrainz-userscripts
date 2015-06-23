@@ -564,6 +564,7 @@ function parseDiscogsRelease(data) {
                 else if (freetext.match(/jewel/)) {
                     release.packaging = freetext.match(/slim/) ? "slim jewel case" : "jewel case";
                 }
+                else if (freetext.match(/gatefold|digisleeve/)) release.packaging = "gatefold cover";
             }
         }
     }
