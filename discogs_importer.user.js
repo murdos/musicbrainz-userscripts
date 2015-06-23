@@ -436,6 +436,23 @@ function artistNoNum(artist_name) {
   return artist_name.replace(/ \(\d+\)$/, "");
 }
 
+// Parse a US date string and set object properties year, month, day
+function parse_YYYY_MM_DD(date, obj) {
+  if (!date) return;
+  var m = date.split(/\D+/, 3).map(function (e) {
+    return parseInt(e, 10);
+  });
+  if (m[0] !== undefined) {
+    obj.year = m[0];
+    if (m[1] !== undefined) {
+      obj.month = m[1];
+      if (m[2] !== undefined) {
+        obj.day = m[2];
+      }
+    }
+  }
+}
+
 // Analyze Discogs data and return a release object
 function parseDiscogsRelease(data) {
 
@@ -473,19 +490,7 @@ function parseDiscogsRelease(data) {
 
     // Release date
     if (discogsRelease.released) {
-        var releasedate = discogsRelease.released;
-        if (typeof releasedate != "undefined" && releasedate != "") {
-            var tmp = releasedate.split('-');
-            if (tmp[0] != "undefined" && tmp[0] != "") {
-                release.year = parseInt(tmp[0], 10);
-                if (tmp[1] != "undefined" && tmp[1] != "") {
-                    release.month = parseInt(tmp[1], 10);
-                    if (tmp[2] != "undefined" && tmp[2] != "") {
-                        release.day = parseInt(tmp[2], 10);
-                    }
-                }
-            }
-        }
+      parse_YYYY_MM_DD(discogsRelease.released, release);
     }
 
     // Release country
