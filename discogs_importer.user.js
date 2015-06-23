@@ -475,7 +475,8 @@ function parseDiscogsRelease(data) {
     if (discogsRelease.released) {
         var releasedate = discogsRelease.released;
         if (typeof releasedate != "undefined" && releasedate != "") {
-            var tmp = releasedate.split('-');        if (tmp[0] != "undefined" && tmp[0] != "") {
+            var tmp = releasedate.split('-');
+            if (tmp[0] != "undefined" && tmp[0] != "") {
                 release.year = parseInt(tmp[0], 10);
                 if (tmp[1] != "undefined" && tmp[1] != "") {
                     release.month = parseInt(tmp[1], 10);
