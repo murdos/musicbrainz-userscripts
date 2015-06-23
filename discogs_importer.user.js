@@ -591,7 +591,8 @@ function parseDiscogsRelease(data) {
         if (discogsTrack.type_ == 'heading') {
           heading = discogsTrack.title;
           return;
-        } else if (discogsTrack.type_ != 'track' && discogsTrack.type_ != 'index') {
+        }
+        if (discogsTrack.type_ != 'track' && discogsTrack.type_ != 'index') {
           return;
         }
 
