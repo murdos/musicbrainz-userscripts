@@ -687,13 +687,15 @@ function parseDiscogsRelease(data) {
         // Create release if needed
         var discindex = releaseNumber-1;
         if (!release.discs[discindex]) {
-            release.discs.push(new Object());
-            release.discs[discindex].tracks = [];
-            release.discs[discindex].format = release_formats[discindex];
+            var newdisc = {
+              tracks: [],
+              format: release_formats[discindex],
+            };
             if (heading) {
-              release.discs[discindex].title = heading;
+              newdisc.title = heading;
               heading = "";
             }
+            release.discs.push(newdisc);
         }
 
         // Track number (only for Vinyl and Cassette)
