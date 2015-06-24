@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2015-04-07
+// @version        2015-06-24
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -88,13 +88,16 @@ function setRecordingComments() {
             editing = !editing;
             $("#set-recording-comments").add($inputs).toggle(editing);
             $(this).text((editing ? "Hide" : "Edit") + " recording comments");
+            if (editing) {
+                $("#all-recording-comments").focus();
+            }
         })
         .appendTo($container);
 
     $container.append('\
 <table id="set-recording-comments">\
   <tr>\
-    <td><label for="all-recording-comments">Set all comments to:</label></td>\
+    <td><label for="all-recording-comments">Set all visible comments to:</label></td>\
     <td><input type="text" id="all-recording-comments" style="width: 32em;"></td>\
   </tr>\
   <tr>\
@@ -103,7 +106,7 @@ function setRecordingComments() {
   </tr>\
   <tr>\
     <td colspan="2">\
-      <button id="submit-recording-comments" class="styled-button">Submit changes (marked red)</button>\
+      <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
   </tr>\
 </table>');
@@ -111,7 +114,7 @@ function setRecordingComments() {
     $("#set-recording-comments").hide();
 
     $("#all-recording-comments").on("input", function () {
-        $inputs.val(this.value).trigger("input.rc");
+        $inputs.filter(":visible").val(this.value).trigger("input.rc");
     });
 
     var $submitButton = $("#submit-recording-comments").on("click", function () {
@@ -129,28 +132,30 @@ function setRecordingComments() {
         var editData = [], deferred = $.Deferred();
 
         $.each($tracks, function (i, track) {
-            var $input = $inputs.eq(i), comment = $input.val();
+            if ($(track).filter(":visible").length > 0) {
+                var $input = $inputs.eq(i), comment = $input.val();
+                if (comment === $input.data("old")) {
+                    $input.prop("disabled", false);
+                    return;
+                }
 
-            if (comment === $input.data("old")) {
-                $input.prop("disabled", false);
-                return;
+                deferred
+                    .done(function () {
+                        $input.data("old", comment).trigger("input.rc").prop("disabled", false);
+                    })
+                    .fail(function () {
+                        $input.css("border-color", "red").prop("disabled", false);
+                    });
+
+                var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
+                    mbid = link.href.match(MBID_REGEX)[0];
+
+                editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
             }
-
-            deferred
-                .done(function () {
-                    $input.data("old", comment).trigger("input.rc").prop("disabled", false);
-                })
-                .fail(function () {
-                    $input.css("border-color", "red").prop("disabled", false);
-                });
-
-            var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
-                mbid = link.href.match(MBID_REGEX)[0];
-
-            editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
         });
 
         if (editData.length === 0) {
+            $inputs.prop("disabled", false);
             $submitButton.prop("disabled", false).text("Submit changes (marked red)");
         } else {
             var editNote = $("#recording-comments-edit-note").val();
