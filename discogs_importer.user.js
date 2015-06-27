@@ -544,7 +544,7 @@ function parseDiscogsRelease(data) {
                     // Release type
                     if (desc.match(/Compilation/)) release.secondary_types.push("compilation");
                     if (desc.match(/^Album/)) release.type = "album";
-                    if (desc.match(/Single/)) release.type = "single";
+                    if (desc.match(/Single(?! Sided)/)) release.type = "single";
                     if (desc.match(/EP|Mini-Album/)) release.type = "ep";
                 });
             }
