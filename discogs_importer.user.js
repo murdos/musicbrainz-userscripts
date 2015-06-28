@@ -16,6 +16,9 @@
 // @require        lib/logger.js
 // @require        lib/mblinks.js
 // @require        lib/mbimportstyle.js
+// @require        lib/map_langs.js
+// @require        https://raw.githubusercontent.com/richtr/guessLanguage.js/master/lib/_languageData.js
+// @require        https://raw.githubusercontent.com/richtr/guessLanguage.js/master/lib/guessLanguage.js
 // ==/UserScript==
 
 
@@ -726,6 +729,27 @@ function parseDiscogsRelease(data) {
         }
     });
 
+
+    // Language detection using https://github.com/richtr/guessLanguage.js
+    if (!release.language) {
+      var all_titles = function (release) {
+        var text = release.title;
+        release.discs.forEach(function(disc, disc_index, disc_array) {
+          disc.tracks.forEach(function(track, track_index, track_array) {
+            text += ' ' + track.title;
+          });
+        });
+        return text;
+      }(release);
+      LOGGER.info(all_titles);
+      guessLanguage.detect(all_titles, function(lng) {
+        LOGGER.info(lng);
+        if (lng && lng !== 'unknown' && MAP_LANGDETECT_ISO693_3[lng]) {
+          release.language = MAP_LANGDETECT_ISO693_3[lng];
+          LOGGER.debug('Detected language: ' + release.language);
+        }
+      });
+    }
     LOGGER.info("Parsed release: ", release);
     return release;
 }
