@@ -726,6 +726,12 @@ function parseDiscogsRelease(data) {
         }
     });
 
+    if (release.discs.length == 1 && release.discs[0].title) {
+      // remove title if there is only one disc
+      // https://github.com/murdos/musicbrainz-userscripts/issues/69
+      release.discs[0].title = '';
+    }
+
     LOGGER.info("Parsed release: ", release);
     return release;
 }
