@@ -15,8 +15,9 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function () {
+if (!unsafeWindow) unsafeWindow = window;
 
+$(document).ready(function () {
   // Display a link to the correct album bandcamp url (ie. main page or releases page)
   // search for the rss feed link and use it to build the current album url
   var rssurl = $("#rssFeedAlbum").attr('href');
