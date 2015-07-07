@@ -8,7 +8,7 @@
 // @include     http*://*.bandcamp.com/
 // @include     http*://*.bandcamp.com/releases
 // @exclude     http*://*.bandcamp.com/*/*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     lib/logger.js
 // ==/UserScript==
 
