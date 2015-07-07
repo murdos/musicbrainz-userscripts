@@ -19,12 +19,10 @@ if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function () {
   // Display a link to the correct album bandcamp url (ie. main page or releases page)
-  // search for the rss feed link and use it to build the current album url
-  var rssurl = $("#rssFeedAlbum").attr('href');
-  if (typeof rssurl !== "undefined" && rssurl.indexOf('/feed/album/') !== -1) {
-    var albumurl = rssurl.replace('/feed/', '/');
-    var innerHTML = '<div id="bci_helper" style="padding-top: 5px;">' + '<a href="' + albumurl +
+  var bandcampAlbumData = unsafeWindow.TralbumData;
+  if (bandcampAlbumData && bandcampAlbumData.url) {
+   var innerHTML = '<div id="bci_helper" style="padding-top: 5px;">' + '<a href="' +  bandcampAlbumData.url +
       '" title="Load album page and display Import to MB button">Album page (MB import)</a></div>';
-    $('#name-section').append(innerHTML);
+   $('#name-section').append(innerHTML);
   }
 });
