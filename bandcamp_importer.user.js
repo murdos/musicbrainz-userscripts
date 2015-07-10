@@ -248,12 +248,12 @@ $(document).ready(function () {
   var release = BandcampImport.retrieveReleaseInfo();
 
   // add MB artist link
-  var artist_link = release.url.match(/^(http:\/\/[^\/]+)/)[1];
-  mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+  var root_url = release.url.match(/^(http:\/\/[^\/]+)/)[1];
+  mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
 
   if (release.artist_credit.length == 1) {
     // try to get artist's mbid from cache
-    var artist_mbid = mblinks.resolveMBID(artist_link);
+    var artist_mbid = mblinks.resolveMBID(root_url);
     if (artist_mbid) {
       release.artist_credit[0].mbid = artist_mbid;
     }
