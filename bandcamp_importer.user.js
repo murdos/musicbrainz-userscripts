@@ -259,6 +259,21 @@ $(document).ready(function () {
       release.artist_credit[0].mbid = artist_mbid;
     }
   }
+
+  // try to get label mbid from cache
+  var label_mbid = mblinks.resolveMBID('label:' + root_url);
+  if (label_mbid) {
+    if (release.labels.length == 0) {
+      release.labels.push({
+        'name': '',
+        'mbid': '',
+        'catno': 'none'
+      });
+    }
+    release.labels[0].name = $('p#band-name-location span.title').text().trim();
+    release.labels[0].mbid = label_mbid;
+  }
+
   BandcampImport.insertLink(release);
   LOGGER.info("Parsed release: ", release);
 
