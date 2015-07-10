@@ -12,6 +12,7 @@
 // @require        lib/mblinks.js
 // @require        lib/logger.js
 // @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');

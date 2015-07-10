@@ -8,6 +8,7 @@
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;

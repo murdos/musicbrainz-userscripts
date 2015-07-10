@@ -11,6 +11,7 @@
 // @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
