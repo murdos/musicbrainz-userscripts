@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2015-04-07
+// @version        2015-07-10
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -43,9 +43,9 @@ function setRecordingComments() {
 
         $tracks.each(function () {
             var $td = $(this).children("td").eq(nameColumn),
-                node = ($td.find(".mp")[0] ||
-                        $td.find(".name-variation")[0] ||
-                        $td.find("a[href*=\\/recording\\/]")[0]),
+                node = ($td.children(".mp")[0] ||
+                        $td.children(".name-variation")[0] ||
+                        $td.children("a[href*=\\/recording\\/]")[0]),
                 $input = $("<input />").addClass("recording-comment").insertAfter(node);
 
             if (!editing) {
