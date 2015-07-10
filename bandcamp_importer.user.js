@@ -248,16 +248,32 @@ $(document).ready(function () {
   var release = BandcampImport.retrieveReleaseInfo();
 
   // add MB artist link
-  var artist_link = release.url.match(/^(http:\/\/[^\/]+)/)[1];
-  mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+  var root_url = release.url.match(/^(http:\/\/[^\/]+)/)[1];
+  mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+  mblinks.searchAndDisplayMbLink(root_url, 'label', function (link) { $('p#band-name-location span.title').append(link); }, 'label:' + root_url );
 
   if (release.artist_credit.length == 1) {
     // try to get artist's mbid from cache
-    var artist_mbid = mblinks.resolveMBID(artist_link);
+    var artist_mbid = mblinks.resolveMBID(root_url);
     if (artist_mbid) {
       release.artist_credit[0].mbid = artist_mbid;
     }
   }
+
+  // try to get label mbid from cache
+  var label_mbid = mblinks.resolveMBID('label:' + root_url);
+  if (label_mbid) {
+    if (release.labels.length == 0) {
+      release.labels.push({
+        'name': '',
+        'mbid': '',
+        'catno': 'none'
+      });
+    }
+    release.labels[0].name = $('p#band-name-location span.title').text().trim();
+    release.labels[0].mbid = label_mbid;
+  }
+
   BandcampImport.insertLink(release);
   LOGGER.info("Parsed release: ", release);
 
