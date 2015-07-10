@@ -250,6 +250,7 @@ $(document).ready(function () {
   // add MB artist link
   var root_url = release.url.match(/^(http:\/\/[^\/]+)/)[1];
   mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
+  mblinks.searchAndDisplayMbLink(root_url, 'label', function (link) { $('p#band-name-location span.title').append(link); }, 'label:' + root_url );
 
   if (release.artist_credit.length == 1) {
     // try to get artist's mbid from cache
