@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2015.06.27.0
+// @version        2015.07.07.0
 // @namespace      http://userscripts.org/users/22504
 // @icon           http://www.discogs.com/images/discogs130.png
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -729,6 +729,11 @@ function parseDiscogsRelease(data) {
         }
     });
 
+    if (release.discs.length == 1 && release.discs[0].title) {
+      // remove title if there is only one disc
+      // https://github.com/murdos/musicbrainz-userscripts/issues/69
+      release.discs[0].title = '';
+    }
 
     // Language detection using https://github.com/richtr/guessLanguage.js
     if (!release.language) {
@@ -741,15 +746,14 @@ function parseDiscogsRelease(data) {
         });
         return text;
       }(release);
-      LOGGER.info(all_titles);
       guessLanguage.detect(all_titles, function(lng) {
-        LOGGER.info(lng);
         if (lng && lng !== 'unknown' && MAP_LANGDETECT_ISO693_3[lng]) {
           release.language = MAP_LANGDETECT_ISO693_3[lng];
           LOGGER.debug('Detected language: ' + release.language);
         }
       });
     }
+
     LOGGER.info("Parsed release: ", release);
     return release;
 }
