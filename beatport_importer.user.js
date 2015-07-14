@@ -21,6 +21,25 @@ $(document).ready(function(){
 });
 
 function retrieveReleaseInfo() {
+  function contains_or(selector, list) {
+    selectors = [];
+    $.each(list, function(ind, value) {
+      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
+    });
+    return selectors.join(',');
+  }
+  var release_date_strings = [
+    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Erscheinungsdatum', 'Data de lançamento', 'Releasedatum', "Data di uscita", "リリース予定日"
+  ];
+  var release_strings = [
+    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
+  ];
+  var labels_strings = [
+    'Labels', 'Sello', 'Gravadoras', "Label", "Etichetta", "Editora", "レーベル"
+  ];
+  var catalog_strings = [
+    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus', "Catalogo", "カタログ"
+  ];
   var release = {};
 
   // Release information global to all Beatport releases
@@ -30,7 +49,7 @@ function retrieveReleaseInfo() {
   release.urls = [];
   release.urls.push( { 'url': window.location.href } );
 
-  var releaseDate = $( "td.meta-data-label:contains('Release Date')" ).next().text().split("-");
+  var releaseDate = $(contains_or("td.meta-data-label", release_date_strings)).next().text().split("-");
   release.year = releaseDate[0];
   release.month = releaseDate[1];
   release.day = releaseDate[2];
@@ -38,8 +57,8 @@ function retrieveReleaseInfo() {
   release.labels = [];
   release.labels.push(
     {
-      name: $( "td.meta-data-label:contains('Labels')" ).next().text(),
-      catno: $( "td.meta-data-label:contains('Catalog #')" ).next().text()
+      name: $(contains_or("td.meta-data-label", labels_strings)).next().text(),
+      catno: $(contains_or("td.meta-data-label", catalog_strings)).next().text()
     }
   );
 
