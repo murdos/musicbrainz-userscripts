@@ -29,12 +29,31 @@ $(document).ready(function(){
 });
 
 function retrieveReleaseInfo(release_url) {
-  var releaseDate = $( ".category:contains('Release Date')" ).next().text().split("-");
+  function contains_or(selector, list) {
+    selectors = [];
+    $.each(list, function(ind, value) {
+      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
+    });
+    return selectors.join(',');
+  }
+  var release_date_strings = [
+    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Veröffentlichungsdatum', 'Data de lançamento', 'Releasedatum'
+  ];
+  var release_strings = [
+    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
+  ];
+  var labels_strings = [
+    'Labels', 'Compañías discográficas', 'Gravadoras'
+  ];
+  var catalog_strings = [
+    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus'
+  ];
+  var releaseDate = $(contains_or(".category", release_date_strings)).next().text().split("-");
 
   // Release information global to all Beatport releases
   var release = {
     artist_credit: [],
-    title: $( "h3.interior-type:contains('Release')" ).next().text().trim(),
+    title: $(contains_or("h3.interior-type", release_strings)).next().text().trim(),
     year: releaseDate[0],
     month: releaseDate[1],
     day: releaseDate[2],
@@ -60,8 +79,8 @@ function retrieveReleaseInfo(release_url) {
 
   release.labels.push(
     {
-      name: $( ".category:contains('Labels')" ).next().text().trim(),
-      catno: $( ".category:contains('Catalog')" ).next().text()
+      name: $(contains_or(".category", labels_strings)).next().text().trim(),
+      catno: $(contains_or(".category", catalog_strings)).next().text().trim()
     }
   );
 
