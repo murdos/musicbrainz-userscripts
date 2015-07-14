@@ -4,7 +4,7 @@
 // @version        2015.06.17.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
-// @include        http*://www.beatport.com/release/*
+// @include        http*://classic.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
