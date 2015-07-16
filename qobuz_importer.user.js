@@ -74,7 +74,6 @@ function parseRelease(data) {
     var track = {};
     track.title = trackobj.title;
     track.duration = trackobj.duration * 1000;
-    // FIXME: featured artists
     var performers = trackobj.performers.split('\r - ').map(function(v) {
       var list = v.split(', ');
       var name = list.shift();
