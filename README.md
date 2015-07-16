@@ -9,6 +9,7 @@
 * [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
 * [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 * [Import Last.fm releases to MusicBrainz](#lastfm_importer)
+* [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 * [Musicbrainz DiscIds Detector](#mb_discids_detector)
 * [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
@@ -74,6 +75,13 @@ One-click importing of releases from last.fm into MusicBrainz. PLEASE import rel
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/lastfm_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js)
+
+## <a name="qobuz_importer"></a> Import Qobuz releases to MusicBrainz
+
+Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/qobuz_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js)
 
 ## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
 
