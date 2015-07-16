@@ -75,17 +75,27 @@ function parseRelease(data) {
       return [name, list];
     });
     var artists = [];
+    var featured_artists = [];
     $.each(performers, function(index, performer) {
-      if ($.inArray('Main Performer', performer[1]) != -1
+      if ($.inArray('Featured Artist', performer[1]) != -1) {
+       featured_artists.push(performer[0]);
+      }
+      else if ($.inArray('Main Performer', performer[1]) != -1
 	  || $.inArray('Primary', performer[1]) != -1
 	  || $.inArray('interprète', performer[1]) != -1
 	  || $.inArray('Performer', performer[1]) != -1
 	  || $.inArray('Main Artist', performer[1]) != -1
-	  || $.inArray('Featured Artist', performer[1]) != -1) {
+      ) {
         artists.push(performer[0]);
       }
     });
     track.artist_credit = MBImport.makeArtistCredits(artists);
+    if (featured_artists.length) {
+      if (track.artist_credit.length) {
+        track.artist_credit[track.artist_credit.length-1].joinphrase = ' feat. ';
+      }
+      $.merge(track.artist_credit, MBImport.makeArtistCredits(featured_artists));
+    }
     tracks.push(track);
   });
   release.discs = [];
