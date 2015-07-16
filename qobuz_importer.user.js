@@ -156,4 +156,8 @@ $(document).ready(function() {
       LOGGER.error("AJAX error thrown: ", errorThrown);
     }
   });
+
+  // replace image zoom link by the maximum size image link
+  $("#product-cover-link").attr("href", $("#product-cover-link").attr("href").replace('_600', '_max'));
+  $("#product-cover-link").attr("title", $("#product-cover-link").attr("title") + ' (Qobuz importer: hires image)');
 });
