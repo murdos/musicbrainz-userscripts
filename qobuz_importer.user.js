@@ -25,6 +25,9 @@ if (DEBUG) {
   LOGGER.setLevel('debug');
 }
 
+// list of qobuz artist id which should be mapped to Various Artists
+var various_artists_ids = [ 26887, 145383, 353325, 183869, 997899 ];
+
 function parseRelease(data) {
   var release = {};
 
@@ -33,6 +36,9 @@ function parseRelease(data) {
 
   release.title = data.title;
   release.artist_credit = MBImport.makeArtistCredits([data.artist.name]); // FIXME: various artists
+  if ($.inArray(data.artist.id, various_artists_ids) != -1) {
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  }
 
   // Release information global to all Beatport releases
   release.packaging = 'None';
