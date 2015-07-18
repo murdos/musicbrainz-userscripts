@@ -9,7 +9,7 @@
 // @include        http*://*musicbrainz.org/artist/*
 // @include        http*://*musicbrainz.org/release-group/*
 // @include        http*://*musicbrainz.org/label/*
-// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
@@ -39,6 +39,11 @@ var incOptions = {
     'recording': [ 'work-rels' ],
     'work': [ 'url-rels' ]
 };
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
+
+if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
 
