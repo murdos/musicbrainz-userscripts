@@ -28,8 +28,8 @@ var relationsIconsURLs = {
        "single from": "http://www.amaesingtools.com/images/left_arrow_icon.gif"
     },
     'release': {
-       "part of set": "http://oldwiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png",
-       "remaster": "http://oldwiki.musicbrainz.org/-/musicbrainz/img/moin-www.png",
+       "part of set": "http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png",
+       "remaster": "http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png",
     }
 };
 
