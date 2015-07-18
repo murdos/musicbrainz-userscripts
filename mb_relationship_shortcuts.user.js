@@ -9,6 +9,7 @@
 // @include        http*://*musicbrainz.org/artist/*
 // @include        http*://*musicbrainz.org/release-group/*
 // @include        http*://*musicbrainz.org/label/*
+// @require        lib/logger.js
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // ==/UserScript==
 
@@ -97,7 +98,7 @@ $(document).ready(function(){
 
     // Call the MB webservice
     var url = '/ws/2/' + child.type + '?' + parent.type + "=" + parent.mbid + '&inc=' + incOptions[child.type].join("+") + '&limit=100';
-    mylog('wsurl: ' + url);
+    LOGGER.debug("MB WS url: " + url);
 
     $.get(url, function(data, textStatus, jqXHR) {
 
@@ -154,9 +155,3 @@ $(document).ready(function(){
     });
 
 });
-
-function mylog(text) {
-    if (unsafeWindow.console) {
-        unsafeWindow.console.log(text);
-    }
-}
