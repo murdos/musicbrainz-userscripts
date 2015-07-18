@@ -1,5 +1,6 @@
 # MusicBrainz UserScripts
 
+* [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
 * [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 * [Import Bandcamp releases to MusicBrainz Album Link Helper](#bandcamp_importer_helper)
 * [Import Beatport Pro releases to MusicBrainz](#beatport_pro_importer)
@@ -12,6 +13,13 @@
 * [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 * [Musicbrainz DiscIds Detector](#mb_discids_detector)
 * [Musicbrainz UI enhancements](#mb_ui_enhancements)
+
+## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
+
+Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_relationship_shortcuts.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js)
 
 ## <a name="bandcamp_importer"></a> Import Bandcamp releases to MusicBrainz
 
