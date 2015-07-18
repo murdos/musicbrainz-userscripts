@@ -1,15 +1,14 @@
 ﻿// ==UserScript==
-// @name           MusicBrainz Release-Group/Release URLs
-// @description    Display release and release-group urls (AMZ, Discogs, Wikipedia) on the artist and release-group page
+// @name           Display shortcut for relationships on MusicBrainz
+// @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
 // @version        2013.01.30.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
-// @include        http://*musicbrainz.org/artist/*
-// @include        http://*musicbrainz.org/release-group/*
-// @include        http://*musicbrainz.org/label/*
-// @include        https://*musicbrainz.org/artist/*
-// @include        https://*musicbrainz.org/release-group/*
-// @include        https://*musicbrainz.org/label/*
+// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @include        http*://*musicbrainz.org/artist/*
+// @include        http*://*musicbrainz.org/release-group/*
+// @include        http*://*musicbrainz.org/label/*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // ==/UserScript==
 
