@@ -158,6 +158,15 @@ $(document).ready(function() {
   });
 
   // replace image zoom link by the maximum size image link
-  $("#product-cover-link").attr("href", $("#product-cover-link").attr("href").replace('_600', '_max'));
-  $("#product-cover-link").attr("title", $("#product-cover-link").attr("title") + ' (Qobuz importer: hires image)');
+  var maximgurl = $("#product-cover-link").attr("href").replace('_600', '_max');
+  var maximg = new Image();
+  maximg.onerror = function (evt) {
+    LOGGER.debug("No max image");
+  }
+  maximg.onload = function (evt) {
+    $("#product-cover-link").attr("href", maximgurl);
+    $("#product-cover-link").attr("title", $("#product-cover-link").attr("title") + ' (Qobuz importer: ' + maximg.width + 'x' + maximg.height + ' image)');
+  }
+  maximg.src = maximgurl;
+
 });
