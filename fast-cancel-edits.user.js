@@ -2,6 +2,8 @@
 // @name        MusicBrainz: Fast cancel edits
 // @version     2015-08-03
 // @author      Michael Wiencek
+// @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
+// @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
 // @include     *://musicbrainz.org/user/*/edits/open*
 // @include     *://musicbrainz.org/*/*/open_edits*
 // @include     *://musicbrainz.org/*/*/edits*
