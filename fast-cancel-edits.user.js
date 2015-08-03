@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
-// @version     2013-08-07
+// @version     2015-08-03
 // @author      Michael Wiencek
 // @include     *://musicbrainz.org/user/*/edits/open*
 // @include     *://musicbrainz.org/*/*/open_edits*
@@ -26,6 +26,7 @@
 // @match       *://*.mbsandbox.org/*/*/open_edits*
 // @match       *://*.mbsandbox.org/*/*/edits*
 // @match       *://*.mbsandbox.org/search/edits*
+// @grant       none
 // ==/UserScript==
 //**************************************************************************//
 
@@ -70,12 +71,29 @@ function fastCancelScript() {
             var editNote = $edit.find("div.add-edit-note textarea").val();
             var data = { "confirm.edit_note": editNote };
 
-            $.post($self.attr("href"), data, function () {
-                totalCancels -= 1;
-                updateStatus();
+            $.ajax({
+                type: "POST",
+                url: $self.attr("href"),
+                data: data,
+                error: function (request, status, error) {
+                    $self
+                        .css({
+                            "background": "red",
+                            "color": "yellow",
+                            "cursor": "help"
+                        })
+                        .attr("title", "Error cancelling this edit: “" + error + "”");
+                    $edit
+                        .css({border: "6px solid red"})
+                        .show();
+                },
+                complete: function () {
+                    totalCancels -= 1;
+                    updateStatus();
+                }
             });
         });
-        $edit.remove();
+        $edit.hide();
     });
 
     var pushRequest = (function () {
