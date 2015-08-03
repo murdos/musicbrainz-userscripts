@@ -39,6 +39,50 @@ function batch_recording_rels() {
         return $("<button>Go</button>").click(func);
     }
 
+    // Date parsing utils
+    var dateRegex = /^(\d{4}|\?{4})(?:-(\d{2}|\?{2})(?:-(\d{2}|\?{2}))?)?$/;
+    var integerRegex = /^[0-9]+$/;
+
+    function parseInteger(num) {
+        return integerRegex.test(num) ? parseInt(num, 10) : NaN;
+    }
+
+    function parseIntegerOrNull(str) {
+        var integer = parseInteger(str);
+        return isNaN(integer) ? null : integer;
+    }
+
+    function parseDate(str) {
+        var match = str.match(dateRegex) || [];
+        return {
+            year: parseIntegerOrNull(match[1]),
+            month: parseIntegerOrNull(match[2]),
+            day: parseIntegerOrNull(match[3])
+        };
+    }
+
+    function nonEmpty(value) {
+        return value !== null && value !== undefined && value !== '';
+    }
+
+    var daysInMonth = {
+        "true":  [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+        "false": [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    };
+
+    function isDateValid(y, m, d) {
+        y = nonEmpty(y) ? parseInteger(y) : null;
+        m = nonEmpty(m) ? parseInteger(m) : null;
+        d = nonEmpty(d) ? parseInteger(d) : null;
+        if (isNaN(y) || isNaN(m) || isNaN(d)) return false;
+        if (y !== null && y < 1) return false;
+        if (m !== null && (m < 1 || m > 12)) return false;
+        if (d === null) return true;
+        var isLeapYear = y % 400 ? (y % 100 ? !(y % 4) : false) : true;
+        if (d < 1 || d > 31 || d > daysInMonth[isLeapYear.toString()][m]) return false;
+        return true;
+    }
+
     // Request rate limiting
 
     var REQUEST_COUNT = 0;
@@ -282,9 +326,9 @@ function batch_recording_rels() {
             if (this.value) {
                 $input.css("color", "#000");
 
-                var parsedDate = MB.utility.parseDate(this.value);
+                var parsedDate = parseDate(this.value);
                 if ((parsedDate.year || parsedDate.month || parsedDate.day) &&
-                    MB.utility.validDate(parsedDate.year, parsedDate.month, parsedDate.day)) {
+                    isDateValid(parsedDate.year, parsedDate.month, parsedDate.day)) {
                 } else {
                     $input.css("border-color", "#f00");
                     parsedDate = null;
