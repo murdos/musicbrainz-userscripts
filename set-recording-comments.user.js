@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2015-07-10
+// @version        2015.7.10.1418
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
