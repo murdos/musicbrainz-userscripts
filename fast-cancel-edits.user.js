@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
-// @version     2015.8.3.1649
+// @version     2015.8.21
 // @author      Michael Wiencek
 // @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
 // @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
@@ -84,7 +84,7 @@ function fastCancelScript() {
                             "color": "yellow",
                             "cursor": "help"
                         })
-                        .attr("title", "Error cancelling this edit: ì" + error + "î");
+                        .attr("title", "Error cancelling this edit: ‚Äú" + error + "‚Äù");
                     $edit
                         .css({border: "6px solid red"})
                         .show();
