@@ -16,6 +16,55 @@ document.body.appendChild(scr);
 
 function batch_recording_rels() {
 
+    // 'leven' function taken from https://github.com/sindresorhus/leven
+    // Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+    // Released under the MIT License:
+    // https://raw.githubusercontent.com/sindresorhus/leven/49baddd/license
+    function leven(a, b) {
+        if (a === b) {
+            return 0;
+        }
+
+        var aLen = a.length;
+        var bLen = b.length;
+
+        if (aLen === 0) {
+            return bLen;
+        }
+
+        if (bLen === 0) {
+            return aLen;
+        }
+
+        var bCharCode;
+        var ret;
+        var tmp;
+        var tmp2;
+        var i = 0;
+        var j = 0;
+        var arr = [];
+        var charCodeCache = [];
+
+        while (i < aLen) {
+            charCodeCache[i] = a.charCodeAt(i);
+            arr[i] = ++i;
+        }
+
+        while (j < bLen) {
+            bCharCode = b.charCodeAt(j);
+            tmp = j++;
+            ret = j;
+
+            for (i = 0; i < aLen; i++) {
+                tmp2 = bCharCode === charCodeCache[i] ? tmp : tmp + 1;
+                tmp = arr[i];
+                ret = arr[i] = tmp > ret ? tmp2 > ret ? ret + 1 : tmp2 : tmp2 > tmp ? tmp + 1 : tmp2;
+            }
+        }
+
+        return ret;
+    }
+
     // HTML helpers
 
     function make_element(el_name, args) {
@@ -727,7 +776,9 @@ function batch_recording_rels() {
         }
 
         function sim(r, w) {
-            return r == w ? 0 : _.str.levenshtein(r, w) / ((r.length + w.length) / 2);
+            r = r || '';
+            w = w || '';
+            return r == w ? 0 : leven(r, w) / ((r.length + w.length) / 2);
         }
 
         var matches = {};
