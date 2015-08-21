@@ -16,6 +16,16 @@ document.body.appendChild(scr);
 
 function batch_recording_rels() {
 
+    function setting(name) {
+        name = 'bpr_' + name;
+
+        if (arguments.length === 2) {
+            localStorage.setItem(name, arguments[1]);
+        } else {
+            return localStorage.getItem(name);
+        }
+    }
+
     // 'leven' function taken from https://github.com/sindresorhus/leven
     // Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
     // Released under the MIT License:
@@ -301,8 +311,8 @@ function batch_recording_rels() {
         .css({"margin": "0.5em", "background": "#F2F2F2", "border": "1px #999 solid"})
         .insertAfter($("div#content h2")[0]);
 
-    var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
-    var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
+    var hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
+    var hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
 
     function make_checkbox(func, default_val, lbl) {
         var chkbox = $('<input type="checkbox"/>')
@@ -333,9 +343,9 @@ function batch_recording_rels() {
         function populate($obj, kind) {
             $obj
                 .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
-                .val($.cookie('bpr_work_'+ kind) || 0)
+                .val(setting('work_'+ kind) || 0)
                 .on('change', function () {
-                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
+                    setting('work_' + kind, this.value);
                 });
         }
         _.each($work_options, populate);
@@ -1236,7 +1246,7 @@ function batch_recording_rels() {
             $performed.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
-        $.cookie('hide_performed_recs', hide_performed_recs.toString(), { path: '/', expires: 1000 });
+        setting('hide_performed_recs', hide_performed_recs.toString());
     }
 
     function toggle_pending_edits(event, checked) {
@@ -1251,7 +1261,7 @@ function batch_recording_rels() {
             $pending.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
-        $.cookie('hide_pending_edits', hide_pending_edits.toString(), { path: '/', expires: 1000 });
+        setting('hide_pending_edits', hide_pending_edits.toString());
     }
     toggle_pending_edits(null, hide_pending_edits);
 
