@@ -84,7 +84,7 @@ function fastCancelScript() {
                             "color": "yellow",
                             "cursor": "help"
                         })
-                        .attr("title", "Error cancelling this edit: ì" + error + "î");
+                        .attr("title", "Error cancelling this edit: ‚Äú" + error + "‚Äù");
                     $edit
                         .css({border: "6px solid red"})
                         .show();
