@@ -6,12 +6,14 @@
 // @downloadURL	https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
 // @update		https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
 // @include		http://www.metal-archives.com/albums/*/*/*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require    	https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require		https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require		lib/mbimport.js
+// @require    	lib/logger.js
 // ==/UserScript==
 $(document).ready(function () {
     var release = retrieveReleaseInfo();
     insertLink(release);
+	LOGGER.info("Parsed release: ", release);
 });
 
 function setreleasedate(release, datestring) {
@@ -77,8 +79,10 @@ function retrieveReleaseInfo() {
     }
 
     // Release URL
+	  // URLs
+    var link_type = MBImport.URL_TYPES;
     release.urls = new Array();
-    release.urls.push( { url: window.location.href, link_type: 82 } );
+    release.urls.push( { url: window.location.href, link_type: link_type.other_databases } );
 
     var releaseNumber=1;
     release.discs = new Array();
