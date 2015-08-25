@@ -49,16 +49,36 @@ function getGenericalData() {
     return rdata;
 }
 
+function getArtistsList() {
+    var artists = $('h2.band_name').text().split('/');
+    for (var i = 0; i < artists.length; i++) {
+        artists[i] = $.trim(artists[i]);
+    }
+    return artists;
+}
+
 function retrieveReleaseInfo() {
     var release = new Object();
+    var rdata = getGenericalData();
+
     release.artist_credit = new Array();
-    release.artist_credit.push({
-        artist_name: $('h2.band_name').text(),
-        credited_name: $('h2.band_name').text()
-    });
+    var artists = getArtistsList();
+    if (rdata["Type"] == "Split") {
+        var joinphrase = "/";
+    };
+    for (var i = 0; i < artists.length; i++) {
+
+        release.artist_credit.push({
+            artist_name: artists[i],
+            credited_name: artists[i],
+        });
+        if (i != artists.length - 1) {
+            release.artist_credit[i].joinphrase = joinphrase;
+        }
+    }
     release.title = $('h1.album_name').text();
 
-    var rdata = getGenericalData();
+
 
     release = setreleasedate(release, rdata["Release date"]);
     //todo add case for multiple labels if such a case exist
@@ -97,7 +117,6 @@ function retrieveReleaseInfo() {
     release.discs[releaseNumber - 1].tracks = new Array();
     release.discs[releaseNumber - 1].format = ReleaseFormat[rdata["Format"]];
     var tracksline = $('table.table_lyrics tr.even,table.table_lyrics tr.odd');
-    var trackslinelength = tracksline.length;
 
     tracksline.each(function(index, element) {
         var trackNumber = $.trim(element.children[0].textContent).replace('.', "");
@@ -126,7 +145,7 @@ function insertLink(release) {
     var parameters = MBImport.buildFormParameters(release, edit_note);
     var innerHTML = MBImport.buildFormHTML(parameters);
 
-    $('h2.band_name').append(innerHTML);
+    $('h2.band_name').after(innerHTML);
     $("form[action='//musicbrainz.org/release/add']").css("padding", "initial");
 
 }
@@ -158,6 +177,7 @@ ReleaseTypes["Single"] = ["Single"];
 ReleaseTypes["EP"] = ["EP"];
 ReleaseTypes["Compilation"] = ["Album", "Compilation"];
 ReleaseTypes["Split"] = ["Album"];
+ReleaseTypes["Collaboration"] = [""];
 
 //ReleaseFormat[MAformat]="MBformat";
 var ReleaseFormat = new Array();
