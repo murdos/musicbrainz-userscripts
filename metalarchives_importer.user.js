@@ -8,8 +8,14 @@
 // @include		http://www.metal-archives.com/albums/*/*/*
 // @require		https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require		lib/mbimport.js
-// @require    	lib/logger.js
+// @require		lib/logger.js
 // ==/UserScript==
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
+
+if (!unsafeWindow) unsafeWindow = window;
+
 $(document).ready(function() {
     var release = retrieveReleaseInfo();
     insertLink(release);
@@ -59,26 +65,22 @@ function getArtistsList() {
 
 function retrieveReleaseInfo() {
     var release = new Object();
-    var rdata = getGenericalData();
-
     release.artist_credit = new Array();
-    var artists = getArtistsList();
-    if (rdata["Type"] == "Split") {
-        var joinphrase = "/";
-    };
-    for (var i = 0; i < artists.length; i++) {
-
-        release.artist_credit.push({
-            artist_name: artists[i],
-            credited_name: artists[i],
-        });
-        if (i != artists.length - 1) {
-            release.artist_credit[i].joinphrase = joinphrase;
-        }
-    }
+	var rdata = getGenericalData();
+	var artists=getArtistsList();
+    if(rdata["Type"]=="Split"){
+		var joinphrasesplit="/";
+	}
+	for(var i=0;i<artists.length;i++){
+		release.artist_credit.push({
+			artist_name:  artists[i],
+			credited_name:  artists[i],
+			joinphrase:(typeof joinphrasesplit != 'undefined' && i !=artists.length - 1)?joinphrasesplit:""
+		});
+	}
     release.title = $('h1.album_name').text();
 
-
+   
 
     release = setreleasedate(release, rdata["Release date"]);
     //todo add case for multiple labels if such a case exist
@@ -117,6 +119,7 @@ function retrieveReleaseInfo() {
     release.discs[releaseNumber - 1].tracks = new Array();
     release.discs[releaseNumber - 1].format = ReleaseFormat[rdata["Format"]];
     var tracksline = $('table.table_lyrics tr.even,table.table_lyrics tr.odd');
+    var trackslinelength = tracksline.length;
 
     tracksline.each(function(index, element) {
         var trackNumber = $.trim(element.children[0].textContent).replace('.', "");
@@ -178,7 +181,6 @@ ReleaseTypes["EP"] = ["EP"];
 ReleaseTypes["Compilation"] = ["Album", "Compilation"];
 ReleaseTypes["Split"] = ["Album"];
 ReleaseTypes["Collaboration"] = [""];
-
 //ReleaseFormat[MAformat]="MBformat";
 var ReleaseFormat = new Array();
 ReleaseFormat["CD"] = "CD";
