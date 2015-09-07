@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2015.07.10.0
+// @version        2015.09.07.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -88,9 +88,11 @@ var BandcampImport = {
     // attempt to detect multiple artists tracks
     // bandcamp formats them as 'artist - tracktitle'
     // only set to true if ALL tracks are formatted like this
+    // and if string doesn't start with a number (ie. 02 - title)
     var various_artists = true;
     for (var i=0; i < bandcampAlbumData.trackinfo.length; i++) {
-      if (!bandcampAlbumData.trackinfo[i].title.match(/ - /)) {
+      if (!bandcampAlbumData.trackinfo[i].title.match(/ - /)
+          || bandcampAlbumData.trackinfo[i].title.match(/^\d+ - /)) {
         various_artists = false;
         break;
       }
