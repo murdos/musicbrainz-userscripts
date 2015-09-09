@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2015.06.10.0
+// @version        2015.09.09.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -226,6 +226,13 @@ function main() {
                 $('#'+track_mbid).find("td:nth-last-child("+ISRC_COLUMN_POSITION+")").before("<td class='isrc c'><small>"+isrcsLinks+"</small></td>");
             });
         }
+    }
+
+    // Display "Edit relationships" link for release besides "Edit" link
+    re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
+    if (window.location.href.match(re)) {
+        var mbid = window.location.href.match(re)[1];
+        $('ul.tabs').append('<li><a href="/release/' + mbid + '/edit-relationships">Edit relationships</a></li>');
     }
 
     // Discogs link rollover
