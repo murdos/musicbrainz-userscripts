@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
-// @version     2015.8.21
+// @version     2015.9.15
 // @author      Michael Wiencek
 // @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
 // @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
@@ -90,12 +90,20 @@ function fastCancelScript() {
                         .show();
                 },
                 complete: function () {
+                    $edit.remove();
                     totalCancels -= 1;
                     updateStatus();
                 }
             });
         });
         $edit.hide();
+    });
+
+    $("div#edits > form[action$='/edit/enter_votes']").on("submit", function(event) {
+    	if (totalCancels > 0) {
+    		event.preventDefault();
+    		alert("Please wait, " + (totalCancels > 1 ? totalCancels + " edits are" : "an edit is") + " being cancelled in the background.");
+    	}
     });
 
     var pushRequest = (function () {
