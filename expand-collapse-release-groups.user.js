@@ -343,7 +343,7 @@ function getAncestor(obj, searchedTag) {
         if (obj.parentNode.nodeName == searchedTag.toUpperCase()) {
             return obj.parentNode;
         } else {
-            getAncestor(obj.parentNode, searchedTag)
+            getAncestor(obj.parentNode, searchedTag);
         }
     } else {
         return null;
