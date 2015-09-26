@@ -23,8 +23,7 @@ $(document).ready(function() {
 });
 
 function setreleasedate(release, datestring) {
-    var patt = new RegExp('^d{4}$');
-    if (patt.exec(datestring)) {
+    if (/^\d{4}$/.exec(datestring)) {
         release.year = datestring;
     } else if (datestring.indexOf(',') != -1) {
         var commaindex = datestring.indexOf(',');
