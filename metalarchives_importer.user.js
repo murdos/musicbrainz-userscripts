@@ -105,11 +105,24 @@ function retrieveReleaseInfo(release_url) {
   release.title = $('h1.album_name').text();
 
   release = setreleasedate(release, rdata["Release date"]);
-  //todo add case for multiple labels if such a case exist
-  release.labels.push({
-    name: (rdata["Label"] == "Independent" ? "[no label]" : rdata["Label"]),
-    catno: (rdata["Catalog ID"] == "N/A" ? "" : rdata["Catalog ID"])
-  });
+  if ("Label" in rdata) {
+    // TODO: add case for multiple labels if such a case exist
+    var label = rdata["Label"];
+    var label_mbid = "";
+    if (label == "Independent") {
+      label = "[no label]";
+      label_mbid = '157afde4-4bf5-4039-8ad2-5a15acc85176';
+    }
+    var catno = rdata["Catalog ID"];
+    if (catno == undefined || catno == "N/A") {
+      catno = "";
+    }
+    release.labels.push({
+      name: label,
+      catno: catno,
+      mbid: label_mbid
+    });
+  }
 
   if (rdata["Type"] in ReleaseTypes) {
     var types = ReleaseTypes[rdata["Type"]];
