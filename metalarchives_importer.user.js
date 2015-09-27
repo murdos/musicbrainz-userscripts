@@ -86,14 +86,20 @@ function retrieveReleaseInfo(release_url) {
 
   var rdata = getGenericalData();
   var artists = getArtistsList();
-  if (rdata["Type"] == "Split") {
-    var joinphrasesplit = "/";
+  var joinphrase = "";
+  if (artists.length > 1) {
+    if (rdata["Type"] == "Split") {
+      joinphrase = " / ";
+    }
+    else {
+      joinphrase = " & ";
+    }
   }
   for (var i = 0; i < artists.length; i++) {
     release.artist_credit.push({
       artist_name: artists[i],
       credited_name: artists[i],
-      joinphrase: (typeof joinphrasesplit != 'undefined' && i != artists.length - 1) ? joinphrasesplit : ""
+      joinphrase: i != artists.length - 1 ? joinphrase : ""
     });
   }
   release.title = $('h1.album_name').text();
