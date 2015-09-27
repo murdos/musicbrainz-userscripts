@@ -127,6 +127,7 @@ function retrieveReleaseInfo(release_url) {
   if (rdata["Type"] in ReleaseTypes) {
     var types = ReleaseTypes[rdata["Type"]];
     release.type = types[0];
+    // NOTE: secondary type may not be selected on MB editor, but it still works, a bug on MB side
     release.secondary_types = types.slice(1);
   }
 
@@ -234,13 +235,13 @@ Split video
 
 //ReleaseTypes[MAtype]=["primary type","secondary type on mb"];
 var ReleaseTypes = {
-  "Full-length": ["Album"],
-  "Live album": ["Album", "Live"],
-  "Demo": ["Album", "Demo"],
-  "Single": ["Single"],
-  "EP": ["EP"],
-  "Compilation": ["Album", "Compilation"],
-  "Split": ["Album"],
+  "Full-length": ["album"],
+  "Live album": ["album", "live"],
+  "Demo": ["album", "demo"],
+  "Single": ["single"],
+  "EP": ["ep"],
+  "Compilation": ["album", "compilation"],
+  "Split": ["album"],
   "Collaboration": [""],
 };
 
