@@ -155,7 +155,7 @@ function retrieveReleaseInfo(release_url) {
 
     var track = {
       'number': trackNumber,
-      'title': $.trim(element.children[1].textContent),
+      'title': $.trim(element.children[1].textContent.replace(/\s+/g, ' ')),
       'duration': $.trim(element.children[2].textContent),
       'artist_credit': [release.artist_credit]
     };
