@@ -130,8 +130,18 @@ function retrieveReleaseInfo(release_url) {
     release.secondary_types = types.slice(1);
   }
 
-  if (rdata.hasOwnProperty("Version desc.") && rdata["Version desc."].indexOf("Digipak") != -1) {
-    release.packaging = "Digipak";
+  // FIXME: multiple vinyls ie. http://www.metal-archives.com/albums/Reverend_Bizarre/III%3A_So_Long_Suckers/415313
+  if (rdata["Format"] in ReleaseFormat) {
+    release.format = ReleaseFormat[rdata["Format"]];
+  }
+
+  if ("Version desc." in rdata) {
+    if (rdata["Version desc."].indexOf("Digipak") != -1) {
+      release.packaging = "Digipak";
+    }
+    if (release.format == "CD" && rdata["Version desc."] == "CD-R") {
+      release.format = "CD-R";
+    }
   }
 
   var identifiers = $("#album_tabs_notes > div:nth-child(2)").find("p:not([class])").contents();
@@ -150,10 +160,6 @@ function retrieveReleaseInfo(release_url) {
   });
 
   var releaseNumber = 0;
-  // FIXME: multiple vinyls ie. http://www.metal-archives.com/albums/Reverend_Bizarre/III%3A_So_Long_Suckers/415313
-  if (rdata["Format"] in ReleaseFormat) {
-    release.format = ReleaseFormat[rdata["Format"]];
-  }
   var disc = {
     tracks: [],
     format: release.format
