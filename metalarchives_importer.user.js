@@ -159,6 +159,7 @@ function retrieveReleaseInfo(release_url) {
       });
     }
 
+    // TODO: handling of split and compilation artists (artist - title)
     var track = {
       'number': trackNumber,
       'title': $.trim(element.children[1].textContent.replace(/\s+/g, ' ')),
