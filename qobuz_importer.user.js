@@ -120,7 +120,7 @@ function insertLink(release) {
 
   var mbUI = $('<p class="musicbrainz-import">' + MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release) + '</p>').hide();
 
-  $("div.meta").append(mbUI);
+  $("#info div.meta").append(mbUI);
   $('form.musicbrainz_import').css({
     'display': 'inline-block',
     'margin': '1px'
