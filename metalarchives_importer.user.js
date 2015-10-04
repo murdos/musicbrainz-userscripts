@@ -10,6 +10,7 @@
 // @require     lib/mbimport.js
 // @require     lib/mbimportstyle.js
 // @require     lib/logger.js
+// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 
