@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
-// @version     2014-12-28
+// @version     2015.8.21
 // @author      Michael Wiencek
 // @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
 // @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -15,6 +15,65 @@ scr.textContent = "(" + batch_recording_rels + ")();";
 document.body.appendChild(scr);
 
 function batch_recording_rels() {
+
+    function setting(name) {
+        name = 'bpr_' + name;
+
+        if (arguments.length === 2) {
+            localStorage.setItem(name, arguments[1]);
+        } else {
+            return localStorage.getItem(name);
+        }
+    }
+
+    // 'leven' function taken from https://github.com/sindresorhus/leven
+    // Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+    // Released under the MIT License:
+    // https://raw.githubusercontent.com/sindresorhus/leven/49baddd/license
+    function leven(a, b) {
+        if (a === b) {
+            return 0;
+        }
+
+        var aLen = a.length;
+        var bLen = b.length;
+
+        if (aLen === 0) {
+            return bLen;
+        }
+
+        if (bLen === 0) {
+            return aLen;
+        }
+
+        var bCharCode;
+        var ret;
+        var tmp;
+        var tmp2;
+        var i = 0;
+        var j = 0;
+        var arr = [];
+        var charCodeCache = [];
+
+        while (i < aLen) {
+            charCodeCache[i] = a.charCodeAt(i);
+            arr[i] = ++i;
+        }
+
+        while (j < bLen) {
+            bCharCode = b.charCodeAt(j);
+            tmp = j++;
+            ret = j;
+
+            for (i = 0; i < aLen; i++) {
+                tmp2 = bCharCode === charCodeCache[i] ? tmp : tmp + 1;
+                tmp = arr[i];
+                ret = arr[i] = tmp > ret ? tmp2 > ret ? ret + 1 : tmp2 : tmp2 > tmp ? tmp + 1 : tmp2;
+            }
+        }
+
+        return ret;
+    }
 
     // HTML helpers
 
@@ -252,8 +311,8 @@ function batch_recording_rels() {
         .css({"margin": "0.5em", "background": "#F2F2F2", "border": "1px #999 solid"})
         .insertAfter($("div#content h2")[0]);
 
-    var hide_performed_recs = $.cookie('hide_performed_recs') === 'true' ? true : false;
-    var hide_pending_edits = $.cookie('hide_pending_edits') === 'true' ? true : false;
+    var hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
+    var hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
 
     function make_checkbox(func, default_val, lbl) {
         var chkbox = $('<input type="checkbox"/>')
@@ -284,9 +343,9 @@ function batch_recording_rels() {
         function populate($obj, kind) {
             $obj
                 .append($('#id-edit-work\\.' + kind + '_id', nodes).children())
-                .val($.cookie('bpr_work_'+ kind) || 0)
+                .val(setting('work_'+ kind) || 0)
                 .on('change', function () {
-                    $.cookie('bpr_work_' + kind, this.value, { path: '/', expires: 1000 });
+                    setting('work_' + kind, this.value);
                 });
         }
         _.each($work_options, populate);
@@ -727,7 +786,9 @@ function batch_recording_rels() {
         }
 
         function sim(r, w) {
-            return r == w ? 0 : _.str.levenshtein(r, w) / ((r.length + w.length) / 2);
+            r = r || '';
+            w = w || '';
+            return r == w ? 0 : leven(r, w) / ((r.length + w.length) / 2);
         }
 
         var matches = {};
@@ -1185,7 +1246,7 @@ function batch_recording_rels() {
             $performed.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
-        $.cookie('hide_performed_recs', hide_performed_recs.toString(), { path: '/', expires: 1000 });
+        setting('hide_performed_recs', hide_performed_recs.toString());
     }
 
     function toggle_pending_edits(event, checked) {
@@ -1200,7 +1261,7 @@ function batch_recording_rels() {
             $pending.filter(function () { return !$(this).data("filtered") }).show();
         }
         restripeRows();
-        $.cookie('hide_pending_edits', hide_pending_edits.toString(), { path: '/', expires: 1000 });
+        setting('hide_pending_edits', hide_pending_edits.toString());
     }
     toggle_pending_edits(null, hide_pending_edits);
 

@@ -3,10 +3,11 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.1.2
+// @version       6.1.3
 // @license       GPL
 // @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
+// @grant         none
 // @include       *://musicbrainz.org/artist/*
 // @include       *://musicbrainz.org/label/*
 // @include       *://musicbrainz.org/release-group/*
@@ -25,6 +26,9 @@
 // @match         *://test.musicbrainz.org/artist/*
 // @match         *://test.musicbrainz.org/label/*
 // @match         *://test.musicbrainz.org/release-group/*
+// @exclude       *musicbrainz.org/artist/*/*
+// @exclude       *musicbrainz.org/label/*/*
+// @exclude       *musicbrainz.org/release-group/*/*
 // ==/UserScript==
 
 var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/,
@@ -206,7 +210,9 @@ function parse_release_group(json, mbid, parent, table) {
         track_tr.appendChild(track_td);
         inject_release_button(td, track_td, track_table, release.id);
         td.appendChild(a);
-        if (release.disambiguation) { td.appendChild(document.createTextNode(" ("+release.disambiguation+")")); }
+        if (release.disambiguation) {
+            td.appendChild(document.createTextNode(" (" + release.disambiguation + ")"));
+        }
         tr.appendChild(td);
         format_td.innerHTML = release.formats;
         tr.appendChild(format_td);
