@@ -226,7 +226,9 @@ function parse_release_group(json, mbid, parent, table) {
         track_tr.appendChild(track_td);
         inject_release_button(td, track_td, track_table, release.id);
         td.appendChild(a);
-        if (release.disambiguation) { td.appendChild(document.createTextNode(" ("+release.disambiguation+")")); }
+        if (release.disambiguation) {
+            td.appendChild(document.createTextNode(" (" + release.disambiguation + ")"));
+        }
         tr.appendChild(td);
         format_td.innerHTML = release.formats;
         tr.appendChild(format_td);
