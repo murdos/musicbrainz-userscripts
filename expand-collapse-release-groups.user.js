@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.2
+// @version       6.3
 // @license       GPL
 // @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
@@ -32,7 +32,6 @@
 // @match         *://test.musicbrainz.org/label/*
 // @match         *://test.musicbrainz.org/release-group/*
 // @match         *://test.musicbrainz.org/series/*
-// @exclude       *musicbrainz.org/artist/*/*
 // @exclude       *musicbrainz.org/label/*/*
 // @exclude       *musicbrainz.org/release-group/*/*
 // @exclude       *musicbrainz.org/series/*/*
@@ -52,34 +51,12 @@ if (firstThead) {
         var current_tab = document.querySelector(".tabs .sel a").textContent;
     }
 
-    if (entity == "series") {
-        var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='" + location.protocol + "//" + location.host + "/release']");
-        for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
-            if (releasesOrReleaseGroups[r].getAttribute("href").match(/\/release-group\//)) {
-                inject_release_group_button(getAncestor(releasesOrReleaseGroups[r], "td"));
-            } else {
-                inject_release_button(getAncestor(releasesOrReleaseGroups[r], "td"));
-            }
-        }
-    } else if (entity == "artist" && current_tab == "Overview") {
-        for (; col < ths.length; col++)
-            if (ths[col].textContent == "Title")
-                break;
-
-        for (var i = 0; i < trs.length; i++) {
-            if (/\/release-group\/[a-z\d\-]+/.test(trs[i].innerHTML)) {
-                inject_release_group_button(trs[i].getElementsByTagName("td")[col]);
-            }
-        }
-    } else if (entity != "artist" || entity == "artist" && current_tab == "Releases") {
-        for (; col < ths.length; col++)
-            if (ths[col].textContent == "Release")
-                break;
-
-        for (var i = 0; i < trs.length; i++) {
-            if (/\/release\/[a-z\d\-]+/.test(trs[i].innerHTML)) {
-                inject_release_button(trs[i].getElementsByTagName("td")[col]);
-            }
+    var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='" + location.protocol + "//" + location.host + "/release']");
+    for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
+        if (releasesOrReleaseGroups[r].getAttribute("href").match(/\/release-group\//)) {
+            inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
+        } else {
+            inject_release_button(releasesOrReleaseGroups[r].parentNode);
         }
     }
 }
@@ -338,16 +315,4 @@ function createLink(href, text) {
     var element = createElement("a", text);
     element.href = href;
     return element;
-}
-
-function getAncestor(obj, searchedTag) {
-    if (obj.parentNode) {
-        if (obj.parentNode.nodeName == searchedTag.toUpperCase()) {
-            return obj.parentNode;
-        } else {
-            getAncestor(obj.parentNode, searchedTag);
-        }
-    } else {
-        return null;
-    }
 }
