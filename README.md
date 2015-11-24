@@ -1,4 +1,4 @@
-# Bitmap’s User Scripts #
+ï»¿# Bitmapâ€™s User Scripts #
 
 These are **user scripts** for [MusicBrainz](https://musicbrainz.org).
 
@@ -11,7 +11,7 @@ Batch link recordings to works from artist **Recordings** page.
 
 ### [MusicBrainz: Expand/collapse release groups](../../raw/master/expand-collapse-release-groups.user.js) ###
 
-See what’s inside a release or release group without having to follow its URL. Also adds convenient edit links for it.
+See whatâ€™s inside a release or release group without having to follow its URL. Also adds convenient edit links for it.
 
 ### [MusicBrainz: Fast cancel edits](../../raw/master/fast-cancel-edits.user.js) ###
 
