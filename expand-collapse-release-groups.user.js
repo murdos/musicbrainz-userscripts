@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.3
+// @version       6.3.1
 // @license       GPL
 // @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
@@ -37,27 +37,14 @@
 // @exclude       *musicbrainz.org/series/*/*
 // ==/UserScript==
 
-var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/,
-    entity = window.location.pathname.match(/\/(artist|label|release-group|series)\/.+/)[1],
-    firstThead = document.querySelector("table.tbl > thead");
+var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/;
 
-if (firstThead) {
-
-    var ths = firstThead.getElementsByTagName("th"),
-        trs = document.querySelectorAll("table.tbl > tbody > tr:not(.subh)"),
-        col = 0;
-
-    if (entity == "artist") {
-        var current_tab = document.querySelector(".tabs .sel a").textContent;
-    }
-
-    var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='" + location.protocol + "//" + location.host + "/release']");
-    for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
-        if (releasesOrReleaseGroups[r].getAttribute("href").match(/\/release-group\//)) {
-            inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
-        } else {
-            inject_release_button(releasesOrReleaseGroups[r].parentNode);
-        }
+var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='" + location.protocol + "//" + location.host + "/release']");
+for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
+    if (releasesOrReleaseGroups[r].getAttribute("href").match(/\/release-group\//)) {
+        inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
+    } else {
+        inject_release_button(releasesOrReleaseGroups[r].parentNode);
     }
 }
 
