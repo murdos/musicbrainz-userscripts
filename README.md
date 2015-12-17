@@ -2,7 +2,7 @@
 
 These are **user scripts** for [MusicBrainz](https://musicbrainz.org).
 
-Once you have installed a [user script extension](https://greasyfork.org/help/installing-user-scripts) to your browser, you can click one of these scripts to install and start using it.
+Once you have installed a [user script extension](https://greasyfork.org/help/installing-user-scripts) to your browser, you can click these script links below to install and start using them.
 
 
 ### [MusicBrainz: Batch-add "performance of" relationships](../../raw/master/batch-add-recording-relationships.user.js) ###
