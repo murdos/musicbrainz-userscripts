@@ -657,7 +657,7 @@ function parseDiscogsRelease(data) {
         // A1 or A    => Vinyl or Cassette : guess releaseNumber from vinyl side
         // 1-1 or 1.1 => releaseNumber.trackNumber
         // 1          => trackNumber
-        var tmp = trackPosition.match(/(\d+|[A-Z])(?:[\.-](\d+))?/i);
+        var tmp = trackPosition.match(/(\d+|[A-Z])(?:[\.-]+(\d+))?/i);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
             var buggyTrackNumber = false;
