@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2015.07.07.0
+// @version        2016.01.08.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -657,7 +657,7 @@ function parseDiscogsRelease(data) {
         // A1 or A    => Vinyl or Cassette : guess releaseNumber from vinyl side
         // 1-1 or 1.1 => releaseNumber.trackNumber
         // 1          => trackNumber
-        var tmp = trackPosition.match(/(\d+|[A-Z])(?:[\.-](\d+))?/i);
+        var tmp = trackPosition.match(/(\d+|[A-Z])(?:[\.-]+(\d+))?/i);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
             var buggyTrackNumber = false;
