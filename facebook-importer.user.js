@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 var API_URL = "//graph.facebook.com/v2.5/";
-var API_KEY = "CAAH2KEQYlHUBAApqvkEmKZCudgkWFJm79jIQkyK6J8W3rZBlaVx8HRN5ppv2pzHtj1vYUcNHb74iIo2uD2OKRdqjZAwmclAUoxU4th0VDqYNufIlVhGPb5dtV1G1K97qC81ZBLpDWcc3qjmuHkRdmDZBPWKicZCGbx2mton6tMk9HZCy7ezMOuEPUxPItemcCFEmyauhHUX9AZDZD";
+var API_KEY = "CAAO2IKDySlMBAOc6UU5jRHqiEFrENsZC09f4KJsMpDPOTV9gAjZC5tIdVqBeibxfk0i2XwuHL61ywnQdnI4KdCgwCfZCXwc0ZCryj48a1PRjVMuCbpoScvzeYlrTujLynPPKdgS66eLAvqGZCzl3Kj7ahRj97tYeR4VIGGVCQ9pRWDxZC9rPzIBEFTjvjBZCacZD";
 var GITHUB_URL = "";
 
 $(window).load(function () {
