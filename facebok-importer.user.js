@@ -3,6 +3,7 @@
 // @version     2016-01-15
 // @author      Ohm Patel
 // @require     https://code.jquery.com/jquery-2.2.0.min.js
+// @grant       none
 //
 // @include     *://www.facebook.*/events/*
 // ==/UserScript==
@@ -11,7 +12,7 @@ var API_URL = "//graph.facebook.com/v2.5/";
 var API_KEY = "CAAO2IKDySlMBAOZAVymMJ5EqAJFoVEMPg0FqaojoeP8MamUjoteZCCEJdovGTbGDYIfxvI3K4i6ZB82PElo4vFZAk7EbqelEm7wSzs61cgqrf0jneTDftN0WoXKsrL3hgyVBcExOWZC4ZAgM6E3ZAyDgEbuE40bqF9ZBGBqjeOfv7YfNk23CJJTzq5AYzmfpNGopZCSrsyjTFzQZDZD";
 var GITHUB_URL = "";
 
-$(window).load(function (") {
+$(window).load(function () {
   // Create Form
   var addForm = document.createElement("form");
   addForm.method = "get";
