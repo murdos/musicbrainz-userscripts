@@ -14,17 +14,28 @@ var GITHUB_URL = "";
 
 $(window).load(function () {
   // Create Form
-  var addForm = document.createElement("form");
-  addForm.method = "get";
-  addForm.target = "_blank";
-  addForm.action = document.location.protocol + "//musicbrainz.org/event/create";
-  var addBtnElem = document.createElement("input");
-  addBtnElem.value = "Add event to MusicBrainz";
-  addBtnElem.type = "submit";
+  var addForm = document.createElement('form');
+  addForm.method = 'get';
+  addForm.target = '_blank';
+  addForm.action = document.location.protocol + '//musicbrainz.org/event/create';
+  var addBtnElem = document.createElement('input');
+  addBtnElem.value = 'Add event to MusicBrainz';
+  addBtnElem.type = 'submit';
+  $(addBtnElem).css({
+    'display': 'inline-block',
+    'border-color': '#CCC #C5C6C8 #B6B7B9',
+    'color': '#4E5665',
+    'text-shadow': '0px 1px 0px #FFF',
+    'padding': '3px 0px',
+    'z-index': '1'
+  });
   addForm.appendChild(addBtnElem);
-  var div = document.createElement("div");
+  var div = document.createElement('div');
+  $(div).css({
+    'display': 'inline-block'
+  });
   div.appendChild(addForm);
-  var parent = document.getElementById("event_button_bar");
+  var parent = document.getElementById('event_button_bar');
   parent.insertBefore(div, parent.firstChild);
   
   // Facebook API Call & Set Options
