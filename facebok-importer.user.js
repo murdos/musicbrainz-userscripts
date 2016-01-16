@@ -22,7 +22,6 @@ $(window).load(function () {
   addBtnElem.value = 'Add event to MusicBrainz';
   addBtnElem.type = 'submit';
   $(addBtnElem).css({
-    'display': 'inline-block',
     'border-color': '#CCC #C5C6C8 #B6B7B9',
     'color': '#4E5665',
     'text-shadow': '0px 1px 0px #FFF',
