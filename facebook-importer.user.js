@@ -42,7 +42,10 @@ $(window).load(function () {
   var url = API_URL + event_id + "/?access_token=" + API_KEY;
   $.getJSON(url, function (eventData) {
     add_field("edit-event.name", eventData.name);
-    add_field("edit-event.edit_note", "Imported from " + window.location.href + " using " + GITHUB_URL);
+    add_field("edit-event.edit_note", "Imported from " + window.location.href + " using MusicBrainz - Facebook Event Importer");
+    
+    add_field("edit-event.url.0.text", window.location.href);
+    add_field("edit-event.url.0.link_type_id", "783");
     
     add_field("edit-event.period.begin_date.year", eventData.start_time.substring(0,4));
     add_field("edit-event.period.begin_date.month", eventData.start_time.substring(5,7));
