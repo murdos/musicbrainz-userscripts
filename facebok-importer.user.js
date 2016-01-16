@@ -17,7 +17,7 @@ $(window).load(function () {
   var addForm = document.createElement("form");
   addForm.method = "get";
   addForm.target = "_blank";
-               addForm.action = document.location.protocol + "//musicbrainz.org/event/create";
+  addForm.action = document.location.protocol + "//musicbrainz.org/event/create";
   var addBtnElem = document.createElement("input");
   addBtnElem.value = "Add event to MusicBrainz";
   addBtnElem.type = "submit";
