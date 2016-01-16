@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 var API_URL = "//graph.facebook.com/v2.5/";
-var API_KEY = "CAAO2IKDySlMBAOZAVymMJ5EqAJFoVEMPg0FqaojoeP8MamUjoteZCCEJdovGTbGDYIfxvI3K4i6ZB82PElo4vFZAk7EbqelEm7wSzs61cgqrf0jneTDftN0WoXKsrL3hgyVBcExOWZC4ZAgM6E3ZAyDgEbuE40bqF9ZBGBqjeOfv7YfNk23CJJTzq5AYzmfpNGopZCSrsyjTFzQZDZD";
+var API_KEY = "CAAH2KEQYlHUBAApqvkEmKZCudgkWFJm79jIQkyK6J8W3rZBlaVx8HRN5ppv2pzHtj1vYUcNHb74iIo2uD2OKRdqjZAwmclAUoxU4th0VDqYNufIlVhGPb5dtV1G1K97qC81ZBLpDWcc3qjmuHkRdmDZBPWKicZCGbx2mton6tMk9HZCy7ezMOuEPUxPItemcCFEmyauhHUX9AZDZD";
 var GITHUB_URL = "";
 
 $(window).load(function () {
@@ -43,9 +43,6 @@ $(window).load(function () {
   $.getJSON(url, function (eventData) {
     add_field("edit-event.name", eventData.name);
     add_field("edit-event.edit_note", "Imported from " + window.location.href + " using " + GITHUB_URL);
-    
-    add_field("urls.0.url", window.location.href);
-    add_field("urls.0.link_type", "783");
     
     add_field("edit-event.period.begin_date.year", eventData.start_time.substring(0,4));
     add_field("edit-event.period.begin_date.month", eventData.start_time.substring(5,7));
