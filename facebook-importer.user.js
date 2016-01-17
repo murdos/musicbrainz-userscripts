@@ -1,16 +1,14 @@
 // ==UserScript==
 // @name        MusicBrainz: Import events from Facebook
-// @version     2016-01-15
+// @version     2016-01-17
 // @author      Ohm Patel
 // @require     https://code.jquery.com/jquery-2.2.0.min.js
 // @grant       none
-//
 // @include     *://www.facebook.*/events/*
 // ==/UserScript==
 
 var API_URL = "//graph.facebook.com/v2.5/";
 var API_KEY = "CAAO2IKDySlMBAOc6UU5jRHqiEFrENsZC09f4KJsMpDPOTV9gAjZC5tIdVqBeibxfk0i2XwuHL61ywnQdnI4KdCgwCfZCXwc0ZCryj48a1PRjVMuCbpoScvzeYlrTujLynPPKdgS66eLAvqGZCzl3Kj7ahRj97tYeR4VIGGVCQ9pRWDxZC9rPzIBEFTjvjBZCacZD";
-var GITHUB_URL = "";
 
 $(window).load(function () {
   // Create Form
