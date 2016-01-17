@@ -49,6 +49,18 @@ $(window).load(function () {
     add_field("edit-event.period.begin_date.month", eventData.start_time.substring(5,7));
     add_field("edit-event.period.begin_date.day", eventData.start_time.substring(8,10));
     add_field("edit-event.time", eventData.start_time.substring(11,16));
+    
+    if(eventData.end_time) {
+      add_field("edit-event.period.end_date.year", eventData.end_time.substring(0,4));
+      add_field("edit-event.period.end_date.month", eventData.end_time.substring(5,7));
+      add_field("edit-event.period.end_date.day", eventData.end_time.substring(8,10));
+    }
+    else {
+      add_field("edit-event.period.end_date.year", eventData.start_time.substring(0,4));
+      add_field("edit-event.period.end_date.month", eventData.start_time.substring(5,7));
+      add_field("edit-event.period.end_date.day", eventData.start_time.substring(8,10));
+    }
+    
   });
   
   // Add Field Function
