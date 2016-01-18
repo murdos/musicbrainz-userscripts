@@ -4,7 +4,7 @@
 // @author      Ohm Patel
 // @require     https://code.jquery.com/jquery-2.2.0.min.js
 // @grant       none
-// @include     *://www.facebook.*/events/*
+// @include     *.facebook.*/events/*
 // ==/UserScript==
 
 var API_URL = "//graph.facebook.com/v2.5/";
