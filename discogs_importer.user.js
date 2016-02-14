@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2016.02.13.0
+// @version        2016.02.14.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -60,7 +60,7 @@ $(document).ready(function(){
     if (current_page_info.type == 'release') {
 
         // Discogs Webservice URL
-        var discogsWsUrl = 'http://api.discogs.com/releases/' + current_page_info.id;
+        var discogsWsUrl = 'https://api.discogs.com/releases/' + current_page_info.id;
 
         $.ajax({
             url: discogsWsUrl,
@@ -291,7 +291,7 @@ function getDiscogsLinkKey(url) {
         link_infos[key] = {
           type: m[1],
           id: m[2],
-          clean_url: 'http://www.discogs.com/' + m[1] + '/' + m[2]
+          clean_url: 'https://www.discogs.com/' + m[1] + '/' + m[2]
         }
         LOGGER.debug('getDiscogsLinkKey:' + url + ' --> ' + key);
       } else {
