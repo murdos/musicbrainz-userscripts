@@ -2,10 +2,10 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2016.02.15.0
+// @version        2016.02.17.0
 // @namespace      http://userscripts.org/users/22504
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
+// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
+// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @include        http*://www.discogs.com/*
 // @include        http*://*.discogs.com/*release/*
 // @exclude        http*://*.discogs.com/*release/*?f=xml*
@@ -368,12 +368,12 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 
 function insertMbUI(mbUI) {
   var e;
-  if ((e = $("div.section.social")) && e.length) {
-    e.before(mbUI);
+  if ((e = $("div.section.collections")) && e.length) {
+    e.after(mbUI);
   } else if ((e = $('#statistics')) && e.length) {
     e.before(mbUI);
-  } else if ((e = $("div.marketplace_box_links")) && e.length) {
-    e.after(mbUI);
+  } else if ((e = $("div.section.social")) && e.length) {
+    e.before(mbUI);
   }
 }
 
@@ -1054,3 +1054,4 @@ var Countries = {
     "Saint Helena": "SH",
     "Svalbard and Jan Mayen": "SJ"
 };
+
