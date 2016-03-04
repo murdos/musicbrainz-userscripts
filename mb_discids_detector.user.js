@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version        2016.02.20.0
+// @version        2016.03.05.0
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -23,7 +23,7 @@ var CHECK_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA
 
 $(document).ready(function () {
 
-    if (window.location.host.match(/(what\.cd|lztr\.us)|mutracker\.org/)) {
+    if (window.location.host.match(/what\.cd|lztr\.(us|me)|mutracker\.org/)) {
         gazellePageHandler();
     } else if (window.location.host.match(/avaxhome\.ws/)) {
         avaxHomePageHandler();
