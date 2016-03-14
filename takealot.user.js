@@ -59,7 +59,6 @@ function insertMbUI(mbUI) {
 
 
 
-
 // Insert links in Takealot page
 function insertMBSection(release) {
 	LOGGER.debug("insertMBsection Firing");
@@ -75,9 +74,9 @@ function insertMBSection(release) {
 
 	// Form parameters
 	var edit_note = MBImport.makeEditNote(window.location.href, 'Takealot');
-	LOGGER.debug("*** Edit Note: ", edit_note);
+	LOGGER.debug("Edit Note: ", edit_note);
 	var parameters = MBImport.buildFormParameters(release, edit_note);
-	LOGGER.debug("*** Form parameters: ",parameters);
+	// LOGGER.debug("*** Form parameters: ", parameters);
 	// Build form + search button
 	var innerHTML = '<div id="mb_buttons">' + MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release) + '</div>';
 	mbContentBlock.append(innerHTML);
@@ -103,7 +102,6 @@ function insertMBSection(release) {
 	mbUI.slideDown();
 }
 
-
 // Analyze Takealot data and return a release object
 function ParseTakealotPage() {
 	LOGGER.debug("ParseTakealotPage function firing");
@@ -114,21 +112,8 @@ function ParseTakealotPage() {
 	var releaselanguage = "";
 	var releasetitle = "";
 
-	// sample header "Huisgenoot Se 20 Country-Treffers - Various Artists (CD)"
-	var MediaHeading = document.querySelectorAll("h1.fn");
-	LOGGER.debug(MediaHeading[0].innerText);
-	var TitleStr = MediaHeading[0].innerText;
-	var TitleRegex = /(.*)-(.*)+\s\(([^)]+)\)/;
-	var HeadArray = TitleStr.match(TitleRegex);
-	releasetitle = HeadArray[1];
-	LOGGER.debug("** Title from H1** ", releasetitle);
-	// need to move and do check further down sometimes artist sometimes album first
-	// therefore if title = artist move to next item in array ... a real hack
-
-
 	// Select all DL data in the "Product Info" div id = second div class = details 
 	var allinfolist = document.querySelectorAll("div#second > div.details > dl > *");
-
 	// Iterate all over the lines
 	for (var i = 0; i < allinfolist.length; i++) {
 		var artistitemlabel = allinfolist[i];
@@ -143,6 +128,10 @@ function ParseTakealotPage() {
 				case "country": // use these cases to select the spesific text values
 					releasecountry = artistitemlabel.nextSibling.textContent.trim();
 					LOGGER.debug('The value is :' + artistitem + ' > ' + releasecountry);
+					break;
+				case "artists": // use these cases to select the spesific text values
+					releaseartist = artistitemlabel.nextSibling.textContent.trim();
+					LOGGER.debug('The value is :' + artistitem + ' > ' + releaseartist);
 					break;
 				case "date released": // use these cases to select the spesific text values
 					releasedaterel = artistitemlabel.nextSibling.textContent.trim();
@@ -166,7 +155,7 @@ function ParseTakealotPage() {
 					// Tracks
 					var tracklistarray = new Array(); // create the tracklist array to use later
 
-					//var releaseartist = alltracklist[0].textContent.trim();
+					// var releaseartist = alltracklist[0].textContent.trim();
 					// The format on Takealot changed and Artist is not the first element in li anymore but last
 					// remember this is a nodeList and not an array
 					var releaseartist = alltracklist[alltracklist.length - 1].textContent.trim();
@@ -190,6 +179,26 @@ function ParseTakealotPage() {
 					break;
 			}
 		}
+
+	}
+
+	if (releasetitle == "") {
+		// sample header "Huisgenoot Se 20 Country-Treffers - Various Artists (CD)"
+		var MediaHeading = document.querySelectorAll("h1.fn");
+		// LOGGER.debug(MediaHeading[0].innerText);
+		var TitleStr = MediaHeading[0].innerText;
+		var TitleRegex = /(.*)-(.*)+\s\(([^)]+)\)/;
+		var HeadArray = TitleStr.match(TitleRegex);
+
+		if (HeadArray[1].trim() == releaseartist) {
+			LOGGER.debug('matched title equal releaseartist therefore swapped');
+			releasetitle = HeadArray[2].trim();
+		} else {
+			LOGGER.debug('not swapped');
+			releasetitle = HeadArray[1].trim();
+		}
+		LOGGER.debug("The value is :", releasetitle);
+		// therefore if title = artist move to next item in array ... a real hack
 	}
 
 	release = new Object();
