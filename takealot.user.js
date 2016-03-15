@@ -160,28 +160,55 @@ function ParseTakealotPage() {
 					// remember this is a nodeList and not an array
 					var releaseartist = alltracklist[alltracklist.length - 1].textContent.trim();
 					LOGGER.debug('The album artist:' + releaseartist);
-					for (var j = 0; j < alltracklist.length - 1; j++) { // start at 1 to ignore 0 as it is not a track but previous ol need to change code to only iterate second ol
-						// changed j to 0 and length-1 as Artist is at end now
-						var track = new Object();
-						//LOGGER.info('The track number:' + j);
-						var trackdetails = alltracklist[j].textContent.trim();
-						//LOGGER.info('The track name:' + trackdetails);
-						var getridoffront = trackdetails.replace(/\[ Disc 01 Track./g, ""); //regex to change beginning of text
-						var changebacktodot = getridoffront.replace(/\b\d{2}.\]./g, ""); // regex to change the remainder of text in correct MusicBrainz import format   new \b\d{2}.\]  old .\].
-						//LOGGER.debug('The track regexed:' + changebacktodot);
 
-						track.number = j;
-						track.title = changebacktodot;
-						tracklistarray.push(track); // push the track objects into the array
+					// Last track to find last disc number
+					var lasttrack = alltracklist[alltracklist.length - 2].textContent.trim();
+					LOGGER.debug('The last track:' + lasttrack);
 
+					lastdiscnumberregex = /\[ Disc (.*) Track./; // regex to match disc number from last track
+					var lastdiscnumbermatch = lasttrack.match(lastdiscnumberregex);
+					var lastdiscnumber = parseInt(lastdiscnumbermatch[1]);
+					LOGGER.debug("Last Disc Number: ", lastdiscnumber);
+
+					// Discs
+					var disclistarray = new Array(); // create the tracklist array to use later
+
+					for (var k = 1; k < lastdiscnumber + 1; k++) { // start at 1 to keep array in sync with disc numbers
+						LOGGER.info("Disc itterate: ", k);
+
+						// Tracks
+						var tracklistarray = new Array(); // create the track list array
+
+						for (var j = 0; j < alltracklist.length - 1; j++) { // changed j to 0 and length-1 as Artist is at end
+							// do regex here and if disc = k then, so another if loop
+							var trackdetails = alltracklist[j].textContent.trim();
+							disctracktitleregex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*)/;
+							var disctracktitle = trackdetails.match(disctracktitleregex);
+
+							var currentdiscnumber = parseInt(disctracktitle[1]);
+
+							if (currentdiscnumber == k) {
+
+								var track = new Object();
+								track.number = parseInt(disctracktitle[2]);
+								track.title = disctracktitle[3];
+								LOGGER.debug("The track object: ", currentdiscnumber + ' - ' + track.number + " - " + track.title);
+
+								tracklistarray.push(track);
+							}
+						}
+						disclistarray.push(tracklistarray);
 					}
-					//LOGGER.info(tracklistarray);
+
+					LOGGER.debug("** Disclist Array *** ", disclistarray);
+					//LOGGER.debug("** Tracklist Array *** ", tracklistarray);
 					break;
 			}
 		}
 
 	}
 
+	// Logic added to derive the release title from the heading if missing from product info
 	if (releasetitle == "") {
 		// sample header "Huisgenoot Se 20 Country-Treffers - Various Artists (CD)"
 		var MediaHeading = document.querySelectorAll("h1.fn");
@@ -225,11 +252,18 @@ function ParseTakealotPage() {
 	release.country = Countries[releasecountry];
 	release.language = Languages[releaselanguage];
 
-	var disc = {
-		'position': 1,
-		'tracks': tracklistarray
-	}; //use the tracklist array
-	release.discs = [disc];
+
+
+	release.discs = new Array();
+	for (var l = 0; l < lastdiscnumber; l++) {
+		LOGGER.debug("*** Disc position ***", l + 1);
+		LOGGER.debug("*** The Disk tracks *** ", disclistarray[l]);
+		var disc = {
+			'position': l + 1,
+			'tracks': disclistarray[l]
+		};
+		release.discs.push(disc);
+	}
 
 	release.labels = [];
 
