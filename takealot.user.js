@@ -113,7 +113,7 @@ function ParseTakealotPage() {
 	var releaselanguage = "";
 	var releasetitle = "";
 
-	// Select all DL data in the "Product Info" div id = second div class = details 
+	// Select all DL data in the "Product Info" div id = second div class = details
 	var allinfolist = document.querySelectorAll("div#second > div.details > dl > *");
 	// Iterate all over the lines
 	for (var i = 0; i < allinfolist.length; i++) {
