@@ -12,6 +12,7 @@
 * [Import Last.fm releases to MusicBrainz](#lastfm_importer)
 * [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 * [Import Qobuz releases to MusicBrainz](#qobuz_importer)
+* [Import Takealot releases to MusicBrainz](#takealot_importer)
 * [Musicbrainz DiscIds Detector](#mb_discids_detector)
 * [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
@@ -62,7 +63,7 @@ Add a button on CD1D.com release pages allowing to open MusicBrainz release edit
 Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
 
 ## <a name="encyclopedisque_importer"></a> Import Encyclopedisque releases to MusicBrainz
 
@@ -98,6 +99,12 @@ Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/qobuz_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js)
+
+## <a name="takealot_importer"></a> Import Takealot releases to MusicBrainz
+
+Add a button to import Takealot releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/takealot_importer.user.js)
 
 ## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
 
