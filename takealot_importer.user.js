@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Takealot releases to MusicBrainz
 // @description    Add a button to import Takealot releases to MusicBrainz
-// @version        2016.03.09.2
+// @version        2016.03.15.0
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://www.takealot.com/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
