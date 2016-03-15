@@ -2,7 +2,7 @@
 // @name           Import Takealot releases to MusicBrainz
 // @description    Add a button to import Takealot releases to MusicBrainz
 // @version        2016.03.09.2
-// @namespace      http://lenjoubertblog.blogspot.com
+// @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://www.takealot.com/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
@@ -19,7 +19,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true;
+var DEBUG = false;
 //DEBUG = false;
 if (DEBUG) {
 	LOGGER.setLevel('debug');
@@ -29,8 +29,9 @@ if (DEBUG) {
 
 /*
  * Test cases:
- * - http://www.takealot.com/theuns-jordaan-roeper-cd/PLID17284867 - working
- * - http://www.takealot.com/various-artists-still-the-one-3cd/PLID40723650 - pending
+ * - http://www.takealot.com/theuns-jordaan-roeper-cd/PLID17284867 - working (Single artist release)
+ * - http://www.takealot.com/various-artists-still-the-one-3cd/PLID40723650 - a dirty example
+ * - http://www.takealot.com/now-71-various-artists-cd/PLID40688034 - working (Various Artists and Multi Disc)
  */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,13 +175,13 @@ function ParseTakealotPage() {
 					var disclistarray = new Array(); // create the tracklist array to use later
 
 					for (var k = 1; k < lastdiscnumber + 1; k++) { // start at 1 to keep array in sync with disc numbers
-						LOGGER.info("Disc itterate: ", k);
+						LOGGER.debug("Disc iterate: ", k);
 
 						// Tracks
 						var tracklistarray = new Array(); // create the track list array
 
 						for (var j = 0; j < alltracklist.length - 1; j++) { // changed j to 0 and length-1 as Artist is at end
-							// do regex here and if disc = k then, so another if loop
+							// do regex here and if current disc listed in track = k then push the track into the array for that disc
 							var trackdetails = alltracklist[j].textContent.trim();
 							disctracktitleregex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*)/;
 							var disctracktitle = trackdetails.match(disctracktitleregex);
@@ -201,7 +202,6 @@ function ParseTakealotPage() {
 					}
 
 					LOGGER.debug("** Disclist Array *** ", disclistarray);
-					//LOGGER.debug("** Tracklist Array *** ", tracklistarray);
 					break;
 			}
 		}
@@ -218,14 +218,14 @@ function ParseTakealotPage() {
 		var HeadArray = TitleStr.match(TitleRegex);
 
 		if (HeadArray[1].trim() == releaseartist) {
-			LOGGER.debug('matched title equal releaseartist therefore swapped');
+			LOGGER.debug('matched title equal the releaseartist therefore swapped');
 			releasetitle = HeadArray[2].trim();
 		} else {
-			LOGGER.debug('not swapped');
+			LOGGER.debug('matched title equal the title therefore not swapped');
 			releasetitle = HeadArray[1].trim();
 		}
-		LOGGER.debug("The value is :", releasetitle);
-		// therefore if title = artist move to next item in array ... a real hack
+		LOGGER.debug("Release Title from heading:", releasetitle);
+
 	}
 
 	release = new Object();
@@ -252,12 +252,10 @@ function ParseTakealotPage() {
 	release.country = Countries[releasecountry];
 	release.language = Languages[releaselanguage];
 
-
-
 	release.discs = new Array();
 	for (var l = 0; l < lastdiscnumber; l++) {
-		LOGGER.debug("*** Disc position ***", l + 1);
-		LOGGER.debug("*** The Disk tracks *** ", disclistarray[l]);
+		LOGGER.debug("Disc position:", l + 1);
+		LOGGER.debug("Tracklist for the selected disc: ", disclistarray[l]);
 		var disc = {
 			'position': l + 1,
 			'tracks': disclistarray[l]
@@ -271,7 +269,7 @@ function ParseTakealotPage() {
 	release.urls = new Array();
 	release.urls.push({
 		'url': window.location.href,
-		'link_type': 74
+		'link_type': MBImport.URL_TYPES.purchase_for_download
 	}); //type 74 is purchase for download
 
 	// Release date
