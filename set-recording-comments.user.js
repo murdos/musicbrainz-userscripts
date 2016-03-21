@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2015.7.10.1418
+// @version        2016.3.21
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -24,15 +24,11 @@ document.body.appendChild(scr);
 function setRecordingComments() {
     var $tracks;
     var $inputs = $();
-    var nameColumn = 1;
     var EDIT_RECORDING_EDIT = 72;
 
     $("head").append($("<style></style>").text("input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }"));
 
     var delay = setInterval(function () {
-        if ($("th.video").length > 0) {
-            nameColumn = 2;
-        }
         $tracks = $(".medium tbody tr[id]");
 
         if ($tracks.length) {
@@ -42,7 +38,7 @@ function setRecordingComments() {
         }
 
         $tracks.each(function () {
-            var $td = $(this).children("td").eq(nameColumn),
+            var $td = $(this).children("td + td:not(.video)"),
                 node = ($td.children(".mp")[0] ||
                         $td.children(".name-variation")[0] ||
                         $td.children("a[href*=\\/recording\\/]")[0]),
@@ -147,7 +143,7 @@ function setRecordingComments() {
                         $input.css("border-color", "red").prop("disabled", false);
                     });
 
-                var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
+                var link = $(track).children("td + td:not(.video)").find("a[href*=\\/recording\\/]")[0],
                     mbid = link.href.match(MBID_REGEX)[0];
 
                 editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
