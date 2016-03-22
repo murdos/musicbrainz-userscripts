@@ -261,7 +261,7 @@ function ParseTakealotPage() {
 				descriptiontrack.disc = thediscnumber;
 				descriptiontrack.track = descriptionrow_tracktitleartist[1];
 				descriptiontrack.title = descriptionrow_tracktitleartist[2];
-			  descriptiontrack.artist = descriptionrow_tracktitleartist[3];
+				descriptiontrack.artist = descriptionrow_tracktitleartist[3];
 
 				//to get the last disc number via iterate
 				var description_lastdisc = parseInt(thediscnumber);
@@ -281,13 +281,13 @@ function ParseTakealotPage() {
 				var desc_currentdiscnumber = descriptionarray[desc__track].disc;
 				if (desc_currentdiscnumber == desc_discs + 1) {
 					var track = new Object();
-          var track_artist_credit = new Array();
-					
+					var track_artist_credit = new Array();
+
 					track.number = descriptionarray[desc__track].track;
 					track.title = descriptionarray[desc__track].title;
-					
+
 					var track_artist_credit_object = new Object();
-          track_artist_credit_object.artist_name = descriptionarray[desc__track].artist;
+					track_artist_credit_object.artist_name = descriptionarray[desc__track].artist;
 					track_artist_credit.push(track_artist_credit_object);
 					//track_artist_credit.artist_name = descriptionarray[desc__track].artist;
 					track.artist_credit = track_artist_credit;
