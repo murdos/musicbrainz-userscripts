@@ -21,7 +21,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true;
+var DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {
 	LOGGER.setLevel('debug');
@@ -342,7 +342,7 @@ function ParseTakealotPage() {
 	release.urls = new Array();
 	release.urls.push({
 		'url': window.location.href,
-		'link_type': MBImport.URL_TYPES.purchase_for_download
+		'link_type': MBImport.URL_TYPES.purchase_for_mail_order
 	}); //type 74 is purchase for download
 	// TODO check if CD then add purchase medium
 
