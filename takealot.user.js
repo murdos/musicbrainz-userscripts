@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Takealot releases to MusicBrainz
 // @description    Add a button to import Takealot releases to MusicBrainz
-// @version        2016.03.21.1
+// @version        2016.03.22.2
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://www.takealot.com/*
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
@@ -21,7 +21,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = false;
+var DEBUG = true;
 //DEBUG = true;
 if (DEBUG) {
 	LOGGER.setLevel('debug');
@@ -261,6 +261,7 @@ function ParseTakealotPage() {
 				descriptiontrack.disc = thediscnumber;
 				descriptiontrack.track = descriptionrow_tracktitleartist[1];
 				descriptiontrack.title = descriptionrow_tracktitleartist[2];
+			  descriptiontrack.artist = descriptionrow_tracktitleartist[3];
 
 				//to get the last disc number via iterate
 				var description_lastdisc = parseInt(thediscnumber);
@@ -280,9 +281,16 @@ function ParseTakealotPage() {
 				var desc_currentdiscnumber = descriptionarray[desc__track].disc;
 				if (desc_currentdiscnumber == desc_discs + 1) {
 					var track = new Object();
-
+          var track_artist_credit = new Array();
+					
 					track.number = descriptionarray[desc__track].track;
 					track.title = descriptionarray[desc__track].title;
+					
+					var track_artist_credit_object = new Object();
+          track_artist_credit_object.artist_name = descriptionarray[desc__track].artist;
+					track_artist_credit.push(track_artist_credit_object);
+					//track_artist_credit.artist_name = descriptionarray[desc__track].artist;
+					track.artist_credit = track_artist_credit;
 					tracklistarray.push(track);
 				}
 			}
