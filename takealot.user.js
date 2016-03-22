@@ -19,7 +19,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true;
+var DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {
 	LOGGER.setLevel('debug');
