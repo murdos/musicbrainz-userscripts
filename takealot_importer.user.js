@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Takealot releases to MusicBrainz
 // @description    Add a button to import Takealot releases to MusicBrainz
-// @version        2016.03.15.1
+// @version        2016.03.15.2
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://www.takealot.com/*
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
@@ -22,7 +22,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 var DEBUG = false;
-//DEBUG = false;
+//DEBUG = true;
 if (DEBUG) {
 	LOGGER.setLevel('debug');
 }
@@ -34,6 +34,7 @@ if (DEBUG) {
  * - http://www.takealot.com/theuns-jordaan-roeper-cd/PLID17284867 - working (Single artist release)
  * - http://www.takealot.com/various-artists-still-the-one-3cd/PLID40723650 - a dirty example
  * - http://www.takealot.com/now-71-various-artists-cd/PLID40688034 - working (Various Artists and Multi Disc)
+ * - http://www.takealot.com/various-clubtraxxx-15-cd/PLID41391268 - working - do check if tracklist not in product info then look if tracklist in description
  */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +65,7 @@ function insertMbUI(mbUI) {
 
 // Insert links in Takealot page
 function insertMBSection(release) {
-	LOGGER.debug("insertMBsection Firing");
+	//LOGGER.debug("insertMBsection Firing");
 
 	var mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
 
@@ -191,12 +192,10 @@ function ParseTakealotPage() {
 							var currentdiscnumber = parseInt(disctracktitle[1]);
 
 							if (currentdiscnumber == k) {
-
 								var track = new Object();
 								track.number = parseInt(disctracktitle[2]);
 								track.title = disctracktitle[3];
 								LOGGER.debug("The track object: ", currentdiscnumber + ' - ' + track.number + " - " + track.title);
-
 								tracklistarray.push(track);
 							}
 						}
@@ -212,9 +211,7 @@ function ParseTakealotPage() {
 
 	// Logic added to derive the release title from the heading if missing from product info
 	if (releasetitle == "") {
-		// sample header "Huisgenoot Se 20 Country-Treffers - Various Artists (CD)"
 		var MediaHeading = document.querySelectorAll("h1.fn");
-		// LOGGER.debug(MediaHeading[0].innerText);
 		var TitleStr = MediaHeading[0].innerText;
 		var TitleRegex = /(.*)-(.*)+\s\(([^)]+)\)/;
 		var HeadArray = TitleStr.match(TitleRegex);
@@ -227,8 +224,82 @@ function ParseTakealotPage() {
 			releasetitle = HeadArray[1].trim();
 		}
 		LOGGER.debug("Release Title from heading:", releasetitle);
-
 	}
+
+
+	var thediscnumber = 0;
+	var descriptionarray = [];
+
+	if (lastdiscnumber > 0) {
+		LOGGER.debug("** Tracklist present in Product Info tab **");
+	} else {
+		LOGGER.debug(" ** No tracks in Product Info tab let's have a look in description tab");
+
+		// Select all data in the "Description" div id = prod-desc
+		var allprodinfo = document.querySelectorAll("div#prod-desc > br");
+		for (var k = 0; k < allprodinfo.length - 1; k++) {
+			descriptionrow = allprodinfo[k].nextSibling.textContent.trim();
+			// LOGGER.debug("PROD-INFO > BR > ",descriptionrow);
+			// regex to find Disc 1 and add 1 to a group ^Disc+(.\d)
+			descriptionrowregex = /^Disc+(.\d)/;
+			var founddisc = descriptionrow.match(descriptionrowregex);
+			//	LOGGER.debug(" **** DISC FOUND ****", founddisc);
+			if (founddisc != null) {
+				var thediscnumber = parseInt(founddisc[1]);
+				// LOGGER.debug(" **** DISC FOUND NUMBER ****", thediscnumber);
+			}
+			// LOGGER.debug("PROD-INFO > BR > ",thediscnumber + '-' + descriptionrow);
+
+			// regex to split the description row into track, title and artist (^\d).(.*)-(.*)
+			var descriptionrowregex = /(^\d+).(.*)-(.*)/;
+			var descriptionrow_tracktitleartist = descriptionrow.match(descriptionrowregex);
+
+			// do the same as in tracklist and push the disc numbers into an array
+			descriptiontrack = new Object();
+
+			if (descriptionrow_tracktitleartist != null) {
+				descriptiontrack.disc = thediscnumber;
+				descriptiontrack.track = descriptionrow_tracktitleartist[1];
+				descriptiontrack.title = descriptionrow_tracktitleartist[2];
+				descriptiontrack.artist = descriptionrow_tracktitleartist[3];
+
+				//to get the last disc number via iterate
+				var description_lastdisc = parseInt(thediscnumber);
+				descriptionarray.push(descriptiontrack);
+			}
+		}
+
+
+		// Discs
+		var disclistarray = new Array(); // create the tracklist array to use later
+
+
+		for (var desc_discs = 0; desc_discs < description_lastdisc; desc_discs++) {
+			var tracklistarray = new Array();
+			for (var desc__track = 0; desc__track < descriptionarray.length; desc__track++) {
+
+				var desc_currentdiscnumber = descriptionarray[desc__track].disc;
+				if (desc_currentdiscnumber == desc_discs + 1) {
+					var track = new Object();
+					var track_artist_credit = new Array();
+
+					track.number = descriptionarray[desc__track].track;
+					track.title = descriptionarray[desc__track].title;
+
+					var track_artist_credit_object = new Object();
+					track_artist_credit_object.artist_name = descriptionarray[desc__track].artist;
+					track_artist_credit.push(track_artist_credit_object);
+					//track_artist_credit.artist_name = descriptionarray[desc__track].artist;
+					track.artist_credit = track_artist_credit;
+					tracklistarray.push(track);
+				}
+			}
+			disclistarray.push(tracklistarray);
+		}
+		lastdiscnumber = description_lastdisc;
+	}
+
+
 
 	release = new Object();
 
@@ -256,8 +327,8 @@ function ParseTakealotPage() {
 
 	release.discs = new Array();
 	for (var l = 0; l < lastdiscnumber; l++) {
-		LOGGER.debug("Disc position:", l + 1);
-		LOGGER.debug("Tracklist for the selected disc: ", disclistarray[l]);
+		// LOGGER.debug("Disc position:", l + 1);
+		// LOGGER.debug("Tracklist for the selected disc: ", disclistarray[l]);
 		var disc = {
 			'position': l + 1,
 			'tracks': disclistarray[l]
@@ -271,8 +342,9 @@ function ParseTakealotPage() {
 	release.urls = new Array();
 	release.urls.push({
 		'url': window.location.href,
-		'link_type': MBImport.URL_TYPES.purchase_for_download
+		'link_type': MBImport.URL_TYPES.purchase_for_mail_order
 	}); //type 74 is purchase for download
+	// TODO check if CD then add purchase medium
 
 	// Release date
 	var releasedate = releasedaterel;
@@ -298,11 +370,8 @@ function ParseTakealotPage() {
 //                                   Takealot -> MusicBrainz mapping                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 var Languages = new Array();
 Languages["Afrikaans"] = "afr";
-
-
 
 var Countries = new Array();
 Countries["Afghanistan"] = "AF";
