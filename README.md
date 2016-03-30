@@ -5,6 +5,7 @@
 * [Import Bandcamp releases to MusicBrainz Album Link Helper](#bandcamp_importer_helper)
 * [Import Beatport Pro releases to MusicBrainz](#beatport_pro_importer)
 * [Import Beatport releases to MusicBrainz](#beatport_importer)
+* [Import CD Baby releases to MusicBrainz](#cdbaby_importer)
 * [Import CD1D releases to MusicBrainz](#cd1d_importer)
 * [Import Discogs releases to MusicBrainz](#discogs_importer)
 * [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
@@ -50,6 +51,13 @@ One-click importing of releases from beatport.com/release pages into MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
+
+## <a name="cdbaby_importer"></a> Import CD Baby releases to MusicBrainz
+
+One-click importing of releases from cdbaby.com into MusicBrainz.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cdbaby_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js)
 
 ## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
 
