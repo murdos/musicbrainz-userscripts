@@ -2,7 +2,7 @@
 // @name           Import CD Baby releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from cdbaby.com into MusicBrainz.
-// @version        2016.03.30.0
+// @version        2016.04.03.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
 // @include        /^https?:\/\/(?:www\.)?(?:cdbaby\.com)\/cd\/[^\/]+/
@@ -23,13 +23,22 @@ $(document).ready(function(){
   var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
   release_url = release_url.replace(/^(?:https?:\/\/)?(?:www\.)?(?:cdbaby\.com)\//, "http://www.cdbaby.com/");
 
-  var release = retrieveReleaseInfo(release_url);
-  insertLink(release, release_url);
+  var release;
+  var buttons = "";
+  $("div.album-page-buy-button-container a").each(function() {
+    var format = $(this).attr("title").trim();
+    release = retrieveReleaseInfo(release_url, format);
+    buttons += getImportButton(release, release_url, format);
+  });
+
+  if (release) {
+    insertImportLinks(release, buttons);
+  }
+
 });
 
 
-function retrieveReleaseInfo(release_url) {
-
+function retrieveReleaseInfo(release_url, format) {
 
   // Release defaults
   var release = {
@@ -49,6 +58,33 @@ function retrieveReleaseInfo(release_url) {
     labels: [],
     discs: [],
   };
+
+  var link_type = MBImport.URL_TYPES;
+
+  release.urls = [];
+  if (format.match(/^vinyl/i)) {
+    release.country = 'US';
+    release.format = "Vinyl";
+    release.urls.push({
+      'url': release_url,
+      'link_type': link_type.purchase_for_mail_order
+    });
+  } else if (format.match(/^cd/i)) {
+    release.country = 'US';
+    release.format = 'CD';
+    release.urls.push({
+      'url': release_url,
+      'link_type': link_type.purchase_for_mail_order
+    });
+  } else if (format.match(/^download/i)) {
+    release.country = 'XW';
+    release.packaging = 'None';
+    release.format = "Digital Media";
+    release.urls.push({
+      'url': release_url,
+      'link_type': link_type.purchase_for_download
+    });
+  }
 
   // Release artist
   var artist = $("h2 span[itemprop='byArtist'] a").text().trim();
@@ -78,20 +114,21 @@ function retrieveReleaseInfo(release_url) {
 	  var trackname = $(this).find("meta[itemprop='name']").attr('content').trim();
 	  var tracklength = $(this).find("meta[itemprop='duration']").attr('content').trim();
 
-    // VA releases have an additional link to the lastfm artist page
     var track_artists = [];
     // FIXME various artists releases ...
-    /*
-    $(this).find("td.subjectCell > a:not(:last)").each(
+    $(this).find("div.track-artist").each(
       function () {
-        track_artists.push($(this).text().trim());
+        var artistname = $(this).text().trim();
+        if (artistname) {
+          track_artists.push(artistname);
+        }
       }
     );
-    */
+
     var ac = {
-        'artist_credit': '',
-        'title': trackname,
-        'duration': MBImport.ISO8601toMilliSeconds(tracklength)
+      'artist_credit': '',
+      'title': trackname,
+      'duration': MBImport.ISO8601toMilliSeconds(tracklength)
     };
     if (!track_artists.length && various_artists) {
       ac.artist_credit = [ MBImport.specialArtist('unknown') ];
@@ -110,22 +147,28 @@ function retrieveReleaseInfo(release_url) {
   return release;
 }
 
-// Insert button into page under label information
-function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'cdbaby');
-    var parameters = MBImport.buildFormParameters(release, edit_note);
+function getImportButton(release, release_url, format) {
+  var edit_note = MBImport.makeEditNote(release_url, "CD Baby", format);
+  var parameters = MBImport.buildFormParameters(release, edit_note);
+  return MBImport.buildFormHTML(parameters).replace('<span>Import into MB</span>', '<span>Import ' + format + '</span>');
+}
 
-    $("div.right-container-top-right").prepend(
-        $('<div id="mb_buttons">'
-        + MBImport.buildFormHTML(parameters)
-        + MBImport.buildSearchButton(release)
-        + '</div>').hide()
-    );
-    $('#mb_buttons').css({
-      'margin-bottom': '5px',
-      'padding': '2%',
-      'background-color': '#fff'
-    });
+function insertImportLinks(release, buttons) {
+  $("div.right-container-top-right").prepend(
+    $('<div id="mb_buttons">'
+    + buttons
+    + MBImport.buildSearchButton(release)
+    + '</div>').hide()
+  );
+  $('#mb_buttons').css({
+    'margin-bottom': '5px',
+    'padding': '2%',
+    'background-color': '#fff'
+  });
 
-    $('#mb_buttons').slideDown();
+  $('form.musicbrainz_import').css({
+    'margin-bottom': '5px'
+  });
+
+  $('#mb_buttons').slideDown();
 }
