@@ -33,6 +33,7 @@ if (DEBUG) {
  * - http://www.loot.co.za/product/various-artists-30-30-goue-sokkie-treffers-volume-17/hbhf-3088-g440
  * - http://www.loot.co.za/product/jacques-de-coning-veels-geluk/lzmg-572-g610
  * - http://www.loot.co.za/product/various-artists-vat-5-volume-5/dfnc-3405-g1a0
+ * - http://www.loot.co.za/product/bette-midler-a-gift-of-love/mhgm-3483-g060  *** NOT WORKING *** extra tab
  */
 
 
@@ -59,6 +60,13 @@ function insertMbUI(mbUI) {
   }
 }
 
+// Insert links to high res image in Loot page
+function insertIMGlinks() {
+  var imghref = $('#imagePreview0 a.fancybox').attr('href');
+  imghref = 'http://static.loot.co.za/' + imghref;
+  LOGGER.debug("insertIMGlink Firing", imghref);
+  $('#imagePreview0').append('<p><a href="' + imghref + '">MB High Res Image</a></p>');
+}
 
 // Insert links in Loot page
 function insertMBSection(release) {
@@ -73,7 +81,7 @@ function insertMBSection(release) {
   mbUI.append(mbContentBlock);
 
   if (release.maybe_buggy) {
-    var warning_buggy = $('<p><small><b>Warning</b>: this release has perhaps a buggy tracklist, please check twice the data you import.</small><p').css({
+    var warning_buggy = $('<p><small><b>Warning</b>: this release has perhaps a buggy title, please check twice the data you import.</small><p').css({
       'color': 'red',
       'margin-top': '4px',
       'margin-bottom': '4px'
@@ -91,6 +99,7 @@ function insertMBSection(release) {
   mbContentBlock.append(innerHTML);
 
   insertMbUI(mbUI);
+  insertIMGlinks();
 
   $('#mb_buttons').css({
     display: 'inline-block',
@@ -110,7 +119,6 @@ function insertMBSection(release) {
 
   mbUI.slideDown();
 }
-
 
 function parseReleaseDate(rdate) {
   var months = {
@@ -137,9 +145,6 @@ function parseReleaseDate(rdate) {
   }
   return false;
 }
-
-
-
 // Analyze Loot data and return a release object
 function ParseLootPage() {
   LOGGER.debug("ParseLootPage function firing");
@@ -153,6 +158,7 @@ function ParseLootPage() {
   var prodlabels = [];
   var release_artist_array = [];
   var release_format = "";
+  var release_maybe_buggy = false;
 
   // div#productContent table tbody tr.productOverview td.productInfo h1
   var AlbumName = document.querySelectorAll("div#productContent > table > tbody > tr.productOverview > td.productInfo > *");
@@ -160,26 +166,37 @@ function ParseLootPage() {
   releaseartist = AlbumName[1].innerText;
   if (releaseartist == "Various Artists") {
     // Everything is: title(format)
-    releaseartisttitle_regex = /(.*)\((.*)\)/;
-    releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
-
-
-    releasetitle = releaseartisttitle[1];
-    release_format = releaseartisttitle[2];
-
+    releaseartisttitle_regex = /(.*?)\((.*)\)/; //match external parenthesis
+    if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
+      releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+      releasetitle = releaseartisttitle[1].trim();
+      release_format = releaseartisttitle[2];
+    } else {
+      LOGGER.debug("Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for Compilations");
+      release_maybe_buggy = true;
+      releasetitle = "";
+      release_format = "";
+    }
   } else {
-    // 
-    releaseartisttitle_regex = /(.*) - (.*)\((.*)\)/;
-    releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+    // artist - title(format)
+    releaseartisttitle_regex = /(.*) (-|–) (.*?)\((.*)\)/;
 
-    releasetitle = releaseartisttitle[2].trim();
-    releaseartist = releaseartisttitle[1];
-    release_format = releaseartisttitle[3];
+    if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
 
+      releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+
+      releasetitle = releaseartisttitle[3].trim();
+      releaseartist = releaseartisttitle[1];
+      release_format = releaseartisttitle[4];
+
+    } else {
+      LOGGER.debug("Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for non Compilations");
+      release_maybe_buggy = true;
+      releasetitle = "";
+      releaseartist = "";
+      release_format = "";
+    }
   }
-
-
-
   LOGGER.debug("Release Title:", releasetitle, "  Release Artist:", releaseartist, "  Release Format:", release_format);
 
 
@@ -203,23 +220,34 @@ function ParseLootPage() {
         break;
       case "countryoforigin:":
         releasecountry = value;
-        LOGGER.debug("** country of origin: **", releasecountry);
+        LOGGER.debug(" ** country of origin: **", releasecountry);
         break;
       case "performers:":
-        LOGGER.debug("** performers: **", value);
+        LOGGER.debug(" ** performers: **", value);
         release_artist_array.push({
           name: value
         });
         break;
       case "format:":
-        LOGGER.debug("* format: **");
+        LOGGER.debug(" ** format: **");
         break;
-        /* etc... */
+      case "categories:":
+        //LOGGER.debug(" ** categories: **", value);
+
+        if ($('table.productDetails tr td a:contains("Afrikaans")').length) {
+          LOGGER.debug("Language Afrikaans exists");
+          releaselanguage = "Afrikaans";
+        }
+
+        if ($('table.productDetails tr td a:contains("South Africa")').length) {
+          LOGGER.debug("Country South Africa exists in catagories");
+          releasecountry = "South Africa";
+        }
+
+        break;
     }
 
   });
-
-
   // Select all  data in the "Tracks" div id = tab-2 
   var allinfolist = document.querySelectorAll("div#tab-2 > table.productDetails > tbody");
   LOGGER.debug("Track Info: (allinfolist)", allinfolist);
@@ -293,13 +321,22 @@ function ParseLootPage() {
   //LOGGER.debug(disclistarray);
   release = new Object();
 
+  // Check if anything is untoward and highlight to importer
+  release.maybe_buggy = release_maybe_buggy;
+
   // Release artist credit
   release.artist_credit = new Array();
 
   var artist_name = releaseartist;
-  release.artist_credit.push({
-    'artist_name': artist_name
-  });
+
+  var various_artists = (releaseartist == 'Various Artists');
+  if (various_artists) {
+    release.artist_credit = [MBImport.specialArtist('various_artists')];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits([artist_name]);
+  }
+
+
 
   // Release title
   release.title = releasetitle;
@@ -344,11 +381,12 @@ function ParseLootPage() {
     release.day = parsed_releaseDate.day;
   }
 
+
+
   LOGGER.info("Release:", release);
 
   return release;
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                   Loot -> MusicBrainz mapping                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
