@@ -19,7 +19,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true;
+var DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {
   LOGGER.setLevel('debug');
@@ -31,6 +31,8 @@ if (DEBUG) {
  * Test cases:
  * - http://www.loot.co.za/product/jakkie-en-daai-band-louw-klein-karoo-cowboy/mgyv-565-g540
  * - http://www.loot.co.za/product/various-artists-30-30-goue-sokkie-treffers-volume-17/hbhf-3088-g440
+ * - http://www.loot.co.za/product/jacques-de-coning-veels-geluk/lzmg-572-g610
+ * - http://www.loot.co.za/product/various-artists-vat-5-volume-5/dfnc-3405-g1a0
  */
 
 
@@ -110,6 +112,34 @@ function insertMBSection(release) {
 }
 
 
+function parseReleaseDate(rdate) {
+  var months = {
+    "January": 1,
+    "February": 2,
+    "March": 3,
+    "April": 4,
+    "May": 5,
+    "June": 6,
+    "July": 7,
+    "August": 8,
+    "September": 9,
+    "October": 10,
+    "November": 11,
+    "December": 12
+  };
+
+  var m = rdate.match(/([a-zA-Z]+) (\d{4})/i);
+  if (m) {
+    return {
+      year: m[2],
+      month: months[m[1]]
+    }
+  }
+  return false;
+}
+
+
+
 // Analyze Loot data and return a release object
 function ParseLootPage() {
   LOGGER.debug("ParseLootPage function firing");
@@ -126,49 +156,69 @@ function ParseLootPage() {
 
   // div#productContent table tbody tr.productOverview td.productInfo h1
   var AlbumName = document.querySelectorAll("div#productContent > table > tbody > tr.productOverview > td.productInfo > *");
-  LOGGER.debug("Album Name: ", AlbumName[0].innerText); // textContent give the space formatting and we just need the text so we use innerText
-  releasetitle = AlbumName[0].innerText;
-  LOGGER.debug("Artist Name: ", AlbumName[1].innerText);
+
   releaseartist = AlbumName[1].innerText;
+  if (releaseartist == "Various Artists") {
+    // Everything is: title(format)
+    releaseartisttitle_regex = /(.*)\((.*)\)/;
+    releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
 
-  // select the product info
-  var ReleaseInfo = document.querySelectorAll("div#tab-1 > table > tbody > tr > *");
-  LOGGER.debug("Product Info: ", ReleaseInfo);
 
-  for (var prodinfoloop = 0; prodinfoloop < ReleaseInfo.length; prodinfoloop++) {
-    var prodinfolabel = ReleaseInfo[prodinfoloop];
-    //LOGGER.debug("** ProdInfo LABEL: ",prodinfolabel);
-    if (prodinfolabel.tagName == "TD") {
-      var prodinfolabellowcase = prodinfolabel.innerText.toLowerCase().trim(); //replaced textContent with innerText
+    releasetitle = releaseartisttitle[1];
+    release_format = releaseartisttitle[2];
 
-      LOGGER.debug("<TD>", prodinfolabellowcase);
+  } else {
+    // 
+    releaseartisttitle_regex = /(.*) - (.*)\((.*)\)/;
+    releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
 
-      switch (prodinfolabellowcase) {
-        case "label:": // use these cases to select the spesific text values
-          LOGGER.debug("* label: selected *");
-          var release_label = new Object();
-          release_label.name = prodinfolabel.nextElementSibling.innerText.trim();
-          prodlabels.push(release_label);
-          break;
-        case "release date:": // "release date:" TODO: NOT WORKING
-          LOGGER.debug("* release date: *");
-          var date_regex = /([A-Z][a-z]+)\s(\d{4})/; // October 2014 [1] [2]
-          // need to add month and year code
-          break;
-        case "performers:": // use these cases to select the spesific text values
-          LOGGER.debug("* performers: selected *");
-          var release_artist_credit_object = new Object();
-          release_artist_credit_object.artist_name = prodinfolabel.nextElementSibling.innerText.trim();
-          release_artist_array.push(release_artist_credit_object);
-          break;
-        case "format:":
-          LOGGER.debug("* format: selected *");
-          release_format = prodinfolabel.nextElementSibling.childNodes[0].alt;
-          LOGGER.debug("** format: value **", release_format);
-          break;
-      }
-    }
+    releasetitle = releaseartisttitle[2].trim();
+    releaseartist = releaseartisttitle[1];
+    release_format = releaseartisttitle[3];
+
   }
+
+
+
+  LOGGER.debug("Release Title:", releasetitle, "  Release Artist:", releaseartist, "  Release Format:", release_format);
+
+
+  // extract all tr from table with class productDetails
+  $("table.productDetails tr").each(function() {
+    // get text from first td, trim and convert it to lowercase
+    var prodinfolabellowcase = $(this).children('td').eq(0).text().trim().toLowerCase();
+    prodinfolabellowcase = prodinfolabellowcase.replace(/\s+/g, ''); //removing white spaces as switch isnt matching spaces for some reason
+    // get test from second td, which is the corresponding value
+    var value = $(this).children('td').eq(1).text().trim();
+    // now compare and process
+    switch (prodinfolabellowcase) {
+      case "label:": // use these cases to select the spesific text values
+        prodlabels.push({
+          name: value
+        });
+        break;
+      case "releasedate:":
+        releasedaterel = value;
+        LOGGER.debug(" ** release date: **", releasedaterel)
+        break;
+      case "countryoforigin:":
+        releasecountry = value;
+        LOGGER.debug("** country of origin: **", releasecountry);
+        break;
+      case "performers:":
+        LOGGER.debug("** performers: **", value);
+        release_artist_array.push({
+          name: value
+        });
+        break;
+      case "format:":
+        LOGGER.debug("* format: **");
+        break;
+        /* etc... */
+    }
+
+  });
+
 
   // Select all  data in the "Tracks" div id = tab-2 
   var allinfolist = document.querySelectorAll("div#tab-2 > table.productDetails > tbody");
@@ -190,13 +240,14 @@ function ParseLootPage() {
       descriptiontrack = new Object();
 
       var currenttrack = tracklisting[trackiterate].querySelectorAll("td");
-      var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title 
+      //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title 
+      var artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
 
       // need to check if this can be replaced with single regex for now check artist-title if 
       // not matching check just title
       if (currenttrack[1].innerText.match(artisttitle_regex)) {
         var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
-        descriptiontrack.title = artisttitle[2];
+        descriptiontrack.title = artisttitle[3];
         descriptiontrack.artist = artisttitle[1];
       } else {
         var artisttitle_regex = /(.*)/; // regex: title
@@ -282,23 +333,16 @@ function ParseLootPage() {
     'url': window.location.href,
     'link_type': MBImport.URL_TYPES.purchase_for_mail_order
   });
-  // TODO check if CD then add purchase medium
+
+  // TODO check format then change purchase medium
 
   // Release date
-  var releasedate = releasedaterel;
-  // need to fix release date swith before we add the date parser
-  /*  if (typeof releasedate != "undefined" && releasedate != "") {
-      var tmp = releasedate.split('-');
-      if (tmp[0] != "undefined" && tmp[0] != "") {
-        release.year = parseInt(tmp[0], 10);
-        if (tmp[1] != "undefined" && tmp[1] != "") {
-          release.month = parseInt(tmp[1], 10);
-          if (tmp[2] != "undefined" && tmp[2] != "") {
-            release.day = parseInt(tmp[2], 10);
-          }
-        }
-      }
-    }*/
+  var parsed_releaseDate = parseReleaseDate(releasedaterel);
+  if (parsed_releaseDate) {
+    release.year = parsed_releaseDate.year;
+    release.month = parsed_releaseDate.month;
+    release.day = parsed_releaseDate.day;
+  }
 
   LOGGER.info("Release:", release);
 
