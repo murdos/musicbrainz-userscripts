@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name           Import Loot releases to MusicBrainz
-// @description    Add a button to import Loot releases to MusicBrainz
-// @version        2016.03.27.1
+// @description    Add a button to import Loot.co.za releases to MusicBrainz
+// @version        2016.04.05.0
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://www.loot.co.za/product/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mblinks.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
+// @require        lib/mbimport.js
+// @require        lib/logger.js
+// @require        lib/mblinks.js
+// @require        lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant          none
 // ==/UserScript==
@@ -248,7 +248,7 @@ function ParseLootPage() {
     }
 
   });
-  // Select all  data in the "Tracks" div id = tab-2 
+  // Select all  data in the "Tracks" div id = tab-2
   var allinfolist = document.querySelectorAll("div#tab-2 > table.productDetails > tbody");
   LOGGER.debug("Track Info: (allinfolist)", allinfolist);
 
@@ -268,10 +268,10 @@ function ParseLootPage() {
       descriptiontrack = new Object();
 
       var currenttrack = tracklisting[trackiterate].querySelectorAll("td");
-      //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title 
+      //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title
       var artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
 
-      // need to check if this can be replaced with single regex for now check artist-title if 
+      // need to check if this can be replaced with single regex for now check artist-title if
       // not matching check just title
       if (currenttrack[1].innerText.match(artisttitle_regex)) {
         var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);

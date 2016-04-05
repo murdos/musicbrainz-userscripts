@@ -11,6 +11,7 @@
 * [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
 * [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 * [Import Last.fm releases to MusicBrainz](#lastfm_importer)
+* [Import Loot releases to MusicBrainz](#loot_importer)
 * [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 * [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 * [Import Takealot releases to MusicBrainz](#takealot_importer)
@@ -93,6 +94,12 @@ One-click importing of releases from last.fm into MusicBrainz. PLEASE import rel
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/lastfm_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js)
+
+## <a name="loot_importer"></a> Import Loot releases to MusicBrainz
+
+Add a button to import Loot.co.za releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/loot_importer.user.js)
 
 ## <a name="metalarchives_importer"></a> Import Metal Archives releases into MusicBrainz
 
