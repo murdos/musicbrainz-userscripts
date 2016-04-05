@@ -100,6 +100,7 @@ One-click importing of releases from last.fm into MusicBrainz. PLEASE import rel
 Add a button to import Loot.co.za releases to MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/loot_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js)
 
 ## <a name="metalarchives_importer"></a> Import Metal Archives releases into MusicBrainz
 
