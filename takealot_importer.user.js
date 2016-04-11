@@ -130,6 +130,8 @@ function ParseTakealotPage() {
 	var releasedaterel = "";
 	var releaselanguage = "";
 	var releasetitle = "";
+	var releaselabel = [];
+	var releaseformat = "";
 	var release_maybe_buggy = false;
 
 	// Select all DL data in the "Product Info" div id = second div class = details
@@ -153,9 +155,19 @@ function ParseTakealotPage() {
 					releaseartist = artistitemlabel.nextSibling.textContent.trim();
 					LOGGER.debug('The value is :' + artistitem + ' > ' + releaseartist);
 					break;
+				case "label": // use these cases to select the spesific text values
+					releaselabel.push({
+						name: artistitemlabel.nextSibling.textContent.trim()
+					});
+					LOGGER.debug('The value is :' + artistitem + ' > ' + releaselabel);
+					break;
 				case "date released": // use these cases to select the spesific text values
 					releasedaterel = artistitemlabel.nextSibling.textContent.trim();
 					LOGGER.debug('The value is :' + artistitem + ' > ' + releasedaterel);
+					break;
+				case "format": // use these cases to select the spesific text values
+					releaseformat = artistitemlabel.nextSibling.textContent.trim();
+					LOGGER.debug('The value is :' + artistitem + ' > ' + releaseformat);
 					break;
 				case "language": // use these cases to select the spesific text values
 					releaselanguage = artistitemlabel.nextSibling.textContent.trim();
