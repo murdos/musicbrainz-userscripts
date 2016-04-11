@@ -81,6 +81,15 @@ function insertMBSection(release) {
 	var mbContentBlock = $('<div class="section_content"></div>');
 	mbUI.append(mbContentBlock);
 
+	if (release.maybe_buggy) {
+		var warning_buggy = $('<p><small><b>Warning</b>: this release is buggy, please check twice the data you import.</small><p').css({
+			'color': 'red',
+			'margin-top': '4px',
+			'margin-bottom': '4px'
+		});
+		mbContentBlock.prepend(warning_buggy);
+	}
+
 	// Form parameters
 	var edit_note = MBImport.makeEditNote(window.location.href, 'Takealot');
 	LOGGER.debug("Edit Note: ", edit_note);
@@ -121,6 +130,7 @@ function ParseTakealotPage() {
 	var releasedaterel = "";
 	var releaselanguage = "";
 	var releasetitle = "";
+	var release_maybe_buggy = false;
 
 	// Select all DL data in the "Product Info" div id = second div class = details
 	var allinfolist = document.querySelectorAll("div#second > div.details > dl > *");
@@ -305,9 +315,15 @@ function ParseTakealotPage() {
 		lastdiscnumber = description_lastdisc;
 	}
 
-
+	// do final checks to determine if it may be buggy information
+	if (releaseartist == null) {
+		release_maybe_buggy = true;
+	}
 
 	release = new Object();
+
+	// Release buggy
+	release.maybe_buggy = release_maybe_buggy;
 
 	// Release artist credit
 	release.artist_credit = new Array();
