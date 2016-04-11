@@ -61,7 +61,12 @@ function insertMbUI(mbUI) {
 	}
 }
 
-
+// Insert links to high res image in Takealot page
+function insertIMGlinks() {
+	var imghref = $('#slideshow a.jqzoom').attr('href');
+	LOGGER.debug("insertIMGlink Firing", imghref);
+	$('#slideshow').append('<p><img src="//musicbrainz.org/favicon.ico" /><a href="' + imghref + '">MB High Res Image</a></p>');
+}
 
 // Insert links in Takealot page
 function insertMBSection(release) {
@@ -86,6 +91,7 @@ function insertMBSection(release) {
 	mbContentBlock.append(innerHTML);
 
 	insertMbUI(mbUI);
+	insertIMGlinks();
 
 	$('#mb_buttons').css({
 		display: 'inline-block',
