@@ -370,7 +370,7 @@ function ParseTakealotPage() {
 		release.discs.push(disc);
 	}
 
-	release.labels = [];
+	release.labels = releaselabel;
 
 	// Release URL
 	release.urls = new Array();
