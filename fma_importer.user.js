@@ -34,7 +34,7 @@ var FMA_API = "FMA API KEY Missing";
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true; // true | false
+var DEBUG = false; // true | false
 
 if (DEBUG) {
 	LOGGER.setLevel('debug');
@@ -74,6 +74,7 @@ $(document).ready(function() {
 	LOGGER.info("Document Ready & FMA Userscript Executing");
 
 	var fmaPage = parseFMApage();
+	var mblinks = new MBLinks('FMA_CACHE', 7 * 24 * 60);
 
 	if (DEBUG) {
 		insertAPISection();
@@ -125,6 +126,21 @@ $(document).ready(function() {
 
 			var FreeMusicArchiveRelease = new Parsefmarelease(album_api_array[0], tracks_api_array);
 			insertMBSection(FreeMusicArchiveRelease);
+
+			var album_link = window.location.href;
+
+			var url = $(location).attr('href').split('/');
+			var artist_url = url[url.length - 3];
+			var base_url = 'http://freemusicarchive.org/music/';
+			var artist_link = base_url + artist_url + '/';
+
+			mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
+				$('.subh1').before(link);
+			});
+			mblinks.searchAndDisplayMbLink(artist_link, 'artist', function(link) {
+				$('.subh1').after(link);
+			});
+
 		});
 	}
 
