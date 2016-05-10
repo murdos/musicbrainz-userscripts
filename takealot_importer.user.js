@@ -371,6 +371,7 @@ function insertMBSection(release) {
 
 	insertMbUI(mbUI);
 	insertIMGlinks();
+	insertMBLinks();
 
 	$('#mb_buttons').css({
 		display: 'inline-block',
@@ -382,7 +383,7 @@ function insertMBSection(release) {
 	});
 	$('form.musicbrainz_import_search').css({
 		'float': 'right'
-	})
+	});
 	$('form.musicbrainz_import > button').css({
 		width: '100%',
 		'box-sizing': 'border-box'
@@ -391,6 +392,19 @@ function insertMBSection(release) {
 	mbUI.slideDown();
 }
 
+// Insert link to MB release (MB Release need a URL entry to match )
+function insertMBLinks() {
+	var mblinks = new MBLinks('TAKEALOT_CACHE', 7 * 24 * 60); // force refresh of cached links once a week
+
+	// var artist_link = 'http://' + window.location.href.match( /^https?:\/\/(.*)\/album\/.+$/i)[1];
+	// mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) { $('div#there').before(link); } );
+
+	var album_link = window.location.href;
+	mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
+		$('h1.fn').append(link);
+	});
+
+}
 // Analyze Takealot data and return a release object
 function ParseTakealotPage() {
 	LOGGER.debug("ParseTakealotPage function firing");
