@@ -733,7 +733,7 @@ function ParseTakealotPage() {
 		// LOGGER.debug("Tracklist for the selected disc: ", disclistarray[l]);
 		var disc = {
 			'position': l + 1,
-			'format': releaseformat,
+			'format': DiscFormats[releaseformat],
 			'tracks': disclistarray[l]
 		};
 		release.discs.push(disc);
@@ -772,6 +772,11 @@ function ParseTakealotPage() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                   Takealot -> MusicBrainz mapping                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var DiscFormats = new Array();
+DiscFormats["CD"] = "CD";
+DiscFormats["DVD"] = "DVD";
+DiscFormats["Audio CD"] = "CD";
 
 var Languages = new Array();
 Languages["Afrikaans"] = "afr";
