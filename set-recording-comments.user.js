@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2016.3.21
+// @version        2016.5.19
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -38,10 +38,8 @@ function setRecordingComments() {
         }
 
         $tracks.each(function () {
-            var $td = $(this).children("td + td:not(.video)"),
-                node = ($td.children(".mp")[0] ||
-                        $td.children(".name-variation")[0] ||
-                        $td.children("a[href*=\\/recording\\/]")[0]),
+            var $td = $(this).children("td:not(.pos):not(.video):not(.rating):not(.treleases)").has("a[href^=\\/recording\\/]"),
+                node = $td.children("td > .mp, td > .name-variation, td > a[href^=\\/recording\\/]").filter(":first"),
                 $input = $("<input />").addClass("recording-comment").insertAfter(node);
 
             if (!editing) {
@@ -143,7 +141,7 @@ function setRecordingComments() {
                         $input.css("border-color", "red").prop("disabled", false);
                     });
 
-                var link = $(track).children("td + td:not(.video)").find("a[href*=\\/recording\\/]")[0],
+                var link = $(track).children("td a[href^=\\/recording\\/]").filter(":first"),
                     mbid = link.href.match(MBID_REGEX)[0];
 
                 editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
