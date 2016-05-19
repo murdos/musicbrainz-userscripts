@@ -61,8 +61,7 @@ function setRecordingComments() {
         });
     }, 1000);
 
-    var location = window.location.pathname;
-    if (!location.match(/\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
+    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
         return;
     }
 
