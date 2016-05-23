@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.1.3
+// @version       6.3.2
 // @license       GPL
 // @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
@@ -11,60 +11,40 @@
 // @include       *://musicbrainz.org/artist/*
 // @include       *://musicbrainz.org/label/*
 // @include       *://musicbrainz.org/release-group/*
+// @include       *://musicbrainz.org/series/*
 // @include       *://beta.musicbrainz.org/artist/*
 // @include       *://beta.musicbrainz.org/label/*
 // @include       *://beta.musicbrainz.org/release-group/*
+// @include       *://beta.musicbrainz.org/series/*
 // @include       *://test.musicbrainz.org/artist/*
 // @include       *://test.musicbrainz.org/label/*
 // @include       *://test.musicbrainz.org/release-group/*
+// @include       *://test.musicbrainz.org/series/*
 // @match         *://musicbrainz.org/artist/*
 // @match         *://musicbrainz.org/label/*
 // @match         *://musicbrainz.org/release-group/*
+// @match         *://musicbrainz.org/series/*
 // @match         *://beta.musicbrainz.org/artist/*
 // @match         *://beta.musicbrainz.org/label/*
 // @match         *://beta.musicbrainz.org/release-group/*
+// @match         *://beta.musicbrainz.org/series/*
 // @match         *://test.musicbrainz.org/artist/*
 // @match         *://test.musicbrainz.org/label/*
 // @match         *://test.musicbrainz.org/release-group/*
-// @exclude       *musicbrainz.org/artist/*/*
+// @match         *://test.musicbrainz.org/series/*
 // @exclude       *musicbrainz.org/label/*/*
 // @exclude       *musicbrainz.org/release-group/*/*
+// @exclude       *musicbrainz.org/series/*/*
 // ==/UserScript==
 
-var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/,
-    entity = window.location.pathname.match(/\/(artist|label|release-group)\/.+/)[1],
-    firstThead = document.querySelector("table.tbl > thead");
+var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/;
 
-if (firstThead) {
-
-    var ths = firstThead.getElementsByTagName("th"),
-        trs = document.querySelectorAll("table.tbl > tbody > tr:not(.subh)"),
-        col = 0;
-
-    if (entity == "artist") {
-        var current_tab = document.querySelector(".tabs .sel a").textContent;
-    }
-
-    if (entity == "artist" && current_tab == "Overview") {
-        for (; col < ths.length; col++)
-            if (ths[col].textContent == "Title")
-                break;
-
-        for (var i = 0; i < trs.length; i++) {
-            if (/\/release-group\/[a-z\d\-]+/.test(trs[i].innerHTML)) {
-                inject_release_group_button(trs[i].getElementsByTagName("td")[col]);
-            }
-        }
-    } else if (entity != "artist" || entity == "artist" && current_tab == "Releases") {
-        for (; col < ths.length; col++)
-            if (ths[col].textContent == "Release")
-                break;
-
-        for (var i = 0; i < trs.length; i++) {
-            if (/\/release\/[a-z\d\-]+/.test(trs[i].innerHTML)) {
-                inject_release_button(trs[i].getElementsByTagName("td")[col]);
-            }
-        }
+var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
+for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
+    if (releasesOrReleaseGroups[r].getAttribute("href").match(/\/release-group\//)) {
+        inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
+    } else {
+        inject_release_button(releasesOrReleaseGroups[r].parentNode);
     }
 }
 

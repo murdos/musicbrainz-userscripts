@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2015.7.10.1418
+// @version        2016.5.19
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -24,15 +24,11 @@ document.body.appendChild(scr);
 function setRecordingComments() {
     var $tracks;
     var $inputs = $();
-    var nameColumn = 1;
     var EDIT_RECORDING_EDIT = 72;
 
     $("head").append($("<style></style>").text("input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }"));
 
     var delay = setInterval(function () {
-        if ($("th.video").length > 0) {
-            nameColumn = 2;
-        }
         $tracks = $(".medium tbody tr[id]");
 
         if ($tracks.length) {
@@ -42,10 +38,8 @@ function setRecordingComments() {
         }
 
         $tracks.each(function () {
-            var $td = $(this).children("td").eq(nameColumn),
-                node = ($td.children(".mp")[0] ||
-                        $td.children(".name-variation")[0] ||
-                        $td.children("a[href*=\\/recording\\/]")[0]),
+            var $td = $(this).children("td:not(.pos):not(.video):not(.rating):not(.treleases)").has("a[href^=\\/recording\\/]"),
+                node = $td.children("td > .mp, td > .name-variation, td > a[href^=\\/recording\\/]").filter(":first"),
                 $input = $("<input />").addClass("recording-comment").insertAfter(node);
 
             if (!editing) {
@@ -67,8 +61,7 @@ function setRecordingComments() {
         });
     }, 1000);
 
-    var location = window.location.pathname;
-    if (!location.match(/\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
+    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
         return;
     }
 
@@ -147,7 +140,7 @@ function setRecordingComments() {
                         $input.css("border-color", "red").prop("disabled", false);
                     });
 
-                var link = $(track).children("td").eq(nameColumn).find("a[href*=\\/recording\\/]")[0],
+                var link = $(track).children("td a[href^=\\/recording\\/]").filter(":first"),
                     mbid = link.href.match(MBID_REGEX)[0];
 
                 editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
