@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
-// @version     2015.8.21
+// @version     2016.5.23
 // @author      Michael Wiencek
 // @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
 // @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -222,7 +222,7 @@ function batch_recording_rels() {
 
     // Get recordings on the page
 
-    var TITLE_SELECTOR = "a[href*='" + window.location.host + "/recording/']";
+    var TITLE_SELECTOR = "a[href*='/recording/']";
     var $recordings = $('tr:has(' + TITLE_SELECTOR + ')').data('filtered', false);
 
     if (!$recordings.length) {
