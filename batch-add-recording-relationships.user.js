@@ -461,8 +461,8 @@ function batch_recording_rels() {
         queue_recordings_request(
             "/ws/2/recording?artist=" + ARTIST_MBID +
             "&inc=work-rels" +
-            "&limit=50" +
-            "&offset=" + ((CURRENT_PAGE - 1) * 50) +
+            "&limit=100" +
+            "&offset=" + ((CURRENT_PAGE - 1) * 100) +
             "&fmt=json"
         );
     }
@@ -719,7 +719,7 @@ function batch_recording_rels() {
                 }
             };
 
-            var works_url = "/ws/2/work?artist=" + mbid + "&inc=aliases&limit=50&fmt=json";
+            var works_url = "/ws/2/work?artist=" + mbid + "&inc=aliases&limit=100&fmt=json";
             ws_requests.unshift(function () {
                 request_works(works_url, 0, -1, callback);
             });
@@ -765,7 +765,7 @@ function batch_recording_rels() {
 
             if (works.length + offset < count) {
                 ws_requests.unshift(function () {
-                    request_works(url, offset + 50, count, callback);
+                    request_works(url, offset + 100, count, callback);
                 });
             }
         }).fail(function () {
