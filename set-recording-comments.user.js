@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2016.5.19
+// @version        2016.5.24
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -49,7 +49,7 @@ function setRecordingComments() {
             $inputs = $inputs.add($input);
         });
 
-        var release = location.match(MBID_REGEX)[0];
+        var release = location.pathname.match(MBID_REGEX)[0];
 
         $.get("/ws/2/release/" + release + "?inc=recordings&fmt=json", function (data) {
             var comments = _.pluck(_.pluck(_.flatten(_.pluck(data.media, "tracks")), "recording"), "disambiguation");
