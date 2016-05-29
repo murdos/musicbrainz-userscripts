@@ -9,6 +9,7 @@
 * [Import CD1D releases to MusicBrainz](#cd1d_importer)
 * [Import Discogs releases to MusicBrainz](#discogs_importer)
 * [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+* [Import FMA releases to MusicBrainz](#fma_importer)
 * [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 * [Import Last.fm releases to MusicBrainz](#lastfm_importer)
 * [Import Loot releases to MusicBrainz](#loot_importer)
@@ -80,6 +81,13 @@ Easily import Encyclopedisque releases into MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
+
+## <a name="fma_importer"></a> Import FMA releases to MusicBrainz
+
+Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fma_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js)
 
 ## <a name="juno_download_importer"></a> Import Juno Download releases to MusicBrainz
 
