@@ -379,7 +379,7 @@ function insertAPIKEYSection() {
 //                                       Retrieve data from FMA API                                                   //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Retrieve Album JSON from API and push into array 
+// Retrieve Album JSON from API and push into array
 function album_api() {
 
 	var fmaWsUrl = 'https://freemusicarchive.org/api/get/albums.json?api_key=' + FMA_API + '&album_id=' + release_attributes.albumid;
@@ -399,7 +399,7 @@ function album_api() {
 	return promise_variable.promise();
 }
 
-// Retrieve Album JSON from API and assign values to release object 
+// Retrieve Album JSON from API and assign values to release object
 function track_api_parameters() {
 
 	var fmaWsUrl = 'https://freemusicarchive.org/api/get/tracks.json?api_key=' + FMA_API + '&album_id=' + release_attributes.albumid + '&limit=20';
@@ -624,7 +624,7 @@ function Parsefmarelease(albumobject, trackobject) {
 
 	for (var disccount = 1; disccount <= largest_disc; disccount++) {
 
-		// use this to map all the objects from trackarray with disc_number value of disccount to a new object 
+		// use this to map all the objects from trackarray with disc_number value of disccount to a new object
 		var tracklist_per_disc = $.map(trackarray, function(obj, index) {
 			if (obj.disc_number == disccount) {
 				return obj;
