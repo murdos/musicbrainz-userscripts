@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
-// @version        2016.5.24
+// @version        2016.5.30
 // @author         Michael Wiencek
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://bitbucket.org/mwiencek/userscripts/raw/master/set-recording-comments.user.js
@@ -140,7 +140,7 @@ function setRecordingComments() {
                         $input.css("border-color", "red").prop("disabled", false);
                     });
 
-                var link = $(track).children("td a[href^=\\/recording\\/]").filter(":first"),
+                var link = track.querySelector("td a[href^='/recording/']"),
                     mbid = link.href.match(MBID_REGEX)[0];
 
                 editData.push({edit_type: EDIT_RECORDING_EDIT, to_edit: mbid, comment: comment});
