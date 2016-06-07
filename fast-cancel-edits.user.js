@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
-// @version     2015.9.15
+// @version     2015.6.7
 // @author      Michael Wiencek
 // @downloadURL https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
 // @updateURL   https://bitbucket.org/mwiencek/userscripts/raw/master/fast-cancel-edits.user.js
@@ -61,42 +61,45 @@ function fastCancelScript() {
         }
     }
 
-    $("a.negative").on("click", function (event) {
-        event.preventDefault();
-        totalCancels += 1;
-        updateStatus();
+    document.body.addEventListener("click", function (event) {
+        if (event.target && event.target.tagName && event.target.tagName == "A" && event.target.classList.contains("negative")) {
+            event.stopPropagation();
+            event.preventDefault();
+            totalCancels += 1;
+            updateStatus();
 
-        var $self = $(this),
-            $edit = $self.parents("div.edit-list:eq(0)");
+            var $self = $(event.target),
+                $edit = $self.parents("div.edit-list:eq(0)");
 
-        pushRequest(function () {
-            var editNote = $edit.find("div.add-edit-note textarea").val();
-            var data = { "confirm.edit_note": editNote };
+            pushRequest(function () {
+                var editNote = $edit.find("div.add-edit-note textarea").val();
+                var data = { "confirm.edit_note": editNote };
 
-            $.ajax({
-                type: "POST",
-                url: $self.attr("href"),
-                data: data,
-                error: function (request, status, error) {
-                    $self
-                        .css({
-                            "background": "red",
-                            "color": "yellow",
-                            "cursor": "help"
-                        })
-                        .attr("title", "Error cancelling this edit: “" + error + "”");
-                    $edit
-                        .css({border: "6px solid red"})
-                        .show();
-                },
-                complete: function () {
-                    $edit.remove();
-                    totalCancels -= 1;
-                    updateStatus();
-                }
+                $.ajax({
+                    type: "POST",
+                    url: $self.attr("href"),
+                    data: data,
+                    error: function (request, status, error) {
+                        $self
+                            .css({
+                                "background": "red",
+                                "color": "yellow",
+                                "cursor": "help"
+                            })
+                            .attr("title", "Error cancelling this edit: “" + error + "”");
+                        $edit
+                            .css({border: "6px solid red"})
+                            .show();
+                    },
+                    complete: function () {
+                        $edit.remove();
+                        totalCancels -= 1;
+                        updateStatus();
+                    }
+                });
             });
-        });
-        $edit.hide();
+            $edit.hide();
+        }
     });
 
     $("div#edits > form[action$='/edit/enter_votes']").on("submit", function(event) {
