@@ -583,6 +583,7 @@ function Parsefmarelease(albumobject, trackobject) {
 			'url': albumobject.album_url,
 			'link_type': MBImport.URL_TYPES.stream_for_free
 		});
+	}
 
 	// Release date
 	if (albumobject.album_date_released) {
