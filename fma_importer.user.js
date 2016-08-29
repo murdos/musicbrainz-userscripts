@@ -575,6 +575,15 @@ function Parsefmarelease(albumobject, trackobject) {
 			'link_type': MBImport.URL_TYPES.other_databases
 		});
 	}
+	
+	// Check to see if a play button is available
+	if ($(".sqbtn-playpage").length) {
+		// Release URL
+		fmarelease.urls.push({
+			'url': albumobject.album_url,
+			'link_type': MBImport.URL_TYPES.stream_for_free
+		});
+	}
 
 	// Release date
 	if (albumobject.album_date_released) {
