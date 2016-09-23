@@ -22,6 +22,7 @@
  * http://freemusicarchive.org/music/Podington_Bear/Springtime/
  * http://freemusicarchive.org/music/Broke_For_Free/Directionless_EP/
  * http://freemusicarchive.org/music/Various_Artists_Evergreens_n_Odditunes/Evergreens_n_Odditunes/
+ * Radio program: http://freemusicarchive.org/music/Kyle_Eyre_Clyd/Live_on_WFMUs_Strength_Through_Failure_with_Fabio_Roberti_8132015/
  */
 
 
@@ -552,8 +553,12 @@ function Parsefmarelease(albumobject, trackobject) {
 
 	// Type
 	// TODO: match all FMA types to MB types
-	fmarelease.type = albumobject.album_type.toLowerCase();
-
+	if (albumobject.album_type == "Radio Program") {
+		fmarelease.type = "broadcast";
+	} else {
+		fmarelease.type = albumobject.album_type.toLowerCase();
+	}
+	
 	// Default status is official
 	fmarelease.status = 'official';
 
