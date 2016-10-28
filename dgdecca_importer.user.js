@@ -5,7 +5,7 @@ var meta = function() {
 // @name         Import DG/Decca releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @author       loujine
-// @version      2016.10.26
+// @version      2016.10.28.0
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/dgdecca_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/dgdecca_importer.user.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
