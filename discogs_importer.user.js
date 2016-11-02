@@ -291,7 +291,7 @@ function getDiscogsLinkKey(url) {
         link_infos[key] = {
           type: m[1],
           id: m[2],
-          clean_url: 'http://www.discogs.com/' + m[1] + '/' + m[2]
+          clean_url: 'https://www.discogs.com/' + m[1] + '/' + m[2]
         }
         LOGGER.debug('getDiscogsLinkKey:' + url + ' --> ' + key);
       } else {
