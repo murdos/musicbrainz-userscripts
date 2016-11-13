@@ -5,7 +5,7 @@ var meta = function() {
 // @name         Import DG/Decca releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @author       loujine
-// @version      2016.11.13.0
+// @version      2016.11.13.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/dgdecca_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/dgdecca_importer.user.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
@@ -217,7 +217,7 @@ function extract_release_data() {
         'language': 'eng', // 'English',
         'script': 'Latn', // 'Latin',
         'packaging': '',
-        'country': 'XW',
+        'country': '',
         'year': date[2],
         'month': months[date[1]],
         'day': date[0],
