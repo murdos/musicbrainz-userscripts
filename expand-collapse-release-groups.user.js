@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       6.3.2
+// @version       6.4
 // @license       GPL
 // @downloadURL   https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
 // @updateURL     https://bitbucket.org/mwiencek/userscripts/raw/master/expand-collapse-release-groups.user.js
@@ -222,8 +222,6 @@ function parse_release_group(json, mbid, parent, table) {
     bottom_td.appendChild(document.createTextNode(" | "));
     bottom_td.appendChild(createLink("/release/add?release-group=" + mbid, "add release"));
     bottom_td.appendChild(document.createTextNode(" | "));
-    bottom_td.appendChild(createLink("/release-group/" + mbid + "/relate", "use in a relationship"));
-    bottom_td.appendChild(document.createTextNode(" | "));
     bottom_td.appendChild(createLink("/release-group/" + mbid + "/edits", "editing history"));
 
     bottom_tr.appendChild(bottom_td);
@@ -268,7 +266,7 @@ function parse_release(json, table) {
 
     bottom_td.appendChild(createLink("/release/" + json.id + "/edit", "edit"));
     bottom_td.appendChild(document.createTextNode(" | "));
-    bottom_td.appendChild(createLink("/release/" + json.id + "/relate", "use in a relationship"));
+    bottom_td.appendChild(createLink("/release/" + json.id + "/edit-relationships", "edit relationships"));
     bottom_td.appendChild(document.createTextNode(" | "));
     bottom_td.appendChild(createLink("/release/" + json.id + "/edits", "editing history"));
 
