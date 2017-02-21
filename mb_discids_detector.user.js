@@ -1,13 +1,13 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version        2016.03.05.0
+// @version        2016.12.11.0
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @include        http://avaxhome.ws/music/*
-// @include        http*://what.cd/torrents.php?id=*
-// @include        https://ssl.what.cd/torrents.php?id=*
+// @include        https://apollo.rip/torrents.php?id=*
+// @include        https://passtheheadphones.me/torrents.php?id=*
 // @include        http*://lztr.us/torrents.php?id=*
 // @include        http*://lztr.me/torrents.php?id=*
 // @include        http*://mutracker.org/torrents.php?id=*
@@ -19,11 +19,14 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
+LOGGER.setLevel('info');
+
 var CHECK_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/gD+AP7rGNSCAAAACXBIWXMAAABIAAAASABGyWs+AAAACXZwQWcAAAAQAAAAEABcxq3DAAADKklEQVQ4y32TS2hcZRiGn/8/Z87MNNc2zczEmptO0jSXagJtXCjWhhSEXpCI4EYENy6KG8FFBYtgEbzQ4k5QqNp2VyMtJVGpRU0tGDNoQxvrmCbkMslkSJrJXM6cOef8v4ukQqX4wbP5eL/327wv/M/Em+qNeFO9ASDEwzUPrM+fP8dqOhXqeGJ/f21ddCAYCsfRyFLJvru2mvnh9mTil8am1uJLQ8ceNOhoa+XC8HfMJm81x1q63glV179oBMLVhpQYEiQKzy0VNtZWLs9OT53s6X3qrxPHX+bSyNVNgyujV8lvrDXG2vZ/7oWig64nAY0hwZCCgIRwUGBJRSGbvp6cHH91R33078ODTyNOnXqPxcRl88ibX5wuBJuP5x2BVhop2PwuBA01kn2tJo4HtxfL5DIzZ7+/8MHrOx7tcMQ3I9dwnWKvF+kfTdlVEc/10f59A0HAgMEui90xgxvTLn8u+9SYhXUnNX60smr7z7Jx3wG8UOSZhUI4spJTrGwo0lssZxVSQlOdZGrJYyzpks4qlvLBWhWMHOgb7Mfsq4PfXOvx+bwgk/WxSwrfUwRNQSgAh7oCFB3N1xNllrMK04A5V7PLMOOvCSFMgFzJl6u2Jl8Gx9XkCppSWdEWNWiPGZy9XmIs6WJKKHuasq+p3qlkOwhz9B54dnbOkorOR0yG9gZJ3fP5cNTm4J4Akws+FyfKOK5GCFAatm/T4ObmB7RWxt74k9hrC0LVtLwwmw2FwyY8323hK2iLGnz2U4lMTiHvR04IGiqLxbrS7x/np3NJozoEmcTFTLTz2U7bivTcXNSsFxWHeyyGE2XGZ7x/j7WGyhA0W3e/LU58eiY1N+0IgLc++or1VLLb6hz6MmPGe/M2NFTBzIpH3lYoX6MQhC1NkzV/p2Jp5JX6eP+vn7wxsJnEXXUVnL6T59K7J/u2tR96365oey7nVQTKnsDzNFr5hETBq3ZmbrB47cS5M2+PdTbHmJpL89+OGbv3dLc81n/kWLih+yDhnTGtEcpeXXHSUz/OJ64M3/ojMS3BUw9rI2BsIUxBsLYyEJYC1nNuqawpARrwtwDgHxTwbTT5CxY9AAAALnpUWHRjcmVhdGUtZGF0ZQAAeNozMjCw0DWw0DUyCTEwsDIyszIw0jUwtTIwAABB3gURQfNnBAAAAC56VFh0bW9kaWZ5LWRhdGUAAHjaMzIwsNA1sNA1MggxNLMyNLYyNtM1MLUyMAAAQgUFF56jVzIAAAAASUVORK5CYII%3D";
 
 $(document).ready(function () {
 
-    if (window.location.host.match(/what\.cd|lztr\.(us|me)|mutracker\.org/)) {
+    if (window.location.host.match(/apollo\.rip|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org/)) {
+        LOGGER.info("Gazelle site detected");
         gazellePageHandler();
     } else if (window.location.host.match(/avaxhome\.ws/)) {
         avaxHomePageHandler();
@@ -83,18 +86,7 @@ function gazellePageHandler() {
         artistName = m[1];
         releaseName = m[2];
     }
-    /*
-     if (texts.length == 0) { texts = $("#content div.thin h2 span") };
-     texts = texts.contents().filter(function() { return this.nodeType == 3 || $.nodeName(this, "a") });
-
-     var artistName = "";
-     texts.each(function(i) {
-     if (i < texts.length-1) { artistName = artistName + ((this.nodeType == 3) ? this.textContent : $(this).text()); }
-     });
-
-     var releaseName = texts[texts.length-1].textContent.replace(/\s\[.*\]$/, '');
-     releaseName = releaseName.substring(artistName.length > 0 ? 3 : 0, releaseName.length).replace(/ \[.*\]/g, "").replace("Various Artists - ", "");
-     */
+    LOGGER.debug("artist:", artistName, "- releaseName:", releaseName);
 
     // Parse each torrent
     $('tr.group_torrent').filter(function () {
@@ -105,42 +97,49 @@ function gazellePageHandler() {
         $(torrentInfo).find('a')
             // Only investigate the ones with a log
             .filter(function (index) {
-                return $(this).attr("href").match(/action=viewlog/) || $(this).text().contains("View Log");
+                return $(this).text().match(/View Log/i);
             })
             .each(function () {
-
-                // What.CD way
-                if ($(this).attr("href").match(/action=viewlog/)) {
-                    var blockquote = $(this).parents('blockquote');
-                    var torrentId = /torrentid=(\d+)/.exec($(this).attr('href'))[1];
-                    var url = '/' + $(this).attr('href');
+                LOGGER.debug("Log link", this);
+                if ($(this).attr("onclick").match(/show_logs/)) {
+                    if (window.location.host.match(/apollo/)) {
+                        LOGGER.debug("Apollo");
+                        var logAction = 'viewlog';
+                    } else if (window.location.host.match(/passtheheadphones/)){
+                        LOGGER.debug("PTH");
+                        var logAction = 'loglist';
+                    }
                 }
-                // LzTR way
-                else if ($(this).text().contains("View Log")) {
-                    var blockquote = $(this).parents('div.linkbox');
-                    var torrentId = $(this).parents("tr.pad").attr("id").match(/torrent_(\d+)/)[1];
-                    var url = '/torrents.php?action=log_ajax&torrentid=' + torrentId;
+                // LzTR
+                else if ($(this).attr("onclick").match(/get_log/)) {
+                    LOGGER.debug("LzTR");
+                    var logAction = 'log_ajax';
                 } else {
                     return true;
                 }
+                var targetContainer = $(this).parents(".linkbox");
+                var torrentId = /(show_logs|get_log)\('(\d+)/.exec($(this).attr('onclick'))[2];
+                var logUrl = '/torrents.php?action=' + logAction + '&torrentid=' + torrentId;
+                LOGGER.info("Log URL: ", logUrl);
+                LOGGER.debug("targetContainer: ", targetContainer);
 
                 // Get log content
-                $.get(url,
+                $.get(logUrl,
                     function (data) {
                         LOGGER.debug("Log content", $(data).find('pre'));
                         var discs = analyze_log_files($(data).find('pre'));
                         LOGGER.debug("Number of disc found", discs.length);
                         check_and_display_discs(artistName, releaseName, discs,
                             function (mb_toc_numbers, discid, discNumber) {
-                                blockquote.append('<br /><strong>' + (discs.length > 1 ? 'Disc ' + discNumber + ': ' : '' ) + 'MB DiscId: </strong><span id="' + torrentId + '_disc' + discNumber + '" />');
+                                targetContainer.append('<br /><strong>' + (discs.length > 1 ? 'Disc ' + discNumber + ': ' : '' ) + 'MB DiscId: </strong><span id="' + torrentId + '_disc' + discNumber + '" />');
                             },
                             function (mb_toc_numbers, discid, discNumber, found) {
-
                                 var url = computeAttachURL(mb_toc_numbers, artistName, releaseName);
                                 var html = '<a href="' + url + '">' + discid + '</a>';
                                 if (found) {
                                     html = html + '<img src="' + CHECK_IMAGE + '" />';
                                 }
+                                LOGGER.debug('#' + torrentId + '_disc' + discNumber);
                                 $('#' + torrentId + '_disc' + discNumber).html(html);
                             }
                         );

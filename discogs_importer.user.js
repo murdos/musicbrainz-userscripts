@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2016.11.09.0
+// @version        2016.12.17.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -531,8 +531,10 @@ function parseDiscogsRelease(data) {
             if (discogsRelease.formats[i].descriptions) {
                 $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
                     if (!(discogs_format in ['Box Set'])) {
-                        // Release format: special handling of vinyl 7", 10" and 12" and other more specific CD/DVD formats
-                        if (desc.match(/7"|10"|12"|^VCD|SVCD|CD\+G|HDCD|DVD-Audio|DVD-Video/) && (desc in MediaTypes)) mb_format = MediaTypes[desc];
+                        // Release format: special handling of Vinyl and Shellac 7", 10" and 12"
+                        if (desc.match(/7"|10"|12"/) && (discogs_format.concat(desc) in MediaTypes)) mb_format = MediaTypes[discogs_format.concat(desc)];
+                        // Release format: special handling of specific CD/DVD formats
+                        if (desc.match(/^VCD|SVCD|CD\+G|HDCD|DVD-Audio|DVD-Video/) && (desc in MediaTypes)) mb_format = MediaTypes[desc];
                     }
                     // Release format: special handling of Vinyl, LP == 12" (http://www.discogs.com/help/submission-guidelines-release-format.html#LP)
                     if (discogs_format == "Vinyl" && desc == "LP") mb_format = '12" Vinyl';
@@ -784,16 +786,19 @@ var MediaTypes = {
     "MVD": "Other",
     "Reel-To-Reel": "Reel-to-reel",
     "SelectaVision": "Other",
-    "Shellac": "Vinyl",
+    "Shellac": "Shellac",
+    'Shellac7"': '7" Shellac',
+    'Shellac10"': '10" Shellac',
+    'Shellac12"': '12" Shellac',
     "SVCD": "SVCD",
     "UMD": "UMD",
     "VCD": "VCD",
     "VHS": "VHS",
     "Video 2000": "Other",
     "Vinyl": "Vinyl",
-    '7"': '7" Vinyl',
-    '10"': '10" Vinyl',
-    '12"': '12" Vinyl'
+    'Vinyl7"': '7" Vinyl',
+    'Vinyl10"': '10" Vinyl',
+    'Vinyl12"': '12" Vinyl'
 };
 
 var Countries = {
