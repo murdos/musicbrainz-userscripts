@@ -1,13 +1,14 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version        2016.12.11.0
+// @version        2017.02.22.0
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @include        http://avaxhome.ws/music/*
 // @include        https://apollo.rip/torrents.php?id=*
 // @include        https://passtheheadphones.me/torrents.php?id=*
+// @include        https://redacted.ch/torrents.php?id=*
 // @include        http*://lztr.us/torrents.php?id=*
 // @include        http*://lztr.me/torrents.php?id=*
 // @include        http*://mutracker.org/torrents.php?id=*
@@ -25,7 +26,7 @@ var CHECK_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA
 
 $(document).ready(function () {
 
-    if (window.location.host.match(/apollo\.rip|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org/)) {
+    if (window.location.host.match(/apollo\.rip|redacted\.ch|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org/)) {
         LOGGER.info("Gazelle site detected");
         gazellePageHandler();
     } else if (window.location.host.match(/avaxhome\.ws/)) {
@@ -105,8 +106,8 @@ function gazellePageHandler() {
                     if (window.location.host.match(/apollo/)) {
                         LOGGER.debug("Apollo");
                         var logAction = 'viewlog';
-                    } else if (window.location.host.match(/passtheheadphones/)){
-                        LOGGER.debug("PTH");
+                    } else if (window.location.host.match(/redacted|passtheheadphones/)){
+                        LOGGER.debug("RED");
                         var logAction = 'loglist';
                     }
                 }
