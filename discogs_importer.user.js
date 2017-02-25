@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2016.12.17.0
+// @version        2017.02.25.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -785,6 +785,7 @@ var MediaTypes = {
     "Minidisc": "MiniDisc",
     "MVD": "Other",
     "Reel-To-Reel": "Reel-to-reel",
+    "SACD": "SACD",
     "SelectaVision": "Other",
     "Shellac": "Shellac",
     'Shellac7"': '7" Shellac',
