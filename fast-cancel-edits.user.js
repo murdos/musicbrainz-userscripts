@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
+// @description Mass cancel open edits with optional edit notes.
 // @version     2015.6.7
 // @author      Michael Wiencek
 // @license     X11

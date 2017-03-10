@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
+// @description    Batch set recording comments from a Release page.
 // @version        2016.5.30
 // @author         Michael Wiencek
 // @license        X11

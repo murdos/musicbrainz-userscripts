@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
+// @description Batch link recordings to works from artist Recordings page.
 // @version     2016.5.23
 // @author      Michael Wiencek
 // @license     X11
