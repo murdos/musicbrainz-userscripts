@@ -17,6 +17,10 @@
 * [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 * [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 * [Import Takealot releases to MusicBrainz](#takealot_importer)
+* [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
+* [MusicBrainz: Expand/collapse release groups](#expand-collapse-release-groups)
+* [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
+* [MusicBrainz: Set recording comments for a release](#set-recording-comments)
 * [Musicbrainz DiscIds Detector](#mb_discids_detector)
 * [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
@@ -138,6 +142,34 @@ Add a button to import Takealot releases to MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/takealot_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js)
+
+## <a name="batch-add-recording-relationships"></a> MusicBrainz: Batch-add "performance of" relationships
+
+Batch link recordings to works from artist Recordings page.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/batch-add-recording-relationships.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js)
+
+## <a name="expand-collapse-release-groups"></a> MusicBrainz: Expand/collapse release groups
+
+See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/expand-collapse-release-groups.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js)
+
+## <a name="fast-cancel-edits"></a> MusicBrainz: Fast cancel edits
+
+Mass cancel open edits with optional edit notes.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fast-cancel-edits.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js)
+
+## <a name="set-recording-comments"></a> MusicBrainz: Set recording comments for a release
+
+Batch set recording comments from a Release page.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/set-recording-comments.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js)
 
 ## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
 
