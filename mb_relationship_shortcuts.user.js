@@ -55,7 +55,7 @@ $(document).ready(function(){
         parent.type = 'artist';
         parent.mbid = m[1];
         child.type = 'release-group';
-    } else if (m = window.location.href.match("\/(release-group|label)\/(.{36})$")) {
+    } else if (m = window.location.href.match("\/(release-group|label)\/(.{36})[^\/]*$")) {
         parent.type = m[1];
         parent.mbid = m[2];
         child.type = 'release';
@@ -96,8 +96,15 @@ $(document).ready(function(){
         });
     });
 
+    // Calculate offset for multi-page lists
+    var page = 1
+    if (m = window.location.href.match("[\?&]page=([0-9]*)")) {
+        page = m[1]
+    }
+    var offset = (page - 1) * 100
+    
     // Call the MB webservice
-    var url = '/ws/2/' + child.type + '?' + parent.type + "=" + parent.mbid + '&inc=' + incOptions[child.type].join("+") + '&limit=100';
+    var url = '/ws/2/' + child.type + '?' + parent.type + "=" + parent.mbid + '&inc=' + incOptions[child.type].join("+") + '&limit=100&offset=' + offset;
     LOGGER.debug("MB WS url: " + url);
 
     $.get(url, function(data, textStatus, jqXHR) {
