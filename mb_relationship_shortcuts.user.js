@@ -55,7 +55,7 @@ $(document).ready(function(){
         parent.type = 'artist';
         parent.mbid = m[1];
         child.type = 'release-group';
-    } else if (m = window.location.href.match("\/(release-group|label)\/(.{36})$")) {
+    } else if (m = window.location.href.match("\/(release-group|label)\/(.{36})[^\/]$")) {
         parent.type = m[1];
         parent.mbid = m[2];
         child.type = 'release';
