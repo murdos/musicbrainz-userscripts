@@ -1,24 +1,21 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2015.06.10.0
+// @version        2015.09.15.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
 // @namespace      http://userscripts.org/users/22504
 // @include        http*://*musicbrainz.org/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require        http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require        https://raw.github.com/murdos/mbediting.js/master/mbediting.js
 // ==/UserScript==
 
-function addJQuery(callback) {var script = document.createElement("script");script.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js");script.addEventListener('load', function() {var script = document.createElement("script");script.textContent = "(" + callback.toString() + ")();";document.body.appendChild(script);}, false);document.body.appendChild(script);}addJQuery(main);
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
 
-function main() {
+$(document).ready(function () {
     LASTFM_APIKEY = null;
-    jQuery.noConflict();
-    (function ($) {
-
-    // -------------- Start of script ------------------------
 
     // Highlight table rows
     $('table.tbl tbody tr').hover(
@@ -228,11 +225,17 @@ function main() {
         }
     }
 
+    // Display "Edit relationships" link for release besides "Edit" link
+    re = new RegExp("musicbrainz\.org\/release\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})","i");
+    if (window.location.href.match(re)) {
+        var mbid = window.location.href.match(re)[1];
+        $('ul.tabs').append('<li><a href="/release/' + mbid + '/edit-relationships">Edit relationships</a></li>');
+    }
+
     // Discogs link rollover
     // TODO...
 
     // -------------- End of script ------------------------
 
-}(jQuery));
-}
+});
 

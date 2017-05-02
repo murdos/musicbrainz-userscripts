@@ -3,14 +3,16 @@
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
-// @version        2015.06.13.0
+// @version        2015.07.14.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @include        http://pro.beatport.com/release/*
 // @include        https://pro.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
+// @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -19,18 +21,39 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
+  MBImportStyle();
+
   var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
   var release = retrieveReleaseInfo(release_url);
   insertLink(release, release_url);
 });
 
 function retrieveReleaseInfo(release_url) {
-  var releaseDate = $( ".category:contains('Release Date')" ).next().text().split("-");
+  function contains_or(selector, list) {
+    selectors = [];
+    $.each(list, function(ind, value) {
+      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
+    });
+    return selectors.join(',');
+  }
+  var release_date_strings = [
+    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Veröffentlichungsdatum', 'Data de lançamento', 'Releasedatum'
+  ];
+  var release_strings = [
+    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
+  ];
+  var labels_strings = [
+    'Labels', 'Compañías discográficas', 'Gravadoras'
+  ];
+  var catalog_strings = [
+    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus'
+  ];
+  var releaseDate = $(contains_or(".category", release_date_strings)).next().text().split("-");
 
   // Release information global to all Beatport releases
   var release = {
     artist_credit: [],
-    title: $( "h3.interior-type:contains('Release')" ).next().text().trim(),
+    title: $(contains_or("h3.interior-type", release_strings)).next().text().trim(),
     year: releaseDate[0],
     month: releaseDate[1],
     day: releaseDate[2],
@@ -51,13 +74,13 @@ function retrieveReleaseInfo(release_url) {
   // URLs
   release.urls.push({
     'url': release_url,
-    'link_type': MBReleaseImportHelper.URL_TYPES.purchase_for_download
+    'link_type': MBImport.URL_TYPES.purchase_for_download
   });
 
   release.labels.push(
     {
-      name: $( ".category:contains('Labels')" ).next().text().trim(),
-      catno: $( ".category:contains('Catalog')" ).next().text()
+      name: $(contains_or(".category", labels_strings)).next().text().trim(),
+      catno: $(contains_or(".category", catalog_strings)).next().text().trim()
     }
   );
 
@@ -89,7 +112,7 @@ function retrieveReleaseInfo(release_url) {
         title += ' (' + track.mix + ')';
       }
       tracks.push({
-        'artist_credit': MBReleaseImportHelper.makeArtistCredits(artists),
+        'artist_credit': MBImport.makeArtistCredits(artists),
         'title': title,
         'duration': track.duration.minutes
       });
@@ -104,9 +127,10 @@ function retrieveReleaseInfo(release_url) {
   });
 
   if (unique_artists.length > 4) {
-    unique_artists = [ 'Various Artists' ];
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits(unique_artists);
   }
-  release.artist_credit = MBReleaseImportHelper.makeArtistCredits(unique_artists);
   release.discs.push( {
     'tracks': tracks,
     'format': release.format
@@ -118,11 +142,16 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = 'Imported from ' + release_url;
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(release_url, 'BeatPort Pro');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var mbUI = $('<li class="interior-release-chart-content-item musicbrainz-import">'
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
+        + '</li>').hide();
 
-    $(".interior-release-chart-content-list").append('<li class="interior-release-chart-content-item musicbrainz-import">' + innerHTML + '</li>');
-    $('.musicbrainz-import input[type="submit"]').css('background', '#eee');
+    $(".interior-release-chart-content-list").append(mbUI);
+    $('form.musicbrainz_import').css({'display': 'inline-block', 'margin-left': '5px'});
+    $('form.musicbrainz_import button').css({'width': '120px'});
+    mbUI.slideDown();
 }

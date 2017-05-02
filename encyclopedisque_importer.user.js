@@ -1,6 +1,6 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2015.06.12.0
+// @version        2016.05.29.0
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
@@ -8,19 +8,24 @@
 // @include        http://www.encyclopedisque.fr/disque/*.html
 // @include        http://www.encyclopedisque.fr/artiste/*.html
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
+// @require        lib/mblinks.js
 // @require        lib/logger.js
+// @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
-$(document).ready(function() {
+var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
-    if (window.location.href.match( /encyclopedisque\.fr\/disque\/(\d+)/) ) {
+$(document).ready(function() {
+    MBImportStyle();
+
+    if (window.location.href.match(/encyclopedisque\.fr\/disque\/(\d+)/)) {
         var release = parseEncyclopedisquePage();
-        setupUI(release);
+        setupImportUI(release);
     }
 
     insertMBLinks();
-
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,87 +33,38 @@ $(document).ready(function() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-function setupUI(release) {
+function setupImportUI(release) {
 
     // Form parameters
-    var edit_note = 'Imported from ' + window.location.href;
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(window.location.href, 'Encyclopedisque');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-
-    // Append search link
-    innerHTML += ' <small>(' + MBReleaseImportHelper.buildSearchLink(release) + ')</small>';
-
-    var importLink = $("<li>"+ innerHTML + "</li>");
-    importLink.appendTo("#menu ul");
-
+    var mbUI = $(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release)).hide();
+    $('#recherchebox').append(mbUI);
+    $('form.musicbrainz_import button').css({width: '100%'});
+    mbUI.slideDown();
 }
 
-function insertMBLinks($root) {
+function insertMBLinks() {
 
-    // Check if we already added links for this content
-    var CACHE_STRING = localStorage.getItem('ENCYCLOPEDISQUE_MB_MAPPING_CACHE');
-    if(!CACHE_STRING) {
-        CACHE_STRING = "{}";
-    }
-    var CACHE = JSON.parse(CACHE_STRING);
-
-    var ajax_requests = [];
-
-    setInterval(function() {
-        if(ajax_requests.length > 0) {
-            var request = ajax_requests.shift();
-            if(typeof request === "function") {
-                request();
-            }
-        }
-    }, 1000);
-
-    function createLink(mb_url) {
-        return '<a href="'+mb_url+'"><img src="http://musicbrainz.org/favicon.ico" /></a> ';
+    var current_url = window.location.href;
+    if (current_url.match(/\/disque\//)) {
+        mblinks.searchAndDisplayMbLink(current_url, 'release', function (link) { $('h2 span').before(link); } );
+    } else if (current_url.match(/\/artiste\//)) {
+        mblinks.searchAndDisplayMbLink(current_url, 'artist', function (link) { $('h2').prepend(link); } );
     }
 
-    function searchAndDisplayMbLink($div) {
-        $div.find('a[href*="/disque/"]').each(function() {
-            var $link = $(this);
-            var external_url = 'http://www.encyclopedisque.fr' + $link.attr('href');
-
-            if(CACHE[external_url]) {
-                $.each(CACHE[external_url], function(index, mb_url) {
-                    $link.after(createLink(mb_url)).after('<br />');
-                });
-            } else {
-                ajax_requests.push($.proxy(function() {
-                    var context = this;
-                    $.getJSON('http://musicbrainz.org/ws/2/url?resource='+context.external_url+'&inc=release-rels', function(data) {
-                        if ('relations' in data) {
-                            CACHE[context.external_url] = [];
-                            $.each(data['relations'], function(idx, relation) {
-                                if ('release'.replace('-', '_') in relation) {
-                                    var mb_url = 'http://musicbrainz.org/release/' + relation['release']['id'];
-                                    CACHE[context.external_url].push(mb_url);
-                                    localStorage.setItem('ENCYCLOPEDISQUE_MB_MAPPING_CACHE', JSON.stringify(CACHE));
-                                    context.$link.after(createLink(mb_url)).after('<br />');
-                                }
-                            });
-                        }
-                    });
-                }, {'external_url': external_url, '$link': $link}));
-            }
-        });
-    }
-
-    if (!$root) {
-        $root = $('body');
-    }
-
-    $root.find('div.v7P').each(function() {
-        searchAndDisplayMbLink($(this));
+    $('div.v7P, div.v12P').find('a[href*="/disque/"]').each(function() {
+        var $link = $(this);
+        var external_url = window.location.origin + $link.attr('href');
+        mblinks.searchAndDisplayMbLink(external_url, 'release', function (link) { $link.after(link).after('<br />') } );
     });
 
-    $root.find('div.v12P').each(function() {
-        searchAndDisplayMbLink($(this));
+    $('h2, div.main').find('a[href*="/artiste/"]').each(function() {
+        var $link = $(this);
+        var external_url = window.location.origin + $link.attr('href');
+        mblinks.searchAndDisplayMbLink(external_url, 'artist', function (link) { $link.before(link); } );
     });
 
 }
@@ -140,7 +96,7 @@ function parseEncyclopedisquePage() {
 
     // Release URL
     release.urls = new Array();
-    release.urls.push( { 'url': window.location.href, 'link_type': MBReleaseImportHelper.URL_TYPES.other_databases } );
+    release.urls.push( { 'url': window.location.href, 'link_type': MBImport.URL_TYPES.other_databases } );
 
     // Parse other infos
     var releaseInfos = document.body.querySelectorAll("div.main tr");
@@ -259,4 +215,3 @@ function parseEncyclopedisquePage() {
 
     return release;
 }
-

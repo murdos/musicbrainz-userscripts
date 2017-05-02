@@ -1,27 +1,51 @@
 // ==UserScript==
 // @name           Import Beatport releases to MusicBrainz
 // @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2015.06.10.1
+// @version        2015.07.14.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
-// @include        http*://www.beatport.com/release/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-// @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/dateFormat.js
-// @require        https://raw.githubusercontent.com/phstc/jquery-dateFormat/master/src/jquery.dateFormat.js
-// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/import_functions.js
-// @require        https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @include        http*://classic.beatport.com/release/*
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require        lib/mbimport.js
+// @require        lib/logger.js
+// @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
+
+// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
+    MBImportStyle();
 
-    var release = retrieveReleaseInfo();
-    insertLink(release);
+    var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
+    var release = retrieveReleaseInfo(release_url);
+    insertLink(release, release_url);
 
 });
 
-function retrieveReleaseInfo() {
+function retrieveReleaseInfo(release_url) {
+  function contains_or(selector, list) {
+    selectors = [];
+    $.each(list, function(ind, value) {
+      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
+    });
+    return selectors.join(',');
+  }
+  var release_date_strings = [
+    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Erscheinungsdatum', 'Data de lançamento', 'Releasedatum', "Data di uscita", "リリース予定日"
+  ];
+  var release_strings = [
+    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
+  ];
+  var labels_strings = [
+    'Labels', 'Sello', 'Gravadoras', "Label", "Etichetta", "Editora", "レーベル"
+  ];
+  var catalog_strings = [
+    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus', "Catalogo", "カタログ"
+  ];
   var release = {};
 
   // Release information global to all Beatport releases
@@ -29,9 +53,12 @@ function retrieveReleaseInfo() {
   release.country = "XW";
   release.status = 'official';
   release.urls = [];
-  release.urls.push( { 'url': window.location.href } );
+  release.urls.push({
+    'url': release_url,
+    'link_type': MBImport.URL_TYPES.purchase_for_download
+  });
 
-  var releaseDate = $( "td.meta-data-label:contains('Release Date')" ).next().text().split("-");
+  var releaseDate = $(contains_or("td.meta-data-label", release_date_strings)).next().text().split("-");
   release.year = releaseDate[0];
   release.month = releaseDate[1];
   release.day = releaseDate[2];
@@ -39,10 +66,12 @@ function retrieveReleaseInfo() {
   release.labels = [];
   release.labels.push(
     {
-      name: $( "td.meta-data-label:contains('Labels')" ).next().text(),
-      catno: $( "td.meta-data-label:contains('Catalog #')" ).next().text()
+      name: $(contains_or("td.meta-data-label", labels_strings)).next().text(),
+      catno: $(contains_or("td.meta-data-label", catalog_strings)).next().text()
     }
   );
+
+  var release_artists = [];
 
   // Tracks
   var tracks = [];
@@ -51,23 +80,37 @@ function retrieveReleaseInfo() {
       var t = $.parseJSON($(tagSoup).attr('data-json'));
       release.title = t.release.name;
 
-      var artist = [];
+      var artists = [];
       t.artists.forEach(
-        function ( artistObject, index, arr ) {
-          artist.push({
-            'artist_name': artistObject.name
-          });
+        function ( artist, index, arr ) {
+          artists.push(artist.name);
+	  release_artists.push(artist.name);
         }
       );
-      release.artist_credit = artist;
+      var title = t.name;
+      if (t.mixName && t.mixName != 'Original Mix' && t.mixName != 'Original') {
+        title += ' (' + t.mixName + ')';
+      }
       tracks.push({
-        'artist_credit': artist,
-        'title': t.title,
-        'duration': t.length
+        'artist_credit': MBImport.makeArtistCredits(artists),
+        'title': title,
+        'duration': t.lengthMs
       });
     }
   );
-  LOGGER.debug("tracks: ", tracks);
+
+  var unique_artists = [];
+  $.each(release_artists, function(i, el){
+    if ($.inArray(el, unique_artists) === -1) {
+      unique_artists.push(el);
+    }
+  });
+
+  if (unique_artists.length > 4) {
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits(unique_artists);
+  }
   release.discs = [];
   release.discs.push( {
     'tracks': tracks,
@@ -79,12 +122,17 @@ function retrieveReleaseInfo() {
 }
 
 // Insert button into page under label information
-function insertLink(release) {
-    var edit_note = 'Imported from ' + window.location.href;
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+function insertLink(release, release_url) {
+    var edit_note = MBImport.makeEditNote(release_url, 'BeatPort');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    var tr = $("<tr><td span='2' /></tr>");
-    tr.find('td').append(innerHTML);
-    $("table.meta-data tbody").append(tr);
+    var mbUI = $('<div class="musicbrainz-import">'
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
+        + '</div>').hide();
+
+    $(".release-detail-metadata").append(mbUI);
+    $('form.musicbrainz_import').css({'display': 'inline-block', 'margin': '1px'});
+    $('form.musicbrainz_import img').css({'display': 'inline-block'});
+    mbUI.slideDown();
 }

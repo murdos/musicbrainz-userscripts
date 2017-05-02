@@ -2,14 +2,16 @@
 // @name           Import Juno Download releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from junodownload.com/products pages into MusicBrainz
-// @version        2015.06.13.1
+// @version        2015.06.21.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @include        http*://www.junodownload.com/products/*
 // @include        http*://secure.junodownload.com/products/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/import_functions.js
+// @require        lib/mbimport.js
 // @require        lib/logger.js
+// @require        lib/mbimportstyle.js
+// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -18,6 +20,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 $(document).ready(function(){
+  MBImportStyle();
   var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
   var release = retrieveReleaseInfo(release_url);
   insertLink(release, release_url);
@@ -52,7 +55,7 @@ function parseReleaseDate(rdate) {
 
 function retrieveReleaseInfo(release_url) {
 
-  // Release information global to all Beatport releases
+  // Release defaults
   var release = {
     artist_credit: [],
     title: $("#product_heading_title").text().trim(),
@@ -82,7 +85,7 @@ function retrieveReleaseInfo(release_url) {
   // URLs
   release.urls.push({
     'url': release_url,
-    'link_type': MBReleaseImportHelper.URL_TYPES.purchase_for_download
+    'link_type': MBImport.URL_TYPES.purchase_for_download
   });
 
   release.labels.push(
@@ -105,7 +108,7 @@ function retrieveReleaseInfo(release_url) {
       trackname = m[2];
     }
     tracks.push({
-        'artist_credit': MBReleaseImportHelper.makeArtistCredits(artists),
+        'artist_credit': MBImport.makeArtistCredits(artists),
         'title': trackname,
         'duration': tracklength
       });
@@ -113,10 +116,10 @@ function retrieveReleaseInfo(release_url) {
 
   var parsed_release_artist = $("#product_heading_artist").text().trim();
   if (parsed_release_artist == 'VARIOUS') {
-    parsed_release_artist = 'Various Artists';
+    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  } else {
+    release.artist_credit = MBImport.makeArtistCredits([ parsed_release_artist ]);
   }
-  var release_artists = [ parsed_release_artist ];
-  release.artist_credit = MBReleaseImportHelper.makeArtistCredits(release_artists);
   release.discs.push( {
     'tracks': tracks,
     'format': release.format
@@ -128,11 +131,16 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = 'Imported from ' + release_url;
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(release_url, 'Juno Download');
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
+    var mbUI = $('<div id="mb_buttons">'
+        + MBImport.buildFormHTML(parameters)
+        + MBImport.buildSearchButton(release)
+        + '</div>').hide();
 
-    $("div.sociald").before('<div id="musicbrainz-import">' + innerHTML + '</div>');
-    $('#musicbrainz-import').css({'background': '#759d44', 'border': '2px solid #ddd', 'text-align': 'center'});
+    $("div.sociald").before(mbUI);
+    $('#mb_buttons').css({'background': '#759d44', 'border': '2px solid #ddd', 'text-align': 'center'});
+    $('form.musicbrainz_import button').css({width: '80%'});
+    mbUI.slideDown();
 }

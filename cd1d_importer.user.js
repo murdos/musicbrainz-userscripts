@@ -8,12 +8,14 @@
 // @include     http://1d-paysdelaloire.com/*/album/*
 // @include     http://1d-rhonealpes.com/*/album/*
 // @include     http://cd1d.com/*/album/*
-// @version     2015.06.13.0
+// @version     2015.06.22.0
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require     lib/import_functions.js
+// @require     lib/mbimport.js
 // @require     lib/logger.js
+// @require     lib/mbimportstyle.js
+// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */
@@ -76,7 +78,7 @@ var CD1DImporter = {
         var title = row.find('td.tracklist-content-title').text().replace(/^[0-9A-F][0-9]* /, '');
         return {
           title: title,
-          duration: MBReleaseImportHelper.hmsToMilliSeconds(duration)
+          duration: MBImport.hmsToMilliSeconds(duration)
         };
       }).get();
       discs.push(disc);
@@ -89,7 +91,7 @@ var CD1DImporter = {
     var artists = $('div.infos-releasegrp div.list-artist a').map(function () {
       return $(this).text();
     }).get();
-    return MBReleaseImportHelper.makeArtistCredits(artists);
+    return MBImport.makeArtistCredits(artists);
   },
 
   getAlbum: function () {
@@ -180,7 +182,7 @@ var CD1DImporter = {
     release.month = releasedate.month;
     release.day = releasedate.day;
 
-    var link_type = MBReleaseImportHelper.URL_TYPES;
+    var link_type = MBImport.URL_TYPES;
 
     if (format.name.match(/vinyl|lp/i)) {
       release.country = 'FR';
@@ -239,18 +241,23 @@ var CD1DImporter = {
     // Insert links in page
 
     // Form parameters
-    var edit_note = 'Imported from ' + this.currentURL() + ' (' + formatname + ')';
-    var parameters = MBReleaseImportHelper.buildFormParameters(release, edit_note);
+    var edit_note = MBImport.makeEditNote(this.currentURL(), 'CD1D', formatname);
+    var parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form
-    var innerHTML = MBReleaseImportHelper.buildFormHTML(parameters);
-    $(where).append(innerHTML);
-
+    var mbUI = $('<div id="mb_buttons">'
+      + MBImport.buildFormHTML(parameters)
+      + MBImport.buildSearchButton(release)
+      + '</div>').hide();
+    $(where).append(mbUI);
+    $('#mb_buttons').css({'margin-top': '6px'});
+    $('form.musicbrainz_import').css({display: 'inline-block', 'margin-right': '5px'});
+    mbUI.slideDown();
   }
 };
 
 $(document).ready(function () {
-
+  MBImportStyle();
   /* CD1D uses same page with hidden tabs for all formats */
   var formats = CD1DImporter.getFormats();
   //LOGGER.info('Formats:', formats);
