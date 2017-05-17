@@ -5,7 +5,7 @@
 // @version        2016.04.03.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
-// @include        /^https?:\/\/(?:www\.)?(?:cdbaby\.com)\/cd\/[^\/]+/
+// @include        /^https?:\/\/(?:store\.)?(?:cdbaby\.com)\/cd\/[^\/]+/
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
@@ -21,7 +21,7 @@ if (!unsafeWindow) unsafeWindow = window;
 $(document).ready(function(){
   MBImportStyle();
   var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
-  release_url = release_url.replace(/^(?:https?:\/\/)?(?:www\.)?(?:cdbaby\.com)\//, "http://www.cdbaby.com/");
+  release_url = release_url.replace(/^(?:https?:\/\/)?(?:store\.)?(?:cdbaby\.com)\//, "http://store.cdbaby.com/");
 
   var release;
   var buttons = "";
