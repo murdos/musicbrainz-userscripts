@@ -2,7 +2,7 @@
 // @name           Import CD Baby releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from cdbaby.com into MusicBrainz.
-// @version        2016.04.03.0
+// @version        2017.05.18.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js
 // @include        /^https?:\/\/(?:store\.)?(?:cdbaby\.com)\/cd\/[^\/]+/
