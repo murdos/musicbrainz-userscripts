@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Import Metal Archives releases into MusicBrainz
 // @namespace   https://github.com/murdos/musicbrainz-userscripts/
-// @version     2015.10.04.0
+// @version     2017.05.23.0
 // @description Add a button on Metal Archives release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
 // @update      https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
-// @include     http://www.metal-archives.com/albums/*/*/*
+// @include     http*://www.metal-archives.com/albums/*/*/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
 // @require     lib/mbimport.js
 // @require     lib/mbimportstyle.js
