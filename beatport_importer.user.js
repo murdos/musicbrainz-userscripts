@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name           Import Beatport releases to MusicBrainz
-// @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
+// @name           Import Beatport Classic releases to MusicBrainz
+// @description    One-click importing of releases from classic.beatport.com/release pages into MusicBrainz
 // @version        2015.07.14.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
@@ -123,7 +123,7 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'BeatPort');
+    var edit_note = MBImport.makeEditNote(release_url, 'Beatport Classic');
     var parameters = MBImport.buildFormParameters(release, edit_note);
 
     var mbUI = $('<div class="musicbrainz-import">'
