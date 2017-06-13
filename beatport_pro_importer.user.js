@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name           Import Beatport Pro releases to MusicBrainz
+// @name           Import Beatport releases to MusicBrainz
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from pro.beatport.com/release pages into MusicBrainz
+// @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
 // @version        2015.07.14.0
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_pro_importer.user.js
-// @include        http://pro.beatport.com/release/*
-// @include        https://pro.beatport.com/release/*
+// @include        http://www.beatport.com/release/*
+// @include        https://www.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
@@ -142,7 +142,7 @@ function retrieveReleaseInfo(release_url) {
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'BeatPort Pro');
+    var edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     var parameters = MBImport.buildFormParameters(release, edit_note);
 
     var mbUI = $('<li class="interior-release-chart-content-item musicbrainz-import">'
