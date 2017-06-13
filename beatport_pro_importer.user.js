@@ -36,9 +36,6 @@ function retrieveReleaseInfo(release_url) {
     });
     return selectors.join(',');
   }
-  var release_strings = [
-    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
-  ];
   var labels_strings = [
     'Labels', 'Compañías discográficas', 'Gravadoras'
   ];
@@ -50,7 +47,7 @@ function retrieveReleaseInfo(release_url) {
   // Release information global to all Beatport releases
   var release = {
     artist_credit: [],
-    title: $(contains_or("h3.interior-type", release_strings)).next().text().trim(),
+    title: ProductDetail.name,
     year: releaseDate[0],
     month: releaseDate[1],
     day: releaseDate[2],
