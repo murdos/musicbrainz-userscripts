@@ -29,19 +29,6 @@ $(document).ready(function(){
 });
 
 function retrieveReleaseInfo(release_url) {
-  function contains_or(selector, list) {
-    selectors = [];
-    $.each(list, function(ind, value) {
-      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
-    });
-    return selectors.join(',');
-  }
-  var labels_strings = [
-    'Labels', 'Compañías discográficas', 'Gravadoras'
-  ];
-  var catalog_strings = [
-    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus'
-  ];
   var releaseDate = ProductDetail.date.published.split("-");
 
   // Release information global to all Beatport releases
@@ -71,8 +58,8 @@ function retrieveReleaseInfo(release_url) {
 
   release.labels.push(
     {
-      name: $(contains_or(".category", labels_strings)).next().text().trim(),
-      catno: $(contains_or(".category", catalog_strings)).next().text().trim()
+      name: ProductDetail.label.name,
+      catno: ProductDetail.catalog
     }
   );
 
