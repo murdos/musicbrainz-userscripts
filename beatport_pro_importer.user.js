@@ -36,9 +36,6 @@ function retrieveReleaseInfo(release_url) {
     });
     return selectors.join(',');
   }
-  var release_date_strings = [
-    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Veröffentlichungsdatum', 'Data de lançamento', 'Releasedatum'
-  ];
   var release_strings = [
     'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
   ];
@@ -48,7 +45,7 @@ function retrieveReleaseInfo(release_url) {
   var catalog_strings = [
     'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus'
   ];
-  var releaseDate = $(contains_or(".category", release_date_strings)).next().text().split("-");
+  var releaseDate = ProductDetail.date.published.split("-");
 
   // Release information global to all Beatport releases
   var release = {
