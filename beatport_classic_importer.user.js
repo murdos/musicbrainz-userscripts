@@ -37,9 +37,6 @@ function retrieveReleaseInfo(release_url) {
   var release_date_strings = [
     'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Erscheinungsdatum', 'Data de lançamento', 'Releasedatum', "Data di uscita", "リリース予定日"
   ];
-  var release_strings = [
-    'Release', 'Lanzamiento', 'Sortie', 'Album', 'Lançamento'
-  ];
   var labels_strings = [
     'Labels', 'Sello', 'Gravadoras', "Label", "Etichetta", "Editora", "レーベル"
   ];
@@ -82,13 +79,13 @@ function retrieveReleaseInfo(release_url) {
 
       var artists = [];
       t.artists.forEach(
-        function ( artist, index, arr ) {
+        function (artist) {
           artists.push(artist.name);
 	  release_artists.push(artist.name);
         }
       );
       var title = t.name;
-      if (t.mixName && t.mixName != 'Original Mix' && t.mixName != 'Original') {
+      if (t.mixName && t.mixName !== 'Original Mix' && t.mixName !== 'Original') {
         title += ' (' + t.mixName + ')';
       }
       tracks.push({

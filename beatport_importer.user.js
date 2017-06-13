@@ -47,7 +47,7 @@ function retrieveReleaseInfo(release_url) {
     type: '',
     urls: [],
     labels: [],
-    discs: [],
+    discs: []
   };
 
   // URLs
@@ -70,7 +70,7 @@ function retrieveReleaseInfo(release_url) {
   var release_artists = [];
   $.each(the_tracks,
     function (idx, track) {
-      if (track.release.id != ProductDetail.id) {
+      if (track.release.id !== ProductDetail.id) {
         return;
       }
       if (seen_tracks[track.id]) {
@@ -87,7 +87,7 @@ function retrieveReleaseInfo(release_url) {
       );
 
       var title = track.name;
-      if (track.mix && track.mix != 'Original Mix') {
+      if (track.mix && track.mix !== 'Original Mix') {
         title += ' (' + track.mix + ')';
       }
       tracks.push({
