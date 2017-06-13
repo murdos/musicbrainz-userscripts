@@ -69,8 +69,6 @@ function retrieveReleaseInfo(release_url) {
     discs: [],
   };
 
-  var release_id = $( "span.playable-play-all[data-release]" ).attr('data-release');
-
   // URLs
   release.urls.push({
     'url': release_url,
@@ -91,7 +89,7 @@ function retrieveReleaseInfo(release_url) {
   var release_artists = [];
   $.each(the_tracks,
     function (idx, track) {
-      if (track.release.id != release_id) {
+      if (track.release.id != ProductDetail.id) {
         return;
       }
       if (seen_tracks[track.id]) {
