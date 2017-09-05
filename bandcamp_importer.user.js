@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2017.02.21.0
+// @version        2017.09.05.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -251,9 +251,18 @@ $(document).ready(function () {
   var release = BandcampImport.retrieveReleaseInfo();
 
   // add MB artist link
-  var root_url = release.url.match(/^(http:\/\/[^\/]+)/)[1];
+  var root_url = release.url.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
+  var label_url = "";
   mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) { $('div#name-section span[itemprop="byArtist"]').before(link); } );
   mblinks.searchAndDisplayMbLink(root_url, 'label', function (link) { $('p#band-name-location span.title').append(link); }, 'label:' + root_url );
+  var labelback = $("a.back-to-label-link");
+  if (labelback) {
+    var labelbacklink = labelback.attr('href');
+    if (labelbacklink) {
+      label_url = labelbacklink.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
+      mblinks.searchAndDisplayMbLink(label_url, 'label', function (link) { $('a.back-to-label-link span.back-link-text').append(link); }, 'label:' + label_url );
+    }
+  }
 
   if (release.artist_credit.length == 1) {
     // try to get artist's mbid from cache
@@ -264,7 +273,15 @@ $(document).ready(function () {
   }
 
   // try to get label mbid from cache
-  var label_mbid = mblinks.resolveMBID('label:' + root_url);
+  var label_mbid = "";
+  var label_name = "";
+  if (label_url) {
+    label_mbid = mblinks.resolveMBID('label:' + label_url);
+    label_name = $('a.back-to-label-link span.back-link-text ').contents().get(2).textContent;
+  } else {
+    label_mbid = mblinks.resolveMBID('label:' + root_url);
+    label_name = $('p#band-name-location span.title').text().trim();
+  }
   if (label_mbid) {
     if (release.labels.length == 0) {
       release.labels.push({
@@ -273,7 +290,7 @@ $(document).ready(function () {
         'catno': 'none'
       });
     }
-    release.labels[0].name = $('p#band-name-location span.title').text().trim();
+    release.labels[0].name = label_name
     release.labels[0].mbid = label_mbid;
   }
 
