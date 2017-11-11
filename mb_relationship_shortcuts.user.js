@@ -1,7 +1,7 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2017.04.16.0
+// @version        2017.11.11.0
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -9,20 +9,19 @@
 // @include        http*://*musicbrainz.org/artist/*
 // @include        http*://*musicbrainz.org/release-group/*
 // @include        http*://*musicbrainz.org/label/*
-// @require        lib/logger.js
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require        https://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
 var relationsIconsURLs = {
     'url': {
-       "amazon asin": "http://amazon.fr/favicon.ico",
-       "discogs": "https://www.discogs.com/images/favicon.ico",
-       "wikidata": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Wikidata-favicon.png",
-       "imdb": "http://www.imdb.com/favicon.ico",
+       "amazon asin": "https://musicbrainz.org/static/images/favicons/amazon-32.png",
+       "discogs": "https://musicbrainz.org/static/images/favicons/discogs-32.png",
+       "wikidata": "https://musicbrainz.org/static/images/favicons/wikidata-32.png",
+       "imdb": "https://musicbrainz.org/static/images/favicons/imdb-32.png",
        "creative commons licensed download": "http://creativecommons.org/favicon.ico",
-       "cover art link": "http://cdcovers.to/favicon.ico",
-       "secondhandsongs": "http://secondhandsongs.com/art/favicon.png",
+       "cover art link": "http://www.cdcovers.cc/favicon.ico",
+       "secondhandsongs": "https://musicbrainz.org/static/images/favicons/secondhandsongs-32.png",
        "lyrics": "http://www.nomy.nu/img/lyrics-icon.gif"
     },
     'release-group': {
@@ -49,8 +48,8 @@ if (!unsafeWindow) unsafeWindow = window;
 $(document).ready(function(){
 
     // Get pageType (label or artist)
-    var parent = new Object();
-    var child = new Object();
+    var parent = {};
+    var child = {};
     if (m = window.location.href.match("\/artist\/(.{36})[^\/]*$")) {
         parent.type = 'artist';
         parent.mbid = m[1];
@@ -74,7 +73,7 @@ $(document).ready(function(){
     var columnindex = 0;
     $("table.tbl tbody tr[class!='subh']").each(function() {
         $(this).children("td").each(function() {
-            if ($(this).find("a").attr("href") !== undefined && $(this).find("a").attr("href").match(mbidRE)) { return false };
+            if ($(this).find("a").attr("href") !== undefined && $(this).find("a").attr("href").match(mbidRE)) { return false; }
             columnindex++;
         });
         return false;
@@ -97,15 +96,15 @@ $(document).ready(function(){
     });
 
     // Calculate offset for multi-page lists
-    var page = 1
+    var page = 1;
     if (m = window.location.href.match("[\?&]page=([0-9]*)")) {
-        page = m[1]
+        page = m[1];
     }
-    var offset = (page - 1) * 100
-    
+    var offset = (page - 1) * 100;
+
     // Call the MB webservice
     var url = '/ws/2/' + child.type + '?' + parent.type + "=" + parent.mbid + '&inc=' + incOptions[child.type].join("+") + '&limit=100&offset=' + offset;
-    LOGGER.debug("MB WS url: " + url);
+    //console.log("MB WS url: " + url);
 
     $.get(url, function(data, textStatus, jqXHR) {
 
@@ -117,11 +116,24 @@ $(document).ready(function(){
             $(this).find("relation-list[target-type='url'] relation").each(function() {
                 var reltype = $(this).attr("type");
                 var target = $(this).children("target").text();
-                if (relationsIconsURLs['url'].hasOwnProperty(reltype)) {
+                if (relationsIconsURLs.url.hasOwnProperty(reltype)) {
                     $("#" + mbid + " td.relationships").append(
-                        "<a href='" + target.replace(/'/g,"&apos;") + "'>"
-                        +   "<img style='max-height: 15px;' src='" + relationsIconsURLs['url'][reltype] + "' />&nbsp;"
-                        + "</a>"
+                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='" + relationsIconsURLs.url[reltype] + "' />&nbsp;" + "</a>"
+                    );
+                }
+                if (target.indexOf("d-nb.info") != -1 ) {
+                    $("#" + mbid + " td.relationships").append(
+                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/dnb-16.png' />&nbsp;" + "</a>"
+                    );
+                }
+                if (target.indexOf("www.musik-sammler.de") != -1 ) {
+                    $("#" + mbid + " td.relationships").append(
+                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/musiksammler-32.png' />&nbsp;" + "</a>"
+                    );
+                }
+                if (target.indexOf("www.worldcat.org") != -1 ) {
+                    $("#" + mbid + " td.relationships").append(
+                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/worldcat-32.png' />&nbsp;" + "</a>"
                     );
                 }
             });
@@ -146,7 +158,7 @@ $(document).ready(function(){
                 $.each(relations, function(reltype, urls) {
                     var html = "";
                     if (urls.length < -1) {
-                        html += "<img src='" + relationsIconsURLs[targettype][reltype] + "' />(" + urls.length + ")&nbsp;"
+                        html += "<img src='" + relationsIconsURLs[targettype][reltype] + "' />(" + urls.length + ")&nbsp;";
                     } else {
                         $.each(urls, function(index, url) {
                             html += "<a href='" + url + "'><img src='" + relationsIconsURLs[targettype][reltype] + "' /></a>&nbsp;";
