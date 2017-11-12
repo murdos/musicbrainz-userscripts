@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2017.11.12.0
+// @version        2017.11.12.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -32,6 +32,13 @@ var relationsIconsURLs = {
        "part of set": "http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png",
        "remaster": "http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png",
     }
+};
+
+var otherDatabasesIconURLs = {
+    "d-nb.info" : "https://musicbrainz.org/static/images/favicons/dnb-16.png",
+    "www.musik-sammler.de": "https://musicbrainz.org/static/images/favicons/musiksammler-32.png",
+    "www.worldcat.org": "https://musicbrainz.org/static/images/favicons/worldcat-32.png",
+    "rateyourmusic.com": "https://musicbrainz.org/static/images/favicons/rateyourmusic-32.png"
 };
 
 var incOptions = {
@@ -121,22 +128,13 @@ $(document).ready(function(){
                     $("#" + mbid + " td.relationships").append(
                         "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='" + relationsIconsURLs.url[reltype] + "' />&nbsp;" + "</a>"
                     );
-                } else if (target.indexOf("d-nb.info") != -1 ) {
-                    $("#" + mbid + " td.relationships").append(
-                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/dnb-16.png' />&nbsp;" + "</a>"
-                    );
-                } else if (target.indexOf("www.musik-sammler.de") != -1 ) {
-                    $("#" + mbid + " td.relationships").append(
-                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/musiksammler-32.png' />&nbsp;" + "</a>"
-                    );
-                } else if (target.indexOf("www.worldcat.org") != -1 ) {
-                    $("#" + mbid + " td.relationships").append(
-                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/worldcat-32.png' />&nbsp;" + "</a>"
-                    );
-                } else if (target.indexOf("rateyourmusic.com") != -1 ) {
-                    $("#" + mbid + " td.relationships").append(
-                        "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='https://musicbrainz.org/static/images/favicons/rateyourmusic-32.png' />&nbsp;" + "</a>"
-                    );
+                }
+                else for (var rel in otherDatabasesIconURLs) {
+                    if (target.indexOf(rel) != -1 ) {
+                        $("#" + mbid + " td.relationships").append(
+                            "<a href='" + target.replace(/'/g,"&apos;") + "'>" + "<img style='max-height: 16px;' src='" + otherDatabasesIconURLs[rel] + "' />&nbsp;" + "</a>"
+                        );
+                    }
                 }
             });
 
