@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Qobuz releases to MusicBrainz
 // @description    Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2016.05.29.0
+// @version        2018.01.14.0
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -32,7 +32,7 @@ function parseRelease(data) {
   var release = {};
 
   release.script = 'Latn';
-  release.url = 'http://www.qobuz.com' + data.relative_url; // no lang
+  release.url = 'https://www.qobuz.com' + data.relative_url; // no lang
 
   release.title = data.title;
   release.artist_credit = MBImport.makeArtistCredits([data.artist.name]); // FIXME: various artists
@@ -140,7 +140,7 @@ $(document).ready(function() {
   album_id = $('ol.tracks').attr('data-qbplayer-id');
   app_id = '667867760';
 
-  wsUrl = 'http://www.qobuz.com/api.json/0.2/album/get?album_id=' + album_id + '&app_id=' + app_id;
+  wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=' + album_id + '&app_id=' + app_id;
 
   $.ajax({
     url: wsUrl,
@@ -162,11 +162,11 @@ $(document).ready(function() {
   var maximg = new Image();
   maximg.onerror = function (evt) {
     LOGGER.debug("No max image");
-  }
+  };
   maximg.onload = function (evt) {
     $("#product-cover-link").attr("href", maximgurl);
     $("#product-cover-link").attr("title", $("#product-cover-link").attr("title") + ' (Qobuz importer: ' + maximg.width + 'x' + maximg.height + ' image)');
-  }
+  };
   maximg.src = maximgurl;
 
 });
