@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2016.5.23
+// @version     2018.1.1.0
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
@@ -298,12 +298,12 @@ function batch_recording_rels() {
 
             return [mbid, norm_title];
         })
-        .object()
+        .fromPairs()
         .value();
 
     var $work_options = _.chain(['type', 'language'])
         .map(function (kind) { return [kind, $('<select id="bpr-work-' + kind + '"></select>')]; })
-        .object()
+        .fromPairs()
         .value();
 
     // Add button to manage performance ARs
@@ -632,7 +632,7 @@ function batch_recording_rels() {
                         var releases = data.releases;
 
                         for (var i = 0; i < releases.length; i++) {
-                            if (_.contains(releases[i]["release-group"]["secondary-types"], "Live")) {
+                            if (_.includes(releases[i]["release-group"]["secondary-types"], "Live")) {
                                 $attrs.find("span.live").click();
                                 break;
                             }
