@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2017.09.05.1
+// @version        2018.01.14.0
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -104,7 +104,7 @@ var BandcampImport = {
         release.artist_credit = [ MBImport.specialArtist('various_artists') ];
     } else {
         release.artist_credit = MBImport.makeArtistCredits([bandcampAlbumData.artist]);
-    };
+    }
 
     $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
       var title = bctrack.title;
@@ -290,7 +290,7 @@ $(document).ready(function () {
         'catno': 'none'
       });
     }
-    release.labels[0].name = label_name
+    release.labels[0].name = label_name;
     release.labels[0].mbid = label_mbid;
   }
 
@@ -306,7 +306,7 @@ $(document).ready(function () {
   }
 
   // append a comma after each tag to ease cut'n'paste to MB
-  $("div.tralbum-tags a:not(:last-child)").after(",");
+  $("div.tralbum-tags a:not(:last-child).tag").after(", ");
 
   // append a link to the full size image
   var fullsizeimageurl = $("div#tralbumArt a").attr("href").replace('_10', '_0');
