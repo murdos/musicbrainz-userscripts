@@ -1,21 +1,16 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2016.5.30
+// @version        2018.2.17
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @include        *://musicbrainz.org/release/*
-// @include        *://beta.musicbrainz.org/release/*
-// @include        *://*.mbsandbox.org/release/*
-// @match          *://musicbrainz.org/release/*
-// @match          *://beta.musicbrainz.org/release/*
+// @match          *://*.musicbrainz.org/release/*
 // @match          *://*.mbsandbox.org/release/*
-// @exclude        *://musicbrainz.org/release/*/*
-// @exclude        *://beta.musicbrainz.org/release/*/*
-// @exclude        *://*.mbsandbox.org/release/*/*
+// @exclude        *musicbrainz.org/release/*/*
+// @exclude        *.mbsandbox.org/release/*/*
 // @grant          none
 // ==/UserScript==
 
@@ -81,7 +76,7 @@ function setRecordingComments() {
         var release = location.pathname.match(MBID_REGEX)[0];
 
         $.get("/ws/2/release/" + release + "?inc=recordings&fmt=json", function (data) {
-            var comments = _.pluck(_.pluck(_.flatten(_.pluck(data.media, "tracks")), "recording"), "disambiguation");
+            var comments = _.map(_.map(_.flatten(_.map(data.media, "tracks")), "recording"), "disambiguation");
 
             for (var i = 0, len = comments.length; i < len; i++) {
                 var comment = comments[i];
