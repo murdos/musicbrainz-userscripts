@@ -26,10 +26,10 @@ To test without modifying file, use stdin:
 def make_version_line(old_value='0.0.0.0', spacing=' '*8, eol="\n"):
     prev_version = [int(x) for x in old_value.split('.')]
     now = datetime.datetime.utcnow()
-    version = [now.year, now.month, now.day, 0]
+    version = [now.year, now.month, now.day, 1]
     if prev_version[:3] == version[:3]:
         version[3] = prev_version[3] + 1
-    version_str = '%04d.%02d.%02d.%d' % tuple(version)
+    version_str = '%04d.%d.%d.%d' % tuple(version)
     return ('// @version' + spacing + version_str + eol, version_str)
 
 
