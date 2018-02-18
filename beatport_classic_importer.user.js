@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Beatport Classic releases to MusicBrainz
 // @description    One-click importing of releases from classic.beatport.com/release pages into MusicBrainz
-// @version        2017.06.13.0
+// @version        2018.2.18.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_classic_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_classic_importer.user.js
 // @include        http*://classic.beatport.com/release/*

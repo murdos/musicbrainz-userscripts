@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Fast cancel edits
 // @description Mass cancel open edits with optional edit notes.
-// @version     2016.6.7
+// @version     2018.2.18.1
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js

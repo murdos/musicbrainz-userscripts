@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2015.09.15.1
+// @version        2018.2.18.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
