@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.2.18.1
+// @version        2018.3.7.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -106,6 +106,7 @@ var BandcampImport = {
         release.artist_credit = MBImport.makeArtistCredits([bandcampAlbumData.artist]);
     }
 
+    var tracks_streamable = 0;
     $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
       var title = bctrack.title;
       var artist = [];
@@ -116,6 +117,7 @@ var BandcampImport = {
           artist = [m[1]];
         }
       }
+      if (bctrack.file) tracks_streamable++;
       var track = {
         'title': title,
         'duration': Math.round(bctrack.duration * 1000),
@@ -173,7 +175,7 @@ var BandcampImport = {
       }
     }
     // Check if the release is streamable
-    if (bandcampAlbumData.hasAudio && !nostream) {
+    if (bandcampAlbumData.hasAudio && !nostream && disc.tracks.length > 0 && disc.tracks.length == tracks_streamable) {
       release.urls.push({
         'url': release.url,
         'link_type': link_type.stream_for_free
