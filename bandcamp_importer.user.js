@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.3.7.1
+// @version        2018.6.1.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -20,7 +20,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
+String.prototype.fix_bandcamp_url = function () {
+    return this.replace('http://', 'https://');
+};
+
 var BandcampImport = {
+
 
   // Analyze Bandcamp data and return a release object
   retrieveReleaseInfo: function () {
@@ -45,7 +50,7 @@ var BandcampImport = {
       language: 'eng',
       script: 'Latn',
       urls: [],
-      url: bandcampAlbumData.url
+      url: bandcampAlbumData.url.fix_bandcamp_url()
     };
 
 
@@ -73,7 +78,7 @@ var BandcampImport = {
       release.type = "single";
       // if track belongs to an album, get its url.
       if (bandcampEmbedData.album_embed_data) {
-        release.parent_album_url = bandcampEmbedData.album_embed_data.linkback;
+        release.parent_album_url = bandcampEmbedData.album_embed_data.linkback.fix_bandcamp_url();
         release.type = 'track'; // <-- no import
       }
     }
@@ -261,7 +266,7 @@ $(document).ready(function () {
   if (labelback) {
     var labelbacklink = labelback.attr('href');
     if (labelbacklink) {
-      label_url = labelbacklink.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
+      label_url = labelbacklink.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0].fix_bandcamp_url();
       mblinks.searchAndDisplayMbLink(label_url, 'label', function (link) { $('a.back-to-label-link span.back-link-text').append(link); }, 'label:' + label_url );
     }
   }
