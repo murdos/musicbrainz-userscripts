@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version        2018.5.25.1
+// @version        2018.7.14.1
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -12,6 +12,7 @@
 // @include        http*://lztr.us/torrents.php?id=*
 // @include        http*://lztr.me/torrents.php?id=*
 // @include        http*://mutracker.org/torrents.php?id=*
+// @include        https://notwhat.cd/torrents.php?id=*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require        http://pajhome.org.uk/crypt/md5/sha1.js
 // @require        lib/logger.js
@@ -26,7 +27,7 @@ var CHECK_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA
 
 $(document).ready(function () {
 
-    if (window.location.host.match(/apollo\.rip|redacted\.ch|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org/)) {
+    if (window.location.host.match(/apollo\.rip|redacted\.ch|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org|notwhat\.cd/)) {
         LOGGER.info("Gazelle site detected");
         gazellePageHandler();
     } else if (window.location.host.match(/avaxhome\.ws/)) {
@@ -115,11 +116,16 @@ function gazellePageHandler() {
                 else if ($(this).attr("onclick").match(/get_log/)) {
                     LOGGER.debug("LzTR");
                     var logAction = 'log_ajax';
+                }
+                // NotWhat.CD
+                else if ($(this).attr("onclick").match(/show_log/)) {
+                    LOGGER.debug("NotWhat.CD");
+                    var logAction = 'viewlog';
                 } else {
                     return true;
                 }
                 var targetContainer = $(this).parents(".linkbox");
-                var torrentId = /(show_logs|get_log)\('(\d+)/.exec($(this).attr('onclick'))[2];
+                var torrentId = /(show_logs|get_log|show_log)\('(\d+)/.exec($(this).attr('onclick'))[2];
                 var logUrl = '/torrents.php?action=' + logAction + '&torrentid=' + torrentId;
                 LOGGER.info("Log URL: ", logUrl);
                 LOGGER.debug("targetContainer: ", targetContainer);
