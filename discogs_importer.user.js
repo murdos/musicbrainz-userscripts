@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2018.3.7.1
+// @version        2018.7.14.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -923,7 +923,7 @@ var Countries = {
     "Lithuania": "LT",
     "Luxembourg": "LU",
     "Montserrat": "MS",
-    "Macedonia, The Former Yugoslav Republic of": "MK",
+    "Macedonia": "MK",
     "Madagascar": "MG",
     "Malawi": "MW",
     "Malaysia": "MY",
@@ -1003,7 +1003,7 @@ var Countries = {
     "Togo": "TG",
     "Tokelau": "TK",
     "Tonga": "TO",
-    "Trinidad and Tobago": "TT",
+    "Trinidad & Tobago": "TT",
     "Tunisia": "TN",
     "Turkey": "TR",
     "Turkmenistan": "TM",
@@ -1028,12 +1028,12 @@ var Countries = {
     "Taiwan": "TW",
     "[Worldwide]": "XW",
     "Europe": "XE",
-    "Soviet Union (historical, 1922-1991)": "SU",
+    "USSR": "SU",
     "East Germany (historical, 1949-1990)": "XG",
-    "Czechoslovakia (historical, 1918-1992)": "XC",
-    "Congo, The Democratic Republic of the": "CD",
+    "Czechoslovakia": "XC",
+    "Congo, Republic of the": "CD",
     "Slovakia": "SK",
-    "Bosnia and Herzegovina": "BA",
+    "Bosnia & Herzegovina": "BA",
     "Korea (North), Democratic People's Republic of": "KP",
     "North Korea": "KP",
     "Korea (South), Republic of": "KR",
@@ -1051,8 +1051,8 @@ var Countries = {
     "Saint Barthélemy": "BL",
     "Saint Martin": "MF",
     "Moldova": "MD",
-    "Yugoslavia (historical, 1918-2003)": "YU",
-    "Serbia and Montenegro (historical, 2003-2006)": "CS",
+    "Yugoslavia": "YU",
+    "Serbia and Montenegro": "CS",
     "Côte d'Ivoire": "CI",
     "Heard Island and McDonald Islands": "HM",
     "Iran, Islamic Republic of": "IR",
