@@ -135,29 +135,26 @@ function insertLink(release) {
   mbUI.slideDown();
 }
 
+// Hook all XMLHttpRequest to use the data fetched by the official web-player.
+(function() {
+    const send = XMLHttpRequest.prototype.send
+    XMLHttpRequest.prototype.send = function() {
+        this.addEventListener('load', function() {
+            var wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=';
+            var repUrl = arguments[0].originalTarget.responseURL;
+            if (repUrl.startsWith(wsUrl)) {
+                var data = JSON.parse(this.responseText);
+                var release = parseRelease(data);
+                insertLink(release);
+            }
+        })
+        return send.apply(this, arguments)
+    }
+})()
+
 $(document).ready(function() {
 
   MBImportStyle();
-
-  album_id = $('ol.tracks').attr('data-qbplayer-id');
-  app_id = '667867760';
-
-  wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=' + album_id + '&app_id=' + app_id;
-
-  $.ajax({
-    url: wsUrl,
-    dataType: 'json',
-    crossDomain: true,
-    success: function(data, textStatus, jqXHR) {
-      LOGGER.debug("Qobuz JSON Data from API:", data);
-      var release = parseRelease(data);
-      insertLink(release);
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      LOGGER.error("AJAX Status: ", textStatus);
-      LOGGER.error("AJAX error thrown: ", errorThrown);
-    }
-  });
 
   // replace image zoom link by the maximum size image link
   var maximgurl = $("#product-cover-link").attr("href").replace('_600', '_max');
