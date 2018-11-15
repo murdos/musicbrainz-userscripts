@@ -42,6 +42,7 @@ function parseRelease(data) {
 
   // Release information global to all Beatport releases
   release.packaging = 'None';
+  release.barcode = data.upc;
   release.country = "";
   if (i18n_global && i18n_global.zone) {
     if (i18n_global.zone == 'GB') release.country = 'UK';
@@ -65,12 +66,13 @@ function parseRelease(data) {
   $.each(data.label.name.split(' - '), function(index, label) {
     release.labels.push({
       name: label,
-      catno: "" // no catno on qobuz ?
+      catno: "[none]" // no catno on qobuz ?
     });
   });
-
+  release.isrcs = [];
   var tracks = [];
   $.each(data.tracks.items, function(index, trackobj) {
+    release.isrcs.push(trackobj.isrc);
     var track = {};
     track.title = trackobj.title;
     track.duration = trackobj.duration * 1000;
@@ -119,8 +121,9 @@ function insertLink(release) {
   var parameters = MBImport.buildFormParameters(release, edit_note);
 
   var mbUI = $('<p class="musicbrainz-import">' + MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release) + '</p>').hide();
+  var isrcslist = $('<textarea>' + release.isrcs.join("\n") + '</textarea>');
 
-  $("#info div.meta").append(mbUI);
+  $("#info div.meta").append(mbUI).append(isrcslist);
   $('form.musicbrainz_import').css({
     'display': 'inline-block',
     'margin': '1px'
