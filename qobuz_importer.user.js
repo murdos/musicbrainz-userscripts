@@ -43,10 +43,9 @@ function parseRelease(data) {
   // Release information global to all Beatport releases
   release.packaging = 'None';
   release.barcode = data.upc;
-  release.country = "";
+  release.country = "XW";
   if (i18n_global && i18n_global.zone) {
-    if (i18n_global.zone == 'GB') release.country = 'UK';
-    else release.country = i18n_global.zone;
+    release.country = i18n_global.zone;
   }
   release.status = 'official';
   release.urls = [];
