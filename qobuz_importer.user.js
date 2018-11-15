@@ -69,9 +69,19 @@ function parseRelease(data) {
     });
   });
   release.isrcs = [];
-  var tracks = [];
+  release.comment = "Digital download";
+  release.discs = [];
+  var tracks = [], old_media_num = 1;
   $.each(data.tracks.items, function(index, trackobj) {
     release.isrcs.push(trackobj.isrc);
+    if (trackobj.media_number != old_media_num) {
+      release.discs.push({
+        'tracks': tracks,
+        'format': "Digital Media"
+      });
+      old_media_num = trackobj.media_number;
+      tracks = [];
+    }
     var track = {};
     track.title = trackobj.title;
     track.duration = trackobj.duration * 1000;
@@ -104,7 +114,6 @@ function parseRelease(data) {
     }
     tracks.push(track);
   });
-  release.discs = [];
   release.discs.push({
     'tracks': tracks,
     'format': "Digital Media"
