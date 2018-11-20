@@ -190,7 +190,7 @@ function gazellePageHandler() {
 // Common functions
 
 function computeAttachURL(mb_toc_numbers, artistName, releaseName) {
-    let url = `${'http://musicbrainz.org/cdtoc/attach' + '?toc='}${mb_toc_numbers.join('%20')}&artist-name=${encodeURIComponent(
+    let url = `${'http://musicbrainz.org/cdtoc/attach?toc='}${mb_toc_numbers.join('%20')}&artist-name=${encodeURIComponent(
         artistName
     )}&release-name=${encodeURIComponent(releaseName)}`;
     return url;

@@ -533,7 +533,7 @@ function batch_recording_rels() {
         get_filtered_page(0);
     } else {
         queue_recordings_request(
-            `/ws/2/recording?artist=${ARTIST_MBID}&inc=work-rels` + `&limit=100` + `&offset=${(CURRENT_PAGE - 1) * 100}&fmt=json`
+            `/ws/2/recording?artist=${ARTIST_MBID}&inc=work-rels&limit=100&offset=${(CURRENT_PAGE - 1) * 100}&fmt=json`
         );
     }
 
@@ -600,10 +600,9 @@ function batch_recording_rels() {
     }
 
     function get_filtered_page(page) {
-        let url =
-            `/ws/2/recording?query=${NAME_FILTER ? `${encodeURIComponent(NAME_FILTER)}%20AND%20` : ''}${
-                ARTIST_FILTER ? `creditname:${encodeURIComponent(ARTIST_FILTER)}%20AND%20` : ''
-            } arid:${ARTIST_MBID}&limit=100` + `&offset=${page * 100}&fmt=json`;
+        let url = `/ws/2/recording?query=${NAME_FILTER ? `${encodeURIComponent(NAME_FILTER)}%20AND%20` : ''}${
+            ARTIST_FILTER ? `creditname:${encodeURIComponent(ARTIST_FILTER)}%20AND%20` : ''
+        } arid:${ARTIST_MBID}&limit=100&offset=${page * 100}&fmt=json`;
 
         ws_requests.push_get(url, function(data) {
             _.each(data.recordings, function(r) {

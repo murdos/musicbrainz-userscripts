@@ -53,7 +53,7 @@ var labels = {
     }
 };
 
-var editNote = `Imported from ${document.URL}\n —\n` + `GM script: "${meta.name}" (${meta.version})\n\n`;
+var editNote = `Imported from ${document.URL}\n —\nGM script: "${meta.name}" (${meta.version})\n\n`;
 
 function _clean(s) {
     return s
