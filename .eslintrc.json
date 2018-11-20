@@ -18,7 +18,6 @@
         "no-useless-concat": "warn",
         "no-useless-escape": "warn",
         "no-unused-vars": "warn",
-        "no-var": "warn",
-        "use-isnan": "warn"
+        "no-var": "warn"
     }
 }
