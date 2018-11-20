@@ -128,10 +128,11 @@ function insertLink(release) {
   var edit_note = MBImport.makeEditNote(release.url, 'Qobuz');
   var parameters = MBImport.buildFormParameters(release, edit_note);
 
-  var mbUI = $('<p class="musicbrainz-import">' + MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release) + '</p>').hide();
-  var isrcslist = $('<textarea>' + release.isrcs.join("\n") + '</textarea>');
+  var mbUI = $('<p class="musicbrainz_import">').append(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release)).hide();
+  mbUI.append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+  var isrclist = $('<p><textarea id="isrclist" style="display:none">' + release.isrcs.join("\n") + '</textarea></p>');
 
-  $("#info div.meta").append(mbUI).append(isrcslist);
+  $("#info div.meta").append(mbUI).append(isrclist);
   $('form.musicbrainz_import').css({
     'display': 'inline-block',
     'margin': '1px'
@@ -177,4 +178,14 @@ $(document).ready(function() {
   };
   maximg.src = maximgurl;
 
+});
+
+$(document).on('click', '#isrcs', function (){
+    $('#isrclist').toggle();
+    if ($('#isrclist').is(':visible')) {
+      $('#isrclist').select();
+      $(this).text('Hide ISRCs');
+    }
+    else $(this).text('Show ISRCs');
+    return false;
 });
