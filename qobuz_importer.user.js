@@ -83,13 +83,13 @@ function parseRelease(data) {
       tracks = [];
     }
     var track = {};
-    track.title = trackobj.title;
+    track.title = trackobj.title.replace('"','\"');
     track.duration = trackobj.duration * 1000;
-    var performers = trackobj.performers.split('\r - ').map(function(v) {
+    var performers = (typeof trackobj.performers !== 'undefined') && trackobj.performers.split('\r - ').map(function(v) {
       var list = v.split(', ');
       var name = list.shift();
       return [name, list];
-    });
+    }) || [trackobj.performer.name, ['Primary']];
     var artists = [];
     var featured_artists = [];
     $.each(performers, function(index, performer) {
