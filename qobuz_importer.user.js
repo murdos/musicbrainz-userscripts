@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Qobuz releases to MusicBrainz
 // @description    Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.2.18.1
+// @version        2018.11.15.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -42,10 +42,10 @@ function parseRelease(data) {
 
   // Release information global to all Beatport releases
   release.packaging = 'None';
-  release.country = "";
+  release.barcode = data.upc;
+  release.country = "XW";
   if (i18n_global && i18n_global.zone) {
-    if (i18n_global.zone == 'GB') release.country = 'UK';
-    else release.country = i18n_global.zone;
+    release.country = i18n_global.zone;
   }
   release.status = 'official';
   release.urls = [];
@@ -65,20 +65,31 @@ function parseRelease(data) {
   $.each(data.label.name.split(' - '), function(index, label) {
     release.labels.push({
       name: label,
-      catno: "" // no catno on qobuz ?
+      catno: "[none]" // no catno on qobuz ?
     });
   });
-
-  var tracks = [];
+  release.isrcs = [];
+  release.comment = "Digital download";
+  release.discs = [];
+  var tracks = [], old_media_num = 1;
   $.each(data.tracks.items, function(index, trackobj) {
+    release.isrcs.push(trackobj.isrc);
+    if (trackobj.media_number != old_media_num) {
+      release.discs.push({
+        'tracks': tracks,
+        'format': "Digital Media"
+      });
+      old_media_num = trackobj.media_number;
+      tracks = [];
+    }
     var track = {};
-    track.title = trackobj.title;
+    track.title = trackobj.title.replace('"','\"');
     track.duration = trackobj.duration * 1000;
-    var performers = trackobj.performers.split('\r - ').map(function(v) {
+    var performers = (typeof trackobj.performers !== 'undefined') && trackobj.performers.split('\r - ').map(function(v) {
       var list = v.split(', ');
       var name = list.shift();
       return [name, list];
-    });
+    }) || [trackobj.performer.name, ['Primary']];
     var artists = [];
     var featured_artists = [];
     $.each(performers, function(index, performer) {
@@ -103,7 +114,6 @@ function parseRelease(data) {
     }
     tracks.push(track);
   });
-  release.discs = [];
   release.discs.push({
     'tracks': tracks,
     'format': "Digital Media"
@@ -118,9 +128,11 @@ function insertLink(release) {
   var edit_note = MBImport.makeEditNote(release.url, 'Qobuz');
   var parameters = MBImport.buildFormParameters(release, edit_note);
 
-  var mbUI = $('<p class="musicbrainz-import">' + MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release) + '</p>').hide();
+  var mbUI = $('<p class="musicbrainz_import">').append(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release)).hide();
+  mbUI.append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+  var isrclist = $('<p><textarea id="isrclist" style="display:none">' + release.isrcs.join("\n") + '</textarea></p>');
 
-  $("#info div.meta").append(mbUI);
+  $("#info div.meta").append(mbUI).append(isrclist);
   $('form.musicbrainz_import').css({
     'display': 'inline-block',
     'margin': '1px'
@@ -133,29 +145,26 @@ function insertLink(release) {
   mbUI.slideDown();
 }
 
+// Hook all XMLHttpRequest to use the data fetched by the official web-player.
+(function() {
+    const send = XMLHttpRequest.prototype.send
+    XMLHttpRequest.prototype.send = function() {
+        this.addEventListener('load', function() {
+            var wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=';
+            var repUrl = arguments[0].originalTarget.responseURL;
+            if (repUrl.startsWith(wsUrl)) {
+                var data = JSON.parse(this.responseText);
+                var release = parseRelease(data);
+                insertLink(release);
+            }
+        })
+        return send.apply(this, arguments)
+    }
+})()
+
 $(document).ready(function() {
 
   MBImportStyle();
-
-  album_id = $('ol.tracks').attr('data-qbplayer-id');
-  app_id = '667867760';
-
-  wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=' + album_id + '&app_id=' + app_id;
-
-  $.ajax({
-    url: wsUrl,
-    dataType: 'json',
-    crossDomain: true,
-    success: function(data, textStatus, jqXHR) {
-      LOGGER.debug("Qobuz JSON Data from API:", data);
-      var release = parseRelease(data);
-      insertLink(release);
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      LOGGER.error("AJAX Status: ", textStatus);
-      LOGGER.error("AJAX error thrown: ", errorThrown);
-    }
-  });
 
   // replace image zoom link by the maximum size image link
   var maximgurl = $("#product-cover-link").attr("href").replace('_600', '_max');
@@ -169,4 +178,14 @@ $(document).ready(function() {
   };
   maximg.src = maximgurl;
 
+});
+
+$(document).on('click', '#isrcs', function (){
+    $('#isrclist').toggle();
+    if ($('#isrclist').is(':visible')) {
+      $('#isrclist').select();
+      $(this).text('Hide ISRCs');
+    }
+    else $(this).text('Show ISRCs');
+    return false;
 });
