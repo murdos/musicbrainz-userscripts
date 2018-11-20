@@ -453,10 +453,11 @@ function batch_recording_rels() {
 
                 let parsedDate = parseDate(this.value);
                 if (
-                    (parsedDate.year || parsedDate.month || parsedDate.day) &&
-                    isDateValid(parsedDate.year, parsedDate.month, parsedDate.day)
+                    !(
+                        (parsedDate.year || parsedDate.month || parsedDate.day) &&
+                        isDateValid(parsedDate.year, parsedDate.month, parsedDate.day)
+                    )
                 ) {
-                } else {
                     $input.css('border-color', '#f00');
                     parsedDate = null;
                 }

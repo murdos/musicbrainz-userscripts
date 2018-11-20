@@ -10,7 +10,6 @@
         "prettier/prettier": "error",
         "prefer-template": "error",
         "no-console": "off",
-        "no-empty": "warn",
         "no-inner-declarations": "warn",
         "no-global-assign": "warn",
         "no-redeclare": "warn",

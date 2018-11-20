@@ -377,12 +377,10 @@ var MBDiscid = (function() {
                 while (input.length < totalChars) {
                     input = padWith + input;
                 }
-            } else {
             }
             if (input.length > totalChars) {
                 //if padWith was a multiple character string and num was overpadded
                 input = input.substring(input.length - totalChars, totalChars);
-            } else {
             }
 
             return input;
