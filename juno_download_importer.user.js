@@ -19,128 +19,144 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function(){
-  MBImportStyle();
-  var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
-  var release = retrieveReleaseInfo(release_url);
-  insertLink(release, release_url);
+$(document).ready(function() {
+    MBImportStyle();
+    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+    let release = retrieveReleaseInfo(release_url);
+    insertLink(release, release_url);
 });
 
 function parseReleaseDate(rdate) {
-  var months = {
-    "January": 1,
-    "February": 2,
-    "March": 3,
-    "April": 4,
-    "May": 5,
-    "June": 6,
-    "July": 7,
-    "August": 8,
-    "September": 9,
-    "October": 10,
-    "November": 11,
-    "December": 12
-  };
+    let months = {
+        January: 1,
+        February: 2,
+        March: 3,
+        April: 4,
+        May: 5,
+        June: 6,
+        July: 7,
+        August: 8,
+        September: 9,
+        October: 10,
+        November: 11,
+        December: 12
+    };
 
-  var m = rdate.match(/(\d{1,2}) ([a-z]+), (\d{4})/i);
-  if (m) {
-    return {
-      year: m[3],
-      month: months[m[2]],
-      day: m[1]
+    let m = rdate.match(/(\d{1,2}) ([a-z]+), (\d{4})/i);
+    if (m) {
+        return {
+            year: m[3],
+            month: months[m[2]],
+            day: m[1]
+        };
     }
-  }
-  return false;
+    return false;
 }
 
 function retrieveReleaseInfo(release_url) {
+    // Release defaults
+    let release = {
+        artist_credit: [],
+        title: $('#product_heading_title')
+            .text()
+            .trim(),
+        year: 0,
+        month: 0,
+        day: 0,
+        format: 'Digital Media',
+        packaging: 'None',
+        country: 'XW',
+        status: 'official',
+        language: 'eng',
+        script: 'Latn',
+        type: '',
+        urls: [],
+        labels: [],
+        discs: []
+    };
 
-  // Release defaults
-  var release = {
-    artist_credit: [],
-    title: $("#product_heading_title").text().trim(),
-    year: 0,
-    month: 0,
-    day: 0,
-    format: 'Digital Media',
-    packaging: 'None',
-    country: 'XW',
-    status: 'official',
-    language: 'eng',
-    script: 'Latn',
-    type: '',
-    urls: [],
-    labels: [],
-    discs: [],
-  };
-
-  // Release date
-  var parsed_releaseDate = parseReleaseDate($("#product_info_released_on").text().trim());
-  if (parsed_releaseDate) {
-    release.year = parsed_releaseDate.year;
-    release.month = parsed_releaseDate.month;
-    release.day = parsed_releaseDate.day;
-  }
-
-  // URLs
-  release.urls.push({
-    'url': release_url,
-    'link_type': MBImport.URL_TYPES.purchase_for_download
-  });
-
-  release.labels.push(
-    {
-      name: $("#product_heading_label").text().trim(),
-      catno: $("#product_info_cat_no").text().trim()
+    // Release date
+    let parsed_releaseDate = parseReleaseDate(
+        $('#product_info_released_on')
+            .text()
+            .trim()
+    );
+    if (parsed_releaseDate) {
+        release.year = parsed_releaseDate.year;
+        release.month = parsed_releaseDate.month;
+        release.day = parsed_releaseDate.day;
     }
-  );
 
-  // Tracks
-  var tracks = [];
-  $(".product_tracklist_records[itemprop='tracks']").each(function() {
-    var artists = [];
-	  var trackno = $(this).find(".product_tracklist_heading_records_sn").text().trim() - 1;
-	  var trackname = $(this).find(".product_tracklist_heading_records_title").text().trim();
-	  var tracklength = $(this).find(".product_tracklist_heading_records_length").text().trim();
-    var m = trackname.match(/^([^-]+) - (.*)$/);
-    if (m) {
-      artists = [m[1]];
-      trackname = m[2];
+    // URLs
+    release.urls.push({
+        url: release_url,
+        link_type: MBImport.URL_TYPES.purchase_for_download
+    });
+
+    release.labels.push({
+        name: $('#product_heading_label')
+            .text()
+            .trim(),
+        catno: $('#product_info_cat_no')
+            .text()
+            .trim()
+    });
+
+    // Tracks
+    let tracks = [];
+    $(".product_tracklist_records[itemprop='tracks']").each(function() {
+        let artists = [];
+        let trackno =
+            $(this)
+                .find('.product_tracklist_heading_records_sn')
+                .text()
+                .trim() - 1;
+        let trackname = $(this)
+            .find('.product_tracklist_heading_records_title')
+            .text()
+            .trim();
+        let tracklength = $(this)
+            .find('.product_tracklist_heading_records_length')
+            .text()
+            .trim();
+        let m = trackname.match(/^([^-]+) - (.*)$/);
+        if (m) {
+            artists = [m[1]];
+            trackname = m[2];
+        }
+        tracks.push({
+            artist_credit: MBImport.makeArtistCredits(artists),
+            title: trackname,
+            duration: tracklength
+        });
+    });
+
+    let parsed_release_artist = $('#product_heading_artist')
+        .text()
+        .trim();
+    if (parsed_release_artist == 'VARIOUS') {
+        release.artist_credit = [MBImport.specialArtist('various_artists')];
+    } else {
+        release.artist_credit = MBImport.makeArtistCredits([parsed_release_artist]);
     }
-    tracks.push({
-        'artist_credit': MBImport.makeArtistCredits(artists),
-        'title': trackname,
-        'duration': tracklength
-      });
-  });
+    release.discs.push({
+        tracks: tracks,
+        format: release.format
+    });
 
-  var parsed_release_artist = $("#product_heading_artist").text().trim();
-  if (parsed_release_artist == 'VARIOUS') {
-    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
-  } else {
-    release.artist_credit = MBImport.makeArtistCredits([ parsed_release_artist ]);
-  }
-  release.discs.push( {
-    'tracks': tracks,
-    'format': release.format
-  } );
-
-  LOGGER.info("Parsed release: ", release);
-  return release;
+    LOGGER.info('Parsed release: ', release);
+    return release;
 }
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'Juno Download');
-    var parameters = MBImport.buildFormParameters(release, edit_note);
+    let edit_note = MBImport.makeEditNote(release_url, 'Juno Download');
+    let parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var mbUI = $('<div id="mb_buttons">'
-        + MBImport.buildFormHTML(parameters)
-        + MBImport.buildSearchButton(release)
-        + '</div>').hide();
+    let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`).hide();
 
-    $("div.sociald").before(mbUI);
-    $('#mb_buttons').css({'background': '#759d44', 'border': '2px solid #ddd', 'text-align': 'center'});
-    $('form.musicbrainz_import button').css({width: '80%'});
+    $('div.sociald').before(mbUI);
+    $('#mb_buttons').css({ background: '#759d44', border: '2px solid #ddd', 'text-align': 'center' });
+    $('form.musicbrainz_import button').css({ width: '80%' });
     mbUI.slideDown();
 }

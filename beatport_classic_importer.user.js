@@ -17,119 +17,121 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function(){
+$(document).ready(function() {
     MBImportStyle();
 
-    var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
-    var release = retrieveReleaseInfo(release_url);
+    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+    let release = retrieveReleaseInfo(release_url);
     insertLink(release, release_url);
-
 });
 
 function retrieveReleaseInfo(release_url) {
-  function contains_or(selector, list) {
-    selectors = [];
-    $.each(list, function(ind, value) {
-      selectors.push(selector + ':contains("' + value.replace('"', '\\"') + '")');
+    function contains_or(selector, list) {
+        selectors = [];
+        $.each(list, function(ind, value) {
+            selectors.push(`${selector}:contains("${value.replace('"', '\\"')}")`);
+        });
+        return selectors.join(',');
+    }
+    let release_date_strings = [
+        'Release Date',
+        'Fecha de lanzamiento',
+        'Date de sortie',
+        'Erscheinungsdatum',
+        'Data de lançamento',
+        'Releasedatum',
+        'Data di uscita',
+        'リリース予定日'
+    ];
+    let labels_strings = ['Labels', 'Sello', 'Gravadoras', 'Label', 'Etichetta', 'Editora', 'レーベル'];
+    let catalog_strings = ['Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus', 'Catalogo', 'カタログ'];
+    let release = {};
+
+    // Release information global to all Beatport releases
+    release.packaging = 'None';
+    release.country = 'XW';
+    release.status = 'official';
+    release.urls = [];
+    release.urls.push({
+        url: release_url,
+        link_type: MBImport.URL_TYPES.purchase_for_download
     });
-    return selectors.join(',');
-  }
-  var release_date_strings = [
-    'Release Date', 'Fecha de lanzamiento', 'Date de sortie', 'Erscheinungsdatum', 'Data de lançamento', 'Releasedatum', "Data di uscita", "リリース予定日"
-  ];
-  var labels_strings = [
-    'Labels', 'Sello', 'Gravadoras', "Label", "Etichetta", "Editora", "レーベル"
-  ];
-  var catalog_strings = [
-    'Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus', "Catalogo", "カタログ"
-  ];
-  var release = {};
 
-  // Release information global to all Beatport releases
-  release.packaging = 'None';
-  release.country = "XW";
-  release.status = 'official';
-  release.urls = [];
-  release.urls.push({
-    'url': release_url,
-    'link_type': MBImport.URL_TYPES.purchase_for_download
-  });
+    let releaseDate = $(contains_or('td.meta-data-label', release_date_strings))
+        .next()
+        .text()
+        .split('-');
+    release.year = releaseDate[0];
+    release.month = releaseDate[1];
+    release.day = releaseDate[2];
 
-  var releaseDate = $(contains_or("td.meta-data-label", release_date_strings)).next().text().split("-");
-  release.year = releaseDate[0];
-  release.month = releaseDate[1];
-  release.day = releaseDate[2];
+    release.labels = [];
+    release.labels.push({
+        name: $(contains_or('td.meta-data-label', labels_strings))
+            .next()
+            .text(),
+        catno: $(contains_or('td.meta-data-label', catalog_strings))
+            .next()
+            .text()
+    });
 
-  release.labels = [];
-  release.labels.push(
-    {
-      name: $(contains_or("td.meta-data-label", labels_strings)).next().text(),
-      catno: $(contains_or("td.meta-data-label", catalog_strings)).next().text()
-    }
-  );
+    let release_artists = [];
 
-  var release_artists = [];
+    // Tracks
+    let tracks = [];
+    unsafeWindow.$('span[data-json]').each(function(index, tagSoup) {
+        let t = $.parseJSON($(tagSoup).attr('data-json'));
+        release.title = t.release.name;
 
-  // Tracks
-  var tracks = [];
-  unsafeWindow.$( "span[data-json]" ).each(
-    function ( index, tagSoup ) {
-      var t = $.parseJSON($(tagSoup).attr('data-json'));
-      release.title = t.release.name;
-
-      var artists = [];
-      t.artists.forEach(
-        function (artist) {
-          artists.push(artist.name);
-	  release_artists.push(artist.name);
+        let artists = [];
+        t.artists.forEach(function(artist) {
+            artists.push(artist.name);
+            release_artists.push(artist.name);
+        });
+        let title = t.name;
+        if (t.mixName && t.mixName !== 'Original Mix' && t.mixName !== 'Original') {
+            title += ` (${t.mixName})`;
         }
-      );
-      var title = t.name;
-      if (t.mixName && t.mixName !== 'Original Mix' && t.mixName !== 'Original') {
-        title += ' (' + t.mixName + ')';
-      }
-      tracks.push({
-        'artist_credit': MBImport.makeArtistCredits(artists),
-        'title': title,
-        'duration': t.lengthMs
-      });
+        tracks.push({
+            artist_credit: MBImport.makeArtistCredits(artists),
+            title: title,
+            duration: t.lengthMs
+        });
+    });
+
+    let unique_artists = [];
+    $.each(release_artists, function(i, el) {
+        if ($.inArray(el, unique_artists) === -1) {
+            unique_artists.push(el);
+        }
+    });
+
+    if (unique_artists.length > 4) {
+        release.artist_credit = [MBImport.specialArtist('various_artists')];
+    } else {
+        release.artist_credit = MBImport.makeArtistCredits(unique_artists);
     }
-  );
+    release.discs = [];
+    release.discs.push({
+        tracks: tracks,
+        format: 'Digital Media'
+    });
 
-  var unique_artists = [];
-  $.each(release_artists, function(i, el){
-    if ($.inArray(el, unique_artists) === -1) {
-      unique_artists.push(el);
-    }
-  });
-
-  if (unique_artists.length > 4) {
-    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
-  } else {
-    release.artist_credit = MBImport.makeArtistCredits(unique_artists);
-  }
-  release.discs = [];
-  release.discs.push( {
-    'tracks': tracks,
-    'format': "Digital Media"
-  } );
-
-  LOGGER.info("Parsed release: ", release);
-  return release;
+    LOGGER.info('Parsed release: ', release);
+    return release;
 }
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'Beatport Classic');
-    var parameters = MBImport.buildFormParameters(release, edit_note);
+    let edit_note = MBImport.makeEditNote(release_url, 'Beatport Classic');
+    let parameters = MBImport.buildFormParameters(release, edit_note);
 
-    var mbUI = $('<div class="musicbrainz-import">'
-        + MBImport.buildFormHTML(parameters)
-        + MBImport.buildSearchButton(release)
-        + '</div>').hide();
+    let mbUI = $(
+        `<div class="musicbrainz-import">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`
+    ).hide();
 
-    $(".release-detail-metadata").append(mbUI);
-    $('form.musicbrainz_import').css({'display': 'inline-block', 'margin': '1px'});
-    $('form.musicbrainz_import img').css({'display': 'inline-block'});
+    $('.release-detail-metadata').append(mbUI);
+    $('form.musicbrainz_import').css({ display: 'inline-block', margin: '1px' });
+    $('form.musicbrainz_import img').css({ display: 'inline-block' });
     mbUI.slideDown();
 }

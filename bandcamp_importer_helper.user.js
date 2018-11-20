@@ -18,12 +18,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
-  // Display a link to the correct album bandcamp url (ie. main page or releases page)
-  var bandcampAlbumData = unsafeWindow.TralbumData;
-  if (bandcampAlbumData && bandcampAlbumData.url) {
-   var innerHTML = '<div id="bci_helper" style="padding-top: 5px;">' + '<a href="' +  bandcampAlbumData.url +
-      '" title="Load album page and display Import to MB button">Album page (MB import)</a></div>';
-   $('#name-section').append(innerHTML);
-  }
+$(document).ready(function() {
+    // Display a link to the correct album bandcamp url (ie. main page or releases page)
+    let bandcampAlbumData = unsafeWindow.TralbumData;
+    if (bandcampAlbumData && bandcampAlbumData.url) {
+        let innerHTML = `${'<div id="bci_helper" style="padding-top: 5px;">' + '<a href="'}${
+            bandcampAlbumData.url
+        }" title="Load album page and display Import to MB button">Album page (MB import)</a></div>`;
+        $('#name-section').append(innerHTML);
+    }
 });
