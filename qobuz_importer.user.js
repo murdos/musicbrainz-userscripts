@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Qobuz releases to MusicBrainz
 // @description    Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.11.15.1
+// @version        2018.11.21.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -26,19 +26,48 @@ if (DEBUG) {
 }
 
 // list of qobuz artist id which should be mapped to Various Artists
-var various_artists_ids = [ 26887, 145383, 353325, 183869, 997899 ];
+var various_artists_ids = [ 26887, 145383, 353325, 183869, 997899, 2225160 ],
+    various_composers_ids = [ 573076 ];
+
+function isVariousArtists(artist) {
+  // Check hard-coded various artist ids
+  if (($.inArray(artist.id, various_artists_ids) != -1)
+      || ($.inArray(artist.id, various_composers_ids) != -1)) {
+    return true;
+  }
+  // Let's assume various based on the slug
+  else if ($.inArray(artist.slug, ['various-artist', 'various-composers']) != -1) {
+    return true;
+  }
+  return false;
+}
+
+function getPerformers(trackobj) {
+  return (typeof trackobj.performers !== 'undefined') && trackobj.performers.replace('\r', '').split(' - ').map(function(v) {
+      var list = v.split(', ');
+      var name = list.shift();
+      return [name, list];
+    }) || [[trackobj.performer.name, ['Primary']]];
+}
 
 function parseRelease(data) {
   var release = {};
+  var classical = false;
 
   release.script = 'Latn';
   release.url = 'https://www.qobuz.com' + data.relative_url; // no lang
-
   release.title = data.title;
-  release.artist_credit = MBImport.makeArtistCredits([data.artist.name]); // FIXME: various artists
-  if ($.inArray(data.artist.id, various_artists_ids) != -1) {
-    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+  if (isVariousArtists(data.artist)) {
+    if ($.inArray('Classique', data.genres_list) != -1) {
+      classical = true;
+      if (isVariousArtists(data.composer)) {
+         release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+      }
+      else release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
+    }
+    else release.artist_credit = [ MBImport.specialArtist('various_artists') ];
   }
+  else release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
 
   // Release information global to all Beatport releases
   release.packaging = 'None';
@@ -85,16 +114,26 @@ function parseRelease(data) {
     var track = {};
     track.title = trackobj.title.replace('"','\"');
     track.duration = trackobj.duration * 1000;
-    var performers = (typeof trackobj.performers !== 'undefined') && trackobj.performers.split('\r - ').map(function(v) {
-      var list = v.split(', ');
-      var name = list.shift();
-      return [name, list];
-    }) || [trackobj.performer.name, ['Primary']];
+    var performers, get_composer = false;
+    if (classical) {
+      if (typeof trackobj.composer !== 'undefined') {
+        performers = [[trackobj.composer.name, ['Primary']]];
+      } else {
+        performers = getPerformers(trackobj);
+        get_composer = true;
+      }
+    }
+    else performers = getPerformers(trackobj);
     var artists = [];
     var featured_artists = [];
     $.each(performers, function(index, performer) {
       if ($.inArray('Featured Artist', performer[1]) != -1) {
        featured_artists.push(performer[0]);
+      }
+      else if (get_composer) {
+          if ($.inArray('Composer', performer[1]) != -1) {
+              artists.push(performer[0]);
+          }
       }
       else if ($.inArray('Main Performer', performer[1]) != -1
 	  || $.inArray('Primary', performer[1]) != -1
