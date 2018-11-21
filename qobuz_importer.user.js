@@ -26,15 +26,12 @@ if (DEBUG) {
 }
 
 // list of qobuz artist id which should be mapped to Various Artists
-var various_artists_ids = [ 26887, 145383, 353325, 183869, 997899, 2225160 ],
-    various_composers_ids = [ 573076 ];
+var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
+    various_composers_ids = [573076];
 
 function isVariousArtists(artist) {
     // Check hard-coded various artist ids
-    if (
-        ($.inArray(artist.id, various_artists_ids) != -1) ||
-        ($.inArray(artist.id, various_composers_ids) != -1)
-    ) {
+    if ($.inArray(artist.id, various_artists_ids) != -1 || $.inArray(artist.id, various_composers_ids) != -1) {
         return true;
     } else if ($.inArray(artist.slug, ['various-artist', 'various-composers']) != -1) {
         // Let's assume various based on the slug
@@ -44,11 +41,17 @@ function isVariousArtists(artist) {
 }
 
 function getPerformers(trackobj) {
-    return (typeof trackobj.performers !== 'undefined') && trackobj.performers.replace('\r', '').split(' - ').map(function(v) {
-        let list = v.split(', ');
-        let name = list.shift();
-        return [name, list];
-    }) || [[trackobj.performer.name, ['Primary']]];
+    return (
+        (typeof trackobj.performers !== 'undefined' &&
+            trackobj.performers
+                .replace('\r', '')
+                .split(' - ')
+                .map(function(v) {
+                    let list = v.split(', ');
+                    let name = list.shift();
+                    return [name, list];
+                })) || [[trackobj.performer.name, ['Primary']]]
+    );
 }
 
 function parseRelease(data) {
@@ -63,9 +66,9 @@ function parseRelease(data) {
         if ($.inArray('Classique', data.genres_list) != -1) {
             classical = true;
             if (isVariousArtists(data.composer)) {
-                release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+                release.artist_credit = [MBImport.specialArtist('various_artists')];
             } else release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
-        } else release.artist_credit = [ MBImport.specialArtist('various_artists') ];
+        } else release.artist_credit = [MBImport.specialArtist('various_artists')];
     } else release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
 
     // Release information global to all Beatport releases
