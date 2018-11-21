@@ -1,0 +1,39 @@
+{
+    "name": "musicbrainz-userscripts",
+    "version": "1.0.0",
+    "description": "Collection of userscripts for MusicBrainz",
+    "main": "index.js",
+    "directories": {
+        "lib": "lib"
+    },
+    "scripts": {
+        "prettier:format": "prettier --write \"{,**/}*.{js,json,md}\"",
+        "lint": "npm run eslint",
+        "lint-fix": "npm run eslint -- --fix",
+        "eslint": "eslint ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/murdos/musicbrainz-userscripts.git"
+    },
+    "keywords": [
+        "musicbrainz",
+        "userscripts",
+        "import",
+        "ui",
+        "improvements"
+    ],
+    "author": "Aurélien Mino <aurelien.mino@gmail.com>",
+    "license": "SEE LICENSE IN individual userscripts",
+    "bugs": {
+        "url": "https://github.com/murdos/musicbrainz-userscripts/issues"
+    },
+    "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
+    "devDependencies": {
+        "eslint": "^5.9.0",
+        "eslint-config-prettier": "^3.3.0",
+        "eslint-plugin-import": "^2.14.0",
+        "eslint-plugin-prettier": "^3.0.0",
+        "prettier": "^1.15.2"
+    }
+}

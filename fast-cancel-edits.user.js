@@ -62,66 +62,63 @@
 
 //**************************************************************************//
 
-var scr = document.createElement("script");
-scr.textContent = "(" + fastCancelScript + ")();";
+var scr = document.createElement('script');
+scr.textContent = `(${fastCancelScript})();`;
 document.body.appendChild(scr);
 
 function fastCancelScript() {
-    var totalCancels = 0;
+    let totalCancels = 0;
 
-    var $status = $("<div></div>")
+    let $status = $('<div></div>')
         .css({
-            "position": "fixed",
-            "right": "0",
-            "bottom": "0",
-            "background": "#FFBA58",
-            "border-top": "1px #000 solid",
-            "border-left": "1px #000 solid",
-            "padding": "0.5em"
+            position: 'fixed',
+            right: '0',
+            bottom: '0',
+            background: '#FFBA58',
+            'border-top': '1px #000 solid',
+            'border-left': '1px #000 solid',
+            padding: '0.5em'
         })
-        .appendTo("body")
+        .appendTo('body')
         .hide();
 
     function updateStatus() {
         if (totalCancels === 0) {
             $status.hide();
         } else {
-            $status.text("Canceling " + totalCancels + " edit" +
-                (totalCancels > 1 ? "s" : "") + "...").show();
+            $status.text(`Canceling ${totalCancels} edit${totalCancels > 1 ? 's' : ''}...`).show();
         }
     }
 
-    document.body.addEventListener("click", function (event) {
-        if (event.target && event.target.tagName && event.target.tagName == "A" && event.target.classList.contains("negative")) {
+    document.body.addEventListener('click', function(event) {
+        if (event.target && event.target.tagName && event.target.tagName == 'A' && event.target.classList.contains('negative')) {
             event.stopPropagation();
             event.preventDefault();
             totalCancels += 1;
             updateStatus();
 
-            var $self = $(event.target),
-                $edit = $self.parents("div.edit-list:eq(0)");
+            let $self = $(event.target),
+                $edit = $self.parents('div.edit-list:eq(0)');
 
-            pushRequest(function () {
-                var editNote = $edit.find("div.add-edit-note textarea").val();
-                var data = { "confirm.edit_note": editNote };
+            pushRequest(function() {
+                let editNote = $edit.find('div.add-edit-note textarea').val();
+                let data = { 'confirm.edit_note': editNote };
 
                 $.ajax({
-                    type: "POST",
-                    url: $self.attr("href"),
+                    type: 'POST',
+                    url: $self.attr('href'),
                     data: data,
-                    error: function (request, status, error) {
+                    error: function(request, status, error) {
                         $self
                             .css({
-                                "background": "red",
-                                "color": "yellow",
-                                "cursor": "help"
+                                background: 'red',
+                                color: 'yellow',
+                                cursor: 'help'
                             })
-                            .attr("title", "Error cancelling this edit: “" + error + "”");
-                        $edit
-                            .css({border: "6px solid red"})
-                            .show();
+                            .attr('title', `Error cancelling this edit: “${error}”`);
+                        $edit.css({ border: '6px solid red' }).show();
                     },
-                    complete: function () {
+                    complete: function() {
                         $edit.remove();
                         totalCancels -= 1;
                         updateStatus();
@@ -132,15 +129,15 @@ function fastCancelScript() {
         }
     });
 
-    $("div#edits > form[action$='/edit/enter_votes']").on("submit", function(event) {
-    	if (totalCancels > 0) {
-    		event.preventDefault();
-    		alert("Please wait, " + (totalCancels > 1 ? totalCancels + " edits are" : "an edit is") + " being cancelled in the background.");
-    	}
+    $("div#edits > form[action$='/edit/enter_votes']").on('submit', function(event) {
+        if (totalCancels > 0) {
+            event.preventDefault();
+            alert(`Please wait, ${totalCancels > 1 ? `${totalCancels} edits are` : 'an edit is'} being cancelled in the background.`);
+        }
     });
 
-    var pushRequest = (function () {
-        var queue = [],
+    var pushRequest = (function() {
+        let queue = [],
             last = 0,
             active = false,
             rate = 2000;
@@ -155,19 +152,19 @@ function fastCancelScript() {
             }
         }
 
-        return function (req) {
+        return function(req) {
             queue.push(req);
 
             if (!active) {
                 active = true;
-                var now = new Date().getTime();
+                let now = new Date().getTime();
                 if (now - last >= rate) {
                     next();
                 } else {
-                    var timeout = rate - now + last;
+                    let timeout = rate - now + last;
                     setTimeout(next, timeout);
                 }
             }
         };
-    }());
+    })();
 }

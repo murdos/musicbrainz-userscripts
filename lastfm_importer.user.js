@@ -18,111 +18,125 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function(){
-  MBImportStyle();
-  var release_url = window.location.href.replace('/\?.*$/', '').replace(/#.*$/, '');
-  release_url = release_url.replace(/^(?:https?:\/\/)?(?:www\.)?(?:last\.fm|lastfm\.(?:com\.br|com\.tr|at|com|de|es|fr|it|jp|pl|pt|ru|se))\//, "http://www.last.fm/");
+$(document).ready(function() {
+    MBImportStyle();
+    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+    release_url = release_url.replace(
+        /^(?:https?:\/\/)?(?:www\.)?(?:last\.fm|lastfm\.(?:com\.br|com\.tr|at|com|de|es|fr|it|jp|pl|pt|ru|se))\//,
+        'http://www.last.fm/'
+    );
 
-  var release = retrieveReleaseInfo(release_url);
-  insertLink(release, release_url);
+    let release = retrieveReleaseInfo(release_url);
+    insertLink(release, release_url);
 });
 
-
 function retrieveReleaseInfo(release_url) {
-
-
-  // Release defaults
-  var release = {
-    artist_credit: '',
-    title: $("h1[itemprop='name']").text().trim(),
-    year: 0,
-    month: 0,
-    day: 0,
-    format: '',
-    packaging: '',
-    country: '',
-    status: 'official',
-    language: 'eng',
-    script: 'Latn',
-    type: '',
-    urls: [],
-    labels: [],
-    discs: [],
-  };
-
-  // Release artist
-  var artist = $("article span[itemprop='byArtist'] meta[itemprop='name']").attr('content').trim();
-  var various_artists = (artist == 'Various Artists');
-  if (various_artists) {
-    release.artist_credit = [ MBImport.specialArtist('various_artists') ];
-  } else {
-    release.artist_credit = MBImport.makeArtistCredits([artist]);
-  }
-
-  // Tracks
-  var tracks = [];
-  $("#albumTracklist tr[itemprop='tracks']").each(function() {
-    var artists = [];
-	  var trackno = parseInt($(this).find("td.positionCell").text(), 10);
-    if (trackno == 1 && tracks.length) {
-      // multiple "discs"
-      release.discs.push( {
-        'tracks': tracks,
-        'format': release.format
-      } );
-      tracks = [];
-    }
-	  var trackname = $(this).find("td.subjectCell span[itemprop='name']").text().trim();
-	  var tracklength = $(this).find("td.durationCell").text().trim();
-
-    // VA releases have an additional link to the lastfm artist page
-    var track_artists = [];
-    $(this).find("td.subjectCell > a:not(:last)").each(
-      function () {
-        track_artists.push($(this).text().trim());
-      }
-    );
-    var ac = {
-        'artist_credit': '',
-        'title': trackname,
-        'duration': tracklength
+    // Release defaults
+    let release = {
+        artist_credit: '',
+        title: $("h1[itemprop='name']")
+            .text()
+            .trim(),
+        year: 0,
+        month: 0,
+        day: 0,
+        format: '',
+        packaging: '',
+        country: '',
+        status: 'official',
+        language: 'eng',
+        script: 'Latn',
+        type: '',
+        urls: [],
+        labels: [],
+        discs: []
     };
-    if (!track_artists.length && various_artists) {
-      ac.artist_credit = [ MBImport.specialArtist('unknown') ];
+
+    // Release artist
+    let artist = $("article span[itemprop='byArtist'] meta[itemprop='name']")
+        .attr('content')
+        .trim();
+    let various_artists = artist == 'Various Artists';
+    if (various_artists) {
+        release.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
-      ac.artist_credit = MBImport.makeArtistCredits(track_artists);
+        release.artist_credit = MBImport.makeArtistCredits([artist]);
     }
-    tracks.push(ac);
-  });
 
-  release.discs.push( {
-    'tracks': tracks,
-    'format': release.format
-  } );
+    // Tracks
+    let tracks = [];
+    $("#albumTracklist tr[itemprop='tracks']").each(function() {
+        let artists = [];
+        let trackno = parseInt(
+            $(this)
+                .find('td.positionCell')
+                .text(),
+            10
+        );
+        if (trackno == 1 && tracks.length) {
+            // multiple "discs"
+            release.discs.push({
+                tracks: tracks,
+                format: release.format
+            });
+            tracks = [];
+        }
+        let trackname = $(this)
+            .find("td.subjectCell span[itemprop='name']")
+            .text()
+            .trim();
+        let tracklength = $(this)
+            .find('td.durationCell')
+            .text()
+            .trim();
 
-  LOGGER.info("Parsed release: ", release);
-  return release;
+        // VA releases have an additional link to the lastfm artist page
+        let track_artists = [];
+        $(this)
+            .find('td.subjectCell > a:not(:last)')
+            .each(function() {
+                track_artists.push(
+                    $(this)
+                        .text()
+                        .trim()
+                );
+            });
+        let ac = {
+            artist_credit: '',
+            title: trackname,
+            duration: tracklength
+        };
+        if (!track_artists.length && various_artists) {
+            ac.artist_credit = [MBImport.specialArtist('unknown')];
+        } else {
+            ac.artist_credit = MBImport.makeArtistCredits(track_artists);
+        }
+        tracks.push(ac);
+    });
+
+    release.discs.push({
+        tracks: tracks,
+        format: release.format
+    });
+
+    LOGGER.info('Parsed release: ', release);
+    return release;
 }
 
 // Insert button into page under label information
 function insertLink(release, release_url) {
-    var edit_note = MBImport.makeEditNote(release_url, 'Last.fm');
-    var parameters = MBImport.buildFormParameters(release, edit_note);
+    let edit_note = MBImport.makeEditNote(release_url, 'Last.fm');
+    let parameters = MBImport.buildFormParameters(release, edit_note);
 
-    $("div.g4").prepend(
-        $('<div id="mb_buttons">'
-        + MBImport.buildFormHTML(parameters)
-        + MBImport.buildSearchButton(release)
-        + '</div>').hide()
-    );
+    $('div.g4').prepend($(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`).hide());
     $('#mb_buttons').css({
-      'margin-bottom': '5px',
-      'padding': '2%',
-      'background-color': '#444'
+        'margin-bottom': '5px',
+        padding: '2%',
+        'background-color': '#444'
     });
-    $('form.musicbrainz_import').css({width: '48%', display:'inline-block'});
-    $('form.musicbrainz_import_search').css({'float': 'right'})
-    $('form.musicbrainz_import > button').css({width: '100%', 'box-sizing': 'border-box'});
+    $('form.musicbrainz_import').css({ width: '48%', display: 'inline-block' });
+    $('form.musicbrainz_import_search').css({ float: 'right' });
+    $('form.musicbrainz_import > button').css({ width: '100%', 'box-sizing': 'border-box' });
 
     $('#mb_buttons').slideDown();
 }
