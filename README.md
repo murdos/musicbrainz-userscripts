@@ -12,7 +12,6 @@
 -   [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
 -   [Import FMA releases to MusicBrainz](#fma_importer)
 -   [Import Juno Download releases to MusicBrainz](#juno_download_importer)
--   [Import Last.fm releases to MusicBrainz](#lastfm_importer)
 -   [Import Loot releases to MusicBrainz](#loot_importer)
 -   [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 -   [Import Qobuz releases to MusicBrainz](#qobuz_importer)
@@ -107,13 +106,6 @@ One-click importing of releases from junodownload.com/products pages into MusicB
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/juno_download_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js)
-
-## <a name="lastfm_importer"></a> Import Last.fm releases to MusicBrainz
-
-One-click importing of releases from last.fm into MusicBrainz. PLEASE import releases from more reliable sources if possible.
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/lastfm_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lastfm_importer.user.js)
 
 ## <a name="loot_importer"></a> Import Loot releases to MusicBrainz
 
