@@ -28,9 +28,9 @@ if (DEBUG) {
 // list of qobuz artist id which should be mapped to Various Artists
 var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
     various_composers_ids = [573076],
-    classical = false,
-    detect = true,
-    force_aa = false,
+    classical = false, // release detected as classical
+    detect_classical = true, // parse as classical, i.e. use composer as artist
+    force_album_artist = false, // force use the album artist from release
     raw_release_data;
 
 function isVariousArtists(artist) {
@@ -68,8 +68,8 @@ function parseRelease(data) {
     if ($.inArray('Classique', data.genres_list) != -1) {
         classical = true;
     }
-    if (detect && classical && typeof data.composer !== 'undefined') {
-        if (force_aa) {
+    if (detect_classical && classical && typeof data.composer !== 'undefined') {
+        if (force_album_artist) {
             release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
         } else if (isVariousArtists(data.composer)) {
             // Use composer on classical
@@ -131,7 +131,7 @@ function parseRelease(data) {
         track.duration = trackobj.duration * 1000;
         let performers,
             get_composer = false;
-        if (classical && detect) {
+        if (classical && detect_classical) {
             if (typeof trackobj.composer !== 'undefined') {
                 performers = [[trackobj.composer.name, ['Primary']]];
             } else {
@@ -189,12 +189,12 @@ function insertLink(release) {
         .append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
     if (classical) {
         let title = 'Release data was detected as classical. Click to parse as artist.';
-        if (!detect) title = 'Click to reparse as classical.';
+        if (!detect_classical) title = 'Click to reparse as classical.';
         mbUI.append($(`<button id="reparse" type="submit" title="${title}">Reparse</button>`));
         mbUI.append(
             $(
-                `<span><input id="force_aa" type="checkbox" title="Force album artist"${force_aa &&
-                    ' checked'}><label for="force_aa">Force album artist</label></span>`
+                `<span><input id="force_album_artist" type="checkbox" title="Force album artist"${force_album_artist &&
+                    ' checked'}><label for="force_album_artist">Force album artist</label></span>`
             )
         );
     }
@@ -267,14 +267,14 @@ $(document).on('click', '#isrcs', function() {
 });
 
 $(document).on('click', '#reparse', function() {
-    detect = !detect;
+    detect_classical = !detect_classical;
     let release = parseRelease(raw_release_data);
     insertLink(release);
     return false;
 });
 
-$(document).on('click', '#force_aa', function() {
-    force_aa = !force_aa;
+$(document).on('click', '#force_album_artist', function() {
+    force_album_artist = !force_album_artist;
     let release = parseRelease(raw_release_data);
     insertLink(release);
     return false;
