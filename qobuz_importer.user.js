@@ -27,7 +27,10 @@ if (DEBUG) {
 
 // list of qobuz artist id which should be mapped to Various Artists
 var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
-    various_composers_ids = [573076];
+    various_composers_ids = [573076],
+    classical = false,
+    detect = true,
+    raw_release_data;
 
 function isVariousArtists(artist) {
     // Check hard-coded various artist ids
@@ -55,21 +58,27 @@ function getPerformers(trackobj) {
 }
 
 function parseRelease(data) {
-    let release = {},
-        classical = false;
+    let release = {};
 
     release.script = 'Latn';
     release.url = `https://www.qobuz.com${data.relative_url}`; // no lang
 
     release.title = data.title;
-    if (isVariousArtists(data.artist)) {
-        if ($.inArray('Classique', data.genres_list) != -1) {
-            classical = true;
-            if (isVariousArtists(data.composer)) {
-                release.artist_credit = [MBImport.specialArtist('various_artists')];
-            } else release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
-        } else release.artist_credit = [MBImport.specialArtist('various_artists')];
-    } else release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
+    if ($.inArray('Classique', data.genres_list) != -1) {
+        classical = true;
+    }
+    if (detect && classical && typeof data.composer !== 'undefined') {
+        // Use composer on classical
+        if (isVariousArtists(data.composer)) {
+            release.artist_credit = [MBImport.specialArtist('various_artists')];
+        } else {
+            release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
+        }
+    } else if (isVariousArtists(data.artist)) {
+        release.artist_credit = [MBImport.specialArtist('various_artists')];
+    } else {
+        release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
+    }
 
     // Release information global to all Beatport releases
     release.packaging = 'None';
@@ -119,7 +128,7 @@ function parseRelease(data) {
         track.duration = trackobj.duration * 1000;
         let performers,
             get_composer = false;
-        if (classical) {
+        if (classical && detect) {
             if (typeof trackobj.composer !== 'undefined') {
                 performers = [[trackobj.composer.name, ['Primary']]];
             } else {
@@ -137,6 +146,8 @@ function parseRelease(data) {
                     artists.push(performer[0]);
                 }
             } else if (
+                (classical && $.inArray('Composer', performer[1]) != -1) ||
+                $.inArray('MainArtist', performer[1]) != -1 ||
                 $.inArray('Main Performer', performer[1]) != -1 ||
                 $.inArray('Primary', performer[1]) != -1 ||
                 $.inArray('interprète', performer[1]) != -1 ||
@@ -171,13 +182,22 @@ function insertLink(release) {
 
     let mbUI = $('<p class="musicbrainz_import">')
         .append(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release))
-        .hide();
-    mbUI.append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+        .hide()
+        .append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+    if (classical) {
+        let title = 'Release data was detected as classical. Click to parse as artist.';
+        if (!detect) title = 'Click to reparse as classical.';
+        mbUI.append($(`<button id="reparse" type="submit" title="${title}">Reparse</button>`));
+    }
     let isrclist = $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`);
 
-    $('#info div.meta')
+    let mbContainer = ($('#mbContainer').length > 0 && $('#mbContainer')) || $('<span id="mbContainer">');
+    mbContainer
+        .empty()
         .append(mbUI)
         .append(isrclist);
+
+    $('#info div.meta').append(mbContainer);
     $('form.musicbrainz_import').css({
         display: 'inline-block',
         margin: '1px'
@@ -198,8 +218,8 @@ function insertLink(release) {
             let wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=';
             let repUrl = arguments[0].originalTarget.responseURL;
             if (repUrl.startsWith(wsUrl)) {
-                let data = JSON.parse(this.responseText);
-                let release = parseRelease(data);
+                raw_release_data = JSON.parse(this.responseText);
+                let release = parseRelease(raw_release_data);
                 insertLink(release);
             }
         });
@@ -234,5 +254,12 @@ $(document).on('click', '#isrcs', function() {
         $('#isrclist').select();
         $(this).text('Hide ISRCs');
     } else $(this).text('Show ISRCs');
+    return false;
+});
+
+$(document).on('click', '#reparse', function() {
+    detect = !detect;
+    let release = parseRelease(raw_release_data);
+    insertLink(release);
     return false;
 });
