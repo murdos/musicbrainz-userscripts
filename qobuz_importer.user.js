@@ -30,6 +30,7 @@ var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
     various_composers_ids = [573076],
     classical = false,
     detect = true,
+    force_aa = false,
     raw_release_data;
 
 function isVariousArtists(artist) {
@@ -68,8 +69,10 @@ function parseRelease(data) {
         classical = true;
     }
     if (detect && classical && typeof data.composer !== 'undefined') {
-        // Use composer on classical
-        if (isVariousArtists(data.composer)) {
+        if (force_aa) {
+            release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
+        } else if (isVariousArtists(data.composer)) {
+            // Use composer on classical
             release.artist_credit = [MBImport.specialArtist('various_artists')];
         } else {
             release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
@@ -188,6 +191,12 @@ function insertLink(release) {
         let title = 'Release data was detected as classical. Click to parse as artist.';
         if (!detect) title = 'Click to reparse as classical.';
         mbUI.append($(`<button id="reparse" type="submit" title="${title}">Reparse</button>`));
+        mbUI.append(
+            $(
+                `<span><input id="force_aa" type="checkbox" title="Force album artist"${force_aa &&
+                    ' checked'}><label for="force_aa">Force album artist</label></span>`
+            )
+        );
     }
     let isrclist = $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`);
 
@@ -259,6 +268,13 @@ $(document).on('click', '#isrcs', function() {
 
 $(document).on('click', '#reparse', function() {
     detect = !detect;
+    let release = parseRelease(raw_release_data);
+    insertLink(release);
+    return false;
+});
+
+$(document).on('click', '#force_aa', function() {
+    force_aa = !force_aa;
     let release = parseRelease(raw_release_data);
     insertLink(release);
     return false;
