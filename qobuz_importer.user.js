@@ -178,6 +178,14 @@ function parseRelease(data) {
     return release;
 }
 
+function insertErrorMessage(error_data) {
+    let mbErrorMsg = $('<p class="musicbrainz_import">')
+        .append('<h5>MB import</h5>')
+        .append(`<em>Error ${error_data.code}: ${error_data.message}</em>`)
+        .append('<p><strong>This probably means that you have to be logged in to Qobuz for the script to work.');
+    $('#info div.meta').append(mbErrorMsg);
+}
+
 // Insert button into page under label information
 function insertLink(release) {
     let edit_note = MBImport.makeEditNote(release.url, 'Qobuz');
@@ -228,8 +236,13 @@ function insertLink(release) {
             let repUrl = arguments[0].originalTarget.responseURL;
             if (repUrl.startsWith(wsUrl)) {
                 raw_release_data = JSON.parse(this.responseText);
-                let release = parseRelease(raw_release_data);
-                insertLink(release);
+                if (raw_release_data.status === 'error') {
+                    LOGGER.error(raw_release_data);
+                    insertErrorMessage(raw_release_data);
+                } else {
+                    let release = parseRelease(raw_release_data);
+                    insertLink(release);
+                }
             }
         });
         return send.apply(this, arguments);
