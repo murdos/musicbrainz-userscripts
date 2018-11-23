@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Qobuz releases to MusicBrainz
 // @description    Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.11.21.1
+// @version        2018.11.23.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -29,8 +29,7 @@ if (DEBUG) {
 var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
     various_composers_ids = [573076],
     classical = false, // release detected as classical
-    detect_classical = true, // parse as classical, i.e. use composer as artist
-    force_album_artist = false, // force use the album artist from release
+    album_artist_data = {}, // for switching album artists on classical
     raw_release_data;
 
 function isVariousArtists(artist) {
@@ -67,23 +66,30 @@ function parseRelease(data) {
     release.title = data.title;
     if ($.inArray('Classique', data.genres_list) != -1) {
         classical = true;
-    }
-    if (detect_classical && classical && typeof data.composer !== 'undefined') {
-        if (force_album_artist) {
-            release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
-        } else if (isVariousArtists(data.composer)) {
-            // Use composer on classical
-            release.artist_credit = [MBImport.specialArtist('various_artists')];
+        release.classical = {};
+        release.classical.discs = [];
+        album_artist_data.classical_is_various = false;
+        album_artist_data.normal_is_various = false;
+        // Use composer on classical
+        if (typeof data.composer !== 'undefined') {
+            if (isVariousArtists(data.composer)) {
+                release.classical.artist_credit = [MBImport.specialArtist('various_artists')];
+                album_artist_data.classical_is_various = true;
+            } else {
+                release.classical.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
+            }
         } else {
-            release.artist_credit = MBImport.makeArtistCredits([data.composer.name]);
+            release.classical.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
         }
-    } else if (isVariousArtists(data.artist)) {
+    }
+
+    if (isVariousArtists(data.artist)) {
         release.artist_credit = [MBImport.specialArtist('various_artists')];
+        album_artist_data.normal_is_various = true;
     } else {
         release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
     }
 
-    // Release information global to all Beatport releases
     release.packaging = 'None';
     release.barcode = data.upc;
     release.country = 'XW';
@@ -115,6 +121,7 @@ function parseRelease(data) {
     release.comment = 'Digital download';
     release.discs = [];
     let tracks = [],
+        classical_tracks = [],
         old_media_num = 1;
     $.each(data.tracks.items, function(index, trackobj) {
         release.isrcs.push(trackobj.isrc);
@@ -123,33 +130,43 @@ function parseRelease(data) {
                 tracks: tracks,
                 format: 'Digital Media'
             });
+            if (classical) {
+                release.classical.discs.push({
+                    tracks: classical_tracks,
+                    format: 'Digital Media'
+                });
+                classical_tracks = [];
+            }
             old_media_num = trackobj.media_number;
             tracks = [];
         }
         let track = {};
         track.title = trackobj.title.replace('"', '"');
         track.duration = trackobj.duration * 1000;
-        let performers,
-            get_composer = false;
-        if (classical && detect_classical) {
+        let performers = getPerformers(trackobj);
+        if (classical) {
+            let classical_artists = [];
             if (typeof trackobj.composer !== 'undefined') {
-                performers = [[trackobj.composer.name, ['Primary']]];
+                classical_artists.push(trackobj.composer.name);
             } else {
-                performers = getPerformers(trackobj);
-                get_composer = true;
+                $.each(performers, function(index, performer) {
+                    if ($.inArray('Composer', performer[1]) != -1) {
+                        classical_artists.push(performer[0]);
+                    }
+                });
             }
-        } else performers = getPerformers(trackobj);
+            let classical_track = $.extend({}, track);
+            classical_track.artist_credit = MBImport.makeArtistCredits(classical_artists);
+            classical_tracks.push(classical_track);
+        }
+
         let artists = [];
         let featured_artists = [];
         $.each(performers, function(index, performer) {
             if ($.inArray('Featured Artist', performer[1]) != -1) {
                 featured_artists.push(performer[0]);
-            } else if (get_composer) {
-                if ($.inArray('Composer', performer[1]) != -1) {
-                    artists.push(performer[0]);
-                }
             } else if (
-                (classical && $.inArray('Composer', performer[1]) != -1) ||
+                // (classical && $.inArray('Composer', performer[1]) != -1) ||
                 $.inArray('MainArtist', performer[1]) != -1 ||
                 $.inArray('Main Performer', performer[1]) != -1 ||
                 $.inArray('Primary', performer[1]) != -1 ||
@@ -173,6 +190,12 @@ function parseRelease(data) {
         tracks: tracks,
         format: 'Digital Media'
     });
+    if (classical) {
+        release.classical.discs.push({
+            tracks: classical_tracks,
+            format: 'Digital Media'
+        });
+    }
 
     LOGGER.info('Parsed release: ', release);
     return release;
@@ -186,35 +209,67 @@ function insertErrorMessage(error_data) {
     $('#info div.meta').append(mbErrorMsg);
 }
 
+function changeAlbumArtist() {
+    let album_artist, classical_artist;
+    if (album_artist_data.forced) {
+        // restore saved classical artist
+        album_artist = album_artist_data.classical;
+    } else {
+        // use the original artist
+        album_artist = $("#mbnormal input[name^='artist_credit.names.0.']");
+    }
+    classical_artist = $('#mbclassical input[name^="artist_credit.names.0."]').detach();
+    if (typeof album_artist_data.classical === 'undefined') {
+        album_artist_data.classical = classical_artist;
+    }
+    $('#mbclassical').prepend(album_artist);
+
+    album_artist_data.forced = !album_artist_data.forced;
+}
+
 // Insert button into page under label information
 function insertLink(release) {
-    let edit_note = MBImport.makeEditNote(release.url, 'Qobuz');
-    let parameters = MBImport.buildFormParameters(release, edit_note);
-
+    let edit_note = MBImport.makeEditNote(release.url, 'Qobuz'),
+        parameters = MBImport.buildFormParameters(release, edit_note),
+        $album_form = $(MBImport.buildFormHTML(parameters)),
+        search_form = MBImport.buildSearchButton(release);
     let mbUI = $('<p class="musicbrainz_import">')
-        .append(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release))
-        .hide()
-        .append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+        .append($album_form, search_form)
+        .hide();
+
     if (classical) {
-        let title = 'Release data was detected as classical. Click to parse as artist.';
-        if (!detect_classical) title = 'Click to reparse as classical.';
-        mbUI.append($(`<button id="reparse" type="submit" title="${title}">Reparse</button>`));
+        let classical_release = $.extend({}, release);
+        classical_release.artist_credit = classical_release.classical.artist_credit;
+        classical_release.discs = classical_release.classical.discs;
+
+        let classical_parameters = MBImport.buildFormParameters(classical_release, edit_note),
+            $classical_form = $(MBImport.buildFormHTML(classical_parameters));
+
+        $('button', $classical_form).prop('title', 'The release was detected as classical. Import with composers as track artists.');
+        $('button span', $classical_form).text('Import as classical');
+
+        if (album_artist_data.classical_is_various && !album_artist_data.normal_is_various) {
+            // Create stuff for forcing album artist
+            $album_form.prop('id', 'mbnormal');
+            $classical_form.prop('id', 'mbclassical');
+            album_artist_data.forced = false;
+        }
+        mbUI.append('<p>');
+        mbUI.append($classical_form);
+        let title = 'Force album artist on classical import. Album artist will be various artists if there are multiple composers.';
         mbUI.append(
             $(
-                `<span><input id="force_album_artist" type="checkbox" title="Force album artist"${force_album_artist &&
-                    ' checked'}><label for="force_album_artist">Force album artist</label></span>`
+                `<label for="force_album_artist" class="musicbrainz_import" title="${title}"><input id="force_album_artist" type="checkbox" title="${title}">Force album artist</label>`
             )
         );
     }
-    let isrclist = $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`);
 
-    let mbContainer = ($('#mbContainer').length > 0 && $('#mbContainer')) || $('<span id="mbContainer">');
-    mbContainer
-        .empty()
-        .append(mbUI)
-        .append(isrclist);
+    mbUI.append(
+        $('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'),
+        $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`)
+    );
 
-    $('#info div.meta').append(mbContainer);
+    $('#info div.meta').append(mbUI);
     $('form.musicbrainz_import').css({
         display: 'inline-block',
         margin: '1px'
@@ -223,6 +278,25 @@ function insertLink(release) {
         display: 'inline-block',
         width: '16px',
         height: '16px'
+    });
+    $('label.musicbrainz_import').css({
+        'white-space': 'nowrap',
+        'border-radius': '5px',
+        display: 'inline-block',
+        cursor: 'pointer',
+        'font-family': 'Arial',
+        'font-size': '12px',
+        padding: '2px 6px',
+        margin: '0 2px 0 1px',
+        'text-decoration': 'none',
+        border: '1px solid rgba(180,180,180,0.8)',
+        'background-color': 'rgba(240,240,240,0.8)',
+        color: '#334',
+        height: '26px',
+        'box-sizing': 'border-box'
+    });
+    $('label.musicbrainz_import input').css({
+        margin: '0 4px 0 0'
     });
     mbUI.slideDown();
 }
@@ -279,16 +353,6 @@ $(document).on('click', '#isrcs', function() {
     return false;
 });
 
-$(document).on('click', '#reparse', function() {
-    detect_classical = !detect_classical;
-    let release = parseRelease(raw_release_data);
-    insertLink(release);
-    return false;
-});
-
 $(document).on('click', '#force_album_artist', function() {
-    force_album_artist = !force_album_artist;
-    let release = parseRelease(raw_release_data);
-    insertLink(release);
-    return false;
+    changeAlbumArtist();
 });
