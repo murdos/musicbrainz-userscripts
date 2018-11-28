@@ -28,7 +28,7 @@ if (DEBUG) {
 // list of qobuz artist id which should be mapped to Various Artists
 var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
     various_composers_ids = [573076],
-    classical = false, // release detected as classical
+    is_classical = false, // release detected as classical
     album_artist_data = {}, // for switching album artists on classical
     raw_release_data;
 
@@ -65,7 +65,7 @@ function parseRelease(data) {
 
     release.title = data.title;
     if ($.inArray('Classique', data.genres_list) != -1) {
-        classical = true;
+        is_classical = true;
         release.classical = {};
         release.classical.discs = [];
         album_artist_data.classical_is_various = false;
@@ -130,7 +130,7 @@ function parseRelease(data) {
                 tracks: tracks,
                 format: 'Digital Media'
             });
-            if (classical) {
+            if (is_classical) {
                 release.classical.discs.push({
                     tracks: classical_tracks,
                     format: 'Digital Media'
@@ -144,7 +144,7 @@ function parseRelease(data) {
         track.title = trackobj.title.replace('"', '"');
         track.duration = trackobj.duration * 1000;
         let performers = getPerformers(trackobj);
-        if (classical) {
+        if (is_classical) {
             let classical_artists = [];
             if (typeof trackobj.composer !== 'undefined') {
                 classical_artists.push(trackobj.composer.name);
@@ -166,7 +166,7 @@ function parseRelease(data) {
             if ($.inArray('Featured Artist', performer[1]) != -1) {
                 featured_artists.push(performer[0]);
             } else if (
-                // (classical && $.inArray('Composer', performer[1]) != -1) ||
+                // (is_classical && $.inArray('Composer', performer[1]) != -1) ||
                 $.inArray('MainArtist', performer[1]) != -1 ||
                 $.inArray('Main Performer', performer[1]) != -1 ||
                 $.inArray('Primary', performer[1]) != -1 ||
@@ -190,7 +190,7 @@ function parseRelease(data) {
         tracks: tracks,
         format: 'Digital Media'
     });
-    if (classical) {
+    if (is_classical) {
         release.classical.discs.push({
             tracks: classical_tracks,
             format: 'Digital Media'
@@ -237,7 +237,7 @@ function insertLink(release) {
         .append($album_form, search_form)
         .hide();
 
-    if (classical) {
+    if (is_classical) {
         let classical_release = $.extend({}, release);
         classical_release.artist_credit = classical_release.classical.artist_credit;
         classical_release.discs = classical_release.classical.discs;
