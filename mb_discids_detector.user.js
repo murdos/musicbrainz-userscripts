@@ -190,7 +190,7 @@ function gazellePageHandler() {
 // Common functions
 
 function computeAttachURL(mb_toc_numbers, artistName, releaseName) {
-    let url = `${'http://musicbrainz.org/cdtoc/attach' + '?toc='}${mb_toc_numbers.join('%20')}&artist-name=${encodeURIComponent(
+    let url = `${'http://musicbrainz.org/cdtoc/attach?toc='}${mb_toc_numbers.join('%20')}&artist-name=${encodeURIComponent(
         artistName
     )}&release-name=${encodeURIComponent(releaseName)}`;
     return url;
@@ -377,12 +377,10 @@ var MBDiscid = (function() {
                 while (input.length < totalChars) {
                     input = padWith + input;
                 }
-            } else {
             }
             if (input.length > totalChars) {
                 //if padWith was a multiple character string and num was overpadded
                 input = input.substring(input.length - totalChars, totalChars);
-            } else {
             }
 
             return input;

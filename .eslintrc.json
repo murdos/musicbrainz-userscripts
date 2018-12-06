@@ -10,7 +10,6 @@
         "prettier/prettier": "error",
         "prefer-template": "error",
         "no-console": "off",
-        "no-empty": "warn",
         "no-inner-declarations": "warn",
         "no-global-assign": "warn",
         "no-redeclare": "warn",
@@ -19,7 +18,6 @@
         "no-useless-concat": "warn",
         "no-useless-escape": "warn",
         "no-unused-vars": "warn",
-        "no-var": "warn",
-        "use-isnan": "warn"
+        "no-var": "warn"
     }
 }
