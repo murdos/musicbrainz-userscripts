@@ -26,10 +26,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
-
 
 if (!unsafeWindow) unsafeWindow = window;
 
@@ -38,8 +36,6 @@ var DEBUG = false; // true | false
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
-
-
 
 // promise to ensure all api calls are done before we parse the release
 var tracks_deferred = $.Deferred();
@@ -53,7 +49,6 @@ var album_api_array = []; // album information [0]
 var tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
 $(document).ready(function() {
-
     LOGGER.info('Document Ready & Takealot Userscript Executing');
 
     let fmaPage = parseFMApage();
@@ -64,17 +59,15 @@ $(document).ready(function() {
         updateAPISection.AlbumId(release_attributes.albumid);
     }
 
-    if ($('span.crumb:nth-child(1)').text() == "Music") {
+    if ($('span.crumb:nth-child(1)').text() == 'Music') {
         // To make sure API and release only build on Album page.
-
 
         // Album detail
         let retrieve_album_detail = new album_api();
 
-
         $.when(retrieve_album_detail).done(function() {
             LOGGER.info('All the AJAX API calls are done continue to build the release object ...');
-            LOGGER.debug("ALBUM Object > " + album_api_array[0]);
+            LOGGER.debug(`ALBUM Object > ${album_api_array[0]}`);
             // LOGGER.debug("TRACK Object > " + tracks_api_array);
 
             let FreeMusicArchiveRelease = new Parsefmarelease(album_api_array[0], tracks_api_array);
@@ -82,12 +75,9 @@ $(document).ready(function() {
 
             let album_link = window.location.href;
 
-
-
             mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
                 $('div.product-title').before(link);
             });
-
         });
     }
 });
@@ -108,18 +98,20 @@ function insertMbUI(mbUI) {
 function insertIMGlinks() {
     let imghref = $('div.image-box.main-gallery-photo img.image-loaded').attr('src');
     //LOGGER.debug('insertIMGlinks 1:: ', imghref);
-    var imgnewhref = imghref.substring(0, imghref.lastIndexOf("-"));
+    let imgnewhref = imghref.substring(0, imghref.lastIndexOf('-'));
     //LOGGER.debug('insertIMGlinks 2:: ', imgnewhref);
-    var imgnewtype = imghref.substring(imghref.lastIndexOf("."));
+    let imgnewtype = imghref.substring(imghref.lastIndexOf('.'));
     //LOGGER.debug('insertIMGlinks 3:: ', imgnewtype);
-    imgnewhref = imgnewhref + "-full" + imgnewtype;
+    imgnewhref = `${imgnewhref}-full${imgnewtype}`;
     //LOGGER.debug('insertIMGlinks 4:: ', imgnewhref);
-    $('div.panel.pdp-main-panel').append(`<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`);
+    $('div.panel.pdp-main-panel').append(
+        `<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`
+    );
 }
 
 // Insert FreeMusicArchive API Status section on FMA page
 function insertAPISection() {
-    LOGGER.debug("FMA insertAPISection Function Executing");
+    LOGGER.debug('FMA insertAPISection Function Executing');
 
     let fmaUI = $('<div id="fmaapistatus" class="sbar-stat"><h4 class="wlinepad"><span class="hd">Takealot API</span></h4></div>').hide();
 
@@ -185,7 +177,6 @@ var updateAPISection = {
                 break;
         }
     }
-
 };
 
 // Insert MusicBrainz section on FMA page
@@ -201,7 +192,9 @@ function insertMBSection(release) {
             border: '1px dotted red'
         });
 
-    let mbContentBlock = $('<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>');
+    let mbContentBlock = $(
+        '<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>'
+    );
     mbUI.append(mbContentBlock);
 
     if (release.maybe_buggy) {
@@ -228,34 +221,32 @@ function insertMBSection(release) {
     insertMbUI(mbUI); // Insert the MusicBrainzUI
     insertIMGlinks(); // Insert the link to high res image
 
-
     $('.search-nav-wrap-2').css({
         'background-color': '#eb743b',
-        'position': 'absolute',
-        'top': '150px',
-        'width': '100%'
+        position: 'absolute',
+        top: '150px',
+        width: '100%'
     });
 
-
     $('form.musicbrainz_import').css({
-        'display': 'inline-block',
+        display: 'inline-block',
         'vertical-align': 'middle',
-        'margin': '0 0 1rem 0',
+        margin: '0 0 1rem 0',
         'margin-bottom': '1rem',
         'font-family': 'inherit',
-        'padding': '0.85em 1em',
+        padding: '0.85em 1em',
         '-webkit-appearance': 'none',
-        'border': '1px solid transparent',
+        border: '1px solid transparent',
         'border-radius': '0',
         '-webkit-transition': 'background-color 0.25s ease-out, color 0.25s ease-out',
         '-o-transition': 'background-color 0.25s ease-out, color 0.25s ease-out',
-        'transition': 'background-color 0.25s ease-out, color 0.25s ease-out',
+        transition: 'background-color 0.25s ease-out, color 0.25s ease-out',
         'font-size': '0.9rem',
         'line-height': '1',
         'text-align': 'center',
-        'cursor': 'pointer',
+        cursor: 'pointer',
         'background-color': '#0b79bf',
-        'color': '#fefefe'
+        color: '#fefefe'
     });
 
     /*    $('#mb_buttons').css({
@@ -340,8 +331,6 @@ function album_api() {
     return promise_variable.promise();
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                 Parse information from FMA Page                                                    //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,14 +351,14 @@ function parseFMApage() {
         //LOGGER.debug("FMA parseFMApage Function Executing on ", FMAtype);
         // <input type="hidden" id="idProduct" value="53513920">
 
-        if (typeof $('#idProduct').attr('value') === "undefined" && $('div.cell:nth-child(3) > a:nth-child(1)').length) {
+        if (typeof $('#idProduct').attr('value') === 'undefined' && $('div.cell:nth-child(3) > a:nth-child(1)').length) {
             LOGGER.debug('Uhm I think the idProduct is missing folks and comments left ...');
             let FMAEmbedCode = $('div.cell:nth-child(3) > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
             FMAEmbedCodeRegex = /product_id\=(\d*)/;
             let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[1]; // assign the ID to a variable
-        } else if (typeof $('#idProduct').attr('value') === "undefined" && $('.reviews > a:nth-child(1)').length) {
+        } else if (typeof $('#idProduct').attr('value') === 'undefined' && $('.reviews > a:nth-child(1)').length) {
             LOGGER.debug('Uhm I think the idProduct is missing folks ...');
             let FMAEmbedCode = $('.reviews > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
@@ -475,8 +464,7 @@ function Parsefmarelease(albumobject, trackobject) {
     fmarelease.urls = [];
     fmarelease.discs = [];
 
-    LOGGER.debug("Album object for parsing", albumobject);
-
+    LOGGER.debug('Album object for parsing', albumobject);
 
     // Title
     fmarelease.title = albumobject.title;
@@ -495,7 +483,7 @@ function Parsefmarelease(albumobject, trackobject) {
     // Type
     // TODO: match all FMA types to MB types
 
-    if (albumobject.hasOwnProperty("albumobject.type")) {
+    if (albumobject.hasOwnProperty('albumobject.type')) {
         LOGGER.debug('Album type from albumobject: ', albumobject.type);
     } else {
         LOGGER.debug('NO ALBUMOBJECT -> TYPE exists !!!');
@@ -508,7 +496,6 @@ function Parsefmarelease(albumobject, trackobject) {
             //fmarelease.type = albumobject.type.slug.toLowerCase();
             fmarelease.type = 'album'; // for Theuns Jordaan .type was not in JSON
         }*/
-
 
     // Default status is official
     fmarelease.status = 'official';
@@ -554,7 +541,7 @@ function Parsefmarelease(albumobject, trackobject) {
     // Release date
     if (albumobject.date_released) {
         //parse_YYYY_MM_DD(albumobject.date_released, fmarelease);
-        parse_YYYY_MM_DD(albumobject.meta["Date Released"], fmarelease);
+        parse_YYYY_MM_DD(albumobject.meta['Date Released'], fmarelease);
     }
 
     // Label parsed from webpage as it is not in API - not true for TAL
@@ -564,15 +551,14 @@ function Parsefmarelease(albumobject, trackobject) {
 
     let alltracklist = [];
 
-    var lastdiscnumber = 0;
+    let lastdiscnumber = 0;
 
     // copied logic from original TAL page as first try
 
     //var tracklistarray = []; // create the tracklist array to use later
 
     // Discs
-    var disclistarray = []; // create the tracklist array to use later
-
+    let disclistarray = []; // create the tracklist array to use later
 
     LOGGER.debug('Report on meta track type:', typeof albumobject.meta.Tracks);
 
@@ -581,14 +567,12 @@ function Parsefmarelease(albumobject, trackobject) {
         alltracklist = albumobject.meta.Tracks;
         LOGGER.debug('The track array to work with: ', alltracklist);
 
-
-
         //release artist
 
         LOGGER.debug('alltracklist length', alltracklist.length);
 
         // Last track to find last disc number
-        var lasttrack = alltracklist[alltracklist.length - 1];
+        let lasttrack = alltracklist[alltracklist.length - 1];
         LOGGER.debug(`The last track:${lasttrack}`);
 
         // Define all te formats here
@@ -616,13 +600,11 @@ function Parsefmarelease(albumobject, trackobject) {
         }
 
         lastdiscnumberregex = /\[ Disc (.*) Track./; // regex to match disc number from last track
-        var lastdiscnumbermatch = lasttrack.match(lastdiscnumberregex);
+        let lastdiscnumbermatch = lasttrack.match(lastdiscnumberregex);
         lastdiscnumber = parseInt(lastdiscnumbermatch[1]);
         LOGGER.debug('Last Disc Number: ', lastdiscnumber);
 
-
-
-        for (var k = 1; k < lastdiscnumber + 1; k++) {
+        for (let k = 1; k < lastdiscnumber + 1; k++) {
             // start at 1 to keep array in sync with disc numbers
             LOGGER.debug('Disc iterate: ', k);
 
@@ -655,7 +637,7 @@ function Parsefmarelease(albumobject, trackobject) {
                         track.artist_credit = MBImport.makeArtistCredits([albumobject.meta.Artists[0]]);
                     } else {
                         fmarelease.maybe_buggy = true;
-                        track.artist_credit = MBImport.makeArtistCredits([""]);
+                        track.artist_credit = MBImport.makeArtistCredits(['']);
                     }
 
                     LOGGER.debug('The track object: ', `${currentdiscnumber} - ${track.number} - ${track.title}`);
@@ -663,11 +645,9 @@ function Parsefmarelease(albumobject, trackobject) {
                 }
             }
             disclistarray.push(tracklistarray);
-
         }
 
         LOGGER.debug('** Disclist Array *** ', disclistarray);
-
     } // end of type 1 array tracks
 
     // to catch the first format type (2) - start of type 2 array tracks
@@ -678,17 +658,16 @@ function Parsefmarelease(albumobject, trackobject) {
 
         //var lines = alltracklist.value.split("\n");
         //var lines = alltracklist.val().split('\n');
-        var lines = alltracklist.split(/\r?\n/);
+        let lines = alltracklist.split(/\r?\n/);
 
         takealot_format = 'v2_type1';
 
         // Tracks
         var tracklistarray = new Array(); // create the track list array
 
-        for (var j = 0; j < lines.length; j++) {
+        for (let j = 0; j < lines.length; j++) {
             //code here using lines[i] which will give you each line
             LOGGER.debug('Line: ', j, ' - ', lines[j]);
-
 
             // changed j to 0 and length-1 as Artist is at end
             // do regex here and if current disc listed in track = k then push the track into the array for that disc
@@ -716,26 +695,21 @@ function Parsefmarelease(albumobject, trackobject) {
                     track.artist_credit = MBImport.makeArtistCredits([albumobject.meta.Artists[0].trim()]);
                 } else {
                     fmarelease.maybe_buggy = true;
-                    track.artist_credit = MBImport.makeArtistCredits([""]);
+                    track.artist_credit = MBImport.makeArtistCredits(['']);
                 }
 
                 LOGGER.debug('The track object: ', `${currentdiscnumber} - ${track.number} - ${track.title}`);
                 tracklistarray.push(track);
             }
-
-
         }
         disclistarray.push(tracklistarray);
         LOGGER.debug('** Disclist Array *** ', disclistarray);
-
     } // end of type 2 array tracks
-
-
 
     fmarelease.discs = [];
     for (let l = 0; l < lastdiscnumber; l++) {
-        LOGGER.debug("Disc position:", l + 1);
-        LOGGER.debug("Tracklist for the selected disc: ", disclistarray[l]);
+        LOGGER.debug('Disc position:', l + 1);
+        LOGGER.debug('Tracklist for the selected disc: ', disclistarray[l]);
         let disc = {
             position: l + 1,
             format: DiscFormats[fmarelease.packaging],
@@ -744,11 +718,9 @@ function Parsefmarelease(albumobject, trackobject) {
         fmarelease.discs.push(disc);
     }
 
-
     LOGGER.info('Release:', fmarelease);
     return fmarelease;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                   Takealot -> MusicBrainz mapping                                                  //
