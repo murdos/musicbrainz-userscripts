@@ -3,8 +3,8 @@
 // @description    Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
 // @version        2019.1.4.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
+// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
+// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
 // @include        http*://www.takealot.com/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/mbimport.js
@@ -33,7 +33,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-var DEBUG = true; // true | false
+var DEBUG = false; // true | false
 
 if (DEBUG) {
     LOGGER.setLevel('debug');
