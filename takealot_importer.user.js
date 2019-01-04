@@ -76,7 +76,7 @@ $(document).ready(function() {
             let album_link = window.location.href;
 
             mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
-                $('div.product-title').before(link);
+                $('div.product-title').after(link);
             });
         });
     }
@@ -220,14 +220,14 @@ function insertMBSection(release) {
     }
 
     // Form parameters
-    let edit_note = `FMA_Album_Id: ${release_attributes.albumid} `; // temp add album id here untill we can add easy way to schema
+    let edit_note = `Takealot_Album_Id: ${release_attributes.albumid} `; // temp add album id here untill we can add easy way to schema
     edit_note = edit_note + MBImport.makeEditNote(window.location.href, 'Takealot');
     let parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form + search button
     //let innerHTML = `<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`;
     //<button class="button add-to-mb-button async-button"><i class="plus-icon"></i><i class="add-to-mb-icon"></i></button>
-    let innerHTML = `<div class="search-wrap right">${MBImport.buildFormHTML(parameters)}</div>`;
+    let innerHTML = `<div class="search-wrap right">${MBImport.buildFormHTML(parameters)}   ${MBImport.buildSearchButton(release)}</div>`;
     mbContentBlock.append(innerHTML);
 
     insertMbUI(mbUI); // Insert the MusicBrainzUI
@@ -241,6 +241,27 @@ function insertMBSection(release) {
     });
 
     $('form.musicbrainz_import').css({
+        display: 'inline-block',
+        'vertical-align': 'middle',
+        margin: '0 0 1rem 0',
+        'margin-bottom': '1rem',
+        'font-family': 'inherit',
+        padding: '0.85em 1em',
+        '-webkit-appearance': 'none',
+        border: '1px solid transparent',
+        'border-radius': '0',
+        '-webkit-transition': 'background-color 0.25s ease-out, color 0.25s ease-out',
+        '-o-transition': 'background-color 0.25s ease-out, color 0.25s ease-out',
+        transition: 'background-color 0.25s ease-out, color 0.25s ease-out',
+        'font-size': '0.9rem',
+        'line-height': '1',
+        'text-align': 'center',
+        cursor: 'pointer',
+        'background-color': '#0b79bf',
+        color: '#fefefe'
+    });
+
+    $('form.musicbrainz_import_search').css({
         display: 'inline-block',
         'vertical-align': 'middle',
         margin: '0 0 1rem 0',
@@ -507,20 +528,16 @@ function Parsefmarelease(albumobject, trackobject) {
 
     // Type
     // TODO: match all FMA types to MB types
-
-    if (albumobject.hasOwnProperty('albumobject.type')) {
-        LOGGER.debug('Album type from albumobject: ', albumobject.type);
+    // currently if exist and music then its set to album
+    if (hasProp(albumobject, 'type.slug')) {
+        LOGGER.debug('Album type from albumobject: ', albumobject.type.slug);
+        if (albumobject.type.slug == 'music') {
+            fmarelease.type = 'album';
+        }
     } else {
-        LOGGER.debug('NO ALBUMOBJECT -> TYPE exists !!!');
+        // no type could be found, made it album as default
         fmarelease.type = 'album';
     }
-
-    /*    if (albumobject.type.slug == 'music') {
-            fmarelease.type = 'album';
-        } else {
-            //fmarelease.type = albumobject.type.slug.toLowerCase();
-            fmarelease.type = 'album'; // for Theuns Jordaan .type was not in JSON
-        }*/
 
     // Default status is official
     fmarelease.status = 'official';
