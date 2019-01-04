@@ -179,6 +179,18 @@ var updateAPISection = {
     }
 };
 
+// function to determine if JSON or sub objects exist
+// hasProp(albumobject, 'meta.Artists'); return true | false
+function hasProp(obj, propPath, i) {
+    if (typeof i === 'undefined' && !(i = 0)) {
+        propPath = propPath.split('.');
+    }
+    if (typeof obj[propPath[i]] !== 'undefined') {
+        return ++i && i !== propPath.length ? hasProp(obj[propPath[i - 1]], propPath, i) : true;
+    }
+    return false;
+}
+
 // Insert MusicBrainz section on FMA page
 function insertMBSection(release) {
     //LOGGER.debug(release);
@@ -324,7 +336,12 @@ function album_api() {
         LOGGER.debug(' >> Album > DONE');
         updateAPISection.AlbumAjaxStatus('completed');
         //LOGGER.debug('Takealot RAW album JSON: ',albumjson);
-        release_attributes.artist_name = albumjson.response.meta.Artists[0];
+        // test for meta.Artists key
+        if (hasProp(albumjson, 'response.meta.Artists')) {
+            LOGGER.debug('response.meta.Artists > exist in JSON');
+            release_attributes.artist_name = albumjson.response.meta.Artists[0];
+        }
+
         album_api_array.push(albumjson.response);
     });
 
@@ -472,12 +489,20 @@ function Parsefmarelease(albumobject, trackobject) {
 
     // Artist Credit
     let VariousArtistsRegex = /(Various Artists)/; //found "Various Artists || Various Artists [album name]"
-    let various_artists = VariousArtistsRegex.test(albumobject.meta.Artists[0]);
 
-    if (various_artists) {
-        fmarelease.artist_credit = [MBImport.specialArtist('various_artists')];
-    } else {
-        fmarelease.artist_credit = MBImport.makeArtistCredits([albumobject.meta.Artists[0]]);
+    // added a check to see if JSON proerty exist
+    if (hasProp(albumobject, 'meta.Artists')) {
+        LOGGER.debug('Testing > hasOwnProperty > albumobject.meta.Artists = success');
+        let various_artists = VariousArtistsRegex.test(albumobject.meta.Artists[0]);
+        if (various_artists) {
+            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = success');
+            fmarelease.artist_credit = [MBImport.specialArtist('various_artists')];
+        } else {
+            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false');
+
+            fmarelease.artist_credit = MBImport.makeArtistCredits([albumobject.meta.Artists[0]]);
+            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false : ', fmarelease.artist_credit);
+        }
     }
 
     // Type
