@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Loot releases to MusicBrainz
 // @description    Add a button to import Loot.co.za releases to MusicBrainz
-// @version        2018.2.18.1
+// @version        2019.1.5.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
@@ -12,7 +12,7 @@
 // @require        lib/mblinks.js
 // @require        lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant          none
+// @grant          unsafeWindow
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
