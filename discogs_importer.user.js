@@ -21,8 +21,6 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-if (!unsafeWindow) unsafeWindow = window;
-
 var DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {

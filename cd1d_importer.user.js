@@ -19,7 +19,6 @@
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */
-if (!unsafeWindow) unsafeWindow = window;
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
