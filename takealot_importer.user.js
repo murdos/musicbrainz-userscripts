@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Takealot releases to MusicBrainz
 // @description    Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
-// @version        2019.1.4.1
+// @version        2019.1.5.1
 // @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
@@ -185,7 +185,8 @@ function hasProp(obj, propPath, i) {
     if (typeof i === 'undefined' && !(i = 0)) {
         propPath = propPath.split('.');
     }
-    if (typeof obj[propPath[i]] !== 'undefined') {
+    if (typeof obj[propPath[i]] !== 'undefined' && obj[propPath[i]] != null) {
+        //added null check as some JSON set to null
         return ++i && i !== propPath.length ? hasProp(obj[propPath[i - 1]], propPath, i) : true;
     }
     return false;
@@ -501,6 +502,7 @@ function Parsefmarelease(albumobject, trackobject) {
     fmarelease.barcode = '';
     fmarelease.urls = [];
     fmarelease.discs = [];
+    fmarelease.disc_format = '';
 
     LOGGER.debug('Album object for parsing', albumobject);
 
@@ -513,16 +515,16 @@ function Parsefmarelease(albumobject, trackobject) {
 
     // added a check to see if JSON proerty exist
     if (hasProp(albumobject, 'meta.Artists')) {
-        LOGGER.debug('Testing > hasOwnProperty > albumobject.meta.Artists = success');
+        //LOGGER.debug('Testing > hasOwnProperty > albumobject.meta.Artists = success');
         let various_artists = VariousArtistsRegex.test(albumobject.meta.Artists[0]);
         if (various_artists) {
-            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = success');
+            //LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = success');
             fmarelease.artist_credit = [MBImport.specialArtist('various_artists')];
         } else {
-            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false');
+            //LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false');
 
             fmarelease.artist_credit = MBImport.makeArtistCredits([albumobject.meta.Artists[0]]);
-            LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false : ', fmarelease.artist_credit);
+            //LOGGER.debug('Testing > hasOwnProperty > value > Various Artists = false : ', fmarelease.artist_credit);
         }
     }
 
@@ -571,25 +573,32 @@ function Parsefmarelease(albumobject, trackobject) {
         });
     }
 
-    // Check to see if a play button is available
-    if ($('.sqbtn-playpage').length) {
-        // Release URL
-        fmarelease.urls.push({
-            url: albumobject.uri,
-            link_type: MBImport.URL_TYPES.stream_for_free
-        });
-    }
-
     // Release date
     if (albumobject.date_released) {
         //parse_YYYY_MM_DD(albumobject.date_released, fmarelease);
         parse_YYYY_MM_DD(albumobject.meta['Date Released'], fmarelease);
     }
 
-    // Label parsed from webpage as it is not in API - not true for TAL
-    fmarelease.labels.push({
-        name: release_attributes.label
-    });
+    // @TODO: need to figure out to get packaging styles from page
+    if (hasProp(albumobject, 'meta.Media')) {
+        fmarelease.packaging = PackagingFormats[albumobject.meta.Media];
+    }
+
+    if (hasProp(albumobject, 'meta.Format')) {
+        fmarelease.disc_format = albumobject.meta.Format;
+    }
+
+    //labels
+    if (hasProp(albumobject, 'meta.Label')) {
+        fmarelease.labels.push({
+            name: albumobject.meta.Label
+        });
+    }
+
+    // Language
+    if (hasProp(albumobject, 'meta.Languages')) {
+        fmarelease.language = albumobject.meta.Languages;
+    }
 
     let alltracklist = [];
 
@@ -754,7 +763,7 @@ function Parsefmarelease(albumobject, trackobject) {
         LOGGER.debug('Tracklist for the selected disc: ', disclistarray[l]);
         let disc = {
             position: l + 1,
-            format: DiscFormats[fmarelease.packaging],
+            format: DiscFormats[fmarelease.disc_format],
             tracks: disclistarray[l]
         };
         fmarelease.discs.push(disc);
@@ -779,3 +788,6 @@ Languages['Afrikaans'] = 'afr';
 var Countries = [];
 Countries['South Africa'] = 'ZA';
 Countries['SA'] = 'ZA';
+
+var PackagingFormats = [];
+PackagingFormats['CD'] = 'jewel case';
