@@ -597,7 +597,7 @@ function Parsefmarelease(albumobject, trackobject) {
 
     // Language
     if (hasProp(albumobject, 'meta.Languages')) {
-        fmarelease.language = albumobject.meta.Languages;
+        fmarelease.language = Languages[albumobject.meta.Languages];
     }
 
     let alltracklist = [];
@@ -784,6 +784,7 @@ DiscFormats['Audio CD'] = 'CD';
 
 var Languages = [];
 Languages['Afrikaans'] = 'afr';
+Languages['afrikaans'] = 'afr';
 
 var Countries = [];
 Countries['South Africa'] = 'ZA';
