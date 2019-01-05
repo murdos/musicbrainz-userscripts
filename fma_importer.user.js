@@ -31,8 +31,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 // API Key assigned to registered user on FMA
 var FMA_API = 'FMA API KEY Missing';
 
-if (!unsafeWindow) unsafeWindow = window;
-
 var DEBUG = false; // true | false
 
 if (DEBUG) {

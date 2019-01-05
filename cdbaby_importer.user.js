@@ -16,8 +16,6 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-if (!unsafeWindow) unsafeWindow = window;
-
 $(document).ready(function() {
     MBImportStyle();
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
