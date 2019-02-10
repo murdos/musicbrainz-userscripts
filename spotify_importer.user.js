@@ -58,10 +58,13 @@ function parseRelease(data) {
 
     release.url = data.external_urls.spotify;
     release.barcode = data.external_ids.upc;
-    release.type = data.type;
-    if (typeof data.album_type !== 'undefined') {
+
+    if (data.album_type == 'compilation') {
+        release.type = 'album';
         release.secondary_types = [];
         release.secondary_types.push(data.album_type);
+    } else {
+        release.type = data.album_type;
     }
 
     release.urls = [];
