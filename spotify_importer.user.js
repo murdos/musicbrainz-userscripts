@@ -49,7 +49,6 @@ function getPerformers(trackobj) {
 }
 
 function parseRelease(data) {
-    console.log(data);
     let release = {};
     release.country = 'XW';
     release.packaging = 'None';
@@ -112,16 +111,13 @@ function parseRelease(data) {
         let artists = [];
         let featured_artists = [];
         $.each(performers, function(index, performer) {
-            console.log(performer);
             if ($.inArray('featured', performer[1]) != -1) {
                 featured_artists.push(performer[0]);
             } else if ($.inArray('artist', performer[1]) != -1 || $.inArray('Main Artist', performer[1]) != -1) {
                 artists.push(performer[0]);
             }
         });
-        console.log(artists);
         track.artist_credit = MBImport.makeArtistCredits(artists);
-        console.log(track.artist_credit);
         if (featured_artists.length) {
             if (track.artist_credit.length) {
                 track.artist_credit[track.artist_credit.length - 1].joinphrase = ' feat. ';
@@ -194,7 +190,6 @@ function sendReplacement(data) {
     if (this.onreadystatechange) {
         this._onreadystatechange = this.onreadystatechange;
     }
-    // console.log(this);
     this.onreadystatechange = onReadyStateChangeReplacement;
     return send.apply(this, arguments);
 }
