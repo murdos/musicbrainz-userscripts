@@ -810,7 +810,8 @@ var MediaTypes = {
     Vinyl: 'Vinyl',
     'Vinyl7"': '7" Vinyl',
     'Vinyl10"': '10" Vinyl',
-    'Vinyl12"': '12" Vinyl'
+    'Vinyl12"': '12" Vinyl',
+    'Lathe Cut': 'Phonograph record'
 };
 
 var Countries = {
@@ -833,6 +834,7 @@ var Countries = {
     Bahrain: 'BH',
     Bangladesh: 'BD',
     Barbados: 'BB',
+    'Barbados, The': 'BB',
     Belarus: 'BY',
     Belgium: 'BE',
     Belize: 'BZ',
