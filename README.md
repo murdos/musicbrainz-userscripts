@@ -22,6 +22,7 @@
 -   [MusicBrainz: Set recording comments for a release](#set-recording-comments)
 -   [Musicbrainz DiscIds Detector](#mb_discids_detector)
 -   [Musicbrainz UI enhancements](#mb_ui_enhancements)
+-   [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
 
 ## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
 
@@ -176,3 +177,10 @@ Various UI enhancements for Musicbrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_ui_enhancements.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js)
+
+## <a name="edit-instrument-recordings-links"></a> MusicBrainz: Add recording edit links to instrument pages
+
+Direct links to the recording edit page are added to instruments' recordings pages.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/edit-instrument-recordings-links.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/edit-instrument-recordings-links.user.js)
