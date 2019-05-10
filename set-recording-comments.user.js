@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2018.2.18.1
+// @version        2019.5.10.1
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
@@ -136,6 +136,14 @@ function setRecordingComments() {
     <td><textarea id="recording-comments-edit-note" style="width: 32em;" rows="5"></textarea></td>\
   </tr>\
   <tr>\
+    <td colspan="2" class="auto-editor">\
+      <label>\
+        <input id="make-recording-comments-votable" type="checkbox">\
+        Make all edits votable.\
+      </label>\
+    </td>\
+  </tr>\
+  <tr>\
     <td colspan="2">\
       <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
@@ -199,12 +207,13 @@ function setRecordingComments() {
             $submitButton.prop('disabled', false).text('Submit changes (marked red)');
         } else {
             let editNote = $('#recording-comments-edit-note').val();
+            let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
             activeRequest = $.ajax({
                 type: 'POST',
                 url: '/ws/js/edit/create',
                 dataType: 'json',
-                data: JSON.stringify({ edits: editData, editNote: editNote }),
+                data: JSON.stringify({ edits: editData, editNote: editNote, makeVotable: makeVotable }),
                 contentType: 'application/json; charset=utf-8'
             })
                 .always(function() {
