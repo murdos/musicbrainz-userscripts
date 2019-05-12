@@ -1,8 +1,8 @@
-﻿// ==UserScript==
+// ==UserScript==
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2018.7.14.1
+// @version        2019.4.11.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -791,7 +791,7 @@ var MediaTypes = {
     'HD DVD-R': 'HD-DVD',
     Hybrid: 'Other',
     Laserdisc: 'LaserDisc',
-    'Memory Stick': 'Other',
+    'Memory Stick': 'USB Flash Drive',
     Microcassette: 'Other',
     Minidisc: 'MiniDisc',
     MVD: 'Other',
