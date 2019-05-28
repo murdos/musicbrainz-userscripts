@@ -7,6 +7,7 @@
 -   [Import Beatport releases to MusicBrainz](#beatport_importer)
 -   [Import CD Baby releases to MusicBrainz](#cdbaby_importer)
 -   [Import CD1D releases to MusicBrainz](#cd1d_importer)
+-   [Import Deezer releases to MusicBrainz](#deezer_importer)
 -   [Import DG/Decca releases to MusicBrainz](#dgdecca_importer)
 -   [Import Discogs releases to MusicBrainz](#discogs_importer)
 -   [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
@@ -72,6 +73,13 @@ Add a button on CD1D.com release pages allowing to open MusicBrainz release edit
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
+
+## <a name="deezer_importer"></a> Import Deezer releases to MusicBrainz
+
+Add a button to import Deezer releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/deezer_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js)
 
 ## <a name="dgdecca_importer"></a> Import DG/Decca releases to MusicBrainz
 
