@@ -52,7 +52,7 @@ header.appendChild(headerColumn);
 // We add the links to the recordings
 for (let i = 0; i < recordings.length; i++) {
     const recordingRow = recordings[i];
-    const recordingUrl = recordingRow.childNodes[3].childNodes[0].getAttribute('href');
+    const recordingUrl = recordingRow.childNodes[1].childNodes[0].getAttribute('href');
     const extraCell = document.createElement('td');
     extraCell.innerHTML = `<a href="${recordingUrl}/edit">edit</a>`;
     recordingRow.appendChild(extraCell);
