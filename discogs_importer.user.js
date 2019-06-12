@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2019.4.11.1
+// @version        2019.6.12.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -568,7 +568,7 @@ function parseDiscogsRelease(data) {
             if (discogsRelease.formats[i].text) {
                 let freetext = discogsRelease.formats[i].text.toLowerCase().replace(/[\s-]/g, '');
                 if (freetext.match(/cardboard|paper/)) release.packaging = 'cardboard/paper sleeve';
-                else if (freetext.match(/digipak/)) release.packaging = 'digipak';
+                else if (freetext.match(/digi[\s\-‐]?pac?k/)) release.packaging = 'digipak';
                 else if (freetext.match(/keepcase/)) release.packaging = 'keep case';
                 else if (freetext.match(/jewel/)) {
                     release.packaging = freetext.match(/slim/) ? 'slim jewel case' : 'jewel case';
