@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		MusicBrainz: Add recording edit links to instrument pages
 // @description Direct links to the recording edit page are added to instruments' recordings pages.
-// @version		2019.4.2.1
+// @version		2019.6.20.1
 // @author		Nicolás Tamargo
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/edit-instrument-recordings-links.user.js
