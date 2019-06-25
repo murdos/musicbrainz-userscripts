@@ -2,7 +2,7 @@
 // @name           MusicBrainz: 1200px CAA
 // @name:da        MusicBrainz: 1200px CAA
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @version        2019.6.24.1
+// @version        2019.6.25.1
 // @author         Frederik “Freso” S. Olesen
 // @license        GPL-3.0-or-later
 // @description    Use the 1200px images for the pop‐up/previews on Release cover art pages. (Also adds 1200px “thumbnail” links.)
@@ -23,7 +23,7 @@ var ca_items = ca_page.querySelectorAll('div.artwork-cont');
 ca_items.forEach(function(ca_item) {
   /* Use 1200px “thumbnails” for the pop‐ups/previews */
   var popup_link = ca_item.querySelector('a.artwork-image');
-  popup_link.href = popup_link.href.replace(/\.([a-z]+)$/, "-1200.$1");
+  popup_link.href = popup_link.href.replace(/\.[a-z]+$/, '-1200.jpg');
 
   /* Add a “1200px” link to the “All sizes” list */
   // Until https://tickets.metabrainz.org/browse/CAA-88 is resolved.
