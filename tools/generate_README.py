@@ -48,14 +48,14 @@ print("# MusicBrainz UserScripts")
 print()
 
 for item in items:
-    print('* [%s](#%s)' % (item['header']['name'][0], item['shortname']))
-print()
+    print('-   [%s](#%s)' % (item['header']['name'][0], item['shortname']))
 
 install_button_url = 'https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png'
 source_button_url = 'https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png'
 source_base_url = 'https://github.com/murdos/musicbrainz-userscripts/blob/master'
 
 for item in items:
+    print()
     print('## <a name="%s"></a> %s' % (item['shortname'], item['header']['name'][0]))
     print()
     if (item['header']['description']):
@@ -65,4 +65,3 @@ for item in items:
     if item['header']['downloadurl']:
         downloadlink = '[![Install](%s)](%s)' % (install_button_url, item['header']['downloadurl'][0])
         print(downloadlink)
-    print()
