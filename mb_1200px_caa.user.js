@@ -22,21 +22,21 @@ var ca_items = ca_page.querySelectorAll('div.artwork-cont');
 
 ca_items.forEach(function(ca_item) {
     /* Use 1200px “thumbnails” for the pop‐ups/previews */
-    var popup_link = ca_item.querySelector('a.artwork-image');
+    let popup_link = ca_item.querySelector('a.artwork-image');
     popup_link.href = popup_link.href.replace(/\.[a-z]+$/, '-1200.jpg');
 
     /* Add a “1200px” link to the “All sizes” list */
     // Until https://tickets.metabrainz.org/browse/CAA-88 is resolved.
-    var link_list = ca_item.querySelector('p.small');
-    var link_list_a = link_list.getElementsByTagName('a');
-    for (var i = 0; i < link_list_a.length; i++) {
+    let link_list = ca_item.querySelector('p.small');
+    let link_list_a = link_list.getElementsByTagName('a');
+    for (let i = 0; i < link_list_a.length; i++) {
         if (link_list_a[i].textContent == '500px') {
             var _500px_link = link_list_a[i];
             break;
         }
     }
-    var _1200px_link = _500px_link.cloneNode(true);
+    let _1200px_link = _500px_link.cloneNode(true);
     _1200px_link.href = _1200px_link.href.replace('-500', '-1200');
     _1200px_link.textContent = _1200px_link.textContent.replace('500', '1200');
-    _500px_link.insertAdjacentHTML('afterend', ' |\n' + _1200px_link.outerHTML);
+    _500px_link.insertAdjacentHTML('afterend', ` |\n${_1200px_link.outerHTML}`);
 });
