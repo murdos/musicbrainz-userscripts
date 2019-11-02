@@ -53,6 +53,9 @@ var BandcampImport = {
         // Grab release title
         release.title = bandcampAlbumData.current.title;
 
+        // Grab barcode
+        release.barcode = bandcampAlbumData.current.upc;
+
         // Grab release event information
         let date = this.convdate(bandcampAlbumData.current.release_date);
         if (date) {
