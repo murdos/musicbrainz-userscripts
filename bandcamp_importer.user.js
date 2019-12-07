@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2018.6.1.1
+// @version        2019.12.7.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -33,6 +33,7 @@ var BandcampImport = {
         let release = {
             discs: [],
             artist_credit: [],
+            barcode: bandcampAlbumData.current.upc,
             title: '',
             year: 0,
             month: 0,
