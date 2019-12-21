@@ -191,7 +191,9 @@ var BandcampImport = {
             });
         }
         // Check if album has a back link to a label
-        let label = $('a.back-to-label-link span.back-to-label-name').text();
+        let label = $('a.back-to-label-link span.back-link-text')
+            .contents()
+            .get(2).textContent;
         if (label) {
             release.labels.push({
                 name: label,
