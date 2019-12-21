@@ -62,6 +62,12 @@ function retrieveReleaseInfo(release_url) {
         catno: ProductDetail.catalog
     });
 
+    // Reload Playables if empty
+    if (!unsafeWindow.Playables.hasOwnProperty('tracks')) {
+        eval($('#data-objects').text());
+        unsafeWindow.Playables = window.Playables;
+    }
+
     // Tracks
     let tracks = [];
     let the_tracks = unsafeWindow.Playables.tracks;
