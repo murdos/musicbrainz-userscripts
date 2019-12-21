@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2019.12.21.1
+// @version        2019.12.21.2
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -191,9 +191,7 @@ var BandcampImport = {
             });
         }
         // Check if album has a back link to a label
-        let label = $('a.back-to-label-link span.back-link-text')
-            .contents()
-            .get(2).textContent;
+        let label = this.getlabelname();
         if (label) {
             release.labels.push({
                 name: label,
@@ -235,6 +233,15 @@ var BandcampImport = {
             };
         }
         return false;
+    },
+
+    // get label name from back link if possible
+    getlabelname: function() {
+        let label = $('a.back-to-label-link span.back-link-text').contents().get(2);
+        if (typeof label == 'undefined') {
+            return '';
+        }
+        return select.textContent;
     }
 };
 
@@ -299,9 +306,7 @@ $(document).ready(function() {
     let label_name = '';
     if (label_url) {
         label_mbid = mblinks.resolveMBID(`label:${label_url}`);
-        label_name = $('a.back-to-label-link span.back-link-text ')
-            .contents()
-            .get(2).textContent;
+        label_name = BandcampImport.getlabelname();
     } else {
         label_mbid = mblinks.resolveMBID(`label:${root_url}`);
         if (label_mbid)
