@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2020.2.14.1
+// @version        2020.2.14.2
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -237,7 +237,9 @@ var BandcampImport = {
 
     // get label name from back link if possible
     getlabelname: function() {
-        let label = $('a.back-to-label-link span.back-link-text').contents().get(2);
+        let label = $('a.back-to-label-link span.back-link-text')
+            .contents()
+            .get(2);
         if (typeof label == 'undefined') {
             return '';
         }
@@ -356,6 +358,6 @@ $(document).ready(function() {
     $('div#bci_link a').css({ 'font-weight': 'bold' });
     let upc = unsafeWindow.TralbumData.current.upc;
     if (typeof upc != 'undefined' && upc !== null) {
-        $('div #trackInfoInner').append('<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ' + upc + '</div>');
+        $('div #trackInfoInner').append(`<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}</div>`);
     }
 });
