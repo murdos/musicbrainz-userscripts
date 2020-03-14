@@ -7,11 +7,11 @@
     },
     "extends": ["eslint:recommended", "plugin:prettier/recommended"],
     "globals": {
-	"LOGGER": true,
-	"MBImportStyle": true,
-	"MBImport": true,
-	"MBLinks": true,
-	"MBSearchItStyle": true
+        "LOGGER": true,
+        "MBImportStyle": true,
+        "MBImport": true,
+        "MBLinks": true,
+        "MBSearchItStyle": true
     },
     "rules": {
         "prettier/prettier": "error",
