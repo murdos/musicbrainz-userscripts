@@ -63,7 +63,7 @@ function retrieveReleaseInfo(release_url) {
     });
 
     // Reload Playables if empty
-    if (!unsafeWindow.Playables.hasOwnProperty('tracks')) {
+    if (!Object.prototype.hasOwnProperty.call(unsafeWindow.Playables, 'tracks')) {
         eval($('#data-objects').text());
         unsafeWindow.Playables = window.Playables;
     }

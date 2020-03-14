@@ -142,7 +142,7 @@ $(document).ready(function() {
                         let target = $(this)
                             .children('target')
                             .text();
-                        if (relationsIconsURLs.url.hasOwnProperty(reltype)) {
+                        if (Object.prototype.hasOwnProperty.call(relationsIconsURLs.url, reltype)) {
                             $(`#${mbid} td.relationships`).append(
                                 `<a href='${target.replace(/'/g, '&apos;')}'>` +
                                     `<img style='max-height: 16px;' src='${relationsIconsURLs.url[reltype]}' />&nbsp;` +
@@ -182,8 +182,8 @@ $(document).ready(function() {
                                     .text();
                                 let url = targettype == 'url' ? target : `/${targettype}/${target}`;
 
-                                if (relationsIconsURLs[targettype].hasOwnProperty(reltype)) {
-                                    if (!relations.hasOwnProperty(reltype)) relations[reltype] = [url];
+                                if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
+                                    if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [url];
                                     else relations[reltype].push(url);
                                 }
                             });
