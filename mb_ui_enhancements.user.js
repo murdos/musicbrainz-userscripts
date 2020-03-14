@@ -259,7 +259,7 @@ $(document).ready(function() {
             $medium.find('tbody tr[id]').each(function(index, medium_track) {
                 track_mbid = $(medium_track).attr('id');
                 let isrcsLinks = '';
-                if (ws_tracks.hasOwnProperty(track_mbid)) {
+                if (Object.prototype.hasOwnProperty.call(ws_tracks, track_mbid)) {
                     track = ws_tracks[track_mbid];
                     let recording = track.recording;
                     // Recording comment
