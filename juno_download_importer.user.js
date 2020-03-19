@@ -2,7 +2,7 @@
 // @name           Import Juno Download releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from junodownload.com/products pages into MusicBrainz
-// @version        2018.2.18.1
+// @version        2020.3.19.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @include        http*://www.junodownload.com/products/*
@@ -19,9 +19,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 $(document).ready(function() {
     MBImportStyle();
-    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-    let release = retrieveReleaseInfo(release_url);
-    insertLink(release, release_url);
+    let releaseUrl = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+    let release = retrieveReleaseInfo(releaseUrl);
+    insertLink(release, releaseUrl);
 });
 
 function parseReleaseDate(rdate) {
@@ -48,15 +48,15 @@ function parseReleaseDate(rdate) {
             day: m[1]
         };
     }
+
     return false;
 }
 
 function retrieveReleaseInfo(release_url) {
-    // Release defaults
     let release = {
         artist_credit: [],
-        title: $('#product_heading_title')
-            .text()
+        title: $('meta[itemProp="name"]')
+            .attr('content')
             .trim(),
         year: 0,
         month: 0,
@@ -73,70 +73,82 @@ function retrieveReleaseInfo(release_url) {
         discs: []
     };
 
-    // Release date
-    let parsed_releaseDate = parseReleaseDate(
-        $('#product_info_released_on')
+    let releaseDate = parseReleaseDate(
+        $('span[itemProp="datePublished"]')
             .text()
             .trim()
     );
-    if (parsed_releaseDate) {
-        release.year = parsed_releaseDate.year;
-        release.month = parsed_releaseDate.month;
-        release.day = parsed_releaseDate.day;
+
+    if (releaseDate) {
+        release.year = releaseDate.year;
+        release.month = releaseDate.month;
+        release.day = releaseDate.day;
     }
 
-    // URLs
     release.urls.push({
         url: release_url,
         link_type: MBImport.URL_TYPES.purchase_for_download
     });
 
     release.labels.push({
-        name: $('#product_heading_label')
-            .text()
+        name: $('meta[itemProp="author"]')
+            .attr('content')
             .trim(),
-        catno: $('#product_info_cat_no')
+        catno: $('strong:contains("Cat:")')
+            .parent()
+            .contents()
+            .slice(2, 3)
             .text()
             .trim()
     });
 
-    // Tracks
     let tracks = [];
-    $(".product_tracklist_records[itemprop='tracks']").each(function() {
-        let artists = [];
-        let trackno =
-            $(this)
-                .find('.product_tracklist_heading_records_sn')
-                .text()
-                .trim() - 1;
+    $('.product-tracklist-track[itemprop="track"]').each(function() {
+        // element only present if VA release or track has multiple artists
+        let artist = $(this)
+            .find('meta[itemprop="byArtist"]')
+            .attr('content');
+        if (artist !== undefined) {
+            artist = artist.trim();
+        }
         let trackname = $(this)
-            .find('.product_tracklist_heading_records_title')
+            .find('span[itemprop="name"]')
             .text()
             .trim();
         let tracklength = $(this)
-            .find('.product_tracklist_heading_records_length')
+            .find('meta[itemprop="duration"]')
+            .parent()
+            .contents()
+            .slice(0, 1)
             .text()
             .trim();
-        let m = trackname.match(/^([^-]+) - (.*)$/);
-        if (m) {
-            artists = [m[1]];
-            trackname = m[2];
+        if (artist !== undefined && trackname.startsWith(`${artist} - `)) {
+            trackname = trackname.replace(`${artist} - `, '');
         }
         tracks.push({
-            artist_credit: MBImport.makeArtistCredits(artists),
+            artist_credit: MBImport.makeArtistCredits(artist === undefined ? [] : [artist]),
             title: trackname,
             duration: tracklength
         });
     });
 
-    let parsed_release_artist = $('#product_heading_artist')
-        .text()
-        .trim();
-    if (parsed_release_artist == 'VARIOUS') {
+    let releaseArtists = $('.product-artist')
+        .contents()
+        .map(function() {
+            if (this.nodeType === Node.TEXT_NODE) {
+                return this.nodeValue === ' / ' ? null : this.nodeValue;
+            } else {
+                return $(this).text();
+            }
+        })
+        .get();
+
+    if (releaseArtists.length === 1 && releaseArtists[0] === 'VARIOUS') {
         release.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
-        release.artist_credit = MBImport.makeArtistCredits([parsed_release_artist]);
+        release.artist_credit = MBImport.makeArtistCredits(releaseArtists);
     }
+
     release.discs.push({
         tracks: tracks,
         format: release.format
@@ -146,15 +158,19 @@ function retrieveReleaseInfo(release_url) {
     return release;
 }
 
-// Insert button into page under label information
-function insertLink(release, release_url) {
-    let edit_note = MBImport.makeEditNote(release_url, 'Juno Download');
-    let parameters = MBImport.buildFormParameters(release, edit_note);
+function insertLink(release, releaseUrl) {
+    let editNote = MBImport.makeEditNote(releaseUrl, 'Juno Download');
+    let parameters = MBImport.buildFormParameters(release, editNote);
 
-    let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`).hide();
+    let mbUI = $(
+        `<div class="col-12 col-lg-9 mt-3"><div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(
+            release
+        )}</div></div>`
+    ).hide();
 
-    $('div.sociald').before(mbUI);
-    $('#mb_buttons').css({ background: '#759d44', border: '2px solid #ddd', 'text-align': 'center' });
-    $('form.musicbrainz_import button').css({ width: '80%' });
+    $('.product-share')
+        .parent()
+        .after(mbUI);
+    $('#mb_buttons form').css({ display: 'inline', 'margin-right': '5px' });
     mbUI.slideDown();
 }
