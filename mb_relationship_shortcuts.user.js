@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2018.2.18.1
+// @version        2020.3.31.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -106,6 +106,17 @@ $(document).ready(function () {
                     return false;
                 }
             });
+    });
+
+    // Adapt width of subheader rows by incrementing the colspan of a cell
+    $("table.tbl tr.subh").each(function() {
+        $(this).children("th[colspan]").attr('colspan', function(index, oldValue) {
+            if (index === 0) {
+                return Number(oldValue) + 1;
+            } else {
+                return oldValue;
+            }
+        });
     });
 
     // Calculate offset for multi-page lists
