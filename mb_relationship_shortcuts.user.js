@@ -109,14 +109,16 @@ $(document).ready(function () {
     });
 
     // Adapt width of subheader rows by incrementing the colspan of a cell
-    $("table.tbl tr.subh").each(function() {
-        $(this).children("th[colspan]").attr('colspan', function(index, oldValue) {
-            if (index === 0) {
-                return Number(oldValue) + 1;
-            } else {
-                return oldValue;
-            }
-        });
+    $('table.tbl tr.subh').each(function() {
+        $(this)
+            .children('th[colspan]')
+            .attr('colspan', function(index, oldValue) {
+                if (index === 0) {
+                    return Number(oldValue) + 1;
+                } else {
+                    return oldValue;
+                }
+            });
     });
 
     // Calculate offset for multi-page lists
