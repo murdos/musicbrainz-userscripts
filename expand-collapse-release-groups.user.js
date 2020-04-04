@@ -282,6 +282,8 @@ function parse_release(json, table) {
     bottom_td.appendChild(createLink(`/release/${json.id}/edit-relationships`, 'edit relationships'));
     bottom_td.appendChild(document.createTextNode(' | '));
     bottom_td.appendChild(createLink(`/release/${json.id}/edits`, 'editing history'));
+    bottom_td.appendChild(document.createTextNode(' | '));
+    bottom_td.appendChild(createLink(`/release/${json.id}/add-cover-art`, 'add cover art'));
 
     bottom_tr.appendChild(bottom_td);
     table.appendChild(bottom_tr);
