@@ -36,15 +36,12 @@ if (DEBUG) {
 
 var mblinks = new MBLinks('DISCOGS_MBLINKS_CACHE', '1');
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
     MBSearchItStyle();
 
     let current_page_key = getDiscogsLinkKey(
-        window.location.href
-            .replace(/\?.*$/, '')
-            .replace(/#.*$/, '')
-            .replace('/master/view/', '/master/')
+        window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/')
     );
     if (!current_page_key) return;
 
@@ -66,7 +63,7 @@ $(document).ready(function() {
             url: discogsWsUrl,
             dataType: 'json',
             crossDomain: true,
-            success: function(data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {
                 LOGGER.debug('Discogs JSON Data from API:', data);
                 try {
                     let release = parseDiscogsRelease(data);
@@ -86,10 +83,10 @@ $(document).ready(function() {
                     throw e;
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 LOGGER.error('AJAX Status: ', textStatus);
                 LOGGER.error('AJAX error thrown: ', errorThrown);
-            }
+            },
         });
     }
 });
@@ -102,7 +99,7 @@ $(document).ready(function() {
 function insertMBLinks(current_page_key) {
     function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type, nosearch) {
         if (!mb_type) mb_type = defaultMBtype(discogs_type);
-        $tr.find(`a[mlink^="${discogs_type}/"]`).each(function() {
+        $tr.find(`a[mlink^="${discogs_type}/"]`).each(function () {
             let $link = $(this);
             if ($link.attr('mlink_stop')) return; // for places
             let mlink = $link.attr('mlink');
@@ -115,7 +112,7 @@ function insertMBLinks(current_page_key) {
             $link.attr(
                 'mlink_done',
                 done
-                    .filter(function(e) {
+                    .filter(function (e) {
                         return e != '';
                     })
                     .join(',')
@@ -134,7 +131,7 @@ function insertMBLinks(current_page_key) {
                         release: { mark: 'R' },
                         'release-group': { mark: 'G' },
                         place: { mark: 'P' },
-                        label: { mark: 'L' }
+                        label: { mark: 'L' },
                     };
                     let mark = '';
                     let entity_name = 'entity';
@@ -151,15 +148,12 @@ function insertMBLinks(current_page_key) {
                             )}"><small>${mark}</small>?</a></span>`
                         );
                 }
-                let insert_normal = function(link) {
+                let insert_normal = function (link) {
                     $link.closest('span.mb_valign').before(`<span class="mb_valign">${link}</span>`);
-                    $link
-                        .closest('span.mb_wrapper')
-                        .find('.mb_searchit')
-                        .remove();
+                    $link.closest('span.mb_wrapper').find('.mb_searchit').remove();
                 };
 
-                let insert_stop = function(link) {
+                let insert_stop = function (link) {
                     insert_normal(link);
                     $link.attr('mlink_stop', true);
                 };
@@ -188,7 +182,7 @@ function insertMBLinks(current_page_key) {
             '#B3FFC6',
             '#B3FFEC',
             '#B3ECFF',
-            '#7598FF'
+            '#7598FF',
         ];
         if (DEBUG) {
             $(what).css('border', `2px dotted ${colors[n % colors.length]}`);
@@ -213,7 +207,7 @@ function insertMBLinks(current_page_key) {
             // just one string
             types = [types];
         }
-        $.each(types, function(idx, val) {
+        $.each(types, function (idx, val) {
             if (!$.isArray(val)) {
                 types[idx] = [val, undefined];
             }
@@ -221,12 +215,12 @@ function insertMBLinks(current_page_key) {
 
         LOGGER.debug(`add_mblinks: ${selector} / ${JSON.stringify(types)}`);
 
-        _root.find(selector).each(function() {
+        _root.find(selector).each(function () {
             let node = $(this).get(0);
             magnifyLinks(node);
             debug_color(this, ++add_mblinks_counter, selector);
             let that = this;
-            $.each(types, function(idx, val) {
+            $.each(types, function (idx, val) {
                 let discogs_type = val[0];
                 let mb_type = val[1];
                 searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type, nosearch);
@@ -235,7 +229,7 @@ function insertMBLinks(current_page_key) {
     }
 
     // Find MB link for the current page and display it next to page title
-    let mbLinkInsert = function(link) {
+    let mbLinkInsert = function (link) {
         let $h1 = $('h1');
         let $titleSpan = $h1.children('span[itemprop="name"]');
         if ($titleSpan.length > 0) {
@@ -301,7 +295,7 @@ function getDiscogsLinkKey(url) {
             link_infos[key] = {
                 type: m[1],
                 id: m[2],
-                clean_url: `https://www.discogs.com/${m[1]}/${m[2]}`
+                clean_url: `https://www.discogs.com/${m[1]}/${m[2]}`,
             };
             LOGGER.debug(`getDiscogsLinkKey:${url} --> ${key}`);
         } else {
@@ -415,7 +409,7 @@ function insertMBSection(release, current_page_key) {
 
     $('#mb_buttons').css({
         display: 'inline-block',
-        width: '100%'
+        width: '100%',
     });
     $('form.musicbrainz_import').css({ width: '49%', display: 'inline-block' });
     $('form.musicbrainz_import_search').css({ float: 'right' });
@@ -446,7 +440,7 @@ function artistNoNum(artist_name) {
 // Parse a US date string and set object properties year, month, day
 function parse_YYYY_MM_DD(date, obj) {
     if (!date) return;
-    let m = date.split(/\D+/, 3).map(function(e) {
+    let m = date.split(/\D+/, 3).map(function (e) {
         return parseInt(e, 10);
     });
     if (m[0] !== undefined) {
@@ -472,12 +466,12 @@ function parseDiscogsRelease(data) {
 
     // Release artist credit
     release.artist_credit = [];
-    $.each(discogsRelease.artists, function(index, artist) {
+    $.each(discogsRelease.artists, function (index, artist) {
         let ac = {
             artist_name: artistNoNum(artist.name),
             credited_name: artist.anv != '' ? artist.anv : artistNoNum(artist.name),
             joinphrase: decodeDiscogsJoinphrase(artist.join),
-            mbid: MBIDfromUrl(artist.resource_url, 'artist')
+            mbid: MBIDfromUrl(artist.resource_url, 'artist'),
         };
         if (artist.id == 194) {
             // discogs place holder for various
@@ -508,11 +502,11 @@ function parseDiscogsRelease(data) {
     // Release labels
     release.labels = [];
     if (discogsRelease.labels) {
-        $.each(discogsRelease.labels, function(index, label) {
+        $.each(discogsRelease.labels, function (index, label) {
             let labelinfo = {
                 name: label.name,
                 catno: label.catno == 'none' ? '[none]' : label.catno,
-                mbid: MBIDfromUrl(label.resource_url, 'label')
+                mbid: MBIDfromUrl(label.resource_url, 'label'),
             };
             release.labels.push(labelinfo);
         });
@@ -535,7 +529,7 @@ function parseDiscogsRelease(data) {
             }
 
             if (discogsRelease.formats[i].descriptions) {
-                $.each(discogsRelease.formats[i].descriptions, function(index, desc) {
+                $.each(discogsRelease.formats[i].descriptions, function (index, desc) {
                     if (!(discogs_format in ['Box Set'])) {
                         // Release format: special handling of Vinyl and Shellac 7", 10" and 12"
                         if (desc.match(/7"|10"|12"/) && discogs_format.concat(desc) in MediaTypes)
@@ -579,7 +573,7 @@ function parseDiscogsRelease(data) {
 
     // Barcode
     if (discogsRelease.identifiers) {
-        $.each(discogsRelease.identifiers, function(index, identifier) {
+        $.each(discogsRelease.identifiers, function (index, identifier) {
             if (identifier.type == 'Barcode') {
                 release.barcode = identifier.value.replace(/ /g, '');
                 return false;
@@ -593,7 +587,7 @@ function parseDiscogsRelease(data) {
     let heading = '';
     let releaseNumber = 1;
     let lastPosition = 0;
-    $.each(discogsRelease.tracklist, function(index, discogsTrack) {
+    $.each(discogsRelease.tracklist, function (index, discogsTrack) {
         if (discogsTrack.type_ == 'heading') {
             heading = discogsTrack.title;
             return;
@@ -610,12 +604,12 @@ function parseDiscogsRelease(data) {
         // Track artist credit
         track.artist_credit = [];
         if (discogsTrack.artists) {
-            $.each(discogsTrack.artists, function(index, artist) {
+            $.each(discogsTrack.artists, function (index, artist) {
                 let ac = {
                     artist_name: artistNoNum(artist.name),
                     credited_name: artist.anv != '' ? artist.anv : artistNoNum(artist.name),
                     joinphrase: decodeDiscogsJoinphrase(artist.join),
-                    mbid: MBIDfromUrl(artist.resource_url, 'artist')
+                    mbid: MBIDfromUrl(artist.resource_url, 'artist'),
                 };
                 track.artist_credit.push(ac);
             });
@@ -631,7 +625,7 @@ function parseDiscogsRelease(data) {
             // Append titles of sub-tracks to main track title
             let subtrack_titles = [];
             let subtrack_total_duration = 0;
-            $.each(discogsTrack.sub_tracks, function(subtrack_index, subtrack) {
+            $.each(discogsTrack.sub_tracks, function (subtrack_index, subtrack) {
                 if (subtrack.type_ != 'track') {
                     return;
                 }
@@ -712,7 +706,7 @@ function parseDiscogsRelease(data) {
         if (!release.discs[discindex]) {
             let newdisc = {
                 tracks: [],
-                format: release_formats[discindex]
+                format: release_formats[discindex],
             };
             if (heading) {
                 newdisc.title = heading;
@@ -811,7 +805,7 @@ var MediaTypes = {
     'Vinyl7"': '7" Vinyl',
     'Vinyl10"': '10" Vinyl',
     'Vinyl12"': '12" Vinyl',
-    'Lathe Cut': 'Phonograph record'
+    'Lathe Cut': 'Phonograph record',
 };
 
 var Countries = {
@@ -1071,5 +1065,5 @@ var Countries = {
     'Iran, Islamic Republic of': 'IR',
     'Saint Pierre and Miquelon': 'PM',
     'Saint Helena': 'SH',
-    'Svalbard and Jan Mayen': 'SJ'
+    'Svalbard and Jan Mayen': 'SJ',
 };

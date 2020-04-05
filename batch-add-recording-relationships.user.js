@@ -144,7 +144,7 @@ function batch_recording_rels() {
         return {
             year: parseIntegerOrNull(match[1]),
             month: parseIntegerOrNull(match[2]),
-            day: parseIntegerOrNull(match[3])
+            day: parseIntegerOrNull(match[3]),
         };
     }
 
@@ -154,7 +154,7 @@ function batch_recording_rels() {
 
     let daysInMonth = {
         true: [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-        false: [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        false: [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
     };
 
     function isDateValid(y, m, d) {
@@ -173,7 +173,7 @@ function batch_recording_rels() {
     // Request rate limiting
 
     let REQUEST_COUNT = 0;
-    setInterval(function() {
+    setInterval(function () {
         if (REQUEST_COUNT > 0) {
             REQUEST_COUNT -= 1;
         }
@@ -188,7 +188,7 @@ function batch_recording_rels() {
         this.stopped = false;
     }
 
-    RequestManager.prototype.next = function() {
+    RequestManager.prototype.next = function () {
         if (this.stopped || !this.queue.length) {
             this.active = false;
             return;
@@ -202,7 +202,7 @@ function batch_recording_rels() {
             let timeout = diff * 1000;
 
             setTimeout(
-                function(self) {
+                function (self) {
                     self.next();
                 },
                 this.rate + timeout,
@@ -210,7 +210,7 @@ function batch_recording_rels() {
             );
         } else {
             setTimeout(
-                function(self) {
+                function (self) {
                     self.next();
                 },
                 this.rate,
@@ -219,34 +219,34 @@ function batch_recording_rels() {
         }
     };
 
-    RequestManager.prototype.push_get = function(url, cb) {
-        this.push(function() {
+    RequestManager.prototype.push_get = function (url, cb) {
+        this.push(function () {
             $.get(url, cb);
         });
     };
 
-    RequestManager.prototype.unshift_get = function(url, cb) {
-        this.unshift(function() {
+    RequestManager.prototype.unshift_get = function (url, cb) {
+        this.unshift(function () {
             $.get(url, cb);
         });
     };
 
-    RequestManager.prototype.push = function(req) {
+    RequestManager.prototype.push = function (req) {
         this.queue.push(req);
         this.maybe_start_queue();
     };
 
-    RequestManager.prototype.unshift = function(req) {
+    RequestManager.prototype.unshift = function (req) {
         this.queue.unshift(req);
         this.maybe_start_queue();
     };
 
-    RequestManager.prototype.maybe_start_queue = function() {
+    RequestManager.prototype.maybe_start_queue = function () {
         if (!(this.active || this.stopped)) {
             this.start_queue();
         }
     };
-    RequestManager.prototype.start_queue = function() {
+    RequestManager.prototype.start_queue = function () {
         if (this.active) {
             return;
         }
@@ -258,7 +258,7 @@ function batch_recording_rels() {
         } else {
             let timeout = this.rate - now + this.last;
             setTimeout(
-                function(self) {
+                function (self) {
                     self.next();
                 },
                 timeout,
@@ -298,13 +298,13 @@ function batch_recording_rels() {
         [/–/g, '-'],
         [/−/g, '-'],
         [/—/g, '-'],
-        [/―/g, '--']
+        [/―/g, '--'],
     ];
 
     function normalizeTitle(title) {
         title = title.toLowerCase().replace(/\s+/g, '');
 
-        _.each(ASCII_PUNCTUATION, function(val) {
+        _.each(ASCII_PUNCTUATION, function (val) {
             title = title.replace(val[0], val[1]);
         });
 
@@ -312,7 +312,7 @@ function batch_recording_rels() {
     }
 
     let RECORDING_TITLES = _.chain($recordings)
-        .map(function(row) {
+        .map(function (row) {
             let $title = $(row).find(TITLE_SELECTOR),
                 mbid = $title.attr('href').match(MBID_REGEX)[0],
                 norm_title = normalizeTitle($title.text().match(WITHOUT_PAREN_CLAUSES_REGEX)[1]);
@@ -323,7 +323,7 @@ function batch_recording_rels() {
         .value();
 
     let $work_options = _.chain(['type', 'language'])
-        .map(function(kind) {
+        .map(function (kind) {
             return [kind, $(`<select id="bpr-work-${kind}"></select>`)];
         })
         .fromPairs()
@@ -368,9 +368,7 @@ function batch_recording_rels() {
     let hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
 
     function make_checkbox(func, default_val, lbl) {
-        let chkbox = $('<input type="checkbox"/>')
-            .on('change', func)
-            .attr('checked', default_val);
+        let chkbox = $('<input type="checkbox"/>').on('change', func).attr('checked', default_val);
         return label(chkbox, lbl);
     }
 
@@ -389,32 +387,23 @@ function batch_recording_rels() {
 
     let $recordings_load_msg = $('<span>Loading performance relationships…</span>');
 
-    $container
-        .find('table')
-        .find('td')
-        .css('width', 'auto');
-    $container
-        .children('tbody')
-        .children('tr')
-        .children('td')
-        .css({ padding: '0.5em', 'vertical-align': 'top' });
+    $container.find('table').find('td').css('width', 'auto');
+    $container.children('tbody').children('tr').children('td').css({ padding: '0.5em', 'vertical-align': 'top' });
 
     // Get actual work types/languages
-    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function(data) {
+    ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
         let nodes = $.parseHTML(data);
         function populate($obj, kind) {
             $obj.append($(`#id-edit-work\\.${kind}_id`, nodes).children())
                 .val(setting(`work_${kind}`) || 0)
-                .on('change', function() {
+                .on('change', function () {
                     setting(`work_${kind}`, this.value);
                 });
         }
         _.each($work_options, populate);
     });
 
-    $('<span></span>')
-        .append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg)
-        .insertBefore($relate_table);
+    $('<span></span>').append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg).insertBefore($relate_table);
 
     // Add additional column
 
@@ -443,7 +432,7 @@ function batch_recording_rels() {
     );
 
     $(document)
-        .on('input', 'input.bpr-date-input', function() {
+        .on('input', 'input.bpr-date-input', function () {
             let $input = $(this);
 
             $input.css('border-color', '#999');
@@ -466,13 +455,13 @@ function batch_recording_rels() {
                 $input.css('color', '#ddd');
             }
         })
-        .on('click', 'span.bpr-attr', function() {
+        .on('click', 'span.bpr-attr', function () {
             let $this = $(this);
             let checked = !$this.data('checked');
 
             $this.data('checked', checked).css({
                 background: checked ? 'blue' : 'inherit',
-                color: checked ? 'white' : 'black'
+                color: checked ? 'white' : 'black',
             });
         });
 
@@ -484,7 +473,7 @@ function batch_recording_rels() {
             'background-color': '#FFFFFF',
             border: '1px solid #D0D0D0',
             'border-top': '1px solid #EAEAEA',
-            'border-left': '1px solid #EAEAEA'
+            'border-left': '1px solid #EAEAEA',
         });
     }
 
@@ -496,7 +485,7 @@ function batch_recording_rels() {
         $rows.find('input[name=add-to-merge]').attr('checked', false);
     }
 
-    $('.tbl > thead input[type=checkbox]').on('change', function() {
+    $('.tbl > thead input[type=checkbox]').on('change', function () {
         if (this.checked) {
             uncheckRows($recordings.filter(':hidden'));
         }
@@ -523,11 +512,7 @@ function batch_recording_rels() {
     }
 
     let NAME_FILTER = $.trim($('#id-filter\\.name').val());
-    let ARTIST_FILTER = $.trim(
-        $('#id-filter\\.artist_credit_id')
-            .find('option:selected')
-            .text()
-    );
+    let ARTIST_FILTER = $.trim($('#id-filter\\.artist_credit_id').find('option:selected').text());
 
     if (NAME_FILTER || ARTIST_FILTER) {
         get_filtered_page(0);
@@ -540,7 +525,7 @@ function batch_recording_rels() {
     function request_recordings(url) {
         let attempts = 1;
 
-        $.get(url, function(data) {
+        $.get(url, function (data) {
             let recs = data.recordings;
             let cache = {};
 
@@ -550,10 +535,7 @@ function batch_recording_rels() {
                 if (row === undefined) {
                     for (let j = 0; j < $recordings.length; j++) {
                         let row_ = $recordings[j];
-                        let row_id = $(row_)
-                            .find(TITLE_SELECTOR)
-                            .attr('href')
-                            .match(MBID_REGEX)[0];
+                        let row_id = $(row_).find(TITLE_SELECTOR).attr('href').match(MBID_REGEX)[0];
 
                         if (node.id === row_id) {
                             row = row_;
@@ -581,12 +563,12 @@ function batch_recording_rels() {
                 restripeRows();
             }
         })
-            .done(function() {
+            .done(function () {
                 $recordings_load_msg.parent().remove();
                 $relate_table.show();
                 load_works_init();
             })
-            .fail(function() {
+            .fail(function () {
                 $recordings_load_msg.text(`Error loading relationships. Retry #${attempts}...`).css('color', 'red');
                 attempts += 1;
                 ws_requests.unshift(request_recordings);
@@ -594,7 +576,7 @@ function batch_recording_rels() {
     }
 
     function queue_recordings_request(url) {
-        ws_requests.push(function() {
+        ws_requests.push(function () {
             request_recordings(url);
         });
     }
@@ -604,8 +586,8 @@ function batch_recording_rels() {
             ARTIST_FILTER ? `creditname:${encodeURIComponent(ARTIST_FILTER)}%20AND%20` : ''
         } arid:${ARTIST_MBID}&limit=100&offset=${page * 100}&fmt=json`;
 
-        ws_requests.push_get(url, function(data) {
-            _.each(data.recordings, function(r) {
+        ws_requests.push_get(url, function (data) {
+            _.each(data.recordings, function (r) {
                 queue_recordings_request(`/ws/2/recording/${r.id}?inc=work-rels&fmt=json`);
             });
 
@@ -622,7 +604,7 @@ function batch_recording_rels() {
         $row.data('performances', []);
         $attrs.data('checked', false).css('color', 'black');
 
-        _.each(node.relations, function(rel) {
+        _.each(node.relations, function (rel) {
             if (rel.type.match(/performance/)) {
                 if (!performed) {
                     $row.addClass('performed');
@@ -630,14 +612,11 @@ function batch_recording_rels() {
                 }
 
                 if (rel.begin) {
-                    $attrs
-                        .find('input.date')
-                        .val(rel.begin)
-                        .trigger('input');
+                    $attrs.find('input.date').val(rel.begin).trigger('input');
                 }
 
                 let attrs = [];
-                _.each(rel.attributes, function(name) {
+                _.each(rel.attributes, function (name) {
                     let cannonical_name = name.toLowerCase();
                     let $button = $attrs.find(`span.${cannonical_name}`);
 
@@ -657,10 +636,7 @@ function batch_recording_rels() {
         let comment = node.disambiguation;
         let date = comment && comment.match && comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
         if (date) {
-            $attrs
-                .find('input.date')
-                .val(date[1])
-                .trigger('input');
+            $attrs.find('input.date').val(date[1]).trigger('input');
         }
 
         if (!performed) {
@@ -669,8 +645,8 @@ function batch_recording_rels() {
             } else {
                 let url = `/ws/2/recording/${node.id}?inc=releases+release-groups&fmt=json`;
 
-                var request_rec = function() {
-                    $.get(url, function(data) {
+                var request_rec = function () {
+                    $.get(url, function (data) {
                         let releases = data.releases;
 
                         for (let i = 0; i < releases.length; i++) {
@@ -679,7 +655,7 @@ function batch_recording_rels() {
                                 break;
                             }
                         }
-                    }).fail(function() {
+                    }).fail(function () {
                         ws_requests.push(request_rec);
                     });
                 };
@@ -734,7 +710,7 @@ function batch_recording_rels() {
             $msg = $('<td></td>');
 
             $button_cell.append(
-                style_buttons($('<button>Remove</button>')).click(function() {
+                style_buttons($('<button>Remove</button>')).click(function () {
                     $table_row.remove();
                     remove_artist_works(mbid);
                 })
@@ -742,7 +718,7 @@ function batch_recording_rels() {
         }
 
         let $reload = style_buttons($('<button>Reload</button>'))
-            .click(function() {
+            .click(function () {
                 $button_cell.css('display', 'none');
                 $msg.text(`Loading works for ${name}...`);
                 load();
@@ -750,9 +726,7 @@ function batch_recording_rels() {
             .prependTo($button_cell);
 
         $msg.text(`Loading works for ${name}...`).css('color', 'green'), $table_row.append($msg, $button_cell);
-        $('tr#bpr-works-row')
-            .css('display', 'none')
-            .before($table_row);
+        $('tr#bpr-works-row').css('display', 'none').before($table_row);
 
         let works_date = localStorage.getItem(`bpr_works_date ${mbid}`);
         let result = [];
@@ -781,7 +755,7 @@ function batch_recording_rels() {
             localStorage.setItem(`bpr_works_date ${mbid}`, works_date);
             result = [];
 
-            let callback = function(loaded, remaining) {
+            let callback = function (loaded, remaining) {
                 result.push.apply(result, loaded);
                 if (remaining > 0) {
                     $msg.text(`Loading ${remaining.toString()} works for ${name}...`);
@@ -792,7 +766,7 @@ function batch_recording_rels() {
             };
 
             let works_url = `/ws/2/work?artist=${mbid}&inc=aliases&limit=100&fmt=json`;
-            ws_requests.unshift(function() {
+            ws_requests.unshift(function () {
                 request_works(works_url, 0, -1, callback);
             });
         }
@@ -806,7 +780,7 @@ function batch_recording_rels() {
         let tmp_comments = [];
         let tmp_norm_titles = [];
 
-        _.each(result, function(parts) {
+        _.each(result, function (parts) {
             let mbid = parts.slice(0, 36);
             let rest = parts.slice(36).split('\u00a0');
 
@@ -820,7 +794,7 @@ function batch_recording_rels() {
     }
 
     function request_works(url, offset, count, callback) {
-        $.get(`${url}&offset=${offset}`, function(data, textStatus, jqXHR) {
+        $.get(`${url}&offset=${offset}`, function (data, textStatus, jqXHR) {
             if (count < 0) {
                 count = data['work-count'];
             }
@@ -828,7 +802,7 @@ function batch_recording_rels() {
             let works = data.works;
             let loaded = [];
 
-            _.each(works, function(work) {
+            _.each(works, function (work) {
                 let comment = work.disambiguation;
                 loaded.push(work.id + work.title + (comment ? `\u00a0${comment}` : ''));
             });
@@ -836,12 +810,12 @@ function batch_recording_rels() {
             callback(loaded, count - offset - works.length);
 
             if (works.length + offset < count) {
-                ws_requests.unshift(function() {
+                ws_requests.unshift(function () {
                     request_works(url, offset + 100, count, callback);
                 });
             }
-        }).fail(function() {
-            ws_requests.unshift(function() {
+        }).fail(function () {
+            ws_requests.unshift(function () {
                 request_works(url, offset, count, callback);
             });
         });
@@ -865,7 +839,7 @@ function batch_recording_rels() {
 
         let matches = {};
 
-        let to_recording = function($rec, rec_title) {
+        let to_recording = function ($rec, rec_title) {
             if (rec_title in matches) {
                 let match = matches[rec_title];
                 suggested_work_link($rec, match[0], match[1], match[2]);
@@ -883,7 +857,7 @@ function batch_recording_rels() {
             let context = { minScore: 0.250001, match: null };
             let total = mbids.length;
 
-            let done = function() {
+            let done = function () {
                 let match = context.match;
                 if (match !== null) {
                     matches[rec_title] = match;
@@ -893,7 +867,7 @@ function batch_recording_rels() {
                 }
             };
 
-            var iid = setInterval(function() {
+            var iid = setInterval(function () {
                 let j = current++;
                 let norm_work_title = norm_titles[j];
                 let score = sim(rec_title, norm_work_title);
@@ -920,10 +894,7 @@ function batch_recording_rels() {
 
         for (let i = 0; i < $not_performed.length; i++) {
             let $rec = $not_performed.eq(i);
-            let mbid = $rec
-                .find(TITLE_SELECTOR)
-                .attr('href')
-                .match(MBID_REGEX)[0];
+            let mbid = $rec.find(TITLE_SELECTOR).attr('href').match(MBID_REGEX)[0];
 
             to_recording($rec, RECORDING_TITLES[mbid]);
         }
@@ -937,9 +908,7 @@ function batch_recording_rels() {
                 .append(
                     $('<span>Suggested work:</span>').css({ color: 'green', 'font-weight': 'bold' }),
                     '&#160;',
-                    $('<a></a>')
-                        .attr('href', `/work/${mbid}`)
-                        .text(title),
+                    $('<a></a>').attr('href', `/work/${mbid}`).text(title),
                     comment ? '&#160;' : null,
                     comment ? $('<span></span>').text(`(${comment})`) : null
                 )
@@ -958,7 +927,7 @@ function batch_recording_rels() {
         let item_key = `bpr_artists ${ARTIST_MBID}`;
         localStorage.setItem(
             item_key,
-            _.filter(localStorage.getItem(item_key).split('\n'), function(artist) {
+            _.filter(localStorage.getItem(item_key).split('\n'), function (artist) {
                 return artist.slice(0, 36) !== mbid;
             }).join('\n')
         );
@@ -1000,7 +969,7 @@ function batch_recording_rels() {
         let mbid = $input.data('mbid');
         let name = $input.data('name');
 
-        load_artist_works(mbid, name).done(function() {
+        load_artist_works(mbid, name).done(function () {
             let artists_string = localStorage.getItem(`bpr_artists ${ARTIST_MBID}`);
             if (artists_string) {
                 artists_string += `\n${mbid}${name}`;
@@ -1032,16 +1001,11 @@ function batch_recording_rels() {
         for (let i = 0; i < total; i++) {
             let $row = $rows.eq(i);
 
-            $row.children('td')
-                .not(':has(input)')
-                .first()
-                .css('color', 'LightSlateGray')
-                .find('a')
-                .css('color', 'LightSlateGray');
+            $row.children('td').not(':has(input)').first().css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
             let promise = relate_to_work($row, mbid, title, comment, false, false);
             if (i === total - 1) {
-                promise.done(function() {
+                promise.done(function () {
                     deferred.resolve();
                 });
             }
@@ -1066,9 +1030,7 @@ function batch_recording_rels() {
 
         ws_requests.stopped = true;
 
-        let $button = $(this)
-            .attr('disabled', true)
-            .css('color', '#EAEAEA');
+        let $button = $(this).attr('disabled', true).css('color', '#EAEAEA');
 
         function callback() {
             ws_requests.stopped = false;
@@ -1076,7 +1038,7 @@ function batch_recording_rels() {
             $button.attr('disabled', false).css('color', '#565656');
         }
 
-        create_new_work(title, function(data) {
+        create_new_work(title, function (data) {
             let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
             relate_all_to_work(work[1], title, '').done(callback);
         });
@@ -1113,26 +1075,21 @@ function batch_recording_rels() {
 
         ws_requests.stopped = true;
 
-        let $button = $(this)
-            .attr('disabled', true)
-            .css('color', '#EAEAEA');
+        let $button = $(this).attr('disabled', true).css('color', '#EAEAEA');
 
-        $.each($rows, function(i, row) {
+        $.each($rows, function (i, row) {
             let $row = $(row);
             let $title_cell = rowTitleCell($row);
             let title = $title_cell.find(TITLE_SELECTOR).text();
 
-            $title_cell
-                .css('color', 'LightSlateGray')
-                .find('a')
-                .css('color', 'LightSlateGray');
+            $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            create_new_work(title, function(data) {
+            create_new_work(title, function (data) {
                 let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
                 let promise = relate_to_work($row, work[1], title, '', true, true);
 
                 if (--total_rows === 0) {
-                    promise.done(function() {
+                    promise.done(function () {
                         flush_work_cache();
                         ws_requests.stopped = false;
                         ws_requests.start_queue();
@@ -1146,13 +1103,13 @@ function batch_recording_rels() {
     function create_new_work(title, callback) {
         function post_edit() {
             let data = `edit-work.name=${title}`;
-            _.each($work_options, function($obj, kind) {
+            _.each($work_options, function ($obj, kind) {
                 if ($obj.val()) {
                     data += `&edit-work.${kind}_id=${$obj.val()}`;
                 }
             });
 
-            $.post('/work/create', data, callback).fail(function() {
+            $.post('/work/create', data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
             });
         }
@@ -1160,7 +1117,7 @@ function batch_recording_rels() {
     }
 
     function relate_to_suggested_works() {
-        let $rows = checked_recordings().filter(function() {
+        let $rows = checked_recordings().filter(function () {
             return $(this).data('suggested_work_mbid');
         });
 
@@ -1169,9 +1126,7 @@ function batch_recording_rels() {
             return;
         }
 
-        let $button = $(this)
-            .attr('disabled', true)
-            .css('color', '#EAEAEA');
+        let $button = $(this).attr('disabled', true).css('color', '#EAEAEA');
         ws_requests.stopped = true;
 
         function callback() {
@@ -1180,16 +1135,13 @@ function batch_recording_rels() {
             $button.attr('disabled', false).css('color', '#565656');
         }
 
-        $.each($rows, function(i, row) {
+        $.each($rows, function (i, row) {
             let $row = $(row);
             let mbid = $row.data('suggested_work_mbid');
             let title = $row.data('suggested_work_title');
             let $title_cell = rowTitleCell($row);
 
-            $title_cell
-                .css('color', 'LightSlateGray')
-                .find('a')
-                .css('color', 'LightSlateGray');
+            $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
             let promise = relate_to_work($row, mbid, title, '', false, false);
             if (i === total - 1) {
@@ -1207,9 +1159,7 @@ function batch_recording_rels() {
                 .text(`${attrs.join(' ')} recording of `)
                 .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em' })
                 .append(
-                    $('<a></a>')
-                        .attr('href', `/work/${mbid}`)
-                        .text(title),
+                    $('<a></a>').attr('href', `/work/${mbid}`).text(title),
                     comment ? '&#160;' : null,
                     comment ? $('<span></span>').text(`(${comment})`) : null
                 )
@@ -1231,10 +1181,7 @@ function batch_recording_rels() {
             $row.data('performances', [work_mbid]);
         }
 
-        let rec_mbid = $row
-            .find(TITLE_SELECTOR)
-            .attr('href')
-            .match(MBID_REGEX)[0];
+        let rec_mbid = $row.find(TITLE_SELECTOR).attr('href').match(MBID_REGEX)[0];
         let $title_cell = rowTitleCell($row);
         let title_link = $title_cell.children('a')[0];
         let $attrs = $row.children('td.bpr_attrs');
@@ -1254,7 +1201,7 @@ function batch_recording_rels() {
             'rel-editor.rels.0.entity.1.type': 'work',
             'rel-editor.rels.0.entity.1.gid': work_mbid,
             'rel-editor.rels.0.entity.0.type': 'recording',
-            'rel-editor.rels.0.entity.0.gid': rec_mbid
+            'rel-editor.rels.0.entity.0.gid': rec_mbid,
         };
 
         let attrs = [];
@@ -1263,7 +1210,7 @@ function batch_recording_rels() {
         if (selected('instrumental')) attrs.push('c031ed4f-c9bb-4394-8cf5-e8ce4db512ae');
         if (selected('cover')) attrs.push('1e8536bd-6eda-3822-8e78-1c0f4d3d2113');
 
-        _.each(attrs, function(attr, index) {
+        _.each(attrs, function (attr, index) {
             data[`rel-editor.rels.0.attributes.${index}.type.gid`] = attr;
         });
 
@@ -1280,7 +1227,7 @@ function batch_recording_rels() {
         function post_edit() {
             $(title_link).css('color', 'green');
 
-            $.post('/relationship-editor', data, function() {
+            $.post('/relationship-editor', data, function () {
                 add_work_link($row, work_mbid, work_title, work_comment, selectedAttrs);
 
                 $(title_link).removeAttr('style');
@@ -1292,7 +1239,7 @@ function batch_recording_rels() {
                 }
 
                 deferred.resolve();
-            }).fail(function() {
+            }).fail(function () {
                 edit_requests.unshift(post_edit);
             });
         }
@@ -1316,10 +1263,7 @@ function batch_recording_rels() {
 
         for (let i = 0; i < $recordings.length; i++) {
             let $rec = $recordings.eq(i);
-            let title = $rec
-                .find(TITLE_SELECTOR)
-                .text()
-                .toLowerCase();
+            let title = $rec.find(TITLE_SELECTOR).text().toLowerCase();
 
             if (title.indexOf(string) !== -1) {
                 $rec.data('filtered', false);
@@ -1341,7 +1285,7 @@ function batch_recording_rels() {
             uncheckRows($performed.hide());
         } else {
             $performed
-                .filter(function() {
+                .filter(function () {
                     return !$(this).data('filtered');
                 })
                 .show();
@@ -1351,12 +1295,8 @@ function batch_recording_rels() {
     }
 
     function toggle_pending_edits(event, checked) {
-        let $pending = $recordings.filter(function() {
-            return $(this)
-                .find(TITLE_SELECTOR)
-                .parent()
-                .parent()
-                .is('span.mp');
+        let $pending = $recordings.filter(function () {
+            return $(this).find(TITLE_SELECTOR).parent().parent().is('span.mp');
         });
         hide_pending_edits = checked !== undefined ? checked : this.checked;
 
@@ -1364,7 +1304,7 @@ function batch_recording_rels() {
             uncheckRows($pending.hide());
         } else {
             $pending
-                .filter(function() {
+                .filter(function () {
                     return !$(this).data('filtered');
                 })
                 .show();
@@ -1375,7 +1315,7 @@ function batch_recording_rels() {
     toggle_pending_edits(null, hide_pending_edits);
 
     function checked_recordings() {
-        return $recordings.filter(':visible').filter(function() {
+        return $recordings.filter(':visible').filter(function () {
             return $(this).find('input[name=add-to-merge]:checked').length;
         });
     }
@@ -1383,13 +1323,13 @@ function batch_recording_rels() {
     function entity_lookup(id_suffix, entity) {
         let $input = $(`<input type="text" id="bpr-${id_suffix}"/>`);
         $input
-            .on('input', function() {
+            .on('input', function () {
                 let match = this.value.match(MBID_REGEX);
                 $(this).data('selected', false);
                 if (match) {
                     let mbid = match[0];
                     ws_requests
-                        .unshift_get(`/ws/2/${entity}/${mbid}?fmt=json`, function(data) {
+                        .unshift_get(`/ws/2/${entity}/${mbid}?fmt=json`, function (data) {
                             let value = data.title || data.name;
                             let out_data = { selected: true, mbid: mbid, name: value };
 
@@ -1397,12 +1337,9 @@ function batch_recording_rels() {
                                 out_data.comment = data.disambiguation;
                             }
 
-                            $input
-                                .val(value)
-                                .data(out_data)
-                                .css('background', '#bbffbb');
+                            $input.val(value).data(out_data).css('background', '#bbffbb');
                         })
-                        .fail(function() {
+                        .fail(function () {
                             $input.css('background', '#ffaaaa');
                         });
                 } else {
@@ -1415,7 +1352,7 @@ function batch_recording_rels() {
     }
 
     function restripeRows() {
-        $recordings.filter(':visible').each(function(index, row) {
+        $recordings.filter(':visible').each(function (index, row) {
             let even = (index + 1) % 2 === 0;
             row.className = row.className.replace(even ? 'odd' : 'even', even ? 'even' : 'odd');
         });

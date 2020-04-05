@@ -48,13 +48,13 @@ var release_attributes = {}; // albumid, total_pages, artist_name, label
 var album_api_array = []; // album information [0]
 var tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
-$(document).ready(function() {
+$(document).ready(function () {
     // if we have something on local storage place that
     if (localStorage.getItem('FMA_API_KEY')) {
         FMA_API = localStorage.getItem('FMA_API_KEY'); // -> YOURAPIKEY
     } else {
         insertAPIKEYSection();
-        $('#api_key_submit').click(function() {
+        $('#api_key_submit').click(function () {
             let myval = $('#apikey_input').val();
             localStorage.setItem('FMA_API_KEY', myval);
             $('#musicbrainz_apikey').hide();
@@ -87,7 +87,7 @@ $(document).ready(function() {
 
         // Track detail
         $.when(retrieve_track_info) // ensure the track info is retrieved first (total_pages counter)
-            .then(function() {
+            .then(function () {
                 // loop and deferred promise for multiple ajax calls
                 updateAPISection.TrackAjaxStatus('busy');
                 let track_api_calls = [];
@@ -95,25 +95,25 @@ $(document).ready(function() {
                     track_api_calls.push(track_api(i));
                 }
 
-                $.when.apply(this, track_api_calls).done(function() {
+                $.when.apply(this, track_api_calls).done(function () {
                     LOGGER.debug('Tracks loaded and done in DONE lets use it');
                     //console.log("total_pages " + release_attributes.total_pages);
                     tracks_deferred.resolve();
                 });
             })
-            .done(function() {
+            .done(function () {
                 LOGGER.debug('Deferred for: Track info > track detail > resolved');
             });
 
         $.when(retrieve_tracks_promise)
-            .done(function() {
+            .done(function () {
                 updateAPISection.TrackAjaxStatus('completed');
             })
-            .fail(function() {
+            .fail(function () {
                 updateAPISection.TrackAjaxStatus('fail');
             });
 
-        $.when(retrieve_track_info, retrieve_tracks_promise, retrieve_album_detail).done(function() {
+        $.when(retrieve_track_info, retrieve_tracks_promise, retrieve_album_detail).done(function () {
             LOGGER.info('All the AJAX API calls are done continue to build the release object ...');
             // LOGGER.debug("ALBUM Object > " + album_api_array[0]);
             // LOGGER.debug("TRACK Object > " + tracks_api_array);
@@ -123,17 +123,15 @@ $(document).ready(function() {
 
             let album_link = window.location.href;
 
-            let url = $(location)
-                .attr('href')
-                .split('/');
+            let url = $(location).attr('href').split('/');
             let artist_url = url[url.length - 3];
             let base_url = 'http://freemusicarchive.org/music/';
             let artist_link = `${base_url + artist_url}/`;
 
-            mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
+            mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) {
                 $('.subh1').before(link);
             });
-            mblinks.searchAndDisplayMbLink(artist_link, 'artist', function(link) {
+            mblinks.searchAndDisplayMbLink(artist_link, 'artist', function (link) {
                 $('.subh1').after(link);
             });
         });
@@ -169,7 +167,7 @@ function insertAPISection() {
 
     if (DEBUG)
         fmaUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let fmaStatusBlock = $(
@@ -183,7 +181,7 @@ function insertAPISection() {
         display: 'inline-block',
         float: 'left',
         height: '120px',
-        width: '49%'
+        width: '49%',
     });
 
     fmaUI.slideDown();
@@ -191,17 +189,17 @@ function insertAPISection() {
 
 // Update FreeMusicArchive API Status section on FMA page
 var updateAPISection = {
-    AlbumId: function(albumid) {
+    AlbumId: function (albumid) {
         this.albumid = albumid;
         $('#lbut-lt-fma-api-album-id').text(this.albumid);
         return 'complete';
     },
-    ApiKey: function(apikey) {
+    ApiKey: function (apikey) {
         this.apikey = apikey;
         $('#lbut-lt-fma-api-key-id').text(FMA_API);
         return 'complete';
     },
-    AlbumAjaxStatus: function(ajaxstatus) {
+    AlbumAjaxStatus: function (ajaxstatus) {
         if (ajaxstatus === null) {
             this.ajaxstatus = 'notcalled';
         } else {
@@ -212,24 +210,24 @@ var updateAPISection = {
             case 'completed': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'green'
+                    'background-color': 'green',
                 });
                 break;
             case 'busy': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'orange'
+                    'background-color': 'orange',
                 });
                 break;
             case 'fail': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'red'
+                    'background-color': 'red',
                 });
                 break;
         }
     },
-    TrackAjaxStatus: function(ajaxstatus) {
+    TrackAjaxStatus: function (ajaxstatus) {
         if (ajaxstatus === null) {
             this.ajaxstatus = 'notcalled';
         } else {
@@ -240,23 +238,23 @@ var updateAPISection = {
             case 'completed': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-tracks').css({
-                    'background-color': 'green'
+                    'background-color': 'green',
                 });
                 break;
             case 'busy': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-tracks').css({
-                    'background-color': 'orange'
+                    'background-color': 'orange',
                 });
                 break;
             case 'fail': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-tracks').css({
-                    'background-color': 'red'
+                    'background-color': 'red',
                 });
                 break;
         }
-    }
+    },
 };
 
 // Insert MusicBrainz section on FMA page
@@ -268,7 +266,7 @@ function insertMBSection(release) {
     ).hide();
     if (DEBUG)
         mbUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let mbContentBlock = $('<div class="section_content"></div>');
@@ -279,7 +277,7 @@ function insertMBSection(release) {
             color: 'red',
             float: 'left',
             'margin-top': '4px',
-            'margin-bottom': '4px'
+            'margin-bottom': '4px',
         });
         mbContentBlock.prepend(warning_buggy);
     }
@@ -300,25 +298,25 @@ function insertMBSection(release) {
         display: 'block',
         float: 'right',
         height: '120px',
-        width: '49%'
+        width: '49%',
     });
 
     $('#mb_buttons').css({
         display: 'inline-block',
         float: 'right',
-        height: '80px'
+        height: '80px',
     });
     $('form.musicbrainz_import').css({
         width: '49%',
-        display: 'inline-block'
+        display: 'inline-block',
     });
     $('form.musicbrainz_import_search').css({
-        float: 'right'
+        float: 'right',
     });
     $('form.musicbrainz_import > button').css({
         width: '63px',
         height: '80px',
-        'box-sizing': 'border-box'
+        'box-sizing': 'border-box',
     });
 
     mbUI.slideDown();
@@ -333,7 +331,7 @@ function insertAPIKEYSection() {
     ).hide();
     if (DEBUG)
         mbUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let mbContentBlock = $('<div class="section_content"></div>');
@@ -351,13 +349,13 @@ function insertAPIKEYSection() {
         display: 'block',
         float: 'right',
         height: '120px',
-        width: '49%'
+        width: '49%',
     });
 
     $('#mb_buttons').css({
         display: 'inline-block',
         float: 'right',
-        height: '80px'
+        height: '80px',
     });
 
     mbUI.slideDown();
@@ -371,10 +369,10 @@ function insertAPIKEYSection() {
 function album_api() {
     let fmaWsUrl = `https://freemusicarchive.org/api/get/albums.json?api_key=${FMA_API}&album_id=${release_attributes.albumid}`;
 
-    var promise_variable = $.getJSON(fmaWsUrl, function() {
+    var promise_variable = $.getJSON(fmaWsUrl, function () {
         updateAPISection.AlbumAjaxStatus('busy');
         LOGGER.debug(`promise_variable [state] in [getJSON] ${promise_variable.state()}`);
-    }).done(function(albumjson) {
+    }).done(function (albumjson) {
         LOGGER.debug(' >> Album > DONE');
         updateAPISection.AlbumAjaxStatus('completed');
         //LOGGER.debug(albumjson);
@@ -389,9 +387,9 @@ function album_api() {
 function track_api_parameters() {
     let fmaWsUrl = `https://freemusicarchive.org/api/get/tracks.json?api_key=${FMA_API}&album_id=${release_attributes.albumid}&limit=20`;
 
-    var promise_track_api_params = $.getJSON(fmaWsUrl, function() {
+    var promise_track_api_params = $.getJSON(fmaWsUrl, function () {
         LOGGER.debug(`promise_track_api_params [state] in [getJSON] ${promise_track_api_params.state()}`);
-    }).done(function(trackinfojson) {
+    }).done(function (trackinfojson) {
         LOGGER.debug(' >> Track INFO > DONE');
         release_attributes.total_pages = trackinfojson.total_pages;
         //LOGGER.debug(trackinfojson);
@@ -406,9 +404,9 @@ function track_api(page) {
         release_attributes.albumid
     }&limit=20&page=${parseInt(page)}`;
 
-    var promise_track_api = $.getJSON(fmaWsUrl, function() {
+    var promise_track_api = $.getJSON(fmaWsUrl, function () {
         LOGGER.debug(`promise_track_api_params [state] in [getJSON] ${promise_track_api.state()}`);
-    }).done(function(tracksjson) {
+    }).done(function (tracksjson) {
         LOGGER.debug(` >> Track page ${page} > DONE `);
         LOGGER.debug(tracksjson);
         tracks_api_array.push(tracksjson.dataset);
@@ -446,17 +444,11 @@ function parseFMApage() {
     }
 
     // Label parsed from webpage as it is not in API
-    $('div.sbar-stat span.lf105.stathd').each(function() {
+    $('div.sbar-stat span.lf105.stathd').each(function () {
         //var tester = $(this).eq(0).text().trim().toLowerCase(); // working
-        let taglist = $(this)
-            .eq(0)
-            .text()
-            .trim()
-            .toLowerCase();
+        let taglist = $(this).eq(0).text().trim().toLowerCase();
         if (taglist == 'label:') {
-            release_attributes.label = $(this)
-                .next()
-                .text();
+            release_attributes.label = $(this).next().text();
             // fmarelease.labels.push({
             // 	name: FMAAlbumLabel
             // });
@@ -473,7 +465,7 @@ function parseFMApage() {
 // Parse the date string and set object properties day, month, year
 function parse_MM_DD_YYYY(date, obj) {
     if (!date) return;
-    let m = date.split(/\D+/, 3).map(function(e) {
+    let m = date.split(/\D+/, 3).map(function (e) {
         return parseInt(e, 10);
     });
     if (m[0] !== undefined) {
@@ -557,13 +549,13 @@ function Parsefmarelease(albumobject, trackobject) {
         // Release URL
         fmarelease.urls.push({
             url: albumobject.album_url,
-            link_type: MBImport.URL_TYPES.download_for_free
+            link_type: MBImport.URL_TYPES.download_for_free,
         });
     } else {
         // Release URL
         fmarelease.urls.push({
             url: albumobject.album_url,
-            link_type: MBImport.URL_TYPES.other_databases
+            link_type: MBImport.URL_TYPES.other_databases,
         });
     }
 
@@ -572,7 +564,7 @@ function Parsefmarelease(albumobject, trackobject) {
         // Release URL
         fmarelease.urls.push({
             url: albumobject.album_url,
-            link_type: MBImport.URL_TYPES.stream_for_free
+            link_type: MBImport.URL_TYPES.stream_for_free,
         });
     }
 
@@ -583,7 +575,7 @@ function Parsefmarelease(albumobject, trackobject) {
 
     // Label parsed from webpage as it is not in API
     fmarelease.labels.push({
-        name: release_attributes.label
+        name: release_attributes.label,
     });
 
     let discarray = [];
@@ -612,7 +604,7 @@ function Parsefmarelease(albumobject, trackobject) {
     // Could not find a example where disc_number != 1 yet but started teh check so long
     let largest_disc = Math.max.apply(
         Math,
-        trackarray.map(function(o) {
+        trackarray.map(function (o) {
             return o.disc_number;
         })
     );
@@ -620,14 +612,14 @@ function Parsefmarelease(albumobject, trackobject) {
 
     for (var disccount = 1; disccount <= largest_disc; disccount++) {
         // use this to map all the objects from trackarray with disc_number value of disccount to a new object
-        let tracklist_per_disc = $.map(trackarray, function(obj, index) {
+        let tracklist_per_disc = $.map(trackarray, function (obj, index) {
             if (obj.disc_number == disccount) {
                 return obj;
             }
         });
 
         // use this to sort the tracks per disc from low to high
-        tracklist_per_disc = tracklist_per_disc.sort(function(a, b) {
+        tracklist_per_disc = tracklist_per_disc.sort(function (a, b) {
             return parseInt(a.number) - parseInt(b.number);
         });
 
@@ -646,7 +638,7 @@ function Parsefmarelease(albumobject, trackobject) {
         let disc = {
             position: disccount,
             format: 'Digital Media',
-            tracks: tracklist_per_disc
+            tracks: tracklist_per_disc,
         };
         fmarelease.discs.push(disc);
     }

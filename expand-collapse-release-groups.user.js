@@ -58,14 +58,14 @@ function inject_release_group_button(parent) {
 
     let button = create_button(
         `/ws/2/release?release-group=${mbid}&limit=100&inc=media&fmt=json`,
-        function(toggled) {
+        function (toggled) {
             if (toggled) parent.appendChild(table);
             else parent.removeChild(table);
         },
-        function(json) {
+        function (json) {
             parse_release_group(json, mbid, parent, table);
         },
-        function(status) {
+        function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release group (HTTP status ${status})</td></tr>`;
         }
     );
@@ -83,14 +83,14 @@ function inject_release_button(parent, _table_parent, _table, _mbid) {
 
     let button = create_button(
         `/ws/2/release/${mbid}?inc=media+recordings+artist-credits&fmt=json`,
-        function(toggled) {
+        function (toggled) {
             if (toggled) parent.appendChild(table);
             else parent.removeChild(table);
         },
-        function(json) {
+        function (json) {
             parse_release(json, table);
         },
-        function(status) {
+        function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release (HTTP status ${status})</td></tr>`;
         }
     );
@@ -109,7 +109,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
 
     button.addEventListener(
         'mousedown',
-        function() {
+        function () {
             toggled = !toggled;
             if (toggled) button.innerHTML = '&#9660;';
             else button.innerHTML = '&#9654;';
@@ -120,12 +120,12 @@ function create_button(url, dom_callback, success_callback, error_callback) {
 
     button.addEventListener(
         'mousedown',
-        function() {
+        function () {
             let this_event = arguments.callee;
             button.removeEventListener('mousedown', this_event, false);
             let req = new XMLHttpRequest();
 
-            req.onreadystatechange = function() {
+            req.onreadystatechange = function () {
                 if (req.readyState != 4) return;
 
                 if (req.status == 200 && req.responseText) {
@@ -133,7 +133,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
                 } else {
                     button.addEventListener(
                         'mousedown',
-                        function() {
+                        function () {
                             button.removeEventListener('mousedown', arguments.callee, false);
                             button.addEventListener('mousedown', this_event, false);
                         },
@@ -187,14 +187,14 @@ function parse_release_group(json, mbid, parent, table) {
         release.formats = formats.join(' + ');
     }
 
-    releases.sort(function(a, b) {
+    releases.sort(function (a, b) {
         if (a.date < b.date) return -1;
         if (a.date > b.date) return 1;
         return 0;
     });
 
     for (var i = 0; i < releases.length; i++) {
-        (function(release) {
+        (function (release) {
             let track_tr = document.createElement('tr'),
                 track_td = document.createElement('td'),
                 track_table = document.createElement('table'),

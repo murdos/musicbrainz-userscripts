@@ -17,7 +17,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
     let releaseUrl = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
     let release = retrieveReleaseInfo(releaseUrl);
@@ -37,7 +37,7 @@ function parseReleaseDate(rdate) {
         September: 9,
         October: 10,
         November: 11,
-        December: 12
+        December: 12,
     };
 
     let m = rdate.match(/(\d{1,2}) ([a-z]+), (\d{4})/i);
@@ -45,7 +45,7 @@ function parseReleaseDate(rdate) {
         return {
             year: m[3],
             month: months[m[2]],
-            day: m[1]
+            day: m[1],
         };
     }
 
@@ -55,9 +55,7 @@ function parseReleaseDate(rdate) {
 function retrieveReleaseInfo(release_url) {
     let release = {
         artist_credit: [],
-        title: $('meta[itemProp="name"]')
-            .attr('content')
-            .trim(),
+        title: $('meta[itemProp="name"]').attr('content').trim(),
         year: 0,
         month: 0,
         day: 0,
@@ -70,14 +68,10 @@ function retrieveReleaseInfo(release_url) {
         type: '',
         urls: [],
         labels: [],
-        discs: []
+        discs: [],
     };
 
-    let releaseDate = parseReleaseDate(
-        $('span[itemProp="datePublished"]')
-            .text()
-            .trim()
-    );
+    let releaseDate = parseReleaseDate($('span[itemProp="datePublished"]').text().trim());
 
     if (releaseDate) {
         release.year = releaseDate.year;
@@ -87,54 +81,36 @@ function retrieveReleaseInfo(release_url) {
 
     release.urls.push({
         url: release_url,
-        link_type: MBImport.URL_TYPES.purchase_for_download
+        link_type: MBImport.URL_TYPES.purchase_for_download,
     });
 
     release.labels.push({
-        name: $('meta[itemProp="author"]')
-            .attr('content')
-            .trim(),
-        catno: $('strong:contains("Cat:")')
-            .parent()
-            .contents()
-            .slice(2, 3)
-            .text()
-            .trim()
+        name: $('meta[itemProp="author"]').attr('content').trim(),
+        catno: $('strong:contains("Cat:")').parent().contents().slice(2, 3).text().trim(),
     });
 
     let tracks = [];
-    $('.product-tracklist-track[itemprop="track"]').each(function() {
+    $('.product-tracklist-track[itemprop="track"]').each(function () {
         // element only present if VA release or track has multiple artists
-        let artist = $(this)
-            .find('meta[itemprop="byArtist"]')
-            .attr('content');
+        let artist = $(this).find('meta[itemprop="byArtist"]').attr('content');
         if (artist !== undefined) {
             artist = artist.trim();
         }
-        let trackname = $(this)
-            .find('span[itemprop="name"]')
-            .text()
-            .trim();
-        let tracklength = $(this)
-            .find('meta[itemprop="duration"]')
-            .parent()
-            .contents()
-            .slice(0, 1)
-            .text()
-            .trim();
+        let trackname = $(this).find('span[itemprop="name"]').text().trim();
+        let tracklength = $(this).find('meta[itemprop="duration"]').parent().contents().slice(0, 1).text().trim();
         if (artist !== undefined && trackname.startsWith(`${artist} - `)) {
             trackname = trackname.replace(`${artist} - `, '');
         }
         tracks.push({
             artist_credit: MBImport.makeArtistCredits(artist === undefined ? [] : [artist]),
             title: trackname,
-            duration: tracklength
+            duration: tracklength,
         });
     });
 
     let releaseArtists = $('.product-artist')
         .contents()
-        .map(function() {
+        .map(function () {
             if (this.nodeType === Node.TEXT_NODE) {
                 return this.nodeValue === ' / ' ? null : this.nodeValue;
             } else {
@@ -151,7 +127,7 @@ function retrieveReleaseInfo(release_url) {
 
     release.discs.push({
         tracks: tracks,
-        format: release.format
+        format: release.format,
     });
 
     LOGGER.info('Parsed release: ', release);
@@ -168,9 +144,7 @@ function insertLink(release, releaseUrl) {
         )}</div></div>`
     ).hide();
 
-    $('.product-share')
-        .parent()
-        .after(mbUI);
+    $('.product-share').parent().after(mbUI);
     $('#mb_buttons form').css({ display: 'inline', 'margin-right': '5px' });
     mbUI.slideDown();
 }

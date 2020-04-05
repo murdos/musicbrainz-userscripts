@@ -24,18 +24,12 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 var CD1DImporter = {
-    getFormats: function() {
+    getFormats: function () {
         // get a list of existing formats, return id of the fragment and name
-        let formats = $('#container-1 ul li.ui-state-default').map(function() {
+        let formats = $('#container-1 ul li.ui-state-default').map(function () {
             return {
-                id: $(this)
-                    .find('a:first')
-                    .attr('href')
-                    .split('#')[1]
-                    .split('-'),
-                name: $(this)
-                    .find('span:first')
-                    .text()
+                id: $(this).find('a:first').attr('href').split('#')[1].split('-'),
+                name: $(this).find('span:first').text(),
             };
         });
         // remove "parent" formats : ie. digital when mp3 and flac are present
@@ -58,31 +52,27 @@ var CD1DImporter = {
             if (!formats[i].toremove) {
                 cleanformats.push({
                     id: formats[i].id.join('-'),
-                    name: formats[i].name
+                    name: formats[i].name,
                 });
             }
         }
         return cleanformats;
     },
 
-    getTracks: function(id) {
+    getTracks: function (id) {
         // extract discs & tracks
         let tracklists = `div#${id} div.tracklist table.tracklist-content`;
         let discs = [];
-        $(tracklists).each(function() {
+        $(tracklists).each(function () {
             disc = $(this)
                 .find('tbody tr')
-                .map(function() {
+                .map(function () {
                     // $(this) is used more than once; cache it for performance.
                     let row = $(this);
 
                     // For each row that's "mapped", return an object that
                     //  describes the first and second <td> in the row.
-                    let duration = row
-                        .find('td.tracklist-content-length')
-                        .text()
-                        .replace('"', '')
-                        .replace("' ", ':');
+                    let duration = row.find('td.tracklist-content-length').text().replace('"', '').replace("' ", ':');
 
                     // drop track number prefix (A A2 C3 01 05 etc...)
                     let title = row
@@ -91,7 +81,7 @@ var CD1DImporter = {
                         .replace(/^[0-9A-F][0-9]* /, '');
                     return {
                         title: title,
-                        duration: MBImport.hmsToMilliSeconds(duration)
+                        duration: MBImport.hmsToMilliSeconds(duration),
                     };
                 })
                 .get();
@@ -100,22 +90,22 @@ var CD1DImporter = {
         return discs;
     },
 
-    getArtists: function() {
+    getArtists: function () {
         // get artists
         let artists = $('div.infos-releasegrp div.list-artist a')
-            .map(function() {
+            .map(function () {
                 return $(this).text();
             })
             .get();
         return MBImport.makeArtistCredits(artists);
     },
 
-    getAlbum: function() {
+    getAlbum: function () {
         // get release title
         return $('h1').text();
     },
 
-    fromCurrentTime: function(offset_in_seconds) {
+    fromCurrentTime: function (offset_in_seconds) {
         let millis = Date.now();
         if (!isNaN(offset_in_seconds)) {
             millis += offset_in_seconds * 1000;
@@ -127,11 +117,11 @@ var CD1DImporter = {
         return {
             year: yyyy,
             month: mm,
-            day: dd
+            day: dd,
         };
     },
 
-    getReleaseDate: function() {
+    getReleaseDate: function () {
         // get release date and convert it to object
         let text = $('div.infos-releasegrp div.row-date').text();
         if (text == 'yesterday' || text == 'hier') {
@@ -169,15 +159,15 @@ var CD1DImporter = {
         return {
             year: parseInt(date[2], 10),
             month: parseInt(date[1], 10),
-            day: parseInt(date[0], 10)
+            day: parseInt(date[0], 10),
         };
     },
 
-    currentURL: function() {
+    currentURL: function () {
         return window.location.href.replace(/\/[a-z]{2}\/album\//i, '/album/').split('#')[0];
     },
 
-    retrieveReleaseInfo: function(format) {
+    retrieveReleaseInfo: function (format) {
         // Analyze CD1D data and return a release object
         let release = {
             artist_credit: this.getArtists(),
@@ -189,7 +179,7 @@ var CD1DImporter = {
             script: 'latn',
             barcode: '',
             urls: [],
-            discs: []
+            discs: [],
         };
 
         // Grab release event information
@@ -205,14 +195,14 @@ var CD1DImporter = {
             release.format = 'Vinyl';
             release.urls.push({
                 url: this.currentURL(),
-                link_type: link_type.purchase_for_mail_order
+                link_type: link_type.purchase_for_mail_order,
             });
         } else if (format.name.match(/cd/i)) {
             release.country = 'FR';
             release.format = 'CD';
             release.urls.push({
                 url: this.currentURL(),
-                link_type: link_type.purchase_for_mail_order
+                link_type: link_type.purchase_for_mail_order,
             });
         } else if (format.name.match(/digital|mp3|flac|ogg|wav/i)) {
             release.country = 'XW';
@@ -220,32 +210,32 @@ var CD1DImporter = {
             release.format = 'Digital Media';
             release.urls.push({
                 url: this.currentURL(),
-                link_type: link_type.purchase_for_download
+                link_type: link_type.purchase_for_download,
             });
         }
 
         release.labels = $('div.infos-details div.row-structure')
-            .map(function() {
+            .map(function () {
                 return {
                     name: $(this).text(),
                     mbid: '',
-                    catno: 'none'
+                    catno: 'none',
                 };
             })
             .get();
 
         // Tracks
-        $.each(this.getTracks(format.id), function(ndisc, disc) {
+        $.each(this.getTracks(format.id), function (ndisc, disc) {
             let thisdisc = {
                 tracks: [],
-                format: release.format
+                format: release.format,
             };
             release.discs.push(thisdisc);
-            $.each(this, function(ntrack, track) {
+            $.each(this, function (ntrack, track) {
                 thisdisc.tracks.push({
                     title: track.title,
                     duration: track.duration,
-                    artist_credit: []
+                    artist_credit: [],
                 });
             });
         });
@@ -254,7 +244,7 @@ var CD1DImporter = {
         return release;
     },
 
-    insertLink: function(release, where, formatname) {
+    insertLink: function (release, where, formatname) {
         // Insert links in page
 
         // Form parameters
@@ -267,10 +257,10 @@ var CD1DImporter = {
         $('#mb_buttons').css({ 'margin-top': '6px' });
         $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-right': '5px' });
         mbUI.slideDown();
-    }
+    },
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
     /* CD1D uses same page with hidden tabs for all formats */
     let formats = CD1DImporter.getFormats();

@@ -20,13 +20,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-String.prototype.fix_bandcamp_url = function() {
+String.prototype.fix_bandcamp_url = function () {
     return this.replace('http://', 'https://');
 };
 
 var BandcampImport = {
     // Analyze Bandcamp data and return a release object
-    retrieveReleaseInfo: function() {
+    retrieveReleaseInfo: function () {
         let bandcampAlbumData = unsafeWindow.TralbumData;
         let bandcampEmbedData = unsafeWindow.EmbedData;
 
@@ -48,7 +48,7 @@ var BandcampImport = {
             language: 'eng',
             script: 'Latn',
             urls: [],
-            url: bandcampAlbumData.url.fix_bandcamp_url()
+            url: bandcampAlbumData.url.fix_bandcamp_url(),
         };
 
         // Grab release title
@@ -83,7 +83,7 @@ var BandcampImport = {
         // Tracks
         let disc = {
             tracks: [],
-            format: release.format
+            format: release.format,
         };
         release.discs.push(disc);
 
@@ -107,7 +107,7 @@ var BandcampImport = {
         }
 
         let tracks_streamable = 0;
-        $.each(bandcampAlbumData.trackinfo, function(index, bctrack) {
+        $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {
@@ -121,7 +121,7 @@ var BandcampImport = {
             let track = {
                 title: title,
                 duration: Math.round(bctrack.duration * 1000),
-                artist_credit: MBImport.makeArtistCredits(artist)
+                artist_credit: MBImport.makeArtistCredits(artist),
             };
             disc.tracks.push(track);
         });
@@ -147,7 +147,7 @@ var BandcampImport = {
                 let track = {
                     title: '[unknown]',
                     duration: null,
-                    artist_credit: []
+                    artist_credit: [],
                 };
                 disc.tracks.push(track);
             }
@@ -166,13 +166,13 @@ var BandcampImport = {
             ) {
                 release.urls.push({
                     url: release.url,
-                    link_type: link_type.download_for_free
+                    link_type: link_type.download_for_free,
                 });
             }
             if (bandcampAlbumData.current.download_pref === 2) {
                 release.urls.push({
                     url: release.url,
-                    link_type: link_type.purchase_for_download
+                    link_type: link_type.purchase_for_download,
                 });
             }
         }
@@ -180,14 +180,14 @@ var BandcampImport = {
         if (bandcampAlbumData.hasAudio && !nostream && disc.tracks.length > 0 && disc.tracks.length == tracks_streamable) {
             release.urls.push({
                 url: release.url,
-                link_type: link_type.stream_for_free
+                link_type: link_type.stream_for_free,
             });
         }
         // Check if release is Creative Commons licensed
         if ($('div#license a.cc-icons').length > 0) {
             release.urls.push({
                 url: $('div#license a.cc-icons').attr('href'),
-                link_type: link_type.license
+                link_type: link_type.license,
             });
         }
         // Check if album has a back link to a label
@@ -196,7 +196,7 @@ var BandcampImport = {
             release.labels.push({
                 name: label,
                 mbid: '',
-                catno: 'none'
+                catno: 'none',
             });
         }
 
@@ -204,7 +204,7 @@ var BandcampImport = {
     },
 
     // Insert links in page
-    insertLink: function(release) {
+    insertLink: function (release) {
         if (release.type == 'track') {
             // only import album or single, tracks belong to an album
             return false;
@@ -223,31 +223,29 @@ var BandcampImport = {
     },
 
     // helper to convert bandcamp date to MB date
-    convdate: function(date) {
+    convdate: function (date) {
         if (typeof date != 'undefined' && date !== '') {
             let d = new Date(date);
             return {
                 year: d.getUTCFullYear(),
                 month: d.getUTCMonth() + 1,
-                day: d.getUTCDate()
+                day: d.getUTCDate(),
             };
         }
         return false;
     },
 
     // get label name from back link if possible
-    getlabelname: function() {
-        let label = $('a.back-to-label-link span.back-link-text')
-            .contents()
-            .get(2);
+    getlabelname: function () {
+        let label = $('a.back-to-label-link span.back-link-text').contents().get(2);
         if (typeof label == 'undefined') {
             return '';
         }
         return label.textContent;
-    }
+    },
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
      * bandcamp pages under third-party domains.
@@ -265,13 +263,13 @@ $(document).ready(function() {
     // add MB artist link
     let root_url = release.url.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
     let label_url = '';
-    mblinks.searchAndDisplayMbLink(root_url, 'artist', function(link) {
+    mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
         $('div#name-section span[itemprop="byArtist"]').before(link);
     });
     mblinks.searchAndDisplayMbLink(
         root_url,
         'label',
-        function(link) {
+        function (link) {
             $('p#band-name-location span.title').append(link);
         },
         `label:${root_url}`
@@ -287,7 +285,7 @@ $(document).ready(function() {
             mblinks.searchAndDisplayMbLink(
                 label_url,
                 'label',
-                function(link) {
+                function (link) {
                     $('a.back-to-label-link span.back-link-text').append(link);
                 },
                 `label:${label_url}`
@@ -311,17 +309,14 @@ $(document).ready(function() {
         label_name = BandcampImport.getlabelname();
     } else {
         label_mbid = mblinks.resolveMBID(`label:${root_url}`);
-        if (label_mbid)
-            label_name = $('p#band-name-location span.title')
-                .text()
-                .trim();
+        if (label_mbid) label_name = $('p#band-name-location span.title').text().trim();
     }
     if (label_mbid || label_name) {
         if (release.labels.length == 0) {
             release.labels.push({
                 name: '',
                 mbid: '',
-                catno: 'none'
+                catno: 'none',
             });
         }
         release.labels[0].name = label_name;
@@ -333,12 +328,12 @@ $(document).ready(function() {
 
     if (release.type == 'track') {
         // add MB links to parent album
-        mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function(link) {
+        mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
             $('div#name-section span[itemprop="inAlbum"] a:first').before(link);
         });
     } else {
         // add MB release links to album or single
-        mblinks.searchAndDisplayMbLink(release.url, 'release', function(link) {
+        mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
             $('div#name-section span[itemprop="byArtist"]').after(link);
         });
     }
@@ -347,9 +342,7 @@ $(document).ready(function() {
     $('div.tralbum-tags a:not(:last-child).tag').after(', ');
 
     // append a link to the full size image
-    let fullsizeimageurl = $('div#tralbumArt a')
-        .attr('href')
-        .replace('_10', '_0');
+    let fullsizeimageurl = $('div#tralbumArt a').attr('href').replace('_10', '_0');
     $('div#tralbumArt').after(
         `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`
     );

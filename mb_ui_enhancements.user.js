@@ -14,23 +14,23 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function() {
+$(document).ready(function () {
     LASTFM_APIKEY = null;
 
     // Highlight table rows
     $('table.tbl tbody tr').hover(
-        function() {
+        function () {
             $(this)
                 .children('td')
-                .each(function() {
+                .each(function () {
                     let backgroundColor = $(this).css('backgroundColor');
                     if (backgroundColor != 'rgb(255, 255, 0)') $(this).css('backgroundColor', '#ffeea8');
                 });
         },
-        function() {
+        function () {
             $(this)
                 .children('td')
-                .each(function() {
+                .each(function () {
                     let backgroundColor = $(this).css('backgroundColor');
                     if (backgroundColor != 'rgb(255, 255, 0)') $(this).css('backgroundColor', '');
                 });
@@ -46,8 +46,8 @@ $(document).ready(function() {
         var mbid = window.location.href.match(re)[1];
         let toptracks = $.getJSON(
             `http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&mbid=${mbid}&api_key=${LASTFM_APIKEY}&format=json`,
-            function(data) {
-                $.each(data.toptracks.track, function(index, track) {
+            function (data) {
+                $.each(data.toptracks.track, function (index, track) {
                     if (index >= 5) return true;
                     let url = track.mbid ? `/recording/${track.mbid}` : track.url;
                     $('ul.toptracks').append(`<li><a href="${url}">${track.name}</a></li>`);
@@ -78,7 +78,7 @@ $(document).ready(function() {
         $("#sidebar h2:contains('Rating')").before(
             $("#sidebar h2:contains('External links')")
                 .nextAll('ul.external_links')
-                .filter(function() {
+                .filter(function () {
                     return !pageHasRGLinks || $(this).nextAll("h2:contains('Release group external links')").length > 0;
                 })
         );
@@ -102,10 +102,8 @@ $(document).ready(function() {
     );
     if (window.location.href.match(re)) {
         $('form')
-            .filter(function() {
-                return $(this)
-                    .prop('action')
-                    .match('merge_queue');
+            .filter(function () {
+                return $(this).prop('action').match('merge_queue');
             })
             .attr('target', '_blank');
     }
@@ -113,14 +111,9 @@ $(document).ready(function() {
     // Modify link to edits: remove " - <Edit type>" from the link "Edit XXXX - <Edit type>"
     re = new RegExp('musicbrainz.org/.*/(open_)?edits', 'i');
     if (window.location.href.match(re)) {
-        $('div.edit-description ~ h2').each(function() {
-            let parts = $(this)
-                .find('a')
-                .text()
-                .split(' - ');
-            $(this)
-                .find('a')
-                .text(parts[0]);
+        $('div.edit-description ~ h2').each(function () {
+            let parts = $(this).find('a').text().split(' - ');
+            $(this).find('a').text(parts[0]);
             $(this).append(` - ${parts[1]}`);
         });
     }
@@ -128,10 +121,8 @@ $(document).ready(function() {
     // Add direct link to cover art tab for Add cover art edits
     re = new RegExp('musicbrainz.org/(.*/(open_)?edits|edit/d+)', 'i');
     if (window.location.href.match(re)) {
-        $("div.edit-description ~ h2:contains('cover art')").each(function() {
-            $editdetails = $(this)
-                .parents('.edit-header')
-                .siblings('.edit-details');
+        $("div.edit-description ~ h2:contains('cover art')").each(function () {
+            $editdetails = $(this).parents('.edit-header').siblings('.edit-details');
             mbid = $editdetails
                 .find("a[href*='musicbrainz.org/release/']")
                 .attr('href')
@@ -168,21 +159,18 @@ $(document).ready(function() {
     re = new RegExp('musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/recordings', 'i');
     if (window.location.href.match(re)) {
         let isrcColNo; // = ($("#content table.tbl thead th:eq(2)").text() == "Artist") ? 3 : 2;
-        $('#content table.tbl thead th').each(function(index, th) {
+        $('#content table.tbl thead th').each(function (index, th) {
             if ($(th).text() == 'ISRCs') {
                 isrcColNo = index;
                 return false;
             }
         });
         let reg = new RegExp('([A-Z]{2}[A-Z0-9]{3}[0-9]{7})');
-        $('#content table.tbl tbody tr').each(function() {
+        $('#content table.tbl tbody tr').each(function () {
             let $td = $(this).find(`td:eq(${isrcColNo})`);
-            let isrcs = $td
-                .text()
-                .trim()
-                .split('\n<br>\n');
+            let isrcs = $td.text().trim().split('\n<br>\n');
             let newHTML = '';
-            $.each(isrcs, function(index, isrc) {
+            $.each(isrcs, function (index, isrc) {
                 isrc = isrc.trim();
                 newHTML += `<a href='/isrc/${isrc}'><code>`;
                 newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
@@ -202,25 +190,25 @@ $(document).ready(function() {
         var mbid = window.location.href.match(re)[1];
         // Get tracks data from webservice
         let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
-        $.getJSON(wsurl, function(data) {
+        $.getJSON(wsurl, function (data) {
             // Store tracks data from webservice in a hash table
             let tracks = {};
-            $.each(data.media, function(index, medium) {
-                $.each(medium.tracks, function(i, track) {
+            $.each(data.media, function (index, medium) {
+                $.each(medium.tracks, function (i, track) {
                     tracks[track.id] = track;
                 });
             });
             // Different behavior depending on the number of mediums
             if ($('table.medium').length <= 10) {
                 // All mediums are already displayed: handle them now
-                $('table.medium').each(function() {
+                $('table.medium').each(function () {
                     handleMedium($(this), tracks);
                 });
             } else {
                 // Each medium will be handled when it's loaded
                 let HANDLED_ATTRIBUTE = 'ui_enh_isrcs_handled';
                 $('table.medium').attr(HANDLED_ATTRIBUTE, 'no');
-                $('table.medium').bind('DOMNodeInserted', function(event) {
+                $('table.medium').bind('DOMNodeInserted', function (event) {
                     $target = $(event.target);
                     if (
                         $target.prop('nodeName') == 'TBODY' &&
@@ -238,17 +226,10 @@ $(document).ready(function() {
 
         function handleMedium($medium, ws_tracks) {
             // Extend colspan for medium table header
-            $medium.find('thead tr').each(function() {
+            $medium.find('thead tr').each(function () {
                 $(this)
                     .find('th:eq(0)')
-                    .attr(
-                        'colspan',
-                        $(this)
-                            .find('th:eq(0)')
-                            .attr('colspan') *
-                            1 +
-                            1
-                    );
+                    .attr('colspan', $(this).find('th:eq(0)').attr('colspan') * 1 + 1);
             });
             // Table sub-header
             $medium
@@ -256,7 +237,7 @@ $(document).ready(function() {
                 .before("<th style='width: 150px;' class='isrc c'> ISRC </th>");
 
             // Handle each track
-            $medium.find('tbody tr[id]').each(function(index, medium_track) {
+            $medium.find('tbody tr[id]').each(function (index, medium_track) {
                 track_mbid = $(medium_track).attr('id');
                 let isrcsLinks = '';
                 if (Object.prototype.hasOwnProperty.call(ws_tracks, track_mbid)) {
@@ -264,18 +245,14 @@ $(document).ready(function() {
                     let recording = track.recording;
                     // Recording comment
                     if (recording.disambiguation != '') {
-                        let td_title_index = $(`#${track_mbid}`)
-                            .find('td:eq(1)')
-                            .hasClass('video')
-                            ? 2
-                            : 1;
+                        let td_title_index = $(`#${track_mbid}`).find('td:eq(1)').hasClass('video') ? 2 : 1;
                         $(`#${track_mbid}`)
                             .find(`td:eq(${td_title_index}) a:eq(0)`)
                             .after(` <span class="comment">(${recording.disambiguation})</span>`);
                     }
                     // ISRCS
                     if (recording.isrcs.length != 0) {
-                        let links = jQuery.map(recording.isrcs, function(isrc, i) {
+                        let links = jQuery.map(recording.isrcs, function (isrc, i) {
                             return `<a href='/isrc/${isrc}'>${isrc}</a>`;
                         });
                         isrcsLinks = links.join(', ');

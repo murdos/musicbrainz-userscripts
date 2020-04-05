@@ -16,17 +16,15 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
     release_url = release_url.replace(/^(?:https?:\/\/)?(?:store\.)?(?:cdbaby\.com)\//, 'http://store.cdbaby.com/');
 
     let release;
     let buttons = '';
-    $('div.album-page-buy-button-container a').each(function() {
-        let format = $(this)
-            .attr('title')
-            .trim();
+    $('div.album-page-buy-button-container a').each(function () {
+        let format = $(this).attr('title').trim();
         release = retrieveReleaseInfo(release_url, format);
         buttons += getImportButton(release, release_url, format);
     });
@@ -40,9 +38,7 @@ function retrieveReleaseInfo(release_url, format) {
     // Release defaults
     let release = {
         artist_credit: '',
-        title: $("h1 span[itemprop='name']")
-            .text()
-            .trim(),
+        title: $("h1 span[itemprop='name']").text().trim(),
         year: 0,
         month: 0,
         day: 0,
@@ -55,7 +51,7 @@ function retrieveReleaseInfo(release_url, format) {
         type: '',
         urls: [],
         labels: [],
-        discs: []
+        discs: [],
     };
 
     let link_type = MBImport.URL_TYPES;
@@ -66,14 +62,14 @@ function retrieveReleaseInfo(release_url, format) {
         release.format = 'Vinyl';
         release.urls.push({
             url: release_url,
-            link_type: link_type.purchase_for_mail_order
+            link_type: link_type.purchase_for_mail_order,
         });
     } else if (format.match(/^cd/i)) {
         release.country = 'US';
         release.format = 'CD';
         release.urls.push({
             url: release_url,
-            link_type: link_type.purchase_for_mail_order
+            link_type: link_type.purchase_for_mail_order,
         });
     } else if (format.match(/^download/i)) {
         release.country = 'XW';
@@ -81,14 +77,12 @@ function retrieveReleaseInfo(release_url, format) {
         release.format = 'Digital Media';
         release.urls.push({
             url: release_url,
-            link_type: link_type.purchase_for_download
+            link_type: link_type.purchase_for_download,
         });
     }
 
     // Release artist
-    let artist = $("h2 span[itemprop='byArtist'] a")
-        .text()
-        .trim();
+    let artist = $("h2 span[itemprop='byArtist'] a").text().trim();
     let various_artists = artist == 'Various';
     if (various_artists) {
         release.artist_credit = [MBImport.specialArtist('various_artists')];
@@ -96,41 +90,31 @@ function retrieveReleaseInfo(release_url, format) {
         release.artist_credit = MBImport.makeArtistCredits([artist]);
     }
 
-    release.year = $("span[itemprop='datePublished']")
-        .text()
-        .trim();
+    release.year = $("span[itemprop='datePublished']").text().trim();
 
     // Tracks
     let tracks = [];
     let trackcount = 0;
-    $("table.track-table tr[itemprop='track']").each(function() {
+    $("table.track-table tr[itemprop='track']").each(function () {
         let artists = [];
         let trackno = tracks.length + 1;
         if (trackno == 1 && tracks.length) {
             // multiple "discs"
             release.discs.push({
                 tracks: tracks,
-                format: release.format
+                format: release.format,
             });
             tracks = [];
         }
-        let trackname = $(this)
-            .find("meta[itemprop='name']")
-            .attr('content')
-            .trim();
-        let tracklength = $(this)
-            .find("meta[itemprop='duration']")
-            .attr('content')
-            .trim();
+        let trackname = $(this).find("meta[itemprop='name']").attr('content').trim();
+        let tracklength = $(this).find("meta[itemprop='duration']").attr('content').trim();
 
         let track_artists = [];
         // FIXME various artists releases ...
         $(this)
             .find('div.track-artist')
-            .each(function() {
-                let artistname = $(this)
-                    .text()
-                    .trim();
+            .each(function () {
+                let artistname = $(this).text().trim();
                 if (artistname) {
                     track_artists.push(artistname);
                 }
@@ -139,7 +123,7 @@ function retrieveReleaseInfo(release_url, format) {
         let ac = {
             artist_credit: '',
             title: trackname,
-            duration: MBImport.ISO8601toMilliSeconds(tracklength)
+            duration: MBImport.ISO8601toMilliSeconds(tracklength),
         };
         if (!track_artists.length && various_artists) {
             ac.artist_credit = [MBImport.specialArtist('unknown')];
@@ -151,7 +135,7 @@ function retrieveReleaseInfo(release_url, format) {
 
     release.discs.push({
         tracks: tracks,
-        format: release.format
+        format: release.format,
     });
 
     LOGGER.info('Parsed release: ', release);
@@ -169,11 +153,11 @@ function insertImportLinks(release, buttons) {
     $('#mb_buttons').css({
         'margin-bottom': '5px',
         padding: '2%',
-        'background-color': '#fff'
+        'background-color': '#fff',
     });
 
     $('form.musicbrainz_import').css({
-        'margin-bottom': '5px'
+        'margin-bottom': '5px',
     });
 
     $('#mb_buttons').slideDown();

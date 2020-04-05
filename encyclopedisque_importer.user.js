@@ -17,7 +17,7 @@
 
 var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
 
     if (window.location.href.match(/encyclopedisque\.fr\/disque\/(\d+)/)) {
@@ -47,31 +47,31 @@ function setupImportUI(release) {
 function insertMBLinks() {
     let current_url = window.location.href;
     if (current_url.match(/\/disque\//)) {
-        mblinks.searchAndDisplayMbLink(current_url, 'release', function(link) {
+        mblinks.searchAndDisplayMbLink(current_url, 'release', function (link) {
             $('h2 span').before(link);
         });
     } else if (current_url.match(/\/artiste\//)) {
-        mblinks.searchAndDisplayMbLink(current_url, 'artist', function(link) {
+        mblinks.searchAndDisplayMbLink(current_url, 'artist', function (link) {
             $('h2').prepend(link);
         });
     }
 
     $('div.v7P, div.v12P')
         .find('a[href*="/disque/"]')
-        .each(function() {
+        .each(function () {
             let $link = $(this);
             let external_url = window.location.origin + $link.attr('href');
-            mblinks.searchAndDisplayMbLink(external_url, 'release', function(link) {
+            mblinks.searchAndDisplayMbLink(external_url, 'release', function (link) {
                 $link.after(link).after('<br />');
             });
         });
 
     $('h2, div.main')
         .find('a[href*="/artiste/"]')
-        .each(function() {
+        .each(function () {
             let $link = $(this);
             let external_url = window.location.origin + $link.attr('href');
-            mblinks.searchAndDisplayMbLink(external_url, 'artist', function(link) {
+            mblinks.searchAndDisplayMbLink(external_url, 'artist', function (link) {
                 $link.before(link);
             });
         });
@@ -162,7 +162,7 @@ function parseEncyclopedisquePage() {
             release.labels = [];
             let labels = m[3];
             if (labels != undefined) {
-                $.each(labels.split('/'), function(index, label) {
+                $.each(labels.split('/'), function (index, label) {
                     release.labels.push({ name: label.trim(), catno: m[4] });
                 });
             } else {
@@ -213,7 +213,7 @@ function parseEncyclopedisquePage() {
             // Format => medium format, release-group type, release status
             var infoValue = releaseInfos[i].querySelector('td:nth-of-type(2)').textContent.trim();
             let values = infoValue.split(' / ');
-            values.forEach(function(value) {
+            values.forEach(function (value) {
                 if (value.indexOf('45 tours') > -1) {
                     disc.format = '7" Vinyl';
                 }

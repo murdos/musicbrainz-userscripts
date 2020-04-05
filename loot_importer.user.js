@@ -34,7 +34,7 @@ if (DEBUG) {
  * - http://www.loot.co.za/product/bette-midler-a-gift-of-love/mhgm-3483-g060  *** NOT WORKING *** extra tab
  */
 
-$(document).ready(function() {
+$(document).ready(function () {
     LOGGER.info('Document Ready & Loot Userscript executing');
     let LootRelease = ParseLootPage();
     insertMBSection(LootRelease);
@@ -71,7 +71,7 @@ function insertMBSection(release) {
 
     if (DEBUG)
         mbUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let mbContentBlock = $('<div class="section_content"></div>');
@@ -83,7 +83,7 @@ function insertMBSection(release) {
         ).css({
             color: 'red',
             'margin-top': '4px',
-            'margin-bottom': '4px'
+            'margin-bottom': '4px',
         });
         mbContentBlock.prepend(warning_buggy);
     }
@@ -102,18 +102,18 @@ function insertMBSection(release) {
 
     $('#mb_buttons').css({
         display: 'inline-block',
-        width: '100%'
+        width: '100%',
     });
     $('form.musicbrainz_import').css({
         width: '49%',
-        display: 'inline-block'
+        display: 'inline-block',
     });
     $('form.musicbrainz_import_search').css({
-        float: 'right'
+        float: 'right',
     });
     $('form.musicbrainz_import > button').css({
         width: '100%',
-        'box-sizing': 'border-box'
+        'box-sizing': 'border-box',
     });
 
     mbUI.slideDown();
@@ -132,14 +132,14 @@ function parseReleaseDate(rdate) {
         September: 9,
         October: 10,
         November: 11,
-        December: 12
+        December: 12,
     };
 
     let m = rdate.match(/([a-zA-Z]+) (\d{4})/i);
     if (m) {
         return {
             year: m[2],
-            month: months[m[1]]
+            month: months[m[1]],
         };
     }
     return false;
@@ -201,26 +201,17 @@ function ParseLootPage() {
     LOGGER.debug('Release Title:', releasetitle, '  Release Artist:', releaseartist, '  Release Format:', release_format);
 
     // extract all tr from table with class productDetails
-    $('table.productDetails tr').each(function() {
+    $('table.productDetails tr').each(function () {
         // get text from first td, trim and convert it to lowercase
-        let prodinfolabellowcase = $(this)
-            .children('td')
-            .eq(0)
-            .text()
-            .trim()
-            .toLowerCase();
+        let prodinfolabellowcase = $(this).children('td').eq(0).text().trim().toLowerCase();
         prodinfolabellowcase = prodinfolabellowcase.replace(/\s+/g, ''); //removing white spaces as switch isnt matching spaces for some reason
         // get test from second td, which is the corresponding value
-        let value = $(this)
-            .children('td')
-            .eq(1)
-            .text()
-            .trim();
+        let value = $(this).children('td').eq(1).text().trim();
         // now compare and process
         switch (prodinfolabellowcase) {
             case 'label:': // use these cases to select the spesific text values
                 prodlabels.push({
-                    name: value
+                    name: value,
                 });
                 break;
             case 'releasedate:':
@@ -234,7 +225,7 @@ function ParseLootPage() {
             case 'performers:':
                 LOGGER.debug(' ** performers: **', value);
                 release_artist_array.push({
-                    name: value
+                    name: value,
                 });
                 break;
             case 'format:':
@@ -360,7 +351,7 @@ function ParseLootPage() {
         let disc = {
             position: l + 1,
             format: release_format,
-            tracks: disclistarray[l]
+            tracks: disclistarray[l],
         };
         release.discs.push(disc);
     }
@@ -371,7 +362,7 @@ function ParseLootPage() {
     release.urls = new Array();
     release.urls.push({
         url: window.location.href,
-        link_type: MBImport.URL_TYPES.purchase_for_mail_order
+        link_type: MBImport.URL_TYPES.purchase_for_mail_order,
     });
 
     // TODO check format then change purchase medium
