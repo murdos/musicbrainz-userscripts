@@ -7,7 +7,7 @@
         "lib": "lib"
     },
     "scripts": {
-        "prettier:format": "prettier --write \"{,**/}*.{js,json,md}\"",
+        "prettier:format": "prettier --write \"{,**/}*.{js,json,md,yml}\"",
         "lint": "npm run eslint",
         "lint-fix": "npm run eslint -- --fix",
         "eslint": "eslint ."
