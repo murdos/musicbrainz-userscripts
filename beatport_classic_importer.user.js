@@ -18,7 +18,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
 
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
@@ -29,7 +29,7 @@ $(document).ready(function() {
 function retrieveReleaseInfo(release_url) {
     function contains_or(selector, list) {
         selectors = [];
-        $.each(list, function(ind, value) {
+        $.each(list, function (ind, value) {
             selectors.push(`${selector}:contains("${value.replace('"', '\\"')}")`);
         });
         return selectors.join(',');
@@ -42,7 +42,7 @@ function retrieveReleaseInfo(release_url) {
         'Data de lançamento',
         'Releasedatum',
         'Data di uscita',
-        'リリース予定日'
+        'リリース予定日',
     ];
     let labels_strings = ['Labels', 'Sello', 'Gravadoras', 'Label', 'Etichetta', 'Editora', 'レーベル'];
     let catalog_strings = ['Catalog', 'Catálogo', 'Catalogue', 'Katalog', 'Catalogus', 'Catalogo', 'カタログ'];
@@ -55,37 +55,30 @@ function retrieveReleaseInfo(release_url) {
     release.urls = [];
     release.urls.push({
         url: release_url,
-        link_type: MBImport.URL_TYPES.purchase_for_download
+        link_type: MBImport.URL_TYPES.purchase_for_download,
     });
 
-    let releaseDate = $(contains_or('td.meta-data-label', release_date_strings))
-        .next()
-        .text()
-        .split('-');
+    let releaseDate = $(contains_or('td.meta-data-label', release_date_strings)).next().text().split('-');
     release.year = releaseDate[0];
     release.month = releaseDate[1];
     release.day = releaseDate[2];
 
     release.labels = [];
     release.labels.push({
-        name: $(contains_or('td.meta-data-label', labels_strings))
-            .next()
-            .text(),
-        catno: $(contains_or('td.meta-data-label', catalog_strings))
-            .next()
-            .text()
+        name: $(contains_or('td.meta-data-label', labels_strings)).next().text(),
+        catno: $(contains_or('td.meta-data-label', catalog_strings)).next().text(),
     });
 
     let release_artists = [];
 
     // Tracks
     let tracks = [];
-    unsafeWindow.$('span[data-json]').each(function(index, tagSoup) {
+    unsafeWindow.$('span[data-json]').each(function (index, tagSoup) {
         let t = $.parseJSON($(tagSoup).attr('data-json'));
         release.title = t.release.name;
 
         let artists = [];
-        t.artists.forEach(function(artist) {
+        t.artists.forEach(function (artist) {
             artists.push(artist.name);
             release_artists.push(artist.name);
         });
@@ -96,12 +89,12 @@ function retrieveReleaseInfo(release_url) {
         tracks.push({
             artist_credit: MBImport.makeArtistCredits(artists),
             title: title,
-            duration: t.lengthMs
+            duration: t.lengthMs,
         });
     });
 
     let unique_artists = [];
-    $.each(release_artists, function(i, el) {
+    $.each(release_artists, function (i, el) {
         if ($.inArray(el, unique_artists) === -1) {
             unique_artists.push(el);
         }
@@ -115,7 +108,7 @@ function retrieveReleaseInfo(release_url) {
     release.discs = [];
     release.discs.push({
         tracks: tracks,
-        format: 'Digital Media'
+        format: 'Digital Media',
     });
 
     LOGGER.info('Parsed release: ', release);

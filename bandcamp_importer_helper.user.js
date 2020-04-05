@@ -19,7 +19,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Display a link to the correct album bandcamp url (ie. main page or releases page)
     let bandcampAlbumData = unsafeWindow.TralbumData;
     if (bandcampAlbumData && bandcampAlbumData.url) {

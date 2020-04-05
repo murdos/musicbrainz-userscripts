@@ -23,29 +23,29 @@ var relationsIconsURLs = {
         'cover art link': 'http://www.cdcovers.cc/favicon.ico',
         secondhandsongs: 'https://musicbrainz.org/static/images/favicons/secondhandsongs-32.png',
         lyrics: 'http://www.nomy.nu/img/lyrics-icon.gif',
-        allmusic: 'https://musicbrainz.org/static/images/favicons/allmusic-16.png'
+        allmusic: 'https://musicbrainz.org/static/images/favicons/allmusic-16.png',
     },
     'release-group': {
-        'single from': 'http://www.amaesingtools.com/images/left_arrow_icon.gif'
+        'single from': 'http://www.amaesingtools.com/images/left_arrow_icon.gif',
     },
     release: {
         'part of set': 'http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png',
-        remaster: 'http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png'
-    }
+        remaster: 'http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png',
+    },
 };
 
 var otherDatabasesIconURLs = {
     'd-nb.info': 'https://musicbrainz.org/static/images/favicons/dnb-16.png',
     'www.musik-sammler.de': 'https://musicbrainz.org/static/images/favicons/musiksammler-32.png',
     'www.worldcat.org': 'https://musicbrainz.org/static/images/favicons/worldcat-32.png',
-    'rateyourmusic.com': 'https://musicbrainz.org/static/images/favicons/rateyourmusic-32.png'
+    'rateyourmusic.com': 'https://musicbrainz.org/static/images/favicons/rateyourmusic-32.png',
 };
 
 var incOptions = {
     'release-group': ['release-group-rels', 'url-rels'],
     release: ['release-rels', 'url-rels', 'discids'],
     recording: ['work-rels'],
-    work: ['url-rels']
+    work: ['url-rels'],
 };
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -53,7 +53,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};
@@ -78,19 +78,11 @@ $(document).ready(function() {
 
     // Determine target column
     let columnindex = 0;
-    $("table.tbl tbody tr[class!='subh']").each(function() {
+    $("table.tbl tbody tr[class!='subh']").each(function () {
         $(this)
             .children('td')
-            .each(function() {
-                if (
-                    $(this)
-                        .find('a')
-                        .attr('href') !== undefined &&
-                    $(this)
-                        .find('a')
-                        .attr('href')
-                        .match(mbidRE)
-                ) {
+            .each(function () {
+                if ($(this).find('a').attr('href') !== undefined && $(this).find('a').attr('href').match(mbidRE)) {
                     return false;
                 }
                 columnindex++;
@@ -99,7 +91,7 @@ $(document).ready(function() {
     });
 
     // Set MBID to row in tables to get easiest fastest access
-    $("table.tbl tr[class!='subh']").each(function() {
+    $("table.tbl tr[class!='subh']").each(function () {
         let $tr = $(this);
 
         $tr.children(`th:eq(${columnindex})`).after("<th style='width: 150px;'>Relationships</th>");
@@ -107,7 +99,7 @@ $(document).ready(function() {
 
         $(this)
             .find('a')
-            .each(function() {
+            .each(function () {
                 let href = $(this).attr('href');
                 if ((m = href.match(mbidRE))) {
                     $tr.attr('id', m[2]);
@@ -127,21 +119,19 @@ $(document).ready(function() {
     let url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
     //console.log("MB WS url: " + url);
 
-    $.get(url, function(data, textStatus, jqXHR) {
+    $.get(url, function (data, textStatus, jqXHR) {
         // Parse each child
         $(data)
             .find(child.type)
-            .each(function() {
+            .each(function () {
                 let mbid = $(this).attr('id');
 
                 // URL relationships
                 $(this)
                     .find("relation-list[target-type='url'] relation")
-                    .each(function() {
+                    .each(function () {
                         let reltype = $(this).attr('type');
-                        let target = $(this)
-                            .children('target')
-                            .text();
+                        let target = $(this).children('target').text();
                         if (Object.prototype.hasOwnProperty.call(relationsIconsURLs.url, reltype)) {
                             $(`#${mbid} td.relationships`).append(
                                 `<a href='${target.replace(/'/g, '&apos;')}'>` +
@@ -163,10 +153,8 @@ $(document).ready(function() {
                 // Other relationships
                 $(this)
                     .find("relation-list[target-type!='url']")
-                    .each(function() {
-                        let targettype = $(this)
-                            .attr('target-type')
-                            .replace('release_group', 'release-group');
+                    .each(function () {
+                        let targettype = $(this).attr('target-type').replace('release_group', 'release-group');
                         let relations = {};
 
                         if (relationsIconsURLs[targettype] === undefined) {
@@ -175,11 +163,9 @@ $(document).ready(function() {
 
                         $(this)
                             .children('relation')
-                            .each(function() {
+                            .each(function () {
                                 let reltype = $(this).attr('type');
-                                let target = $(this)
-                                    .children('target')
-                                    .text();
+                                let target = $(this).children('target').text();
                                 let url = targettype == 'url' ? target : `/${targettype}/${target}`;
 
                                 if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
@@ -188,12 +174,12 @@ $(document).ready(function() {
                                 }
                             });
 
-                        $.each(relations, function(reltype, urls) {
+                        $.each(relations, function (reltype, urls) {
                             let html = '';
                             if (urls.length < -1) {
                                 html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
                             } else {
-                                $.each(urls, function(index, url) {
+                                $.each(urls, function (index, url) {
                                     html += `<a href='${url}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
                                 });
                             }

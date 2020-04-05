@@ -20,7 +20,7 @@ var ca_page = document.querySelector('div#content');
 
 var ca_items = ca_page.querySelectorAll('div.artwork-cont');
 
-ca_items.forEach(function(ca_item) {
+ca_items.forEach(function (ca_item) {
     /* Use 1200px “thumbnails” for the pop‐ups/previews */
     let popup_link = ca_item.querySelector('a.artwork-image');
     popup_link.href = popup_link.href.replace(/\.[a-z]+$/, '-1200.jpg');

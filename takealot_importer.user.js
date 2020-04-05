@@ -45,7 +45,7 @@ var release_attributes = {}; // albumid, total_pages, artist_name, label
 var album_api_array = []; // album information [0]
 var tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
-$(document).ready(function() {
+$(document).ready(function () {
     LOGGER.info('Document Ready & Takealot Userscript Executing');
 
     let fmaPage = parseFMApage();
@@ -62,7 +62,7 @@ $(document).ready(function() {
         // Album detail
         let retrieve_album_detail = new album_api();
 
-        $.when(retrieve_album_detail).done(function() {
+        $.when(retrieve_album_detail).done(function () {
             LOGGER.info('All the AJAX API calls are done continue to build the release object ...');
             LOGGER.debug(`ALBUM Object > ${album_api_array[0]}`);
             // LOGGER.debug("TRACK Object > " + tracks_api_array);
@@ -72,7 +72,7 @@ $(document).ready(function() {
 
             let album_link = window.location.href;
 
-            mblinks.searchAndDisplayMbLink(album_link, 'release', function(link) {
+            mblinks.searchAndDisplayMbLink(album_link, 'release', function (link) {
                 $('div.product-title').after(link);
             });
         });
@@ -114,7 +114,7 @@ function insertAPISection() {
 
     if (DEBUG)
         fmaUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let fmaStatusBlock = $(
@@ -128,7 +128,7 @@ function insertAPISection() {
         display: 'inline-block',
         float: 'left',
         height: '120px',
-        width: '49%'
+        width: '49%',
     });
 
     fmaUI.slideDown();
@@ -136,17 +136,17 @@ function insertAPISection() {
 
 // Update FreeMusicArchive API Status section on FMA page
 var updateAPISection = {
-    AlbumId: function(albumid) {
+    AlbumId: function (albumid) {
         this.albumid = albumid;
         $('#lbut-lt-fma-api-album-id').text(this.albumid);
         return 'complete';
     },
-    ApiKey: function(apikey) {
+    ApiKey: function (apikey) {
         this.apikey = apikey;
         $('#lbut-lt-fma-api-key-id').text(FMA_API);
         return 'complete';
     },
-    AlbumAjaxStatus: function(ajaxstatus) {
+    AlbumAjaxStatus: function (ajaxstatus) {
         if (ajaxstatus === null) {
             this.ajaxstatus = 'notcalled';
         } else {
@@ -157,23 +157,23 @@ var updateAPISection = {
             case 'completed': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'green'
+                    'background-color': 'green',
                 });
                 break;
             case 'busy': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'orange'
+                    'background-color': 'orange',
                 });
                 break;
             case 'fail': // Definition is that api call was successfull hence busy retrieving data
                 //test chaging status of album api to error retrieving data after 2 seconds
                 $('#lbut-lt-fma-api-album').css({
-                    'background-color': 'red'
+                    'background-color': 'red',
                 });
                 break;
         }
-    }
+    },
 };
 
 // function to determine if JSON or sub objects exist
@@ -199,7 +199,7 @@ function insertMBSection(release) {
     ).hide();
     if (DEBUG)
         mbUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let mbContentBlock = $(
@@ -212,7 +212,7 @@ function insertMBSection(release) {
             color: 'red',
             float: 'left',
             'margin-top': '4px',
-            'margin-bottom': '4px'
+            'margin-bottom': '4px',
         });
         mbContentBlock.prepend(warning_buggy);
     }
@@ -235,7 +235,7 @@ function insertMBSection(release) {
         'background-color': '#eb743b',
         position: 'absolute',
         top: '150px',
-        width: '100%'
+        width: '100%',
     });
 
     $('form.musicbrainz_import').css({
@@ -256,7 +256,7 @@ function insertMBSection(release) {
         'text-align': 'center',
         cursor: 'pointer',
         'background-color': '#0b79bf',
-        color: '#fefefe'
+        color: '#fefefe',
     });
 
     $('form.musicbrainz_import_search').css({
@@ -277,7 +277,7 @@ function insertMBSection(release) {
         'text-align': 'center',
         cursor: 'pointer',
         'background-color': '#0b79bf',
-        color: '#fefefe'
+        color: '#fefefe',
     });
 
     /*    $('#mb_buttons').css({
@@ -310,7 +310,7 @@ function insertAPIKEYSection() {
     ).hide();
     if (DEBUG)
         mbUI.css({
-            border: '1px dotted red'
+            border: '1px dotted red',
         });
 
     let mbContentBlock = $('<div class="section_content"></div>');
@@ -328,13 +328,13 @@ function insertAPIKEYSection() {
         display: 'block',
         float: 'right',
         height: '120px',
-        width: '49%'
+        width: '49%',
     });
 
     $('#mb_buttons').css({
         display: 'inline-block',
         float: 'right',
-        height: '80px'
+        height: '80px',
     });
 
     mbUI.slideDown();
@@ -348,10 +348,10 @@ function insertAPIKEYSection() {
 function album_api() {
     let fmaWsUrl = `https://api.takealot.com/rest/v-1-6-0/productlines/lookup?idProduct=${release_attributes.albumid}`;
 
-    var promise_variable = $.getJSON(fmaWsUrl, function() {
+    var promise_variable = $.getJSON(fmaWsUrl, function () {
         updateAPISection.AlbumAjaxStatus('busy');
         LOGGER.debug(`promise_variable [state] in [getJSON] ${promise_variable.state()}`);
-    }).done(function(albumjson) {
+    }).done(function (albumjson) {
         LOGGER.debug(' >> Album > DONE');
         updateAPISection.AlbumAjaxStatus('completed');
         //LOGGER.debug('Takealot RAW album JSON: ',albumjson);
@@ -443,7 +443,7 @@ function parseFMApage() {
 // Parse the date string and set object properties day, month, year
 function parse_MM_DD_YYYY(date, obj) {
     if (!date) return;
-    let m = date.split(/\D+/, 3).map(function(e) {
+    let m = date.split(/\D+/, 3).map(function (e) {
         return parseInt(e, 10);
     });
     if (m[0] !== undefined) {
@@ -459,7 +459,7 @@ function parse_MM_DD_YYYY(date, obj) {
 
 function parse_YYYY_MM_DD(date, obj) {
     if (!date) return;
-    let m = date.split(/\D+/, 3).map(function(e) {
+    let m = date.split(/\D+/, 3).map(function (e) {
         return parseInt(e, 10);
     });
     if (m[0] !== undefined) {
@@ -560,13 +560,13 @@ function Parsefmarelease(albumobject, trackobject) {
         // Release URL
         fmarelease.urls.push({
             url: albumobject.uri,
-            link_type: MBImport.URL_TYPES.purchase_for_mail_order
+            link_type: MBImport.URL_TYPES.purchase_for_mail_order,
         });
     } else {
         // Release URL
         fmarelease.urls.push({
             url: albumobject.uri,
-            link_type: MBImport.URL_TYPES.purchase_for_mail_order
+            link_type: MBImport.URL_TYPES.purchase_for_mail_order,
         });
     }
 
@@ -588,7 +588,7 @@ function Parsefmarelease(albumobject, trackobject) {
     //labels
     if (hasProp(albumobject, 'meta.Label')) {
         fmarelease.labels.push({
-            name: albumobject.meta.Label
+            name: albumobject.meta.Label,
         });
     }
 
@@ -761,7 +761,7 @@ function Parsefmarelease(albumobject, trackobject) {
         let disc = {
             position: l + 1,
             format: DiscFormats[fmarelease.disc_format],
-            tracks: disclistarray[l]
+            tracks: disclistarray[l],
         };
         fmarelease.discs.push(disc);
     }

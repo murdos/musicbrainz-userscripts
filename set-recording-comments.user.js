@@ -56,7 +56,7 @@ function setRecordingComments() {
         )
     );
 
-    var delay = setInterval(function() {
+    var delay = setInterval(function () {
         $tracks = $('.medium tbody tr[id]');
 
         if ($tracks.length) {
@@ -65,14 +65,10 @@ function setRecordingComments() {
             return;
         }
 
-        $tracks.each(function() {
-            let $td = $(this)
-                    .children('td:not(.pos):not(.video):not(.rating):not(.treleases)')
-                    .has('a[href^=\\/recording\\/]'),
+        $tracks.each(function () {
+            let $td = $(this).children('td:not(.pos):not(.video):not(.rating):not(.treleases)').has('a[href^=\\/recording\\/]'),
                 node = $td.children('td > .mp, td > .name-variation, td > a[href^=\\/recording\\/]').filter(':first'),
-                $input = $('<input />')
-                    .addClass('recording-comment')
-                    .insertAfter(node);
+                $input = $('<input />').addClass('recording-comment').insertAfter(node);
 
             if (!editing) {
                 $input.hide();
@@ -83,15 +79,12 @@ function setRecordingComments() {
 
         let release = location.pathname.match(MBID_REGEX)[0];
 
-        $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function(data) {
+        $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function (data) {
             let comments = _.map(_.map(_.flatten(_.map(data.media, 'tracks')), 'recording'), 'disambiguation');
 
             for (let i = 0, len = comments.length; i < len; i++) {
                 let comment = comments[i];
-                $inputs
-                    .eq(i)
-                    .val(comment)
-                    .data('old', comment);
+                $inputs.eq(i).val(comment).data('old', comment);
             }
         });
     }, 1000);
@@ -104,7 +97,7 @@ function setRecordingComments() {
         editing = false,
         activeRequest = null;
 
-    $('body').on('input.rc', '.recording-comment', function() {
+    $('body').on('input.rc', '.recording-comment', function () {
         $(this).css('border-color', this.value === $(this).data('old') ? '#999' : 'red');
     });
 
@@ -112,11 +105,9 @@ function setRecordingComments() {
 
     $('<button>Edit recording comments</button>')
         .addClass('styled-button')
-        .on('click', function() {
+        .on('click', function () {
             editing = !editing;
-            $('#set-recording-comments')
-                .add($inputs)
-                .toggle(editing);
+            $('#set-recording-comments').add($inputs).toggle(editing);
             $(this).text(`${editing ? 'Hide' : 'Edit'} recording comments`);
             if (editing) {
                 $('#all-recording-comments').focus();
@@ -153,14 +144,11 @@ function setRecordingComments() {
 
     $('#set-recording-comments').hide();
 
-    $('#all-recording-comments').on('input', function() {
-        $inputs
-            .filter(':visible')
-            .val(this.value)
-            .trigger('input.rc');
+    $('#all-recording-comments').on('input', function () {
+        $inputs.filter(':visible').val(this.value).trigger('input.rc');
     });
 
-    var $submitButton = $('#submit-recording-comments').on('click', function() {
+    var $submitButton = $('#submit-recording-comments').on('click', function () {
         if (activeRequest) {
             activeRequest.abort();
             activeRequest = null;
@@ -175,7 +163,7 @@ function setRecordingComments() {
         let editData = [],
             deferred = $.Deferred();
 
-        $.each($tracks, function(i, track) {
+        $.each($tracks, function (i, track) {
             if ($(track).filter(':visible').length > 0) {
                 let $input = $inputs.eq(i),
                     comment = $input.val();
@@ -185,13 +173,10 @@ function setRecordingComments() {
                 }
 
                 deferred
-                    .done(function() {
-                        $input
-                            .data('old', comment)
-                            .trigger('input.rc')
-                            .prop('disabled', false);
+                    .done(function () {
+                        $input.data('old', comment).trigger('input.rc').prop('disabled', false);
                     })
-                    .fail(function() {
+                    .fail(function () {
                         $input.css('border-color', 'red').prop('disabled', false);
                     });
 
@@ -214,15 +199,15 @@ function setRecordingComments() {
                 url: '/ws/js/edit/create',
                 dataType: 'json',
                 data: JSON.stringify({ edits: editData, editNote: editNote, makeVotable: makeVotable }),
-                contentType: 'application/json; charset=utf-8'
+                contentType: 'application/json; charset=utf-8',
             })
-                .always(function() {
+                .always(function () {
                     $submitButton.prop('disabled', false).text('Submit changes (marked red)');
                 })
-                .done(function() {
+                .done(function () {
                     deferred.resolve();
                 })
-                .fail(function() {
+                .fail(function () {
                     deferred.reject();
                 });
         }

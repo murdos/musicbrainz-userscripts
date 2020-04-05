@@ -16,7 +16,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
 
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
@@ -45,13 +45,13 @@ function setreleasedate(release, datestring) {
 function getGenericalData() {
     let rdata = new Array();
     let keydata = $('dl.float_left dt, dl.float_right dt')
-        .map(function() {
+        .map(function () {
             let s = $.trim($(this).text());
             return s.substring(0, s.length - 1);
         })
         .get();
     let valuedata = $('dl.float_left dd,dl.float_right dd')
-        .map(function() {
+        .map(function () {
             return $.trim($(this).text());
         })
         .get();
@@ -62,12 +62,7 @@ function getGenericalData() {
 }
 
 function getArtistsList() {
-    return $.map(
-        $('h2.band_name')
-            .text()
-            .split('/'),
-        $.trim
-    );
+    return $.map($('h2.band_name').text().split('/'), $.trim);
 }
 
 function retrieveReleaseInfo(release_url) {
@@ -87,7 +82,7 @@ function retrieveReleaseInfo(release_url) {
         packaging: '',
         language: '',
         script: '',
-        urls: []
+        urls: [],
     };
 
     let rdata = getGenericalData();
@@ -104,7 +99,7 @@ function retrieveReleaseInfo(release_url) {
         release.artist_credit.push({
             artist_name: artists[i],
             credited_name: artists[i],
-            joinphrase: i != artists.length - 1 ? joinphrase : ''
+            joinphrase: i != artists.length - 1 ? joinphrase : '',
         });
     }
     release.title = $('h1.album_name').text();
@@ -125,7 +120,7 @@ function retrieveReleaseInfo(release_url) {
         release.labels.push({
             name: label,
             catno: catno,
-            mbid: label_mbid
+            mbid: label_mbid,
         });
     }
 
@@ -150,9 +145,7 @@ function retrieveReleaseInfo(release_url) {
         }
     }
 
-    let identifiers = $('#album_tabs_notes > div:nth-child(2)')
-        .find('p:not([class])')
-        .contents();
+    let identifiers = $('#album_tabs_notes > div:nth-child(2)').find('p:not([class])').contents();
     for (let j = 0; j < identifiers.length; j++) {
         if (identifiers[j].textContent.indexOf('Barcode:') != -1) {
             release.barcode = $.trim(identifiers[j].textContent.substring(8));
@@ -164,25 +157,25 @@ function retrieveReleaseInfo(release_url) {
     let link_type = MBImport.URL_TYPES;
     release.urls.push({
         url: release_url,
-        link_type: link_type.other_databases
+        link_type: link_type.other_databases,
     });
 
     let releaseNumber = 0;
     let disc = {
         tracks: [],
-        format: release.format
+        format: release.format,
     };
     release.discs.push(disc);
 
     let tracksline = $('table.table_lyrics tr.even,table.table_lyrics tr.odd');
 
-    tracksline.each(function(index, element) {
+    tracksline.each(function (index, element) {
         let trackNumber = $.trim(element.children[0].textContent).replace('.', '');
         if (trackNumber == '1' && trackNumber != index + 1) {
             releaseNumber++;
             release.discs.push({
                 tracks: [],
-                format: release.format
+                format: release.format,
             });
         }
 
@@ -191,7 +184,7 @@ function retrieveReleaseInfo(release_url) {
             number: trackNumber,
             title: $.trim(element.children[1].textContent.replace(/\s+/g, ' ')),
             duration: $.trim(element.children[2].textContent),
-            artist_credit: [release.artist_credit]
+            artist_credit: [release.artist_credit],
         };
         release.discs[releaseNumber].tracks.push(track);
     });
@@ -207,14 +200,14 @@ function insertLink(release, release_url) {
 
     $('h2.band_name').after(mbUI);
     $('#musicbrainz-import form').css({
-        padding: '0'
+        padding: '0',
     });
     $('form.musicbrainz_import').css({
         display: 'inline-block',
-        margin: '1px'
+        margin: '1px',
     });
     $('form.musicbrainz_import img').css({
-        display: 'inline-block'
+        display: 'inline-block',
     });
 
     mbUI.slideDown();
@@ -249,7 +242,7 @@ var ReleaseTypes = {
     EP: ['ep'],
     Compilation: ['album', 'compilation'],
     Split: ['album'],
-    Collaboration: ['']
+    Collaboration: [''],
 };
 
 //ReleaseFormat[MAformat]="MBformat";
@@ -265,5 +258,5 @@ var ReleaseFormat = {
     '2 12" vinyls': '12" Vinyl',
     '12" vinyl (33⅓ RPM)': '12" Vinyl',
     Cassette: 'Cassette',
-    Digital: 'Digital Media'
+    Digital: 'Digital Media',
 };

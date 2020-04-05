@@ -21,7 +21,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
 
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
@@ -48,18 +48,18 @@ function retrieveReleaseInfo(release_url) {
         type: '',
         urls: [],
         labels: [],
-        discs: []
+        discs: [],
     };
 
     // URLs
     release.urls.push({
         url: release_url,
-        link_type: MBImport.URL_TYPES.purchase_for_download
+        link_type: MBImport.URL_TYPES.purchase_for_download,
     });
 
     release.labels.push({
         name: ProductDetail.label.name,
-        catno: ProductDetail.catalog
+        catno: ProductDetail.catalog,
     });
 
     // Reload Playables if empty
@@ -73,7 +73,7 @@ function retrieveReleaseInfo(release_url) {
     let the_tracks = unsafeWindow.Playables.tracks;
     let seen_tracks = {}; // to shoot duplicates ...
     let release_artists = [];
-    $.each(the_tracks, function(idx, track) {
+    $.each(the_tracks, function (idx, track) {
         if (track.release.id !== ProductDetail.id) {
             return;
         }
@@ -83,7 +83,7 @@ function retrieveReleaseInfo(release_url) {
         seen_tracks[track.id] = true;
 
         let artists = [];
-        $.each(track.artists, function(idx2, artist) {
+        $.each(track.artists, function (idx2, artist) {
             artists.push(artist.name);
             release_artists.push(artist.name);
         });
@@ -95,12 +95,12 @@ function retrieveReleaseInfo(release_url) {
         tracks.push({
             artist_credit: MBImport.makeArtistCredits(artists),
             title: title,
-            duration: track.duration.minutes
+            duration: track.duration.minutes,
         });
     });
 
     let unique_artists = [];
-    $.each(release_artists, function(i, el) {
+    $.each(release_artists, function (i, el) {
         if ($.inArray(el, unique_artists) === -1) {
             unique_artists.push(el);
         }
@@ -113,7 +113,7 @@ function retrieveReleaseInfo(release_url) {
     }
     release.discs.push({
         tracks: tracks,
-        format: release.format
+        format: release.format,
     });
 
     LOGGER.info('Parsed release: ', release);

@@ -18,7 +18,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function() {
+$(document).ready(function () {
     let gmXHR;
 
     if (typeof GM_xmlhttpRequest != 'undefined') {
@@ -31,7 +31,7 @@ $(document).ready(function() {
     }
 
     // allow 1 second for Deezer SPA to initialize
-    window.setTimeout(function() {
+    window.setTimeout(function () {
         MBImportStyle();
         let releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
         let releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
@@ -40,7 +40,7 @@ $(document).ready(function() {
         gmXHR({
             method: 'GET',
             url: deezerApiUrl,
-            onload: function(resp) {
+            onload: function (resp) {
                 try {
                     let release = parseDeezerRelease(releaseUrl, JSON.parse(resp.responseText));
                     insertLink(release, releaseUrl);
@@ -48,10 +48,10 @@ $(document).ready(function() {
                     LOGGER.error('Failed to parse release: ', e);
                 }
             },
-            onerror: function(resp) {
+            onerror: function (resp) {
                 LOGGER.error('AJAX status:', resp.status);
                 LOGGER.error('AJAX response:', resp.responseText);
-            }
+            },
         });
     }, 1000);
 });
@@ -73,15 +73,15 @@ function parseDeezerRelease(releaseUrl, data) {
         type: '',
         urls: [],
         labels: [],
-        discs: []
+        discs: [],
     };
 
-    $.each(data.contributors, function(index, artist) {
+    $.each(data.contributors, function (index, artist) {
         if (artist.role != 'Main') return true;
 
         let ac = {
             artist_name: artist.name,
-            joinphrase: index == data.contributors.length - 1 ? '' : ', '
+            joinphrase: index == data.contributors.length - 1 ? '' : ', ',
         };
 
         if (artist.name == 'Various Artists') {
@@ -94,15 +94,15 @@ function parseDeezerRelease(releaseUrl, data) {
     let disc = {
         format: 'Digital Media',
         title: '',
-        tracks: []
+        tracks: [],
     };
 
-    $.each(data.tracks.data, function(index, track) {
+    $.each(data.tracks.data, function (index, track) {
         let t = {
             number: index + 1,
             title: track.title_short,
             duration: track.duration * 1000,
-            artist_credit: []
+            artist_credit: [],
         };
 
         // ignore pointless "(Original Mix)" in title version
@@ -119,7 +119,7 @@ function parseDeezerRelease(releaseUrl, data) {
 
     release.urls.push({
         link_type: MBImport.URL_TYPES.stream_for_free,
-        url: releaseUrl
+        url: releaseUrl,
     });
     release.labels.push({ name: data.label });
     release.type = data.record_type;

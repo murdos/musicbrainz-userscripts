@@ -1,6 +1,6 @@
 /* global $ MBImport */
 'use strict';
-var meta = function() {
+var meta = function () {
     // ==UserScript==
     // @name         Import DG/Decca releases to MusicBrainz
     // @namespace    https://github.com/murdos/musicbrainz-userscripts
@@ -38,19 +38,19 @@ var months = {
     'Sep.': 9,
     'Oct.': 10,
     'Nov.': 11,
-    'Dec.': 12
+    'Dec.': 12,
 };
 var labels = {
     'deutschegrammophon.com': {
         name: 'Deutsche Grammophon',
         mbid: '5a584032-dcef-41bb-9f8b-19540116fb1c',
-        catno: document.URL.split('/')[5]
+        catno: document.URL.split('/')[5],
     },
     'deccaclassics.com': {
         name: 'Decca Classics',
         mbid: '89a9993d-1dad-4445-a3d7-1d8df04f7e7b',
-        catno: document.URL.split('/')[5]
-    }
+        catno: document.URL.split('/')[5],
+    },
 };
 
 var editNote = `Imported from ${document.URL}\n —\nGM script: "${meta.name}" (${meta.version})\n\n`;
@@ -97,12 +97,12 @@ function extract_release_data() {
     function _setReleasePerformers() {
         let list = $('div.artists')[0]
             .innerHTML.split('<br>')
-            .map(function(artist) {
+            .map(function (artist) {
                 return {
                     credited_name: artist,
                     artist_name: artist,
                     artist_mbid: '',
-                    joinphrase: ', '
+                    joinphrase: ', ',
                 };
             });
         list[list.length - 1]['joinphrase'] = '';
@@ -116,8 +116,8 @@ function extract_release_data() {
                 credited_name: composer,
                 artist_name: composer,
                 artist_mbid: '',
-                joinphrase: '; '
-            }
+                joinphrase: '; ',
+            },
         ];
         return list.concat(_setReleasePerformers());
     }
@@ -137,7 +137,7 @@ function extract_release_data() {
     let nodes = [];
     let tracklist_node = document.getElementById('tracklist');
 
-    $('.item,.hier0,.hier1,.hier2,.hier3').each(function(idx, node) {
+    $('.item,.hier0,.hier1,.hier2,.hier3').each(function (idx, node) {
         var idx;
         let d = {};
         if (node.classList.contains('hier0')) {
@@ -166,7 +166,7 @@ function extract_release_data() {
 
     // complete track titles
     let header0, header1, header2, idx;
-    nodes.forEach(function(node, idx) {
+    nodes.forEach(function (node, idx) {
         let level = node['level'],
             type = node['type'],
             content = node['title'];
@@ -194,7 +194,7 @@ function extract_release_data() {
     let discs = [],
         tracks = [],
         medium_title = '';
-    nodes.forEach(function(item, idx) {
+    nodes.forEach(function (item, idx) {
         if (item.type === 'track') {
             let track = extract_track_data(item.node);
             track.title = _clean(item.title);
@@ -205,7 +205,7 @@ function extract_release_data() {
                 discs.push({
                     title: '', // medium_title,
                     format: 'CD',
-                    tracks: tracks
+                    tracks: tracks,
                 });
             }
             medium_title = item.title;
@@ -216,7 +216,7 @@ function extract_release_data() {
     discs.push({
         title: '', // nodes[0].title,
         format: 'CD',
-        tracks: tracks
+        tracks: tracks,
     });
 
     return {
@@ -236,10 +236,10 @@ function extract_release_data() {
         urls: [
             {
                 link_type: 288, // 'discography'
-                url: document.URL
-            }
+                url: document.URL,
+            },
         ],
-        discs: discs
+        discs: discs,
     };
 }
 
@@ -248,23 +248,23 @@ function extract_track_data(node) {
         console.log('artistString', artistString);
         let artists;
         if (artistString.includes(' | ')) {
-            artists = artistString.split(' | ').map(function(artist) {
+            artists = artistString.split(' | ').map(function (artist) {
                 return {
                     credited_name: artist.split(',')[0],
                     artist_name: artist.split(',')[0],
                     artist_mbid: '',
-                    joinphrase: ', '
+                    joinphrase: ', ',
                 };
             });
         } else {
-            artists = artistString.split(', ').map(function(artist, idx) {
+            artists = artistString.split(', ').map(function (artist, idx) {
                 let mbid = '';
                 let url = `/ws/js/artist/?q=${artist}&fmt=json&limit=1`;
                 return {
                     credited_name: artist,
                     artist_name: artist,
                     artist_mbid: mbid,
-                    joinphrase: ', '
+                    joinphrase: ', ',
                 };
             });
         }
@@ -282,14 +282,8 @@ function extract_track_data(node) {
     } else {
         console.log('no meta data on ', node);
         schema.name = node.querySelectorAll('div.track-text > a.fancy')[0].textContent;
-        schema.byArtist = $(node)
-            .parent()
-            .nextAll('div.container-container')
-            .children('.artists-container')[0].textContent;
-        let previousComposers = $(node)
-            .parent()
-            .prevAll('div.container-container')
-            .children('.first-composer-container');
+        schema.byArtist = $(node).parent().nextAll('div.container-container').children('.artists-container')[0].textContent;
+        let previousComposers = $(node).parent().prevAll('div.container-container').children('.first-composer-container');
         schema.creator = previousComposers[previousComposers.length - 1].textContent;
     }
     console.info('schema', schema);
@@ -300,7 +294,7 @@ function extract_track_data(node) {
         artist_credit: _setTrackArtists(schema.byArtist), // CSG
         performer: schema.byArtist,
         composer: schema.creator,
-        url: node.querySelectorAll('div.track-text > a.fancy')[0].href
+        url: node.querySelectorAll('div.track-text > a.fancy')[0].href,
     };
 }
 
@@ -321,7 +315,7 @@ function insertMBSection(release) {
 
     $('#mb_buttons').css({
         display: 'inline-block',
-        width: '100%'
+        width: '100%',
     });
     $('form.musicbrainz_import').css({ width: '49%', display: 'inline-block' });
     $('form.musicbrainz_import_search').css({ float: 'right' });

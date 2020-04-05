@@ -77,7 +77,7 @@ function fastCancelScript() {
             background: '#FFBA58',
             'border-top': '1px #000 solid',
             'border-left': '1px #000 solid',
-            padding: '0.5em'
+            padding: '0.5em',
         })
         .appendTo('body')
         .hide();
@@ -90,7 +90,7 @@ function fastCancelScript() {
         }
     }
 
-    document.body.addEventListener('click', function(event) {
+    document.body.addEventListener('click', function (event) {
         if (event.target && event.target.tagName && event.target.tagName == 'A' && event.target.classList.contains('negative')) {
             event.stopPropagation();
             event.preventDefault();
@@ -100,7 +100,7 @@ function fastCancelScript() {
             let $self = $(event.target),
                 $edit = $self.parents('div.edit-list:eq(0)');
 
-            pushRequest(function() {
+            pushRequest(function () {
                 let editNote = $edit.find('div.add-edit-note textarea').val();
                 let data = { 'confirm.edit_note': editNote };
 
@@ -108,35 +108,35 @@ function fastCancelScript() {
                     type: 'POST',
                     url: $self.attr('href'),
                     data: data,
-                    error: function(request, status, error) {
+                    error: function (request, status, error) {
                         $self
                             .css({
                                 background: 'red',
                                 color: 'yellow',
-                                cursor: 'help'
+                                cursor: 'help',
                             })
                             .attr('title', `Error cancelling this edit: “${error}”`);
                         $edit.css({ border: '6px solid red' }).show();
                     },
-                    complete: function() {
+                    complete: function () {
                         $edit.remove();
                         totalCancels -= 1;
                         updateStatus();
-                    }
+                    },
                 });
             });
             $edit.hide();
         }
     });
 
-    $("div#edits > form[action$='/edit/enter_votes']").on('submit', function(event) {
+    $("div#edits > form[action$='/edit/enter_votes']").on('submit', function (event) {
         if (totalCancels > 0) {
             event.preventDefault();
             alert(`Please wait, ${totalCancels > 1 ? `${totalCancels} edits are` : 'an edit is'} being cancelled in the background.`);
         }
     });
 
-    var pushRequest = (function() {
+    var pushRequest = (function () {
         let queue = [],
             last = 0,
             active = false,
@@ -152,7 +152,7 @@ function fastCancelScript() {
             }
         }
 
-        return function(req) {
+        return function (req) {
             queue.push(req);
 
             if (!active) {

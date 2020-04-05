@@ -48,7 +48,7 @@ function getPerformers(trackobj) {
             trackobj.performers
                 .replace('\r', '')
                 .split(' - ')
-                .map(function(v) {
+                .map(function (v) {
                     let list = v.split(', ');
                     let name = list.shift();
                     return [name, list];
@@ -99,7 +99,7 @@ function parseRelease(data) {
     release.urls = [];
     release.urls.push({
         url: release.url,
-        link_type: MBImport.URL_TYPES.purchase_for_download
+        link_type: MBImport.URL_TYPES.purchase_for_download,
     });
 
     // release timestamps are using France time + daylight saving (GMT+1 or GMT+2),
@@ -110,10 +110,10 @@ function parseRelease(data) {
     release.day = releaseDate.getUTCDate();
 
     release.labels = [];
-    $.each(data.label.name.split(' - '), function(index, label) {
+    $.each(data.label.name.split(' - '), function (index, label) {
         release.labels.push({
             name: label,
-            catno: '[none]' // no catno on qobuz ?
+            catno: '[none]', // no catno on qobuz ?
         });
     });
     release.isrcs = [];
@@ -122,17 +122,17 @@ function parseRelease(data) {
     let tracks = [],
         classical_tracks = [],
         old_media_num = 1;
-    $.each(data.tracks.items, function(index, trackobj) {
+    $.each(data.tracks.items, function (index, trackobj) {
         release.isrcs.push(trackobj.isrc);
         if (trackobj.media_number != old_media_num) {
             release.discs.push({
                 tracks: tracks,
-                format: 'Digital Media'
+                format: 'Digital Media',
             });
             if (is_classical) {
                 release.classical.discs.push({
                     tracks: classical_tracks,
-                    format: 'Digital Media'
+                    format: 'Digital Media',
                 });
                 classical_tracks = [];
             }
@@ -148,7 +148,7 @@ function parseRelease(data) {
             if (typeof trackobj.composer !== 'undefined') {
                 classical_artists.push(trackobj.composer.name);
             } else {
-                $.each(performers, function(index, performer) {
+                $.each(performers, function (index, performer) {
                     if ($.inArray('Composer', performer[1]) != -1) {
                         classical_artists.push(performer[0]);
                     }
@@ -161,7 +161,7 @@ function parseRelease(data) {
 
         let artists = [];
         let featured_artists = [];
-        $.each(performers, function(index, performer) {
+        $.each(performers, function (index, performer) {
             if ($.inArray('Featured Artist', performer[1]) != -1) {
                 featured_artists.push(performer[0]);
             } else if (
@@ -187,12 +187,12 @@ function parseRelease(data) {
     });
     release.discs.push({
         tracks: tracks,
-        format: 'Digital Media'
+        format: 'Digital Media',
     });
     if (is_classical) {
         release.classical.discs.push({
             tracks: classical_tracks,
-            format: 'Digital Media'
+            format: 'Digital Media',
         });
     }
 
@@ -232,9 +232,7 @@ function insertLink(release) {
         parameters = MBImport.buildFormParameters(release, edit_note),
         $album_form = $(MBImport.buildFormHTML(parameters)),
         search_form = MBImport.buildSearchButton(release);
-    let mbUI = $('<p class="musicbrainz_import">')
-        .append($album_form, search_form)
-        .hide();
+    let mbUI = $('<p class="musicbrainz_import">').append($album_form, search_form).hide();
 
     if (is_classical) {
         let classical_release = $.extend({}, release);
@@ -271,12 +269,12 @@ function insertLink(release) {
     $('#info div.meta').append(mbUI);
     $('form.musicbrainz_import').css({
         display: 'inline-block',
-        margin: '1px'
+        margin: '1px',
     });
     $('form.musicbrainz_import img').css({
         display: 'inline-block',
         width: '16px',
-        height: '16px'
+        height: '16px',
     });
     $('label.musicbrainz_import').css({
         'white-space': 'nowrap',
@@ -292,19 +290,19 @@ function insertLink(release) {
         'background-color': 'rgba(240,240,240,0.8)',
         color: '#334',
         height: '26px',
-        'box-sizing': 'border-box'
+        'box-sizing': 'border-box',
     });
     $('label.musicbrainz_import input').css({
-        margin: '0 4px 0 0'
+        margin: '0 4px 0 0',
     });
     mbUI.slideDown();
 }
 
 // Hook all XMLHttpRequest to use the data fetched by the official web-player.
-(function() {
+(function () {
     const send = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function() {
-        this.addEventListener('load', function() {
+    XMLHttpRequest.prototype.send = function () {
+        this.addEventListener('load', function () {
             let wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=';
             let repUrl = arguments[0].currentTarget.responseURL;
             if (repUrl.startsWith(wsUrl)) {
@@ -322,18 +320,16 @@ function insertLink(release) {
     };
 })();
 
-$(document).ready(function() {
+$(document).ready(function () {
     MBImportStyle();
 
     // replace image zoom link by the maximum size image link
-    let maximgurl = $('#product-cover-link')
-        .attr('href')
-        .replace('_600', '_max');
+    let maximgurl = $('#product-cover-link').attr('href').replace('_600', '_max');
     let maximg = new Image();
-    maximg.onerror = function(evt) {
+    maximg.onerror = function (evt) {
         LOGGER.debug('No max image');
     };
-    maximg.onload = function(evt) {
+    maximg.onload = function (evt) {
         $('#product-cover-link').attr('href', maximgurl);
         $('#product-cover-link').attr(
             'title',
@@ -343,7 +339,7 @@ $(document).ready(function() {
     maximg.src = maximgurl;
 });
 
-$(document).on('click', '#isrcs', function() {
+$(document).on('click', '#isrcs', function () {
     $('#isrclist').toggle();
     if ($('#isrclist').is(':visible')) {
         $('#isrclist').select();
@@ -352,6 +348,6 @@ $(document).on('click', '#isrcs', function() {
     return false;
 });
 
-$(document).on('click', '#force_album_artist', function() {
+$(document).on('click', '#force_album_artist', function () {
     changeAlbumArtist();
 });
