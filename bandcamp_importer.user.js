@@ -358,6 +358,8 @@ $(document).ready(function() {
     $('div#bci_link a').css({ 'font-weight': 'bold' });
     let upc = unsafeWindow.TralbumData.current.upc;
     if (typeof upc != 'undefined' && upc !== null) {
-        $('div #trackInfoInner').append(`<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://etc.marlonob.info/atisket/?upc=${upc}">${upc}</a></div>`);
+        $('div #trackInfoInner').append(
+            `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://etc.marlonob.info/atisket/?upc=${upc}">${upc}</a></div>`
+        );
     }
 });
