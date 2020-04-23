@@ -16,6 +16,8 @@
 -   [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 -   [Import Loot releases to MusicBrainz](#loot_importer)
 -   [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
+-   [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
+-   [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
 -   [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 -   [Import Takealot releases to MusicBrainz](#takealot_importer)
 -   [MusicBrainz: 1200px CAA](#mb_1200px_caa)
@@ -137,6 +139,20 @@ Add a button on Metal Archives release pages allowing to open MusicBrainz releas
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/metalarchives_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js)
+
+## <a name="naxos_library3_importer"></a> Import Naxos Music Library 3 releases to MusicBrainz
+
+Add a button to import Naxos Music Library 3 releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/naxos_library3_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library3_importer.user.js)
+
+## <a name="naxos_library_importer"></a> Import Naxos Music Library releases to MusicBrainz
+
+Add a button to import Naxos Music Library releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/naxos_library_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js)
 
 ## <a name="qobuz_importer"></a> Import Qobuz releases to MusicBrainz
 
