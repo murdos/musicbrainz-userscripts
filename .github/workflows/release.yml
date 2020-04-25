@@ -23,7 +23,6 @@ jobs:
             - name: Update version of modified userscripts
               run: |
                   set -x
-#                  MODIFIED_USER_SCRIPTS=$(echo "${{ steps.file_changes.outputs.files_modified }}" | tr " " "\n" | grep "user.js")
                   MODIFIED_USER_SCRIPTS=$(echo "${{ steps.file_changes.outputs.files_modified }}")
                   echo "MODIFIED_USER_SCRIPTS: $MODIFIED_USER_SCRIPTS"
                   MODIFIED_USER_SCRIPTS=$(echo "$MODIFIED_USER_SCRIPTS" | sed 's/\s/\n/g')
