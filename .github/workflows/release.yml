@@ -1,0 +1,34 @@
+name: Release new version(s)
+on: [push]
+jobs:
+    changes:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-python@v1
+            - uses: actions/setup-node@v1
+            - name: 'Install node dependencies'
+              run: npm ci
+            - id: file_changes
+              uses: trilom/file-changes-action@v1.2.3
+              with:
+                  output: ' '
+            - name: Update README
+              run: |
+                  ./tools/generate_README.py > README.md
+                  npx prettier --write README.md
+            - name: Update version of modified userscripts
+              run: |
+                  MODIFIED_USER_SCRIPTS=$(echo ${{ steps.file_changes.outputs.files_modified }} | tr ' ' '\n' | grep 'user.js')
+                  ./tools/update_version.py $MODIFIED_USER_SCRIPTS
+                  npx prettier --write $MODIFIED_USER_SCRIPTS
+            - name: Commit changes
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git commit -m "Release" -a
+#            - name: Push changes
+#              uses: ad-m/github-push-action@master
+#              with:
+#                  github_token: ${{ secrets.GITHUB_TOKEN }}
+#                  branch: master-merge-actions

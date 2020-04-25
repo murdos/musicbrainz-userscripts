@@ -24,6 +24,8 @@ String.prototype.fix_bandcamp_url = function () {
     return this.replace('http://', 'https://');
 };
 
+// dummy change
+
 var BandcampImport = {
     // Analyze Bandcamp data and return a release object
     retrieveReleaseInfo: function () {
