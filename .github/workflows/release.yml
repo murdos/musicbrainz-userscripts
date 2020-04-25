@@ -1,7 +1,10 @@
 name: Release new version(s)
-on: [push]
+on:
+    push:
+        branches:
+            - master-merge-actions
 jobs:
-    changes:
+    release:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -19,14 +22,26 @@ jobs:
                   npx prettier --write README.md
             - name: Update version of modified userscripts
               run: |
-                  MODIFIED_USER_SCRIPTS=$(echo ${{ steps.file_changes.outputs.files_modified }} | tr ' ' '\n' | grep 'user.js')
-                  ./tools/update_version.py $MODIFIED_USER_SCRIPTS
-                  npx prettier --write $MODIFIED_USER_SCRIPTS
+                  set -x
+#                  MODIFIED_USER_SCRIPTS=$(echo "${{ steps.file_changes.outputs.files_modified }}" | tr " " "\n" | grep "user.js")
+                  MODIFIED_USER_SCRIPTS=$(echo "${{ steps.file_changes.outputs.files_modified }}")
+                  echo "MODIFIED_USER_SCRIPTS: $MODIFIED_USER_SCRIPTS"
+                  MODIFIED_USER_SCRIPTS=$(echo "$MODIFIED_USER_SCRIPTS" | sed 's/\s/\n/g')
+                  echo "MODIFIED_USER_SCRIPTS: $MODIFIED_USER_SCRIPTS"
+                  MODIFIED_USER_SCRIPTS=$(echo "$MODIFIED_USER_SCRIPTS" | grep "user.js")
+                  echo "MODIFIED_USER_SCRIPTS: $MODIFIED_USER_SCRIPTS"
+                  if [[ $MODIFIED_USER_SCRIPTS != "" ]]
+                  then
+                    ./tools/update_version.py $MODIFIED_USER_SCRIPTS
+                    npx prettier --write $MODIFIED_USER_SCRIPTS
+                  fi
+                  echo "done"
             - name: Commit changes
               run: |
                   git config --local user.email "action@github.com"
                   git config --local user.name "GitHub Action"
                   git commit -m "Release" -a
+
 #            - name: Push changes
 #              uses: ad-m/github-push-action@master
 #              with:
