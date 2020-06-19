@@ -637,7 +637,7 @@ function parseDiscogsRelease(data) {
                 }
                 if (subtrack.title) {
                     track_new.title = `${track.title}: ${subtrack.title}`;
-                    track_new.artist_credit = track.artist_credit
+                    track_new.artist_credit = track.artist_credit;
                     subtrack_titles.push(subtrack.title);
                 } else {
                     subtrack_titles.push('[unknown]');
