@@ -637,12 +637,12 @@ function parseDiscogsRelease(data) {
                 }
                 if (subtrack.title) {
                     track_new.title = `${track.title}: ${subtrack.title}`;
-                    track_new.artist_credit= track.artist_credit
+                    track_new.artist_credit = track.artist_credit
                     subtrack_titles.push(subtrack.title);
                 } else {
                     subtrack_titles.push('[unknown]');
                 }
-                tracks.push(track_new)
+                tracks.push(track_new);
             });
             if (subtrack_titles.length) {
                 if (track.title) {
@@ -731,11 +731,11 @@ function parseDiscogsRelease(data) {
 
         // Trackposition is empty e.g. for release title
         if (trackPosition != '' && trackPosition != null) {
-            if (tracks.length > 0){
-                for (var i =0; i< tracks.length; i++){
+            if (tracks.length > 0) {
+                for (var i = 0; i < tracks.length; i++) {
                     release.discs[discindex].tracks.push(tracks[i]);
                 }
-            }else {
+            } else {
                 release.discs[discindex].tracks.push(track);
             }
         }
