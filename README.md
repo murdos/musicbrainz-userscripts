@@ -5,6 +5,7 @@
 -   [Import Bandcamp releases to MusicBrainz Album Link Helper](#bandcamp_importer_helper)
 -   [Import Beatport Classic releases to MusicBrainz](#beatport_classic_importer)
 -   [Import Beatport releases to MusicBrainz](#beatport_importer)
+-   [Import Boomkat releases to Musicbrainz](#boomkat_importer)
 -   [Import CD Baby releases to MusicBrainz](#cdbaby_importer)
 -   [Import CD1D releases to MusicBrainz](#cd1d_importer)
 -   [Import DG/Decca releases to MusicBrainz](#dgdecca_importer)
@@ -60,6 +61,12 @@ One-click importing of releases from beatport.com/release pages into MusicBrainz
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
+
+## <a name="boomkat_importer"></a> Import Boomkat releases to Musicbrainz
+
+Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
 
 ## <a name="cdbaby_importer"></a> Import CD Baby releases to MusicBrainz
 
