@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2018.2.18.1
+// @version       2020.8.1.1
 // @license       GPL
 // @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
 // @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
@@ -41,9 +41,11 @@ var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{1
 
 var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
 for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
-    if (releasesOrReleaseGroups[r].getAttribute('href').match(/\/release-group\//)) {
+    let entityLink = releasesOrReleaseGroups[r].getAttribute('href');
+    if (entityLink.match(/\/release-group\//)) {
         inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
-    } else {
+    } else if (!entityLink.match(/\/cover-art/)) {
+        // avoid injecting a second button for a release's cover art link
         inject_release_button(releasesOrReleaseGroups[r].parentNode);
     }
 }
