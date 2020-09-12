@@ -3,7 +3,7 @@
 // @name         Import Naxos Music Library releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @author       loujine
-// @version      2020.8.28
+// @version      2020.9.12
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
@@ -23,10 +23,10 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 const url = document.URL.replace(/\/[^/].*naxos/, '/www.naxos');
 
 const editNote = `
-    Imported from ${url}
-    Warning: Track durations from Naxos Music Library can seldom be incorrect
-    —
-    GM script: "${GM_info.script.name}" (${GM_info.script.version})
+Imported from ${url}
+Warning: Track durations from Naxos Music Library can seldom be incorrect
+—
+GM script: "${GM_info.script.name}" (${GM_info.script.version})
 `;
 
 const months = {
