@@ -41,7 +41,7 @@
 // authorization.
 // ==/License==
 
-var scr = document.createElement('script');
+const scr = document.createElement('script');
 scr.textContent = `$(${setRecordingComments});`;
 document.body.appendChild(scr);
 
@@ -56,7 +56,7 @@ function setRecordingComments() {
         )
     );
 
-    var delay = setInterval(function () {
+    const delay = setInterval(function () {
         $tracks = $('.medium tbody tr[id]');
 
         if ($tracks.length) {
@@ -97,8 +97,8 @@ function setRecordingComments() {
         return;
     }
 
-    var MBID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/,
-        editing = false,
+    const MBID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/;
+    let editing = false,
         activeRequest = null;
 
     $('body').on('input.rc', '.recording-comment', function () {
@@ -152,7 +152,7 @@ function setRecordingComments() {
         $inputs.filter(':visible').val(this.value).trigger('input.rc');
     });
 
-    var $submitButton = $('#submit-recording-comments').on('click', function () {
+    const $submitButton = $('#submit-recording-comments').on('click', function () {
         if (activeRequest) {
             activeRequest.abort();
             activeRequest = null;
