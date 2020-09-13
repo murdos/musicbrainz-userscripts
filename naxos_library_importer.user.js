@@ -108,9 +108,7 @@ function extract_release_data() {
         date = date
             .split(': ')[1]
             .split(' ')
-            .filter(function (i) {
-                return i !== '';
-            });
+            .filter(i => i !== '');
     }
     let label = $('td#left-sidebar b:contains("Label")').parent().text().trim();
     label = label.split(': ')[1];
@@ -125,7 +123,6 @@ function extract_release_data() {
         if (parseInt(numberfield) == 1) {
             // flush finished medium
             discs.push({
-                title: '', // nodes[0].title,
                 format: 'Digital Media',
                 tracks: tracks,
             });
@@ -142,7 +139,6 @@ function extract_release_data() {
             number: parseInt(numberfield),
             title: _clean(title),
             duration: node.children[5].textContent,
-            artist_credit: '',
         };
     }
 
@@ -173,10 +169,6 @@ function extract_release_data() {
         artist_credit: _setReleaseArtists(),
         type: 'Album',
         status: 'Official',
-        language: '',
-        script: '',
-        packaging: '',
-        country: '',
         year: date[2],
         month: months[date[1]],
         day: date[0],
