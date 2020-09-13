@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2018.2.18.1
+// @version     2020.9.12.1
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
@@ -304,30 +304,24 @@ function batch_recording_rels() {
     function normalizeTitle(title) {
         title = title.toLowerCase().replace(/\s+/g, '');
 
-        _.each(ASCII_PUNCTUATION, function (val) {
+        ASCII_PUNCTUATION.forEach(function (val) {
             title = title.replace(val[0], val[1]);
         });
 
         return title;
     }
 
-    let RECORDING_TITLES = _.chain($recordings)
-        .map(function (row) {
+    let RECORDING_TITLES = Object.fromEntries(
+        Array.from($recordings).map(function (row) {
             let $title = $(row).find(TITLE_SELECTOR),
                 mbid = $title.attr('href').match(MBID_REGEX)[0],
                 norm_title = normalizeTitle($title.text().match(WITHOUT_PAREN_CLAUSES_REGEX)[1]);
 
             return [mbid, norm_title];
         })
-        .fromPairs()
-        .value();
+    );
 
-    let $work_options = _.chain(['type', 'language'])
-        .map(function (kind) {
-            return [kind, $(`<select id="bpr-work-${kind}"></select>`)];
-        })
-        .fromPairs()
-        .value();
+    let $work_options = Object.fromEntries(['type', 'language'].map(kind => [kind, $(`<select id="bpr-work-${kind}"></select>`)]));
 
     // Add button to manage performance ARs
     let $relate_table = table(
@@ -393,14 +387,13 @@ function batch_recording_rels() {
     // Get actual work types/languages
     ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
         let nodes = $.parseHTML(data);
-        function populate($obj, kind) {
+        Object.entries($work_options).forEach(function populate([kind, $obj]) {
             $obj.append($(`#id-edit-work\\.${kind}_id`, nodes).children())
                 .val(setting(`work_${kind}`) || 0)
                 .on('change', function () {
                     setting(`work_${kind}`, this.value);
                 });
-        }
-        _.each($work_options, populate);
+    });
     });
 
     $('<span></span>').append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg).insertBefore($relate_table);
@@ -553,7 +546,7 @@ function batch_recording_rels() {
             }
 
             if (recs) {
-                _.each(recs, extract_rec);
+                recs.forEach(extract_rec);
             } else {
                 extract_rec(data);
             }
@@ -587,7 +580,7 @@ function batch_recording_rels() {
         } arid:${ARTIST_MBID}&limit=100&offset=${page * 100}&fmt=json`;
 
         ws_requests.push_get(url, function (data) {
-            _.each(data.recordings, function (r) {
+            data.recordings.forEach(function (r) {
                 queue_recordings_request(`/ws/2/recording/${r.id}?inc=work-rels&fmt=json`);
             });
 
@@ -604,7 +597,7 @@ function batch_recording_rels() {
         $row.data('performances', []);
         $attrs.data('checked', false).css('color', 'black');
 
-        _.each(node.relations, function (rel) {
+        node.relations.forEach(function (rel) {
             if (rel.type.match(/performance/)) {
                 if (!performed) {
                     $row.addClass('performed');
@@ -616,7 +609,7 @@ function batch_recording_rels() {
                 }
 
                 let attrs = [];
-                _.each(rel.attributes, function (name) {
+                rel.attributes.forEach(function (name) {
                     let cannonical_name = name.toLowerCase();
                     let $button = $attrs.find(`span.${cannonical_name}`);
 
@@ -650,7 +643,7 @@ function batch_recording_rels() {
                         let releases = data.releases;
 
                         for (let i = 0; i < releases.length; i++) {
-                            if (_.includes(releases[i]['release-group']['secondary-types'], 'Live')) {
+                            if (releases[i]['release-group']['secondary-types'].includes('Live')) {
                                 $attrs.find('span.live').click();
                                 break;
                             }
@@ -780,7 +773,7 @@ function batch_recording_rels() {
         let tmp_comments = [];
         let tmp_norm_titles = [];
 
-        _.each(result, function (parts) {
+        result.forEach(function (parts) {
             let mbid = parts.slice(0, 36);
             let rest = parts.slice(36).split('\u00a0');
 
@@ -802,7 +795,7 @@ function batch_recording_rels() {
             let works = data.works;
             let loaded = [];
 
-            _.each(works, function (work) {
+            works.forEach(function (work) {
                 let comment = work.disambiguation;
                 loaded.push(work.id + work.title + (comment ? `\u00a0${comment}` : ''));
             });
@@ -927,9 +920,11 @@ function batch_recording_rels() {
         let item_key = `bpr_artists ${ARTIST_MBID}`;
         localStorage.setItem(
             item_key,
-            _.filter(localStorage.getItem(item_key).split('\n'), function (artist) {
-                return artist.slice(0, 36) !== mbid;
-            }).join('\n')
+            localStorage
+                .getItem(item_key)
+                .split('\n')
+                .filter(artist => artist.slice(0, 36) !== mbid)
+                .join('\n')
         );
     }
 
@@ -1103,7 +1098,7 @@ function batch_recording_rels() {
     function create_new_work(title, callback) {
         function post_edit() {
             let data = `edit-work.name=${title}`;
-            _.each($work_options, function ($obj, kind) {
+            Object.entries($work_options).forEach(function ([kind, $obj]) {
                 if ($obj.val()) {
                     data += `&edit-work.${kind}_id=${$obj.val()}`;
                 }
@@ -1210,7 +1205,7 @@ function batch_recording_rels() {
         if (selected('instrumental')) attrs.push('c031ed4f-c9bb-4394-8cf5-e8ce4db512ae');
         if (selected('cover')) attrs.push('1e8536bd-6eda-3822-8e78-1c0f4d3d2113');
 
-        _.each(attrs, function (attr, index) {
+        attrs.forEach(function (attr, index) {
             data[`rel-editor.rels.0.attributes.${index}.type.gid`] = attr;
         });
 
