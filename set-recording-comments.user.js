@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2019.5.10.1
+// @version        2020.9.12.1
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
@@ -80,7 +80,11 @@ function setRecordingComments() {
         let release = location.pathname.match(MBID_REGEX)[0];
 
         $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function (data) {
-            let comments = _.map(_.map(_.flatten(_.map(data.media, 'tracks')), 'recording'), 'disambiguation');
+            let comments = Array.from(data.media)
+                .map(medium => medium.tracks)
+                .flat()
+                .map(track => track.recording)
+                .map(recording => recording.disambiguation);
 
             for (let i = 0, len = comments.length; i < len; i++) {
                 let comment = comments[i];
