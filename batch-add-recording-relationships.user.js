@@ -39,7 +39,7 @@
 // authorization.
 // ==/License==
 
-var scr = document.createElement('script');
+const scr = document.createElement('script');
 scr.textContent = `(${batch_recording_rels})();`;
 document.body.appendChild(scr);
 
@@ -393,7 +393,7 @@ function batch_recording_rels() {
                 .on('change', function () {
                     setting(`work_${kind}`, this.value);
                 });
-    });
+        });
     });
 
     $('<span></span>').append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg).insertBefore($relate_table);
@@ -627,7 +627,7 @@ function batch_recording_rels() {
         //Use the dates in "live YYYY-MM-DD" disambiguation comments
 
         let comment = node.disambiguation;
-        let date = comment && comment.match && comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:\: .+)?$/);
+        let date = comment && comment.match && comment.match(/live(?: .+)?, ([0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?)(?:: .+)?$/);
         if (date) {
             $attrs.find('input.date').val(date[1]).trigger('input');
         }
@@ -638,7 +638,7 @@ function batch_recording_rels() {
             } else {
                 let url = `/ws/2/recording/${node.id}?inc=releases+release-groups&fmt=json`;
 
-                var request_rec = function () {
+                const request_rec = function () {
                     $.get(url, function (data) {
                         let releases = data.releases;
 
@@ -860,7 +860,7 @@ function batch_recording_rels() {
                 }
             };
 
-            var iid = setInterval(function () {
+            const iid = setInterval(function () {
                 let j = current++;
                 let norm_work_title = norm_titles[j];
                 let score = sim(rec_title, norm_work_title);
