@@ -146,7 +146,6 @@ function extract_release_data() {
         });
 
         discs.push({
-            title: '',
             format: 'Digital Media',
             tracks: tracks,
         });
@@ -157,10 +156,6 @@ function extract_release_data() {
         artist_credit: _setReleaseArtists(),
         type: 'Album',
         status: 'Official',
-        language: '',
-        script: '',
-        packaging: '',
-        country: '',
         year: date[2],
         month: months[date[1]],
         day: date[0],
