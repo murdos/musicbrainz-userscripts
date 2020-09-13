@@ -261,15 +261,15 @@ var MBDiscid = (function () {
 
     this.toc_entry_matcher = new RegExp(
         '^\\s*' +
-        '(\\d+)' + // 1 - track number
-        '\\s*\\|\\s*' +
-        '([0-9:.]+)' + // 2 - time start
-        '\\s*\\|\\s*' +
-        '([0-9:.]+)' + // 3 - time length
-        '\\s*\\|\\s*' +
-        '(\\d+)' + // 4 - start sector
-        '\\s*\\|\\s*' +
-        '(\\d+)' + // 5 - end sector
+            '(\\d+)' + // 1 - track number
+            '\\s*\\|\\s*' +
+            '([0-9:.]+)' + // 2 - time start
+            '\\s*\\|\\s*' +
+            '([0-9:.]+)' + // 3 - time length
+            '\\s*\\|\\s*' +
+            '(\\d+)' + // 4 - start sector
+            '\\s*\\|\\s*' +
+            '(\\d+)' + // 5 - end sector
             '\\s*$'
     );
     this.log_input_to_entries = function (text) {

@@ -277,8 +277,8 @@ $(document).ready(function () {
     if (window.location.href.match(re)) {
         document.querySelectorAll('div#bottom-credits a').forEach(function (link) {
             if (link.href.match(/deezer.com|(music|itunes).apple.com|spotify.com/)) {
-                var id;
-                var fragment;
+                let id;
+                let fragment;
 
                 if (link.href.match(/deezer.com/)) {
                     id = new URL(link.href).pathname.split('/').slice(-1)[0];
@@ -291,8 +291,8 @@ $(document).ready(function () {
                     fragment = 'spf';
                 }
 
-                var next = link.nextElementSibling.nextElementSibling;
-                var newlink = document.createElement('a');
+                let next = link.nextElementSibling.nextElementSibling;
+                let newlink = document.createElement('a');
                 newlink.href = `https://etc.marlonob.info/atisket/?${fragment}_id=${id}`;
                 newlink.text = 'a-tisket';
 
