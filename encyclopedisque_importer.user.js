@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2018.2.18.1
+// @version        2020.9.13.1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
@@ -15,7 +15,7 @@
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
-var mblinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
+const mbLinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
 $(document).ready(function () {
     MBImportStyle();
@@ -47,11 +47,11 @@ function setupImportUI(release) {
 function insertMBLinks() {
     let current_url = window.location.href;
     if (current_url.match(/\/disque\//)) {
-        mblinks.searchAndDisplayMbLink(current_url, 'release', function (link) {
+        mbLinks.searchAndDisplayMbLink(current_url, 'release', function (link) {
             $('h2 span').before(link);
         });
     } else if (current_url.match(/\/artiste\//)) {
-        mblinks.searchAndDisplayMbLink(current_url, 'artist', function (link) {
+        mbLinks.searchAndDisplayMbLink(current_url, 'artist', function (link) {
             $('h2').prepend(link);
         });
     }
@@ -61,7 +61,7 @@ function insertMBLinks() {
         .each(function () {
             let $link = $(this);
             let external_url = window.location.origin + $link.attr('href');
-            mblinks.searchAndDisplayMbLink(external_url, 'release', function (link) {
+            mbLinks.searchAndDisplayMbLink(external_url, 'release', function (link) {
                 $link.after(link).after('<br />');
             });
         });
@@ -71,7 +71,7 @@ function insertMBLinks() {
         .each(function () {
             let $link = $(this);
             let external_url = window.location.origin + $link.attr('href');
-            mblinks.searchAndDisplayMbLink(external_url, 'artist', function (link) {
+            mbLinks.searchAndDisplayMbLink(external_url, 'artist', function (link) {
                 $link.before(link);
             });
         });
@@ -79,14 +79,15 @@ function insertMBLinks() {
 
 // Analyze Encyclopedisque data and prepare to release object
 function parseEncyclopedisquePage() {
-    release = new Object();
+    const release = {
+        labels: [],
+    };
 
     let infoHeader = document.body.querySelector('#contenu > h2:nth-of-type(1)');
 
     // Release artist credit
-    release.artist_credit = new Array();
     let artist_name = infoHeader.querySelector('div.floatright:nth-of-type(1)').textContent.trim();
-    release.artist_credit.push({ artist_name: artist_name });
+    release.artist_credit = [{ artist_name: artist_name }];
 
     // Release title
     release.title = infoHeader.querySelector('span:nth-of-type(1)').textContent.trim();
@@ -102,117 +103,78 @@ function parseEncyclopedisquePage() {
     release.discs = [disc];
 
     // Release URL
-    release.urls = new Array();
-    release.urls.push({ url: window.location.href, link_type: MBImport.URL_TYPES.other_databases });
+    release.urls = [{ url: window.location.href, link_type: MBImport.URL_TYPES.other_databases }];
 
     // Parse other infos
-    let releaseInfos = document.body.querySelectorAll('div.main tr');
-    let lastVinylFace = '';
-    let lastInfoType;
-    for (let i = 0; i < releaseInfos.length; i++) {
-        let infoType = releaseInfos[i].querySelector('td:nth-of-type(1)').textContent.trim();
+    let lastMediumSide = '';
+    let lastInfoType = undefined;
+    document.body.querySelectorAll('div.main tr').forEach(releaseInfo => {
+        let infoType = releaseInfo.querySelector('td:nth-of-type(1)').textContent.trim();
 
         // Release date
-        if (infoType == 'Sortie :') {
-            var infoValue = releaseInfos[i].querySelector('td:nth-of-type(2)').textContent.trim();
-            let re = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d\?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^\)]*)?\)?/;
-            m = infoValue.match(re);
-            month = m[1];
-            if (month != undefined) {
-                switch (month) {
-                    case 'janvier':
-                        release.month = 1;
-                        break;
-                    case 'février':
-                        release.month = 2;
-                        break;
-                    case 'mars':
-                        release.month = 3;
-                        break;
-                    case 'avril':
-                        release.month = 4;
-                        break;
-                    case 'mai':
-                        release.month = 5;
-                        break;
-                    case 'juin':
-                        release.month = 6;
-                        break;
-                    case 'juillet':
-                        release.month = 7;
-                        break;
-                    case 'août':
-                        release.month = 8;
-                        break;
-                    case 'septembre':
-                        release.month = 9;
-                        break;
-                    case 'octobre':
-                        release.month = 10;
-                        break;
-                    case 'novembre':
-                        release.month = 11;
-                        break;
-                    case 'décembre':
-                        release.month = 12;
-                        break;
-                }
+        if (infoType === 'Sortie :') {
+            const infoValue = releaseInfo.querySelector('td:nth-of-type(2)').textContent.trim();
+            const releaseRegexp = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^)]*)?\)?/;
+            const m = infoValue.match(releaseRegexp);
+            if (m[1] !== undefined) {
+                release.month = MONTHS[m[1]];
             }
             release.year = m[2];
-            release.labels = [];
-            let labels = m[3];
-            if (labels != undefined) {
-                $.each(labels.split('/'), function (index, label) {
-                    release.labels.push({ name: label.trim(), catno: m[4] });
-                });
+            const labels = m[3];
+            if (labels !== undefined) {
+                labels.split('/').forEach(label => release.labels.push({ name: label.trim(), catno: m[4] }));
             } else {
                 release.labels.push({ catno: m[4] });
             }
-        } else if (infoType.match(/^Face [A-Z]/) || (infoType == '' && lastInfoType.match(/^Face [A-Z]/))) {
+        } else if (infoType.match(/^Face [A-Z]/) || (infoType === '' && lastInfoType !== undefined && lastInfoType.match(/^Face [A-Z]/))) {
             // Tracks
-            let track = new Object();
+            let track = {};
 
             // First part of tracknumber (A, B, ...)
-            let tnum_part1 = '';
-            if ((m = infoType.match(/^Face ([A-Z])/))) {
-                lastVinylFace = m[1];
-                tnum_part1 = m[1];
+            let mediumSide;
+            let m = infoType.match(/^Face ([A-Z])/);
+            if (m != null) {
+                lastMediumSide = m[1];
+                mediumSide = m[1];
             } else {
-                tnum_part1 = lastVinylFace;
+                mediumSide = lastMediumSide;
             }
 
             // Track title
-            if (releaseInfos[i].querySelector('td:nth-of-type(2) em') == null) {
-                continue;
+            if (releaseInfo.querySelector('td:nth-of-type(2) em') == null) {
+                return;
             }
-            let title = releaseInfos[i].querySelector('td:nth-of-type(2) em').textContent.trim();
+            let title = releaseInfo.querySelector('td:nth-of-type(2) em').textContent.trim();
 
             // 2nd part of tracknumber (1, 2, ...)
-            let tnum_part2 = '';
-            if ((m = infoType.match(/^Face [A-Z](\d+)/))) {
-                tnum_part2 = m[1];
-            } else if ((m = title.match(/^(\d+)\.\s+(.*)$/))) {
-                tnum_part2 = m[1];
-                title = m[2];
+            let trackNumber = '';
+            m = infoType.match(/^Face [A-Z](\d+)/);
+            if (m !== null) {
+                trackNumber = m[1];
+            } else {
+                m = title.match(/^(\d+)\.\s+(.*)$/);
+                if (m !== null) {
+                    trackNumber = m[1];
+                    title = m[2];
+                }
             }
 
             // Track length
-            if (
-                (m = releaseInfos[i]
-                    .querySelector('td:nth-of-type(2)')
-                    .textContent.trim()
-                    .match(/- (\d+)’(\d+)$/))
-            ) {
+            m = releaseInfo
+                .querySelector('td:nth-of-type(2)')
+                .textContent.trim()
+                .match(/- (\d+)’(\d+)$/);
+            if (m !== null) {
                 track.duration = `${m[1]}:${m[2]}`;
             }
 
-            track.number = tnum_part1 + tnum_part2;
+            track.number = mediumSide + trackNumber;
             track.title = title;
             disc.tracks.push(track);
-        } else if (infoType == 'Format :') {
+        } else if (infoType === 'Format :') {
             // Format => medium format, release-group type, release status
-            var infoValue = releaseInfos[i].querySelector('td:nth-of-type(2)').textContent.trim();
-            let values = infoValue.split(' / ');
+            const infoValue = releaseInfo.querySelector('td:nth-of-type(2)').textContent.trim();
+            const values = infoValue.split(' / ');
             values.forEach(function (value) {
                 if (value.indexOf('45 tours') > -1) {
                     disc.format = '7" Vinyl';
@@ -233,24 +195,24 @@ function parseEncyclopedisquePage() {
                     release.status = 'promotion';
                 }
             });
-        } else if (infoType == 'Pays :') {
+        } else if (infoType === 'Pays :') {
             // Country
-            var infoValue = releaseInfos[i].querySelector('td:nth-of-type(2)').textContent.trim();
-            if (infoValue == 'France') {
+            const infoValue = releaseInfo.querySelector('td:nth-of-type(2)').textContent.trim();
+            if (infoValue === 'France') {
                 release.country = 'FR';
-            } else if (infoValue == 'Royaume-uni') {
+            } else if (infoValue === 'Royaume-uni') {
                 release.country = 'UK';
-            } else if (infoValue == 'Allemagne') {
+            } else if (infoValue === 'Allemagne') {
                 release.country = 'DE';
-            } else if (infoValue == 'Belgique') {
+            } else if (infoValue === 'Belgique') {
                 release.country = 'BE';
             }
         }
 
-        if (infoType != '') {
+        if (infoType !== '') {
             lastInfoType = infoType;
         }
-    }
+    });
 
     // Barcode ?
     if (parseInt(release.year, 10) <= 1982) {
@@ -262,3 +224,18 @@ function parseEncyclopedisquePage() {
 
     return release;
 }
+
+const MONTHS = {
+    janvier: 1,
+    février: 2,
+    mars: 3,
+    avril: 4,
+    mai: 5,
+    juin: 6,
+    juillet: 7,
+    août: 8,
+    septembre: 9,
+    octobre: 10,
+    novembre: 11,
+    décembre: 12,
+};
