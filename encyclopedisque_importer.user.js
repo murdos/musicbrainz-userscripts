@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2020.09.13.1
+// @version        2020.9.13.1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
