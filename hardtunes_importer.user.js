@@ -31,8 +31,8 @@ function retrieveReleaseInfo(release_url) {
     let release_heading = unsafeWindow.document.getElementsByClassName('release-heading')[0];
     let catno = '';
     let release = {
-        artist_credit: [translateArtist(release_heading.childNodes[1].innerText.replace(/\s/,' '))],
-        title: release_heading.childNodes[0].innerText.replace(/\s/,' '),
+        artist_credit: [translateArtist(release_heading.childNodes[1].innerText.replace(/\s/g,' '))],
+        title: release_heading.childNodes[0].innerText.replace(/\s/g,' '),
         format: 'Digital Media',
         packaging: 'None',
         country: 'XW',
@@ -48,8 +48,8 @@ function retrieveReleaseInfo(release_url) {
     for (form of document.getElementsByClassName('form-group')) {
         if (!form.childNodes[1])
             continue;
-        var name = form.childNodes[0].innerText.replace(/\s/,' ');
-        var value = form.childNodes[1].innerText.replace(/\s/,' ');
+        var name = form.childNodes[0].innerText.replace(/\s/g,' ');
+        var value = form.childNodes[1].innerText.replace(/\s/g,' ');
         switch (name) {
             case 'Style':
                 style = value;
@@ -81,15 +81,15 @@ function retrieveReleaseInfo(release_url) {
             continue;
 
         let track = {
-            number: item.getElementsByClassName('release-list-item-number')[0].innerText.replace(/\s/,' '),
-            title: item.getElementsByClassName('release-list-item-title')[0].innerText.replace(/\s/,' '),
+            number: item.getElementsByClassName('release-list-item-number')[0].innerText.replace(/\s/g,' '),
+            title: item.getElementsByClassName('release-list-item-title')[0].innerText.replace(/\s/g,' '),
             //duration: "0:00",
             artist_credit: []
         };
         let artists = item.getElementsByClassName('release-list-item-artist')[0].childNodes;
         // artist name and connecting strings alternate
         for (let i = 0; i < artists.length; i+=2)
-            track.artist_credit.push(translateArtist(artists[i].innerText.replace(/\s/,' '), (!(artists[i+1])?'':artists[i+1].textContent.replace(/\s/,' '))));
+            track.artist_credit.push(translateArtist(artists[i].innerText.replace(/\s/g,' '), (!(artists[i+1])?'':artists[i+1].textContent.replace(/\s/g,' '))));
         tracks.push(track);
     }
 
@@ -99,7 +99,7 @@ function retrieveReleaseInfo(release_url) {
     });
 
     // define releasing label
-    release.labels.push(translateLabel(release_heading.childNodes[2].innerText.replace(/\s/,' '), catno));
+    release.labels.push(translateLabel(release_heading.childNodes[2].innerText.replace(/\s/g,' '), catno));
 
     LOGGER.info('Parsed release: ', release);
     return release;
@@ -201,8 +201,8 @@ function translateArtist(name, joinphrase) {
             track.artist_name = 'The Stunned Guys';
             track.mbid = 'd676ee2b-57dc-4f99-a949-5523620b0252';
             break;
-        case 'delete ':
-            track.artist_name = 'Delete ';
+        case 'delete':
+            track.artist_name = 'Delete';
             track.mbid = 'ff73b026-61f2-47b8-83df-78d34a4c171c';
             break;
         case 'wildstylez':
@@ -244,7 +244,7 @@ function translateArtist(name, joinphrase) {
             track.mbid = 'c2f1c49a-1469-4d42-b0d5-f61bba9415ca';
             break;
         case 'evil activities':
-            track.artist_name = 'Evil Activities ';
+            track.artist_name = 'Evil Activities';
             track.mbid = 'd5ee4dc0-b286-44d8-85d7-a796a7d35674';
             break;
         case 'anime':
@@ -351,7 +351,7 @@ function translateArtist(name, joinphrase) {
             track.mbid = '0b550e57-4ef5-4852-a1f7-d884c00bd635';
             break;
         case 'the viper':
-            track.artist_name = 'The Viper ';
+            track.artist_name = 'The Viper';
             track.mbid = '81d554c7-51c0-4827-b236-b7571f0aac83';
             break;
         case 'the outside agency':
@@ -374,8 +374,8 @@ function translateArtist(name, joinphrase) {
             track.artist_name = 'Igneon System';
             track.mbid = '42e0d195-1987-45b5-9229-5551ded0e643';
             break;
-        case 'micromakine ':
-            track.artist_name = 'Micromakine ';
+        case 'micromakine':
+            track.artist_name = 'Micromakine';
             track.mbid = '68d62e5f-4fa5-4a21-bab2-148cf7df3302';
             break;
         case 'sandy warez':
@@ -426,8 +426,8 @@ function translateArtist(name, joinphrase) {
             track.artist_name = 'Art of Fighters';
             track.mbid = '4578eca4-9ec5-42a4-a4f1-ed9d668e573c';
             break;
-        case 'paranoizer ':
-            track.artist_name = 'Paranoizer ';
+        case 'paranoizer':
+            track.artist_name = 'Paranoizer';
             track.mbid = '9201aa12-2146-4baa-a65b-86ccf1b79f1e';
             break;
         case 'f.noize':
@@ -477,9 +477,21 @@ function translateArtist(name, joinphrase) {
             track.artist_name = 'DJ Icha';
             track.mbid = '03323579-0540-4a90-b07c-f8908bd9a81b';
             break;
-        case 'Andy The Core':
+        case 'andy the core':
             track.artist_name = 'Andy The Core';
             track.mbid = '3003f38e-d3c1-45d7-9dec-e1bf493696ae';
+            break;
+        case 'amnesys':
+            track.artist_name = 'Amnesys';
+            track.mbid = '25b2b75e-c531-45ec-bc4c-0127ec2e9041';
+            break;
+        case 'tommyknocker':
+            track.artist_name = 'Tommyknocker';
+            track.mbid = 'c7b0dab2-b7db-49d7-a8eb-20590c9a98ed';
+            break;
+        case 'frankentek':
+            track.artist_name = 'FrankenTek';
+            track.mbid = 'dc27cb71-92a9-47be-9599-b9dcf9724048';
             break;
         // src: https://www.hardstyle.com/artists
         case 'act of rage':
@@ -590,7 +602,7 @@ function translateArtist(name, joinphrase) {
             track.mbid = 'd14b0f18-462c-43b3-b945-b5736620123c';
             break;
         case 'd-block':
-            track.artist_name = 'D-Block ';
+            track.artist_name = 'D-Block';
             track.mbid = '34483ca8-7f09-40b7-8f5a-52854d812386';
             break;
         case 'dbstf':
@@ -868,7 +880,7 @@ function translateArtist(name, joinphrase) {
             track.mbid = '468b4977-b55e-41a0-bfa9-6b05dfa827f6';
             break;
         case 'sub sonik':
-            track.artist_name = 'Sub Sonik ';
+            track.artist_name = 'Sub Sonik';
             track.mbid = '28f0ecf1-b1fb-4421-ac64-ec5b26cbd490';
             break;
         case 'sub zero project':
@@ -882,7 +894,7 @@ function translateArtist(name, joinphrase) {
             track.mbid = '0fa94adc-ecaf-4a49-b738-d61d5bf8fa9a';
             break;
         case 'technoboy':
-            track.artist_name = 'Technoboy ';
+            track.artist_name = 'Technoboy';
             track.mbid = '495b431d-c77d-462a-8018-e546106e4ac5';
             break;
         case 'the pitcher':
