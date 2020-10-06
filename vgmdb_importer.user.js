@@ -32,6 +32,8 @@ $(document).ready(function () {
 
 function parseApi(apiResponse) {
     const apiDict = JSON.parse(apiResponse);
+    const releaseDate = mapDate(apiDict.release_date);
+
     const release = {
         title: apiDict.name,
         artist_credit: [],
@@ -39,6 +41,9 @@ function parseApi(apiResponse) {
         urls: [],
         discs: [],
         status: mapStatus(apiDict.publish_format),
+        year: releaseDate.year,
+        month: releaseDate.month,
+        day: releaseDate.day,
     };
 
     return release;
@@ -84,4 +89,13 @@ function mapStatus(publishFormat) {
     } else {
         return 'official';
     }
+}
+
+/*
+ * Returns year, month and day dict based on ISO 8601 date string.
+ */
+function mapDate(releaseDate) {
+    const d = new Date(releaseDate);
+
+    return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDay() };
 }
