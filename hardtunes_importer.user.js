@@ -810,8 +810,8 @@ function translateArtist(name, joinphrase) {
             break;
         case 'project one':
         case 'project 1':
-            track.artist_name = 'Project 1';
-            track.mbid = '34df0659-1491-4400-8250-9b8f4e95a2e4';
+            track.artist_name = 'Project One';
+            track.mbid = 'a31c42d5-ca7d-4ecf-a324-d04ad09ea0d2';
             break;
         case 'psyko punkz':
             track.artist_name = 'Psyko Punkz';
