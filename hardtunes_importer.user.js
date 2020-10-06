@@ -96,10 +96,7 @@ function retrieveReleaseInfo(release_url) {
     });
 
     // define releasing label
-    release.labels.push({
-        name: release_heading.childNodes[2].innerText.replace(/\s/,' '),
-        catno: catno,
-    });
+    release.labels.push(translateLabel(release_heading.childNodes[2].innerText.replace(/\s/,' '), catno));
 
     LOGGER.info('Parsed release: ', release);
     return release;
@@ -111,6 +108,82 @@ function insertLink(release, release_url) {
     let parameters = MBImport.buildFormParameters(release, edit_note);
 
     document.getElementsByClassName('social-media')[0].innerHTML += MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release);
+}
+
+// Fixed mappings for some popular labels
+function translateLabel(name, catno) {
+    let label = {name: name, catno: catno};
+    switch(name.toLowerCase()) {
+        case 'partyraiser records':
+        case 'partyraiser recordings':
+            label.name = 'Partyraiser Recordings';
+            label.mbid = '5f9b04f8-db9b-4ee6-97cf-529e7cdf8b53';
+            break;
+        case 'offensive rage':
+            label.mbid = '841c4476-3d48-4a1b-9a59-800f838110bb';
+            break;
+        case 'offensive records':
+                label.mbid = '06aa3e51-7cbd-48d2-a471-0ee5dcbd923a';
+                break;
+        case 'footworxx recordings':
+        case 'footworxx':
+            label.name = 'Footworxx';
+            label.mbid = '32420075-ed6d-4178-8509-d2993823803c';
+            break;
+        case 'masters of hardcore':
+            label.mbid = '5ee9577e-7ab3-4dba-a9a9-9952a620f430';
+            break;
+        case 'darkside unleashed':
+            label.mbid = 'b89db39-4675-4398-a514-df9ce8a75eab';
+            break;
+        case 'dogfight records':
+            label.mbid = '122b50ac-1e21-4587-8afb-4d87e7517275';
+            break;
+        case 'neophyte':
+        case 'neophyte records':
+            label.name = 'Neophyte Records';
+            label.mbid = 'ce92e488-0a4d-4c9c-a103-3ff5f8d973d6';
+            break;
+        case 'triple six records':
+            label.name = 'Triple Six Records';
+            label.mbid = '79130387-b985-4921-90a4-1fdd5e7d5499';
+            break;
+        case 'industrial strength':
+            label.mbid = '7c550e36-07bf-4f11-845a-7acf04527095';
+            break;
+        case 'this is terror':
+            label.name = 'T.I.T. Records';
+            label.mbid = 'a81a42f3-cb26-4843-972d-75d92eb08523';
+            break;
+        case 'cloud 9 music':
+            label.mbid = '52afcd24-0bb6-47ae-8ecb-26d9a9e63565';
+            break;
+        case 'cloud 9 dance':
+            label.mbid = '72720f91-b3d5-48a0-b85a-72675bf4cc2d';
+            break;
+        case 'peacock records':
+            label.mbid = 'b6274f90-697a-4e92-8851-ed5ca52beb7d';
+            break;
+        case 'prspct recordings':
+            label.mbid = 'e71795cb-afb3-4c46-af1c-77f25e0e58ff';
+            break;
+        case 'dna':
+        case 'dna tracks':
+            label.name = 'DNA Tracks';
+            label.mbid = '34523963-79ea-4afb-9718-ac66b7c484ab';
+            break;
+        case 'enzyme records':
+            label.mbid = '2b8edffb-fa7e-4dad-920f-37b77e184825';
+            break;
+        case 'q-dance compilations':
+            label.mbid = 'a9d8ec1f-3753-4d01-9428-db55af832d85';
+            break;
+        case 'q-dance records':
+        case 'q-dance':
+            label.name = 'Q-Dance';
+            label.mbid = '4843ef9a-f60c-47f0-af4a-4c433f365145';
+    }
+    return label;
 }
 
 // Fixed artist mappings since we have the luxury of being limited to a few genres
