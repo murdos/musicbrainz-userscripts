@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2020.9.1.1
+// @version        2020.10.6.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -271,9 +271,7 @@ $(document).ready(function () {
     // add MB artist link
     let root_url = release.url.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
     let label_url = '';
-    mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-        $('div#name-section span[itemprop="byArtist"]').before(link);
-    });
+
     mblinks.searchAndDisplayMbLink(
         root_url,
         'label',
@@ -335,14 +333,20 @@ $(document).ready(function () {
     LOGGER.info('Parsed release: ', release);
 
     if (release.type == 'track') {
+        mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
+            $('div#name-section h3 span:last').before(link);
+        });
         // add MB links to parent album
         mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
-            $('div#name-section span[itemprop="inAlbum"] a:first').before(link);
+            $('div#name-section h3 span:first').before(link);
         });
     } else {
+        mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
+            $('div#name-section h3 span:first').before(link);
+        });
         // add MB release links to album or single
         mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
-            $('div#name-section span[itemprop="byArtist"]').after(link);
+            $('div#name-section h3 span:first').after(link);
         });
     }
 
