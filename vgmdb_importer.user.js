@@ -37,13 +37,13 @@ function parseApi(apiResponse) {
     const release = {
         title: apiDict.name,
         artist_credit: [],
-        urls: [],
         discs: [],
         status: mapStatus(apiDict.publish_format),
         year: releaseDate.year,
         month: releaseDate.month,
         day: releaseDate.day,
         labels: [{ name: mapLabel(apiDict.organizations), catno: apiDict.catalog }],
+        urls: mapUrls(apiDict.vgmdb_link, apiDict.stores, apiDict.websites),
     };
 
     return release;
@@ -113,6 +113,35 @@ function mapLabel(organizations) {
     } else {
         return null;
     }
+}
+
+/*
+ * Returns a list of MusicBrainz URLs based on the websites, stores and
+ * vgmdb_link values of the VGMdb API.
+ */
+function mapUrls(vgmdbLink, stores, websites) {
+    const urls = [];
+
+    urls.push({ url: vgmdbLink, link_type: 86 });
+
+    if (stores) {
+        for (const store of stores) {
+            // Filter out links to internal marketplace
+            if (store['link'].startsWith('http')) {
+                // Assumes mail order
+                urls.push({ url: store['link'], link_type: MBImport.URL_TYPES.purchase_for_mail_order });
+            }
+        }
+    }
+
+    if (websites) {
+        for (const commercial in websites['Commercial']) {
+            // Seems to fill same purpose as stores for albums
+            urls.push({ url: commercial['link'], link_type: MBImport.URL_TYPES.purchase_for_mail_order });
+        }
+    }
+
+    return urls;
 }
 
 /*
