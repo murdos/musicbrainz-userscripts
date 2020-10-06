@@ -37,13 +37,13 @@ function parseApi(apiResponse) {
     const release = {
         title: apiDict.name,
         artist_credit: [],
-        labels: [],
         urls: [],
         discs: [],
         status: mapStatus(apiDict.publish_format),
         year: releaseDate.year,
         month: releaseDate.month,
         day: releaseDate.day,
+        labels: [{ name: mapLabel(apiDict.organizations), catno: apiDict.catalog }],
     };
 
     return release;
@@ -98,4 +98,32 @@ function mapDate(releaseDate) {
     const d = new Date(releaseDate);
 
     return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDay() };
+}
+
+/*
+ * Returns a likely label based on a list of VGMdb organizations.
+ */
+function mapLabel(organizations) {
+    const labelOrganization = getLabelOrganization(organizations);
+    if (labelOrganization) {
+        return labelOrganization['names']['en'];
+    } else if (organizations.length == 1) {
+        // If only one, assume that's the one
+        return organizations[0]['names']['en'];
+    } else {
+        return null;
+    }
+}
+
+/*
+ * Returns an organization element with the "label" role, or null if none exists.
+ */
+function getLabelOrganization(organizations) {
+    for (const organization of organizations) {
+        if (organization['role'] === 'label') {
+            return organization;
+        }
+    }
+
+    return null;
 }
