@@ -38,6 +38,7 @@ function parseApi(apiResponse) {
         labels: [],
         urls: [],
         discs: [],
+        status: mapStatus(apiDict.publish_format),
     };
 
     return release;
@@ -63,4 +64,24 @@ function insertButtons(release) {
         '<br style="clear: left" />';
 
     $('#rightcolumn').prepend(vgmdbHtml);
+}
+
+/*
+ * Returns MusicBrainz status based on VGMdb publish_format.
+ *
+ * MusicBrainz: official, promotion, bootleg, pseudo
+ * VGMdb, comma separated:
+ *   * one of Commercial, Doujin/Indie, Bootleg
+ *   * one of Limited Edition, Enclosure, First Press Bonus, Preorder Bonus,
+ *     Retailer Bonus, Event Only, Promo/Gift/Reward, Rental (General does not appear in API)
+ */
+function mapStatus(publishFormat) {
+    if (publishFormat.includes('Bootleg')) {
+        // Overrides promo
+        return 'bootleg';
+    } else if (publishFormat.includes('Promo/Gift/Reward')) {
+        return 'promotion';
+    } else {
+        return 'official';
+    }
 }
