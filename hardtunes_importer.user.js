@@ -86,9 +86,12 @@ function retrieveReleaseInfo(release_url) {
             //duration: "0:00",
             artist_credit: []
         };
-        track.artist_credit.push(translateArtist(item.getElementsByClassName('release-list-item-artist')[0].innerText.replace(/\s/,' ')));
+        let artists = item.getElementsByClassName('release-list-item-artist')[0].childNodes;
+        // artist name and connecting strings alternate
+        for (let i = 0; i < artists.length; i+=2)
+            track.artist_credit.push(translateArtist(artists[i].innerText.replace(/\s/,' '), (!(artists[i+1])?'':artists[i+1].textContent.replace(/\s/,' '))));
         tracks.push(track);
-      }
+    }
 
     release.discs.push({
         tracks: tracks,
