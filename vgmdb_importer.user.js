@@ -170,8 +170,7 @@ function mapDiscs(vgmdbDiscs, mediaFormat) {
             disc['format'] = mapFormat(generalMediaFormat);
         }
 
-        const tracks = [];
-        disc['tracks'] = tracks;
+        disc['tracks'] = mapTracks(vgmdbDisc['tracks']);
 
         discs.push(disc);
     }
@@ -184,6 +183,20 @@ function mapDiscs(vgmdbDiscs, mediaFormat) {
  */
 function mapFormat(mediaFormat) {
     return mediaFormat;
+}
+
+/*
+ * Returns a MusicBrainz tracklist based on a VGMdb tracklist.
+ */
+function mapTracks(vgmdbTracks) {
+    const tracks = [];
+
+    const language = getTracklistLanguage(vgmdbTracks);
+    for (const vgmdbTrack of vgmdbTracks) {
+        tracks.push({ title: vgmdbTrack['names'][language], duration: vgmdbTrack['track_length'] });
+    }
+
+    return tracks;
 }
 
 /*
@@ -213,4 +226,39 @@ function getLabelOrganization(organizations) {
     }
 
     return null;
+}
+
+/*
+ * Return the language used as key for the VGMdb tracklist.
+ */
+function getTracklistLanguage(vgmdbTracks) {
+    let language;
+
+    // VGMdb stores tracklists by album, not by disc. Thus it should be enough
+    // to examine the first track to figure out which one to use.
+    const track = vgmdbTracks[0];
+    const languages = Object.keys(track['names']);
+
+    const foreignLanguages = getForeignLanguages(languages);
+    if (foreignLanguages.length) {
+        // Should be the one printed tracklist, probably Japanese or in
+        // some cases Korean
+        language = foreignLanguages[0];
+    } else if (languages.includes('English')) {
+        // Either printed tracklist or pseudo-release translation
+        language = 'English';
+    } else if (languages.includes('Romaji')) {
+        // Should be pseudo-release transliteration
+        language = 'Romaji';
+    }
+
+    return language;
+}
+
+/*
+ * Returns a list of languages other than English and Romaji in the input list.
+ * This should be a list with zero or one elements.
+ */
+function getForeignLanguages(languages) {
+    return languages.filter(language => language !== 'English' && language !== 'Romaji');
 }
