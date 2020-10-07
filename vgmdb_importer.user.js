@@ -161,7 +161,6 @@ function mapDiscs(vgmdbDiscs, mediaFormat) {
 
     for (const vgmdbDisc of vgmdbDiscs) {
         const disc = {};
-        disc['title'] = vgmdbDisc['name'];
 
         if (multipleMedia) {
             const discMediaFormat = extractVgmdbMedia(vgmdbDisc['name']);
