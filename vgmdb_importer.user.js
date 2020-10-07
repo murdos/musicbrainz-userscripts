@@ -37,13 +37,13 @@ function parseApi(apiResponse) {
     const release = {
         title: apiDict.name,
         artist_credit: [],
-        discs: [],
         status: mapStatus(apiDict.publish_format),
         year: releaseDate.year,
         month: releaseDate.month,
         day: releaseDate.day,
         labels: [{ name: mapLabel(apiDict.organizations), catno: apiDict.catalog }],
         urls: mapUrls(apiDict.vgmdb_link, apiDict.stores, apiDict.websites),
+        discs: mapDiscs(apiDict.discs, apiDict.media_format),
     };
 
     return release;
@@ -142,6 +142,64 @@ function mapUrls(vgmdbLink, stores, websites) {
     }
 
     return urls;
+}
+
+/*
+ * Returns a list of disc objects each featuring title, format and tracklist
+ * based on VGMdb disc data and media format.
+ */
+function mapDiscs(vgmdbDiscs, mediaFormat) {
+    const discs = [];
+
+    let multipleMedia;
+    let generalMediaFormat;
+    if (mediaFormat.includes('+')) {
+        multipleMedia = true;
+    } else {
+        generalMediaFormat = extractVgmdbMedia(mediaFormat);
+    }
+
+    for (const vgmdbDisc of vgmdbDiscs) {
+        const disc = {};
+        disc['title'] = vgmdbDisc['name'];
+
+        if (multipleMedia) {
+            const discMediaFormat = extractVgmdbMedia(vgmdbDisc['name']);
+            disc['format'] = mapFormat(discMediaFormat);
+        } else {
+            disc['format'] = mapFormat(generalMediaFormat);
+        }
+
+        const tracks = [];
+        disc['tracks'] = tracks;
+
+        discs.push(disc);
+    }
+
+    return discs;
+}
+
+/*
+ * Returns a MusicBrainz format based on a VGMdb media format.
+ */
+function mapFormat(mediaFormat) {
+    return mediaFormat;
+}
+
+/*
+ * Returns the VGMdb style media format part of a string, or null if none is
+ * found. If an album has only one type of media, the disc name won't contain
+ * media format.
+ *
+ * Doesn't actually match every VGMdb media because they can have subformats
+ * other than this.
+ */
+function extractVgmdbMedia(s) {
+    const match = s.match(
+        /(Cassette|Vinyl|Flexi Disc|DVD|Digital|SA-CD|Other|CD Video|VHS|Blu-ray|Laser Disc|Floppy Disc|USB|Download Card|UHQCD|Blu-spec CD|Blu-spec CD2|HQCD|SHM-CD|PLAYBUTTON|MiniDisc|CD)/g
+    );
+
+    return match ? match[0] : null;
 }
 
 /*
