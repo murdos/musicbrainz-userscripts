@@ -42,6 +42,7 @@ function parseApi(apiResponse) {
         month: releaseDate.month,
         day: releaseDate.day,
         labels: [{ name: mapLabel(apiDict.organizations), catno: apiDict.catalog }],
+        barcode: apiDict.barcode,
         urls: mapUrls(apiDict.vgmdb_link, apiDict.stores, apiDict.websites),
         discs: mapDiscs(apiDict.discs, apiDict.media_format),
     };
