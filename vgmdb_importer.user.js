@@ -182,7 +182,31 @@ function mapDiscs(vgmdbDiscs, mediaFormat) {
  * Returns a MusicBrainz format based on a VGMdb media format.
  */
 function mapFormat(mediaFormat) {
-    return mediaFormat;
+    switch (mediaFormat) {
+        case 'Flexi Disc':
+            return 'Vinyl';
+        case 'Digital':
+        case 'Download Card':
+            return 'Digital Media';
+        case 'SA-CD':
+            return 'SACD';
+        case 'CD Video':
+            return 'CDV';
+        case 'Laser Disc':
+            return 'LaserDisc';
+        case 'Floppy Disc':
+            return 'Other';
+        case 'USB':
+            return 'USB Flash Drive';
+        case 'UHQCD':
+        case 'Blu-spec CD':
+        case 'Blu-spec CD2':
+        case 'HQCD':
+        case 'SHM-CD':
+            return 'CD';
+        default:
+            return mediaFormat;
+    }
 }
 
 /*
