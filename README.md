@@ -19,6 +19,7 @@
 -   [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
 -   [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 -   [Import Takealot releases to MusicBrainz](#takealot_importer)
+-   [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
 -   [MusicBrainz: 1200px CAA](#mb_1200px_caa)
 -   [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
 -   [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
@@ -159,6 +160,13 @@ Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/takealot_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js)
+
+## <a name="vgmdb_importer"></a> Import VGMdb releases into MusicBrainz
+
+One-click importing of releases from vgmdb.net into MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/vgmdb_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js)
 
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
