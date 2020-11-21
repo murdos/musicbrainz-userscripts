@@ -1,0 +1,36 @@
+name: CI
+on: pull_request
+
+jobs:
+    linter:
+        name: 'lint checks'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+            - name: 'Install dependencies'
+              run: npm install
+            - name: 'Run linter'
+              run: npm run lint
+    auto-merge:
+        name: 'dependabot-auto-merge'
+        needs: linter
+        if: github.actor == 'dependabot[bot]'
+        runs-on: ubuntu-latest
+        steps:
+            - name: automerge
+              uses: actions/github-script@0.2.0
+              with:
+                  script: |
+                      github.pullRequests.createReview({
+                        owner: context.payload.repository.owner.login,
+                        repo: context.payload.repository.name,
+                        pull_number: context.payload.pull_request.number,
+                        event: 'APPROVE'
+                      })
+                      github.pullRequests.merge({
+                        owner: context.payload.repository.owner.login,
+                        repo: context.payload.repository.name,
+                        pull_number: context.payload.pull_request.number
+                      })
+                  github-token: ${{github.token}}
