@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2018.2.18.1
+// @version        2021.3.29.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -263,13 +263,6 @@ $(document).ready(function () {
                     .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
             });
         }
-    }
-
-    // Display "Edit relationships" link for release besides "Edit" link
-    re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})', 'i');
-    if (window.location.href.match(re)) {
-        var mbid = window.location.href.match(re)[1];
-        $('ul.tabs').append(`<li><a href="/release/${mbid}/edit-relationships">Edit relationships</a></li>`);
     }
 
     // Display a-tisket links next to Deezer, Spotify, iTunes and Apple Music links
