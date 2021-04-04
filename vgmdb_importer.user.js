@@ -98,7 +98,7 @@ function mapStatus(publishFormat) {
 function mapDate(releaseDate) {
     const d = new Date(releaseDate);
 
-    return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDay() };
+    return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
 }
 
 /*
