@@ -2,7 +2,7 @@
 // @name           Import VGMdb releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from vgmdb.net into MusicBrainz
-// @version        2020.9.26.1
+// @version        2021.7.13.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @include        /^https://vgmdb.net/(album|artist|org)/\d+
