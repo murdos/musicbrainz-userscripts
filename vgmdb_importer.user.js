@@ -139,9 +139,9 @@ function mapUrls(vgmdbLink, stores, websites) {
     }
 
     if (websites) {
-        for (const commercial in websites['Commercial']) {
+        for (const commercial of websites['Commercial']) {
             // Seems to fill same purpose as stores for albums
-            urls.push({ url: commercial['link'], link_type: MBImport.URL_TYPES.purchase_for_mail_order });
+            urls.push({ url: commercial['link'] });
         }
     }
 
