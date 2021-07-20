@@ -721,7 +721,7 @@ function parseDiscogsRelease(discogsRelease) {
 
         // Create release if needed
         let discindex = releaseNumber - 1;
-        if (!release.discs[discindex]) {
+        while (!release.discs[discindex]) {
             let newdisc = {
                 tracks: [],
                 format: release_formats[discindex],
