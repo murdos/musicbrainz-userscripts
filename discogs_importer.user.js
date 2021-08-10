@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2020.9.13.1
+// @version        2021.8.10.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -243,11 +243,20 @@ function insertMBLinks(current_page_key) {
     mbLinks.searchAndDisplayMbLink(current_page_info.clean_url, mb_type, mbLinkInsert, cachekey);
 
     const $root = $('body');
+    // artist/label/master pages, release pages (before the 2021-08-09 update)
     add_mblinks($root, 'div.profile', ['artist', 'label']);
     add_mblinks($root, 'tr[data-object-type="release"] td.artist,td.title', 'artist');
     add_mblinks($root, 'tr[data-object-type="release"] td.title', 'release');
     add_mblinks($root, 'tr[data-object-type="release"]', 'label');
     add_mblinks($root, 'tr[data-object-type~="master"]', ['master', 'artist', 'label']);
+    // release pages (since the 2021-08-09 update)
+    add_mblinks($root, '#release-header', ['artist', 'label']);
+    setInterval(() => add_mblinks($root, '#release-other-versions', ['artist', 'release', 'label']), 500); // Discogs loads this dynamically, wait a moment
+    add_mblinks($root, '#release-tracklist', 'artist');
+    add_mblinks($root, '#release-companies', [['label', 'place'], 'label']);
+    add_mblinks($root, '#release-credits', ['label', 'artist']);
+    add_mblinks($root, '#release-actions', 'master', true);
+    // release pages (before the 2021-08-09 update, TODO: remove after the new layout becomes permanent)
     add_mblinks($root, 'div#tracklist', 'artist');
     add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
     add_mblinks($root, 'div#credits', ['label', 'artist']);
@@ -370,7 +379,11 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 
 function insertMbUI(mbUI) {
     let e;
-    if ((e = $('div.section.collections')) && e.length) {
+    if ((e = $('#release-marketplace')) && e.length) {
+        e.before(mbUI);
+    }
+    // FIXME: the following selectors are broken since the 2021-08-09 release page update, not sure why there are three alternative selectors
+    else if ((e = $('div.section.collections')) && e.length) {
         e.after(mbUI);
     } else if ((e = $('#statistics')) && e.length) {
         e.before(mbUI);
@@ -383,7 +396,7 @@ function insertMbUI(mbUI) {
 function insertMBSection(release, current_page_key) {
     const current_page_info = link_infos[current_page_key];
 
-    const mbUI = $('<div class="section musicbrainz"><h3>MusicBrainz</h3></div>').hide();
+    const mbUI = $('<div class="section musicbrainz"><header><h3>MusicBrainz</h3></header></div>').hide();
 
     if (DEBUG) mbUI.css({ border: '1px dotted red' });
 
@@ -407,9 +420,23 @@ function insertMBSection(release, current_page_key) {
 
     insertMbUI(mbUI);
 
+    // FIXME: duplicates some of Discogs' CSS because they seem to use dynamically generated class names since the 2021-08-09 release page update
+    $('.musicbrainz header').css({
+        // Discogs selector is ".header_W2hzl" (at least now and for me)
+        'border-bottom': '1px solid #e5e5e5',
+        'padding-left': '5px',
+    });
+    $('.musicbrainz h3').css({
+        // Discogs selector is ".header_W2hzl h3"
+        'font-size': '15px',
+        'line-height': '20px',
+        margin: '0 0 0 -5px',
+        padding: '5px',
+    });
     $('#mb_buttons').css({
         display: 'inline-block',
         width: '100%',
+        'margin-top': '5px', // FIXME: related to the above CSS hacks
     });
     $('form.musicbrainz_import').css({ width: '49%', display: 'inline-block' });
     $('form.musicbrainz_import_search').css({ float: 'right' });
