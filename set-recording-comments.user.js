@@ -1,16 +1,15 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2021.8.5.1
+// @version        2021.8.22.1
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @match          *://*.musicbrainz.org/release/*
-// @match          *://*.mbsandbox.org/release/*
 // @exclude        *musicbrainz.org/release/*/*
-// @exclude        *.mbsandbox.org/release/*/*
+// @exclude        *musicbrainz.org/release/add*
 // @grant          none
 // @run-at         document-idle
 // ==/UserScript==
