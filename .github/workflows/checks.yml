@@ -19,7 +19,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: automerge
-              uses: actions/github-script@0.2.0
+              uses: actions/github-script@v4.1
               with:
                   script: |
                       github.pullRequests.createReview({
