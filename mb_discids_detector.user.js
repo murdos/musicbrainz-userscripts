@@ -91,7 +91,7 @@ function gazellePageHandler() {
 
     // Determine Artist name and Release title
     let titleAndArtists = $('#content div.thin h2:eq(0)').text();
-    let pattern = /(.*) - (.*) \[.*\] \[.*/;
+    let pattern = /(.*) [-–] (.*) \[.*\] \[.*/;
     let artistName, releaseName;
     if ((m = titleAndArtists.match(pattern))) {
         artistName = m[1];
