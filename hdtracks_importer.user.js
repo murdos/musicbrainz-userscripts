@@ -62,6 +62,7 @@ function parseHDtracksRelease(data, releaseUrl) {
             title: track.name,
             artist_credit: [{ artist_name: track.mainArtist }], // TODO: try to split strings into multiple artists?
             duration: track.duration * 1000,
+            isrc: track.isrc, // not used as release editor seed
         })),
     });
     release.urls.push({
@@ -74,10 +75,18 @@ function parseHDtracksRelease(data, releaseUrl) {
 function insertButtons(release, releaseUrl) {
     const editNote = MBImport.makeEditNote(releaseUrl, 'HDtracks');
     const formParameters = MBImport.buildFormParameters(release, editNote);
-    const importerUI = $(`<div id="mb-import-ui-${release.id}"  style="line-height: 2.5em">
+    const importerUI = $(`<div id="mb-import-ui-${release.id}" class="musicbrainz_import" style="line-height: 2.5em">
         ${MBImport.buildFormHTML(formParameters)}
         ${MBImport.buildSearchButton(release)}
         </div>`).hide();
+
+    $('<button type="button" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC">Submit ISRCs</button>')
+        .on('click', () => {
+            const allTracks = release.discs.map(disc => disc.tracks).flat();
+            const query = allTracks.map(track => `isrc${track.number}=${track.isrc}`).join('&');
+            window.open('https://magicisrc.kepstin.ca?' + query);
+        })
+        .appendTo(importerUI);
 
     $('div.page-current div.album-buttons-group').prepend(importerUI);
     importerUI.slideDown();
