@@ -14,7 +14,7 @@
 // @include        http*://mutracker.org/torrents.php?id=*
 // @include        https://notwhat.cd/torrents.php?id=*
 // @require        http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
-// @require        http://pajhome.org.uk/crypt/md5/sha1.js
+// @require        https://gist.githubusercontent.com/11xx/8f1152780b1fbc5effe56ab6001a9a94/raw/b81ec8999f6a9db3261ffa3ce5264bb71ae32238/pajhome.org.uk-crypt-md5-sha1.js
 // @require        lib/logger.js
 // ==/UserScript==
 
