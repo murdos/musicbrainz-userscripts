@@ -364,7 +364,7 @@ $(document).ready(function () {
     let upc = unsafeWindow.TralbumData.current.upc;
     if (typeof upc != 'undefined' && upc !== null) {
         $('div #trackInfoInner').append(
-            `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://etc.marlonob.info/atisket/?upc=${upc}">${upc}</a></div>`
+            `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">${upc}</a></div>`
         );
     }
 });
