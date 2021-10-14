@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2021.8.22.1
+// @version        2021.10.14.1
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
@@ -52,9 +52,15 @@ function setRecordingComments() {
 
     $('head').append(
         $('<style></style>').text(
-            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }'
+            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }' +
+                '.inline-recording-warning { display: inline; color: red; margin-left: .5em; }' +
+                '#submit-recording-warning, #submit-recording-error { color: red; }'
         )
     );
+
+    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
+        return;
+    }
 
     const delay = setInterval(function () {
         $tracks = $('.medium tbody tr[id]');
@@ -79,22 +85,65 @@ function setRecordingComments() {
 
         let release = location.pathname.match(MBID_REGEX)[0];
 
-        $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function (data) {
-            let comments = Array.from(data.media)
-                .map(medium => medium.tracks)
-                .flat()
-                .map(track => track.recording)
-                .map(recording => recording.disambiguation);
+        fetch(`/ws/2/release/${release}?inc=recordings&fmt=json`)
+            .then(response => response.json())
+            .then(data => {
+                let recordings = Array.from(data.media)
+                    .map(medium => medium.tracks)
+                    .flat()
+                    .map(track => track.recording);
 
-            for (let i = 0, len = comments.length; i < len; i++) {
-                let comment = comments[i];
-                $inputs.eq(i).val(comment).data('old', comment);
-            }
-        });
+                let comments = recordings.map(recording => recording.disambiguation);
+                let ids = recordings.map(recording => recording.id);
+
+                for (let i = 0, len = comments.length; i < len; i++) {
+                    let comment = comments[i];
+                    $inputs.eq(i).val(comment).data('old', comment);
+                }
+                startLoadingAllRecordings(ids);
+            })
+            .catch(function () {
+                $('#submit-recording-error').show();
+            });
     }, 1000);
 
-    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
-        return;
+    function startLoadingAllRecordings(ids) {
+        let pendingIds = ids;
+        let mapOfIdToIndex = pendingIds.reduce((map, id, i) => {
+            map.set(id, i);
+            return map;
+        }, new Map());
+        let loadAllRecordings = setInterval(function () {
+            if (pendingIds.length === 0) {
+                $('#submit-recording-error').hide();
+                clearInterval(loadAllRecordings);
+            }
+            let id = pendingIds.pop();
+            if (!id) {
+                return;
+            }
+            $('#submit-recording-error')
+                .text(`WARNING: Still loading ${pendingIds.length + 1} recordings`)
+                .show();
+            fetch(`/ws/2/recording/${id}?inc=releases&fmt=json`)
+                .then(response => response.json())
+                .then(data => {
+                    const releases = Array.from(data.releases);
+                    if (releases.length > 1) {
+                        const input = $inputs.eq(mapOfIdToIndex.get(id));
+                        $(input).after(
+                            `<p class="inline-recording-warning">WARNING! There are ${releases.length} releases used on this recording!`
+                        );
+                        $('#submit-recording-warning').show();
+                    }
+                })
+                .catch(function () {
+                    pendingIds = pendingIds.concat([id]);
+                    $('#submit-recording-error')
+                        .text(`WARNING: Still loading ${pendingIds.length + 1} recordings`)
+                        .show();
+                });
+        }, 1000);
     }
 
     const MBID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/;
@@ -140,6 +189,12 @@ function setRecordingComments() {
   </tr>\
   <tr>\
     <td colspan="2">\
+      <p id="submit-recording-warning">WARNING! Some recordings have multiple releases. Please review them before submitting.</p>\
+      <p id="submit-recording-error">ERROR! Not all data has loaded yet</p>\
+    </td>\
+  </tr>\
+  <tr>\
+    <td colspan="2">\
       <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
   </tr>\
@@ -147,6 +202,8 @@ function setRecordingComments() {
     );
 
     $('#set-recording-comments').hide();
+    $('#submit-recording-error').hide();
+    $('#submit-recording-warning').hide();
 
     $('#all-recording-comments').on('input', function () {
         $inputs.filter(':visible').val(this.value).trigger('input.rc');
