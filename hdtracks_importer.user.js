@@ -48,7 +48,8 @@ function parseHDtracksRelease(data, releaseUrl) {
         month: releaseDate.getMonth() + 1,
         day: releaseDate.getDate(),
         comment: data.quality.replace(' · ', '/'),
-        annotation: [data.cLine, data.pLine, '\n== Credits (HDtracks) ==\n', data.credits].join('\n'),
+        annotation: [data.cLine, data.pLine].join('\n'),
+        // `data.credits` is currently not included as its unclear for which tracks the individual credits apply
         discs: [],
         urls: [],
         packaging: 'None',
