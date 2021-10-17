@@ -39,6 +39,7 @@ async function parsePage() {
 
 function parseHDtracksRelease(data, releaseUrl) {
     const releaseDate = new Date(data.release);
+    const audioQuality = data.quality.replace(' · ', '/');
     const release = {
         id: data.productId, // not used as release editor seed
         title: data.name,
@@ -48,8 +49,8 @@ function parseHDtracksRelease(data, releaseUrl) {
         year: releaseDate.getUTCFullYear(),
         month: releaseDate.getUTCMonth() + 1,
         day: releaseDate.getUTCDate(),
-        comment: data.quality.replace(' · ', '/'),
-        annotation: [data.cLine, data.pLine].join('\n'),
+        comment: audioQuality != '44.1kHz/16bit' ? audioQuality : '',
+        annotation: [`${audioQuality} available on HDtracks`, data.cLine, data.pLine].join('\n'),
         // `data.credits` is currently not included as its unclear for which tracks the individual credits apply
         discs: [],
         urls: [],
