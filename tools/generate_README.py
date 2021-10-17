@@ -20,7 +20,7 @@ re_keyval = re.compile(r'^[\s\*/]+@(\S+)\s+(.+)\s*$', re.IGNORECASE)
 items = list()
 for jsfilename in sorted(glob.glob('*.user.js')):
     in_header = False
-    with open(jsfilename) as jsfile:
+    with open(jsfilename, encoding='utf-8') as jsfile:
         d = defaultdict(list)
         for line in jsfile:
             if not in_header and re_start_header.search(line):
