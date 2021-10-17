@@ -22,8 +22,9 @@ $(document).ready(function () {
 });
 
 async function parsePage() {
-    const releaseId = window.location.hash.match(/#\/album\/(.+)/)?.[1];
-    if (!releaseId) return; // SPA currently shows a different type of page
+    const releaseMatch = window.location.hash.match(/#\/album\/(.+)/);
+    if (!releaseMatch) return; // SPA currently shows a different type of page
+    const releaseId = releaseMatch[1];
 
     // our buttons might already be there since the SPA caches the previous page for "also available in"
     if (document.getElementById(`mb-import-ui-${releaseId}`)) return;
@@ -84,7 +85,7 @@ function insertButtons(release, releaseUrl) {
         .on('click', () => {
             const allTracks = release.discs.map(disc => disc.tracks).flat();
             const query = allTracks.map(track => `isrc${track.number}=${track.isrc}`).join('&');
-            window.open('https://magicisrc.kepstin.ca?' + query);
+            window.open(`https://magicisrc.kepstin.ca?${query}`);
         })
         .appendTo(importerUI);
 
