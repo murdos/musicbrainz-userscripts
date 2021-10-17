@@ -45,9 +45,9 @@ function parseHDtracksRelease(data, releaseUrl) {
         artist_credit: data.artists.map(name => ({ artist_name: name })),
         barcode: data.upc,
         labels: [{ name: data.label }],
-        year: releaseDate.getFullYear(),
-        month: releaseDate.getMonth() + 1,
-        day: releaseDate.getDate(),
+        year: releaseDate.getUTCFullYear(),
+        month: releaseDate.getUTCMonth() + 1,
+        day: releaseDate.getUTCDate(),
         comment: data.quality.replace(' · ', '/'),
         annotation: [data.cLine, data.pLine].join('\n'),
         // `data.credits` is currently not included as its unclear for which tracks the individual credits apply
