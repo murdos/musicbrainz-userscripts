@@ -2,7 +2,7 @@
 // @name           Import VGMdb releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from vgmdb.net into MusicBrainz
-// @version        2021.7.13.1
+// @version        2021.11.12.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @include        /^https://vgmdb.net/(album|artist|org)/\d+
@@ -138,7 +138,7 @@ function mapUrls(vgmdbLink, stores, websites) {
         }
     }
 
-    if (websites) {
+    if (websites && websites['Commercial']) {
         for (const commercial of websites['Commercial']) {
             // Seems to fill same purpose as stores for albums
             urls.push({ url: commercial['link'] });
