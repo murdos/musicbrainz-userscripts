@@ -6,6 +6,7 @@
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include        /^https?://[^/]+/(?:album|track)/[^/]+\/?$/
+// @include        /^https?://web\.archive\.org/web/\d+/https?://[^/]+/(?:album|track)/[^/]+\/?$/
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
@@ -13,6 +14,7 @@
 // @require        lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant          unsafeWindow
+// @run-at         document-start
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -252,6 +254,41 @@ var BandcampImport = {
         return label.textContent;
     },
 };
+
+if (window.location.hostname === 'web.archive.org') {
+    window.addEventListener('beforescriptexecute', function (e) {
+        let prev = e.target.previousElementSibling;
+
+        if (!prev || !prev.src) {
+            return;
+        }
+
+        let patchproc = function () {
+            if (!window._WBWombat) {
+                return;
+            }
+
+            // Patch the Wombat options to exclude Musicbrainz URLs
+            let oldWombat = window._WBWombat;
+            window._WBWombat = function (wbwindow, wbinfo) {
+                wbinfo.wombat_opts.no_rewrite_prefixes.push('https://musicbrainz.org/');
+                wbinfo.wombat_opts.no_rewrite_prefixes.push('http://musicbrainz.org/');
+                wbinfo.wombat_opts.no_rewrite_prefixes.push('//musicbrainz.org/');
+                return oldWombat(wbwindow, wbinfo);
+            };
+        };
+
+        // Insert our payload after Wombat's been loaded, but before its initialised
+        if (prev.src.search(/\/_static\/js\/wombat.js/) != -1) {
+            window.removeEventListener('beforescriptexecute', arguments.callee);
+
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.text = `(${patchproc})()`;
+            prev.parentNode.insertBefore(script, e.target);
+        }
+    });
+}
 
 $(document).ready(function () {
     /* keep the following line as first, it is required to skip
