@@ -5,7 +5,7 @@
 // @version        2021.11.12.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
-// @include        /^https://vgmdb.net/(album|artist|org)/\d+
+// @include        /^https://vgmdb.net/(album|artist|org)/\d+/
 // @require        https://code.jquery.com/jquery-3.5.1.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
