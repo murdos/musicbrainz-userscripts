@@ -55,7 +55,7 @@ function parseReleaseDate(rdate) {
 function retrieveReleaseInfo(release_url) {
     let release = {
         artist_credit: [],
-        title: $('meta[itemProp="name"]').attr('content').trim(),
+        title: $('h2.product-title a').text().trim(),
         year: 0,
         month: 0,
         day: 0,
@@ -85,8 +85,8 @@ function retrieveReleaseInfo(release_url) {
     });
 
     release.labels.push({
-        name: $('meta[itemProp="author"]').attr('content').trim(),
-        catno: $('strong:contains("Cat:")').parent().contents().slice(2, 3).text().trim(),
+        name: $('div[itemProp="publisher"] meta[itemProp="name"]').attr('content').trim(),
+        catno: $('strong:contains("Cat:")').parent().contents().slice(1, 2).text().trim(),
     });
 
     let tracks = [];
