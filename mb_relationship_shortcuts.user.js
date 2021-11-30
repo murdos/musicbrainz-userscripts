@@ -19,8 +19,6 @@ const relationsIconsURLs = {
         'single from': `data:image/gif;base64,R0lGODlhDwALAJEAAP2ZAZmZmf///wAAACH5BAAAAAAALAAAAAAPAAsAAAIflI+pq2ABY0DAiYmwqOyaCoaHxjHaZp0e9UhQB8dCAQA7`,
     },
     release: {
-        // deprecated, see also https://musicbrainz.org/report/PartOfSetRelationships
-        'part of set': 'http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png',
         remaster: 'http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png',
     },
 };
@@ -28,7 +26,6 @@ const relationsIconsURLs = {
 const urlRelationsIconClasses = {
     allmusic: 'allmusic',
     'amazon asin': 'amazon',
-    'cover art link': 'coverart', // deprecated, see https://tickets.metabrainz.org/browse/MBS-11856
     'creative commons licensed download': 'creativecommons',
     discogs: 'discogs',
     imdb: 'imdb',
@@ -93,10 +90,6 @@ td.relationships span.favicon {
 .hdtracks-favicon {
     background-image: url(https://www.hdtracks.com/favicon.ico);
     background-size: 16px;
-}
-.coverart-favicon {
-    /* archived version from 2015, originally from http://www.cdcovers.cc/favicon.ico */
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACbklEQVQ4jb2Tz0uTARyH31OXrl47dOuf6FAK3YJAQWVIIRiioDY95JuSbkS4JRQq1QbN9WaiOH82hekk411YL+pBN5fjbcut+U7fvSbN99WDTwcpiX5f+ty/Dx8+PF9B+F/ZzibJ6xp5XeOvDszCHnldQ8tmMAydfWOTfWOTz1qcdCrxa4hh6GxlkqRTCXa0DOFQkCHJw1HhPebWEgfZRQ6yiz+HbGWSqBtRUkmVVFIlq+3Q1FBPQOoBPYKpTmCqE/BhHOXVFFlt5wSiZTMk4qvEYlFisSiKorC+toKtooz48jyH6ihWrB8r1g8JL/ILD4GxqWOAZZkk4qsoioIsR5DlCLFYlPHRIVqb64guy6xFRjhauY21UAOzJQSf3KTzjvsYsKNlkOUIs3NzzM7NoSgKHe2tlFw4z8uZYczCHrnX3Rx6TrPfI4BURLeziYHBYQTLMllfW2FkJIDk9yH5fTidDq7ZStl895Z0KkF6aZSC9wy7boFdt0AuUE5tfSOGoSMYhs746BB2ux273Y7T6cDpdBBfnieva+SmrrN77xQf3QJph8Ch/xytzXV4vN7j+upGFL/PS1NDPaIoIooikt/HGzlMfHme3P0ikp0CyU6BT4/OMvCghctXSrEsk2/ChENBRFGky+Wiy+VCkiREUWTmcQNqm4DaJrD9rJjeuze4WHKJVFL93oGvLXr7+vB4vYRDQWxVV0mMNbLhKWaytxZbRRm2ijK0bOZHgczCHvLCLNPBSWQ5wsjwIB3trYRDQcorK6muqWVifOz3P5DXNYaeP8XzsJea6ioURcEs7B0v/S+ZDk7ScavlZKQ/5AtqYxFgEGjruAAAAABJRU5ErkJggg==);
 }
 .creativecommons-favicon {
     background-image: url(https://creativecommons.org/favicon.ico);
