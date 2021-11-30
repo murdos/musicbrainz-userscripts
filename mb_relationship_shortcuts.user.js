@@ -14,17 +14,12 @@
 
 // Definitions: relations-type and corresponding icons we are going to treat
 const relationsIconsURLs = {
-    url: {
-        'creative commons licensed download': 'http://creativecommons.org/favicon.ico',
-        'cover art link': 'http://www.cdcovers.cc/favicon.ico',
-        // 'http://www.nomy.nu/img/lyrics-icon.gif'
-        lyrics: `data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==`,
-    },
     'release-group': {
         // http://www.amaesingtools.com/images/left_arrow_icon.gif
         'single from': `data:image/gif;base64,R0lGODlhDwALAJEAAP2ZAZmZmf///wAAACH5BAAAAAAALAAAAAAPAAsAAAIflI+pq2ABY0DAiYmwqOyaCoaHxjHaZp0e9UhQB8dCAQA7`,
     },
     release: {
+        // deprecated, see also https://musicbrainz.org/report/PartOfSetRelationships
         'part of set': 'http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png',
         remaster: 'http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png',
     },
@@ -33,8 +28,11 @@ const relationsIconsURLs = {
 const urlRelationsIconClasses = {
     allmusic: 'allmusic',
     'amazon asin': 'amazon',
+    'cover art link': 'coverart', // deprecated, see https://tickets.metabrainz.org/browse/MBS-11856
+    'creative commons licensed download': 'creativecommons',
     discogs: 'discogs',
     imdb: 'imdb',
+    lyrics: 'lyrics',
     secondhandsongs: 'secondhandsongs',
     vgmdb: 'vgmdb',
     wikidata: 'wikidata',
@@ -88,6 +86,19 @@ td.relationships span.favicon {
     height: 16px;
     vertical-align: middle;
     margin-right: 4px;
+}
+
+/* additional custom favicons which are not shipped by MBS */
+.coverart-favicon {
+    /* archived version from 2015, originally from http://www.cdcovers.cc/favicon.ico */
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACbklEQVQ4jb2Tz0uTARyH31OXrl47dOuf6FAK3YJAQWVIIRiioDY95JuSbkS4JRQq1QbN9WaiOH82hekk411YL+pBN5fjbcut+U7fvSbN99WDTwcpiX5f+ty/Dx8+PF9B+F/ZzibJ6xp5XeOvDszCHnldQ8tmMAydfWOTfWOTz1qcdCrxa4hh6GxlkqRTCXa0DOFQkCHJw1HhPebWEgfZRQ6yiz+HbGWSqBtRUkmVVFIlq+3Q1FBPQOoBPYKpTmCqE/BhHOXVFFlt5wSiZTMk4qvEYlFisSiKorC+toKtooz48jyH6ihWrB8r1g8JL/ILD4GxqWOAZZkk4qsoioIsR5DlCLFYlPHRIVqb64guy6xFRjhauY21UAOzJQSf3KTzjvsYsKNlkOUIs3NzzM7NoSgKHe2tlFw4z8uZYczCHrnX3Rx6TrPfI4BURLeziYHBYQTLMllfW2FkJIDk9yH5fTidDq7ZStl895Z0KkF6aZSC9wy7boFdt0AuUE5tfSOGoSMYhs746BB2ux273Y7T6cDpdBBfnieva+SmrrN77xQf3QJph8Ch/xytzXV4vN7j+upGFL/PS1NDPaIoIooikt/HGzlMfHme3P0ikp0CyU6BT4/OMvCghctXSrEsk2/ChENBRFGky+Wiy+VCkiREUWTmcQNqm4DaJrD9rJjeuze4WHKJVFL93oGvLXr7+vB4vYRDQWxVV0mMNbLhKWaytxZbRRm2ijK0bOZHgczCHvLCLNPBSWQ5wsjwIB3trYRDQcorK6muqWVifOz3P5DXNYaeP8XzsJea6ioURcEs7B0v/S+ZDk7ScavlZKQ/5AtqYxFgEGjruAAAAABJRU5ErkJggg==);
+}
+.creativecommons-favicon {
+    background-image: url(https://creativecommons.org/favicon.ico);
+}
+.lyrics-favicon {
+    /* archived version, originally from http://www.nomy.nu/img/lyrics-icon.gif */
+    background-image: url(data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==);
 }`;
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -192,13 +203,6 @@ $(document).ready(function () {
                         let targetUrl = $(this).children('target').text();
                         if (relType in urlRelationsIconClasses) {
                             injectShortcutIcon(mbid, targetUrl, urlRelationsIconClasses[relType]);
-                        } else if (Object.prototype.hasOwnProperty.call(relationsIconsURLs.url, relType)) {
-                            // Use (data) URLs for custom icons which are not included in MBS (as classes)
-                                    $(`#${mbid} td.relationships`).append(
-                                `<a href='${targetUrl.replace(/'/g, '&apos;')}'>` +
-                                    `<img style='max-height: 16px;' src='${relationsIconsURLs.url[relType]}' />&nbsp;` +
-                                            `</a>`
-                                    );
                         } else if (['free streaming', 'streaming', 'purchase for download'].includes(relType)) {
                             injectShortcutIcon(mbid, targetUrl, findIconClassOfUrl(targetUrl, streamingIconClasses));
                         } else {
