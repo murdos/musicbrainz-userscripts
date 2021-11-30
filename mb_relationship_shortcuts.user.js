@@ -50,6 +50,7 @@ const streamingIconClasses = {
     'music.apple.com': 'applemusic',
     'bandcamp.com': 'bandcamp',
     'www.deezer.com': 'deezer',
+    'www.hdtracks.com': 'hdtracks',
     'itunes.apple.com': 'itunes',
     'qobuz.com': 'qobuz',
     'soundcloud.com': 'soundcloud',
@@ -89,6 +90,10 @@ td.relationships span.favicon {
 }
 
 /* additional custom favicons which are not shipped by MBS */
+.hdtracks-favicon {
+    background-image: url(https://www.hdtracks.com/favicon.ico);
+    background-size: 16px;
+}
 .coverart-favicon {
     /* archived version from 2015, originally from http://www.cdcovers.cc/favicon.ico */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACbklEQVQ4jb2Tz0uTARyH31OXrl47dOuf6FAK3YJAQWVIIRiioDY95JuSbkS4JRQq1QbN9WaiOH82hekk411YL+pBN5fjbcut+U7fvSbN99WDTwcpiX5f+ty/Dx8+PF9B+F/ZzibJ6xp5XeOvDszCHnldQ8tmMAydfWOTfWOTz1qcdCrxa4hh6GxlkqRTCXa0DOFQkCHJw1HhPebWEgfZRQ6yiz+HbGWSqBtRUkmVVFIlq+3Q1FBPQOoBPYKpTmCqE/BhHOXVFFlt5wSiZTMk4qvEYlFisSiKorC+toKtooz48jyH6ihWrB8r1g8JL/ILD4GxqWOAZZkk4qsoioIsR5DlCLFYlPHRIVqb64guy6xFRjhauY21UAOzJQSf3KTzjvsYsKNlkOUIs3NzzM7NoSgKHe2tlFw4z8uZYczCHrnX3Rx6TrPfI4BURLeziYHBYQTLMllfW2FkJIDk9yH5fTidDq7ZStl895Z0KkF6aZSC9wy7boFdt0AuUE5tfSOGoSMYhs746BB2ux273Y7T6cDpdBBfnieva+SmrrN77xQf3QJph8Ch/xytzXV4vN7j+upGFL/PS1NDPaIoIooikt/HGzlMfHme3P0ikp0CyU6BT4/OMvCghctXSrEsk2/ChENBRFGky+Wiy+VCkiREUWTmcQNqm4DaJrD9rJjeuze4WHKJVFL93oGvLXr7+vB4vYRDQWxVV0mMNbLhKWaytxZbRRm2ijK0bOZHgczCHvLCLNPBSWQ5wsjwIB3trYRDQcorK6muqWVifOz3P5DXNYaeP8XzsJea6ioURcEs7B0v/S+ZDk7ScavlZKQ/5AtqYxFgEGjruAAAAABJRU5ErkJggg==);
