@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2021.10.17.1
+// @version        2021.12.3.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -20,13 +20,14 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
+// eslint-disable-next-line no-global-assign
 if (!unsafeWindow) unsafeWindow = window;
 
 String.prototype.fix_bandcamp_url = function () {
     return this.replace('http://', 'https://');
 };
 
-var BandcampImport = {
+const BandcampImport = {
     // Analyze Bandcamp data and return a release object
     retrieveReleaseInfo: function () {
         let bandcampAlbumData = unsafeWindow.TralbumData;
@@ -94,7 +95,7 @@ var BandcampImport = {
         // only set to true if ALL tracks are formatted like this
         // and if string doesn't start with a number (ie. 02 - title)
         let various_artists = true;
-        for (var i = 0; i < bandcampAlbumData.trackinfo.length; i++) {
+        for (let i = 0; i < bandcampAlbumData.trackinfo.length; i++) {
             if (!bandcampAlbumData.trackinfo[i].title.match(/ - /) || bandcampAlbumData.trackinfo[i].title.match(/^\d+ - /)) {
                 various_artists = false;
                 break;
@@ -140,12 +141,11 @@ var BandcampImport = {
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
             $('h2.trackTitle').append(
-                `${'<p style="font-size:70%; font-style: italic; margin: 0.1em 0;">' + 'Warning: '}${numtracks} vs ${showntracks} tracks` +
-                    `</p>`
+                `<p style="font-size:70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`
             );
 
             // append unknown tracks to the release
-            for (var i = 0; i < numtracks - showntracks; i++) {
+            for (let i = 0; i < numtracks - showntracks; i++) {
                 let track = {
                     title: '[unknown]',
                     duration: null,
@@ -306,7 +306,7 @@ $(document).ready(function () {
     let release = BandcampImport.retrieveReleaseInfo();
 
     // add MB artist link
-    let root_url = release.url.match(/^(https?:\/\/[^\/]+)/)[1].split('?')[0];
+    let root_url = release.url.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
     let label_url = '';
 
     mblinks.searchAndDisplayMbLink(
@@ -322,7 +322,7 @@ $(document).ready(function () {
         let labelbacklink = labelback.attr('href');
         if (labelbacklink) {
             label_url = labelbacklink
-                .match(/^(https?:\/\/[^\/]+)/)[1]
+                .match(/^(https?:\/\/[^/]+)/)[1]
                 .split('?')[0]
                 .fix_bandcamp_url();
             mblinks.searchAndDisplayMbLink(
