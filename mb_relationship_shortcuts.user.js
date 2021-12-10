@@ -197,12 +197,17 @@ $(document).ready(function () {
                 let mbid = $(this).attr('id');
 
                 // URL relationships
+                let alreadyInjectedUrls = [];
                 $(this)
                     .find("relation-list[target-type='url'] relation")
                     .each(function () {
                         let relType = $(this).attr('type');
                         let targetUrl = $(this).children('target').text();
                         let ended = $(this).children('ended').text() === 'true';
+
+                        // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
+                        if (alreadyInjectedUrls.includes(targetUrl)) return;
+                        alreadyInjectedUrls.push(targetUrl);
 
                         let iconClass;
                         if (relType in urlRelationsIconClasses) {
