@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2020.8.1.1
+// @version       2021.12.10
 // @license       GPL
 // @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
 // @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
@@ -78,16 +78,15 @@ function inject_release_group_button(parent) {
 function inject_release_button(parent, _table_parent, _table, _mbid) {
     let mbid = _mbid || parent.querySelector('a').href.match(MBID_REGEX),
         table = _table || document.createElement('table');
+    let table_parent = _table_parent || parent; // fallback for pages where we do not inject the release groups
 
-    table.style.marginTop = '1em';
-    table.style.marginLeft = '1em';
     table.style.paddingLeft = '1em';
 
     let button = create_button(
         `/ws/2/release/${mbid}?inc=media+recordings+artist-credits&fmt=json`,
         function (toggled) {
-            if (toggled) parent.appendChild(table);
-            else parent.removeChild(table);
+            if (toggled) table_parent.appendChild(table);
+            else table_parent.removeChild(table);
         },
         function (json) {
             parse_release(json, table);
