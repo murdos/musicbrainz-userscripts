@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2021.12.10
+// @version       2021.12.10.1
 // @license       GPL
 // @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
 // @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
@@ -65,7 +65,7 @@ function inject_release_group_button(parent) {
             else parent.removeChild(table);
         },
         function (json) {
-            parse_release_group(json, mbid, parent, table);
+            parse_release_group(json, mbid, table);
         },
         function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release group (HTTP status ${status})</td></tr>`;
@@ -159,7 +159,7 @@ function format_time(ms) {
     return `${Math.floor(ts / 60)}:${s >= 10 ? s : `0${s}`}`;
 }
 
-function parse_release_group(json, mbid, parent, table) {
+function parse_release_group(json, mbid, table) {
     let releases = json.releases;
     table.innerHTML = '';
 
