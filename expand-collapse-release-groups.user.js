@@ -40,13 +40,13 @@
 const MBID_REGEX = /[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/;
 
 const releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
-for (let r = 0; r < releasesOrReleaseGroups.length; r++) {
-    let entityLink = releasesOrReleaseGroups[r].getAttribute('href');
+for (const entity of releasesOrReleaseGroups) {
+    const entityLink = entity.getAttribute('href');
     if (entityLink.match(/\/release-group\//)) {
-        inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
+        inject_release_group_button(entity.parentNode);
     } else if (!entityLink.match(/\/cover-art/)) {
         // avoid injecting a second button for a release's cover art link
-        inject_release_button(releasesOrReleaseGroups[r].parentNode);
+        inject_release_button(entity.parentNode);
     }
 }
 
@@ -163,17 +163,17 @@ function parse_release_group(json, mbid, parent, table) {
     let releases = json.releases;
     table.innerHTML = '';
 
-    for (let i = 0; i < releases.length; i++) {
-        let release = releases[i],
-            media = {},
+    for (const release of releases) {
+        let media = {},
             tracks = [],
             formats = [];
 
-        for (let j = 0; j < release.media.length; j++) {
-            let medium = release.media[j],
-                format = medium.format,
+        for (const medium of release.media) {
+            let format = medium.format,
                 count = medium['track-count'];
-            if (format) format in media ? (media[format] += 1) : (media[format] = 1);
+            if (format) {
+                format in media ? (media[format] += 1) : (media[format] = 1);
+            }
             tracks.push(count);
         }
 
@@ -193,36 +193,35 @@ function parse_release_group(json, mbid, parent, table) {
         return 0;
     });
 
-    for (let i = 0; i < releases.length; i++) {
-        (function (release) {
-            let track_tr = document.createElement('tr'),
-                track_td = document.createElement('td'),
-                track_table = document.createElement('table'),
-                format_td = document.createElement('td'),
-                tr = document.createElement('tr'),
-                td = document.createElement('td'),
-                a = createLink(`/release/${release.id}`, release.title);
+    for (const release of releases) {
+        let track_tr = document.createElement('tr'),
+            track_td = document.createElement('td'),
+            track_table = document.createElement('table'),
+            format_td = document.createElement('td'),
+            tr = document.createElement('tr'),
+            td = document.createElement('td'),
+            a = createLink(`/release/${release.id}`, release.title);
 
-            track_td.colSpan = 6;
-            track_table.style.width = '100%';
-            track_table.style.marginLeft = '1em';
-            track_tr.appendChild(track_td);
-            inject_release_button(td, track_td, track_table, release.id);
-            td.appendChild(a);
-            if (release.disambiguation) {
-                td.appendChild(document.createTextNode(` (${release.disambiguation})`));
-            }
-            tr.appendChild(td);
-            format_td.innerHTML = release.formats;
-            tr.appendChild(format_td);
+        track_td.colSpan = 6;
+        track_table.style.width = '100%';
+        track_table.style.marginLeft = '1em';
+        track_tr.appendChild(track_td);
+        inject_release_button(td, track_td, track_table, release.id);
+        td.appendChild(a);
+        if (release.disambiguation) {
+            td.appendChild(document.createTextNode(` (${release.disambiguation})`));
+        }
+        tr.appendChild(td);
+        format_td.innerHTML = release.formats;
+        tr.appendChild(format_td);
 
-            let columns = [release.tracks, release.date || '', release.country || '', release.status || ''];
+        let columns = [release.tracks, release.date || '', release.country || '', release.status || ''];
+        for (const column of columns) {
+            tr.appendChild(createElement('td', column));
+        }
 
-            for (let i = 0; i < columns.length; i++) tr.appendChild(createElement('td', columns[i]));
-
-            table.appendChild(tr);
-            table.appendChild(track_tr);
-        })(releases[i]);
+        table.appendChild(tr);
+        table.appendChild(track_tr);
     }
 
     let bottom_tr = document.createElement('tr'),
@@ -288,12 +287,11 @@ function parse_release(json, table) {
     table.appendChild(bottom_tr);
 }
 
-function createAC(obj) {
+function createAC(artist_credit_array) {
     let span = document.createElement('span');
 
-    for (let i = 0; i < obj.length; i++) {
-        let credit = obj[i],
-            artist = credit.artist,
+    for (const credit of artist_credit_array) {
+        let artist = credit.artist,
             link = createLink(`/artist/${artist.id}`, credit.name || artist.name);
 
         link.setAttribute('title', artist['sort-name']);
