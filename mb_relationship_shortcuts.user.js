@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2021.8.5.1
+// @version        2021.12.10.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -84,6 +84,9 @@ td.relationships span.favicon {
     height: 16px;
     vertical-align: middle;
     margin-right: 4px;
+}
+td.relationships span.favicon.ended {
+    opacity: 25%; /* make ended rels less visible */
 }
 
 /* additional custom favicons which are not shipped by MBS */
@@ -199,14 +202,24 @@ $(document).ready(function () {
                     .each(function () {
                         let relType = $(this).attr('type');
                         let targetUrl = $(this).children('target').text();
+                        let ended = $(this).children('ended').text() === 'true';
+
+                        let iconClass;
                         if (relType in urlRelationsIconClasses) {
-                            injectShortcutIcon(mbid, targetUrl, urlRelationsIconClasses[relType]);
+                            iconClass = urlRelationsIconClasses[relType];
                         } else if (['free streaming', 'streaming', 'purchase for download'].includes(relType)) {
-                            injectShortcutIcon(mbid, targetUrl, findIconClassOfUrl(targetUrl, streamingIconClasses));
+                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
                         } else {
                             // Other database?
-                            injectShortcutIcon(mbid, targetUrl, findIconClassOfUrl(targetUrl, otherDatabasesIconClasses));
+                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+                        }
+
+                        if (iconClass) {
+                            if (ended) {
+                                iconClass = ['ended', iconClass].join(' ');
                             }
+                            injectShortcutIcon(mbid, targetUrl, iconClass);
+                        }
                     });
 
                 // Other relationships
