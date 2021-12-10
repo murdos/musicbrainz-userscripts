@@ -37,10 +37,10 @@
 // @exclude       *musicbrainz.org/series/*/*
 // ==/UserScript==
 
-var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/;
+const MBID_REGEX = /[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/;
 
-var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
-for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
+const releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
+for (let r = 0; r < releasesOrReleaseGroups.length; r++) {
     let entityLink = releasesOrReleaseGroups[r].getAttribute('href');
     if (entityLink.match(/\/release-group\//)) {
         inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
@@ -163,23 +163,22 @@ function parse_release_group(json, mbid, parent, table) {
     let releases = json.releases;
     table.innerHTML = '';
 
-    for (var i = 0; i < releases.length; i++) {
+    for (let i = 0; i < releases.length; i++) {
         let release = releases[i],
             media = {},
             tracks = [],
             formats = [];
 
         for (let j = 0; j < release.media.length; j++) {
-            var medium = release.media[j],
+            let medium = release.media[j],
                 format = medium.format,
                 count = medium['track-count'];
             if (format) format in media ? (media[format] += 1) : (media[format] = 1);
             tracks.push(count);
         }
 
-        for (format in media) {
-            var count = media[format],
-                txt;
+        for (let format in media) {
+            let count = media[format];
             if (count > 1) formats.push(`${count.toString()}&#215;${format}`);
             else formats.push(format);
         }
@@ -194,7 +193,7 @@ function parse_release_group(json, mbid, parent, table) {
         return 0;
     });
 
-    for (var i = 0; i < releases.length; i++) {
+    for (let i = 0; i < releases.length; i++) {
         (function (release) {
             let track_tr = document.createElement('tr'),
                 track_td = document.createElement('td'),
@@ -256,8 +255,9 @@ function parse_release(json, table) {
             let track = medium.tracks[j],
                 recording = track.recording,
                 disambiguation = recording.disambiguation ? ` (${recording.disambiguation})` : '',
-                length = track.length ? format_time(track.length) : '?:??';
-            (artist_credit = track['artist-credit'] || track.recording['artist-credit']), (tr = document.createElement('tr'));
+                length = track.length ? format_time(track.length) : '?:??',
+                artist_credit = track['artist-credit'] || track.recording['artist-credit'],
+                tr = document.createElement('tr');
 
             tr.appendChild(createElement('td', j + 1));
             let title_td = createElement('td', disambiguation);
