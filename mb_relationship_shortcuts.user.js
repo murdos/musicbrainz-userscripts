@@ -9,6 +9,7 @@
 // @include        http*://*musicbrainz.org/artist/*
 // @include        http*://*musicbrainz.org/release-group/*
 // @include        http*://*musicbrainz.org/label/*
+// @exclude        */artist/*/recordings*
 // @require        https://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
 
