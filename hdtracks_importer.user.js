@@ -2,7 +2,7 @@
 // @name           Import HDtracks releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from hdtracks.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version        2021.11.7.1
+// @version        2021.11.21.1
 // @author         kellnerd
 // @license        MIT
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/hdtracks_importer.user.js
@@ -52,7 +52,7 @@ function parseHDtracksRelease(data, releaseUrl) {
         day: releaseDate.getUTCDate(),
         comment: audioQuality != '44.1kHz/16bit' ? audioQuality : '',
         annotation: [`${audioQuality} available on HDtracks`, data.cLine, data.pLine].join('\n'),
-        // `data.credits` is currently not included as its unclear for which tracks the individual credits apply
+        // `data.credits` is currently not included as it is unclear for which tracks the individual credits apply
         discs: [],
         urls: [],
         packaging: 'None',
