@@ -3,7 +3,7 @@
 // @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace     http://userscripts.org/users/266906
 // @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2021.12.10.1
+// @version       2022.1.6.1
 // @license       GPL
 // @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
 // @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
@@ -230,11 +230,11 @@ function parse_release_group(json, mbid, table) {
     bottom_td.colSpan = 6;
     bottom_td.style.padding = '1em';
 
-    bottom_td.appendChild(createLink(`/release-group/${mbid}/edit`, 'edit'));
+    bottom_td.appendChild(createNewTabLink(`/release-group/${mbid}/edit`, 'edit'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/add?release-group=${mbid}`, 'add release'));
+    bottom_td.appendChild(createNewTabLink(`/release/add?release-group=${mbid}`, 'add release'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release-group/${mbid}/edits`, 'editing history'));
+    bottom_td.appendChild(createNewTabLink(`/release-group/${mbid}/edits`, 'editing history'));
 
     bottom_tr.appendChild(bottom_td);
     table.appendChild(bottom_tr);
@@ -277,13 +277,13 @@ function parse_release(json, table) {
     bottom_td.colSpan = 4;
     bottom_td.style.padding = '1em';
 
-    bottom_td.appendChild(createLink(`/release/${json.id}/edit`, 'edit'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edit`, 'edit'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/${json.id}/edit-relationships`, 'edit relationships'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edit-relationships`, 'edit relationships'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/${json.id}/edits`, 'editing history'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edits`, 'editing history'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/${json.id}/add-cover-art`, 'add cover art'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/add-cover-art`, 'add cover art'));
 
     bottom_tr.appendChild(bottom_td);
     table.appendChild(bottom_tr);
@@ -314,4 +314,10 @@ function createLink(href, text) {
     let element = createElement('a', text);
     element.href = href;
     return element;
+}
+
+function createNewTabLink(href, text) {
+    let link = createLink(href, text);
+    link.target = '_blank';
+    return link;
 }
