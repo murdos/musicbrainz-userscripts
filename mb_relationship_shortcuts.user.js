@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2021.12.11.1
+// @version        2022.1.27.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -83,7 +83,7 @@ td.relationships span.favicon {
     width: 16px;
     height: 16px;
     vertical-align: middle;
-    margin-right: 4px;
+    margin: 2px;
 }
 td.relationships span.favicon.ended {
     opacity: 25%; /* make ended rels less visible */
@@ -151,7 +151,7 @@ $(document).ready(function () {
     $("table.tbl tr[class!='subh']").each(function () {
         let $tr = $(this);
 
-        $tr.children(`th:eq(${columnindex})`).after("<th style='width: 150px;'>Relationships</th>");
+        $tr.children(`th:eq(${columnindex})`).after('<th>Relationships</th>');
         $tr.children(`td:eq(${columnindex})`).after("<td class='relationships'></td>");
 
         $(this)
