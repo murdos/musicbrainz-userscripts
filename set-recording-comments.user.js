@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2021.8.22.1
+// @version        2022.2.3
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
@@ -41,9 +41,11 @@
 // authorization.
 // ==/License==
 
-const scr = document.createElement('script');
-scr.textContent = `$(${setRecordingComments});`;
-document.body.appendChild(scr);
+setTimeout(function() {
+	const scr = document.createElement('script');
+	scr.textContent = `$(${setRecordingComments});`;
+	document.body.appendChild(scr);
+}, 1000);
 
 function setRecordingComments() {
     let $tracks;
