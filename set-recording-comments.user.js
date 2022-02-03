@@ -39,10 +39,10 @@
 // authorization.
 // ==/License==
 
-setTimeout(function() {
-	const scr = document.createElement('script');
-	scr.textContent = `$(${setRecordingComments});`;
-	document.body.appendChild(scr);
+setTimeout(function () {
+    const scr = document.createElement('script');
+    scr.textContent = `$(${setRecordingComments});`;
+    document.body.appendChild(scr);
 }, 1000);
 
 function setRecordingComments() {
