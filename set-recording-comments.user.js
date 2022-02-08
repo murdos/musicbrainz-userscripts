@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           MusicBrainz: Set recording comments for a release
 // @description    Batch set recording comments from a Release page.
-// @version        2022.2.3
+// @version        2022.2.8.1
 // @author         Michael Wiencek
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
@@ -70,6 +70,10 @@ function setRecordingComments() {
                 node = $td.children('td > .mp, td > .name-variation, td > a[href^=\\/recording\\/]').filter(':first'),
                 $input = $('<input />').addClass('recording-comment').insertAfter(node);
 
+            let link = $("a[href^='/recording/']", $td).first().attr('href');
+            let mbid = link.match(MBID_REGEX)[0];
+            $input.data('mbid', mbid);
+
             if (!editing) {
                 $input.hide();
             }
@@ -80,16 +84,17 @@ function setRecordingComments() {
         let release = location.pathname.match(MBID_REGEX)[0];
 
         $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function (data) {
-            let comments = Array.from(data.media)
+            let recordings = Array.from(data.media)
                 .map(medium => medium.tracks)
                 .flat()
-                .map(track => track.recording)
-                .map(recording => recording.disambiguation);
+                .map(track => track.recording);
 
-            for (let i = 0, len = comments.length; i < len; i++) {
-                let comment = comments[i];
-                $inputs.eq(i).val(comment).data('old', comment);
-            }
+            $inputs.each(function () {
+                let mbid = $(this).data('mbid');
+                let recording = recordings.find(recording => recording.id === mbid);
+                let comment = recording ? recording.disambiguation : '';
+                $(this).val(comment).data('old', comment);
+            });
         });
     }, 1000);
 
