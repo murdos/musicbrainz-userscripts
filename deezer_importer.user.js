@@ -140,6 +140,6 @@ function insertLink(release, release_url) {
             </div>`
     ).hide();
 
-    $('div.toolbar-wrapper-full').append(mbUI);
+    $('[data-testid="toolbar"]').append(mbUI);
     mbUI.show();
 }
