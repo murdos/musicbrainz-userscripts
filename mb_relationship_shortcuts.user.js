@@ -1,16 +1,17 @@
 // ==UserScript==
 // @name           Display shortcut for relationships on MusicBrainz
 // @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2022.1.27.1
+// @version        2022.4.21.1
 // @author         Aurelien Mino <aurelien.mino@gmail.com>
 // @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @namespace      https://github.com/murdos/musicbrainz-userscripts
 // @include        http*://*musicbrainz.org/artist/*
 // @include        http*://*musicbrainz.org/release-group/*
 // @include        http*://*musicbrainz.org/label/*
 // @exclude        */artist/*/recordings*
-// @require        https://code.jquery.com/jquery-3.2.1.min.js
+// @require        https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
@@ -56,6 +57,11 @@ const streamingIconClasses = {
     'tidal.com': 'tidal',
 };
 
+/**
+ * @param {string} mbid
+ * @param {string} targetUrl
+ * @param {string} iconClass
+ */
 function injectShortcutIcon(mbid, targetUrl, iconClass) {
     if (!iconClass) return;
     $(`#${mbid} td.relationships`).append(
@@ -63,9 +69,13 @@ function injectShortcutIcon(mbid, targetUrl, iconClass) {
     );
 }
 
+/**
+ * @param {string} url
+ * @param {Object} iconClassMap
+ */
 function findIconClassOfUrl(url, iconClassMap) {
     for (let partialUrl in iconClassMap) {
-        if (url.indexOf(partialUrl) != -1) {
+        if (url.includes(partialUrl)) {
             return iconClassMap[partialUrl];
         }
     }
@@ -103,7 +113,7 @@ td.relationships span.favicon.ended {
     background-image: url(data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==);
 }`;
 
-// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+// prevent JQuery conflicts, see https://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
@@ -130,9 +140,9 @@ $(document).ready(function () {
         return;
     }
 
-    $(`<style id='relationship-shortcuts-userscript-css'>${userscriptCSS}</style>`).appendTo('head');
+    document.head.insertAdjacentHTML('beforeend', `<style id='relationship-shortcuts-userscript-css'>${userscriptCSS}</style>`);
 
-    let mbidRE = /(release|release-group|work)\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/;
+    const mbidRE = /(release|release-group|work)\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/;
 
     // Determine target column
     let columnindex = 0;
@@ -140,7 +150,8 @@ $(document).ready(function () {
         $(this)
             .children('td')
             .each(function () {
-                if ($(this).find('a').attr('href') !== undefined && $(this).find('a').attr('href').match(mbidRE)) {
+                const href = $(this).find('a').attr('href');
+                if (href !== undefined && href.match(mbidRE)) {
                     return false;
                 }
                 columnindex++;
@@ -187,8 +198,7 @@ $(document).ready(function () {
     let offset = (page - 1) * 100;
 
     // Call the MB webservice
-    let url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
-    //console.log("MB WS url: " + url);
+    const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
     $.get(url, function (data, textStatus, jqXHR) {
         // Parse each child
@@ -242,9 +252,9 @@ $(document).ready(function () {
                         $(this)
                             .children('relation')
                             .each(function () {
-                                let reltype = $(this).attr('type');
-                                let target = $(this).children('target').text();
-                                let url = targettype == 'url' ? target : `/${targettype}/${target}`;
+                                const reltype = $(this).attr('type');
+                                const target = $(this).children('target').text();
+                                const url = targettype == 'url' ? target : `/${targettype}/${target}`;
 
                                 if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
                                     if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [url];
