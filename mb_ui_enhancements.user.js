@@ -67,6 +67,17 @@ $(document).ready(function () {
         }
     }
 
+    // Display 'mbid' on sidebar
+    re = new RegExp(
+        'musicbrainz.org/(release|recording)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
+        'i'
+    );
+    if (window.location.href.match(re)) {
+        $("#sidebar h2:contains('Release information')").before($("#sidebar h2:contains('Release information')"));
+        var mbid = window.location.href.match(re)[2];
+        $("#sidebar h2:contains('Release information')").before(`<h2 class="mbid">MBID</h2><p>${mbid}<p>`);
+    }
+
     // Better fix for http://tickets.musicbrainz.org/browse/MBS-1943
     re = new RegExp(
         'musicbrainz.org/(artist|release-group|release|recording|work|label)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
