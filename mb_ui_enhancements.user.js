@@ -74,12 +74,10 @@ $(document).ready(function () {
     );
     if (window.location.href.match(re)) {
         if ($("#sidebar h2:contains('Release information')").length > 0 ) {
-          $("#sidebar h2:contains('Release information')").before($("#sidebar h2:contains('Release information')"));
           var mbid = window.location.href.match(re)[2];
           $("#sidebar h2:contains('Release information')").before(`<h2 class="mbid">MBID</h2><p>${mbid}<p>`);
         }
         else if ($("#sidebar h2:contains('Recording information')").length > 0) {
-          $("#sidebar h2:contains('Recording information')").before($("#sidebar h2:contains('Recording information')"));
           var mbid = window.location.href.match(re)[2];
           $("#sidebar h2:contains('Recording information')").before(`<h2 class="mbid">MBID</h2><p>${mbid}<p>`);
         }
