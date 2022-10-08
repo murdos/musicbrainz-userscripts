@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2021.12.3.1
+// @version        2022.5.6.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include        /^https?://[^/]+/(?:album|track)/[^/]+\/?$/
 // @include        /^https?://web\.archive\.org/web/\d+/https?://[^/]+/(?:album|track)/[^/]+\/?$/
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
 // @require        lib/mbimport.js
 // @require        lib/logger.js
 // @require        lib/mblinks.js
@@ -134,14 +134,14 @@ const BandcampImport = {
         let numtracks = -1;
         let nostream = false;
         // album description indicates number of tracks in the download
-        let match = /^\d+ track album$/.exec($("meta[property='og:description']").attr('content'));
+        let match = /^\d+ track album$/.exec(document.querySelector('meta[property="og:description"]').getAttribute('content'));
         if (match) {
             numtracks = parseInt(match, 10);
         }
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
             $('h2.trackTitle').append(
-                `<p style="font-size:70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`
+                `<p style="font-size: 70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`
             );
 
             // append unknown tracks to the release
@@ -186,9 +186,10 @@ const BandcampImport = {
             });
         }
         // Check if release is Creative Commons licensed
-        if ($('div#license a.cc-icons').length > 0) {
+        const ccIcons = document.querySelector('div#license a.cc-icons');
+        if (ccIcons) {
             release.urls.push({
-                url: $('div#license a.cc-icons').attr('href'),
+                url: ccIcons.getAttribute('href'),
                 link_type: link_type.license,
             });
         }
@@ -227,8 +228,8 @@ const BandcampImport = {
 
         // Append MB import link
         $('#name-section').append(mbUI);
-        $('#mb_buttons').css({ 'margin-top': '6px' });
-        $('form.musicbrainz_import').css({ display: 'inline-block' });
+        document.querySelector('#mb_buttons').style.marginTop = '6px';
+        document.querySelectorAll('form.musicbrainz_import').forEach(form => (form.style.display = 'inline-block'));
         mbUI.slideDown();
     },
 
@@ -317,9 +318,9 @@ $(document).ready(function () {
         },
         `label:${root_url}`
     );
-    let labelback = $('a.back-to-label-link');
+    const labelback = document.querySelector('a.back-to-label-link');
     if (labelback) {
-        let labelbacklink = labelback.attr('href');
+        const labelbacklink = labelback.getAttribute('href');
         if (labelbacklink) {
             label_url = labelbacklink
                 .match(/^(https?:\/\/[^/]+)/)[1]
@@ -391,17 +392,24 @@ $(document).ready(function () {
     $('div.tralbum-tags a:not(:last-child).tag').after(', ');
 
     // append a link to the full size image
-    let fullsizeimageurl = $('div#tralbumArt a').attr('href').replace('_10', '_0');
-    $('div#tralbumArt').after(
+    const tralbumArt = document.querySelector('div#tralbumArt');
+    const fullsizeimageurl = tralbumArt.querySelector('a').getAttribute('href').replace('_10', '_0');
+    tralbumArt.insertAdjacentHTML(
+        'afterend',
         `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`
     );
 
-    $('div#bci_link').css({ 'padding-top': '0.5em', 'text-align': 'right' });
-    $('div#bci_link a').css({ 'font-weight': 'bold' });
-    let upc = unsafeWindow.TralbumData.current.upc;
+    const bci_link = document.querySelector('div#bci_link');
+    bci_link.style.paddingTop = '0.5em';
+    bci_link.style.textAlign = 'right';
+    bci_link.querySelector('a').style.fontWeight = 'bold';
+    const upc = unsafeWindow.TralbumData.current.upc;
     if (typeof upc != 'undefined' && upc !== null) {
-        $('div #trackInfoInner').append(
-            `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">${upc}</a></div>`
-        );
+        document
+            .querySelector('div #trackInfoInner')
+            .insertAdjacentHTML(
+                'beforeend',
+                `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">${upc}</a></div>`
+            );
     }
 });
