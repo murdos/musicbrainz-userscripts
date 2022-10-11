@@ -23,7 +23,7 @@ myform.action = '//musicbrainz.org/release/add';
 myform.acceptCharset = 'UTF-8';
 let mysubmit = document.createElement('input');
 mysubmit.type = 'submit';
-mysubmit.value = 'Add to MusicBrainz';
+mysubmit.value = 'Add Single to MusicBrainz';
 myform.appendChild(mysubmit);
 
 let div = document.createElement('div');
