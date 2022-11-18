@@ -84,9 +84,7 @@ function mb_callback(req) {
     } else {
         div.appendChild(myform);
     }
-    console.log("hit1");
     waitForKeyElements('h1.style-scope.ytd-watch-metadata', add_button);
-    console.log("hit2");
 }
 
 function add_button(title) {
