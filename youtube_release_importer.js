@@ -84,7 +84,9 @@ function mb_callback(req) {
     } else {
         div.appendChild(myform);
     }
-    waitForKeyElements('h1.title:last', add_button);
+    console.log("hit1");
+    waitForKeyElements('h1.style-scope.ytd-watch-metadata', add_button);
+    console.log("hit2");
 }
 
 function add_button(title) {
