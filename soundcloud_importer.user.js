@@ -27,7 +27,7 @@ const SoundcloudImport = {
       year: 0,
       month: 0,
       day: 0,
-      parent_album_url: '',
+      parent_album_url: soundcloudAlbumData.permalink_url,
       labels: [],
       format: 'Digital Media',
       country: 'XW',
@@ -38,6 +38,7 @@ const SoundcloudImport = {
       script: 'Latn',
       urls: [],
       url: soundcloudAlbumData.permalink_url,
+      artist_url: soundcloudAlbumData.user.permalink_url,
     };
 
     // Release title
@@ -67,20 +68,24 @@ const SoundcloudImport = {
         format: release.format,
     }];
 
-    if (soundcloudAlbumData.kind == "track") {
+    if (release.type == "Single") {
       release.discs[0].tracks.push({
           title: release.title,
           duration: soundcloudAlbumData.duration,
           artist_credit: release.artist_credit
       });
     } else {
-      soundcloudAlbumData.tracks.forEach(function (track) {
-        release.discs[0].tracks.push({
-          title: track.title,
-          duration: track.duration,
-          artist_credit: MBImport.makeArtistCredits([track.user.username]),
+      if (release.type == "track") {
+        release.parent_album_url = document.querySelectorAll(".sidebarModule")[1].querySelector(".soundBadgeList__item").querySelector(".soundTitle__title").href;
+      } else {
+        soundcloudAlbumData.tracks.forEach(function (track) {
+          release.discs[0].tracks.push({
+            title: track.title,
+            duration: track.duration,
+            artist_credit: MBImport.makeArtistCredits([track.user.username]),
+          });
         });
-      });
+      }
     }
     // Release artist
     release.artist_credit = MBImport.makeArtistCredits([soundcloudAlbumData.user.username]);
@@ -136,10 +141,22 @@ const SoundcloudImport = {
 }
 
 $(document).ready(function() {
-    // Wait 1 second for soundcloud to execute its scripts
+    // Wait 2 seconds for soundcloud to execute its scripts
     window.setTimeout(function () {
       MBImportStyle();
+      let mblinks = new MBLinks('SCI_MBLINKS_CACHE');
       let release = SoundcloudImport.retrieveReleaseInfo();
+      mblinks.searchAndDisplayMbLink(release.artist_url, 'artist', function (link) {
+        $('.userBadge__actions').append(`<div class="sc-button sc-link" style="top: 4px; max-height:22px">${link}</div>`);
+      });
+      mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
+          $('.soundActions .sc-button-group .sc-button-like').before(`<div class="sc-button sc-link" style="padding-top: 4px">${link}</div>`);
+      });
+      //Not sure why this is required
+      $(".sc-link a").each(function() {
+          $(this).attr("href", "https:" + $(this).attr("href"));
+      });
+
 
       SoundcloudImport.insertLink(release);
     }, 1000);
