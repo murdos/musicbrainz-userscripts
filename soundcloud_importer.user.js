@@ -9,21 +9,8 @@
 // @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant          unsafeWindow
-// @run-at         document-start
+// @run-at         document-end
 // ==/UserScript==
-
-function convertReleaseTypes(type) {
-      switch(type) {
-        case 'album':
-            return 'Album';
-        case 'ep':
-            return 'EP';
-        case 'single':
-            return 'Single';
-        default:
-            return 'Other';
-    }
-}
 
 // eslint-disable-next-line no-global-assign
 if (!unsafeWindow) unsafeWindow = window;
@@ -63,12 +50,15 @@ const SoundcloudImport = {
     release.month = date.getUTCMonth() + 1;
 
     // Release type
-    // FIXME: Find a way to distinguish between a track and single.
-    // Currently, an individual track is imported as a single.
     if (soundcloudAlbumData.kind == "track") {
-        release.type = "Single";
+        // Logic to determine if it is part of a release
+        if (document.querySelectorAll(".sidebarModule")[1].getElementsByClassName("soundBadgeList__item").length == 0) {
+          release.type = "Single";
+        } else {
+          release.type = "track";
+        }
     } else {
-        release.type = convertReleaseTypes(soundcloudAlbumData.set_type);
+        release.type = this.convertReleaseTypes(soundcloudAlbumData.set_type);
     }
 
     // Tracks
@@ -88,7 +78,7 @@ const SoundcloudImport = {
         release.discs[0].tracks.push({
           title: track.title,
           duration: track.duration,
-          artist_credit: MBImport.makeArtistCredits([soundcloudAlbumData.user.username]),
+          artist_credit: MBImport.makeArtistCredits([track.user.username]),
         });
       });
     }
@@ -128,12 +118,29 @@ const SoundcloudImport = {
     $(".listenEngagement__actions").append(importButton);
     $(".listenEngagement__actions").append(searchButton);
   },
+
+  // Convert between soundcloud and MB release types
+  convertReleaseTypes: function (type) {
+      switch(type) {
+        case 'album':
+            return 'Album';
+        case 'ep':
+            return 'EP';
+        case 'single':
+            return 'Single';
+        default:
+            return 'Other';
+    }
 }
 
-$(window).on( "load", function () {
-    MBImportStyle();
-    let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
-    let release = SoundcloudImport.retrieveReleaseInfo();
+}
 
-    SoundcloudImport.insertLink(release);
+$(document).ready(function() {
+    // Wait 1 second for soundcloud to execute its scripts
+    window.setTimeout(function () {
+      MBImportStyle();
+      let release = SoundcloudImport.retrieveReleaseInfo();
+
+      SoundcloudImport.insertLink(release);
+    }, 1000);
 });
