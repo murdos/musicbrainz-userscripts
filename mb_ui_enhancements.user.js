@@ -269,21 +269,24 @@ $(document).ready(function () {
             if (link.href.match(/deezer.com|(music|itunes).apple.com|spotify.com/)) {
                 let id;
                 let fragment;
-
+                let country;
                 if (link.href.match(/deezer.com/)) {
                     id = new URL(link.href).pathname.split('/').slice(-1)[0];
                     fragment = 'deez';
+                    country = 'GB%2CUS%2CIN';
                 } else if (link.href.match(/apple.com/)) {
                     id = new URL(link.href).pathname.split('/', 5).slice(-1)[0].replace('id', '');
                     fragment = 'itu';
+                    country = new URL(link.href).pathname.split('/',2)[1];
                 } else if (link.href.match(/spotify.com/)) {
                     id = new URL(link.href).pathname.split('/', 5).slice(-1)[0];
                     fragment = 'spf';
+                    country = 'GB%2CUS%2CIN';
                 }
 
                 let next = link.nextElementSibling.nextElementSibling;
                 let newlink = document.createElement('a');
-                newlink.href = `https://etc.marlonob.info/atisket/?${fragment}_id=${id}`;
+                newlink.href = `https://atisket.pulsewidth.org.uk/?preferred_countries=${country}&${fragment}_id=${id}&preferred_vendor=${fragment}`;
                 newlink.text = 'a-tisket';
 
                 next.before(document.createTextNode(' ['));
