@@ -128,6 +128,16 @@ function parseDeezerRelease(releaseUrl, data) {
     return release;
 }
 
+function waitForEl(selector, callback) {
+    if (jQuery(selector).length) {
+        callback();
+    } else {
+        setTimeout(function () {
+            waitForEl(selector, callback);
+        }, 100);
+    }
+}
+
 function insertLink(release, release_url) {
     let editNote = MBImport.makeEditNote(release_url, 'Deezer');
     let parameters = MBImport.buildFormParameters(release, editNote);
@@ -139,7 +149,8 @@ function insertLink(release, release_url) {
             ${MBImport.buildSearchButton(release)}
             </div>`
     ).hide();
-
-    $('[data-testid="toolbar"]').append(mbUI);
-    mbUI.show();
+    waitForEl('[data-testid="toolbar"]', function () {
+        $('[data-testid="toolbar"]').append(mbUI);
+        mbUI.show();
+    });
 }
