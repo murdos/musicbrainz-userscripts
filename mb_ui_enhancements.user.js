@@ -171,7 +171,7 @@ $(document).ready(function () {
                 var isrc = $(this).text();
                 newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
                 newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
-                newHTML += '</bdi></a>';
+                newHTML += '</code></bdi></a>';
                 $(this).html(newHTML);
             });
         });
