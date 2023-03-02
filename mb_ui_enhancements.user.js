@@ -166,14 +166,16 @@ $(document).ready(function () {
             }
         });
         $('#content table.tbl tbody tr').each(function () {
-            $(this).find(`td:eq(${isrcColNo})`).find('li').each(function() {
-                let newHTML = '';
-                var isrc = $(this).text();
-                newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
-                newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
-                newHTML += '</code></bdi></a>';
-                $(this).html(newHTML);
-            });
+            $(this).find(`td:eq(${isrcColNo})`)
+                .find('li')
+                .each(function() {
+                    let newHTML = '';
+                    var isrc = $(this).text();
+                    newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
+                    newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
+                    newHTML += '</code></bdi></a>';
+                    $(this).html(newHTML);
+                });
         });
     }
 
