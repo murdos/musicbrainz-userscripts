@@ -165,21 +165,18 @@ $(document).ready(function () {
                 return false;
             }
         });
-        let reg = new RegExp('([A-Z]{2}[A-Z0-9]{3}[0-9]{7})');
         $('#content table.tbl tbody tr').each(function () {
-            let $td = $(this).find(`td:eq(${isrcColNo})`);
-            let isrcs = $td.text().trim().split('\n<br>\n');
-            let newHTML = '';
-            $.each(isrcs, function (index, isrc) {
-                isrc = isrc.trim();
-                newHTML += `<a href='/isrc/${isrc}'><code>`;
-                newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
-                newHTML += '</code></a>';
-                if (index != isrcs.length - 1) {
-                    newHTML += '<br>';
-                }
-            });
-            $td.html(newHTML);
+            $(this)
+                .find(`td:eq(${isrcColNo})`)
+                .find('li')
+                .each(function () {
+                    let newHTML = '';
+                    var isrc = $(this).text();
+                    newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
+                    newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
+                    newHTML += '</code></bdi></a>';
+                    $(this).html(newHTML);
+                });
         });
     }
 
