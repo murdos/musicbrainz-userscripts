@@ -166,9 +166,10 @@ $(document).ready(function () {
             }
         });
         $('#content table.tbl tbody tr').each(function () {
-            $(this).find(`td:eq(${isrcColNo})`)
+            $(this)
+                .find(`td:eq(${isrcColNo})`)
                 .find('li')
-                .each(function() {
+                .each(function () {
                     let newHTML = '';
                     var isrc = $(this).text();
                     newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
