@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
-// @version        2021.3.29.1
+// @version        2023.4.23.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -15,7 +15,9 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 $(document).ready(function () {
-    LASTFM_APIKEY = null;
+    // Follow the instructions found at https://www.last.fm/api/authentication 
+    // then paste your API Key between the single quotes in the variable below.
+    LASTFM_APIKEY = '';
 
     // Highlight table rows
     $('table.tbl tbody tr').hover(
@@ -39,7 +41,7 @@ $(document).ready(function () {
 
     let re;
 
-    // Top tracks from Lastfm
+    // Top tracks from Last.fm
     re = new RegExp('musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$', 'i');
     if (LASTFM_APIKEY && window.location.href.match(re)) {
         $('h2.discography').before('<h2 class="toptracks">Top Last.fm recordings</h2><ul class="toptracks" />');
