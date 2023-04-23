@@ -20,24 +20,7 @@ $(document).ready(function () {
     LASTFM_APIKEY = '';
 
     // Highlight table rows
-    $('table.tbl tbody tr').hover(
-        function () {
-            $(this)
-                .children('td')
-                .each(function () {
-                    let backgroundColor = $(this).css('backgroundColor');
-                    if (backgroundColor != 'rgb(255, 255, 0)') $(this).css('backgroundColor', '#ffeea8');
-                });
-        },
-        function () {
-            $(this)
-                .children('td')
-                .each(function () {
-                    let backgroundColor = $(this).css('backgroundColor');
-                    if (backgroundColor != 'rgb(255, 255, 0)') $(this).css('backgroundColor', '');
-                });
-        }
-    );
+    $('head').append('<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>');
 
     let re;
 
