@@ -15,12 +15,14 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 $(document).ready(function () {
-    // Follow the instructions found at https://www.last.fm/api/authentication 
+    // Follow the instructions found at https://www.last.fm/api/authentication
     // then paste your API Key between the single quotes in the variable below.
     LASTFM_APIKEY = '';
 
     // Highlight table rows
-    $('head').append('<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>');
+    $('head').append(
+        '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>'
+    );
 
     let re;
 
