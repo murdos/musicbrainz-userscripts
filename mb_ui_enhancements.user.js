@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name           Musicbrainz UI enhancements
 // @description    Various UI enhancements for Musicbrainz
 // @version        2023.4.23.1
@@ -264,7 +264,7 @@ $(document).ready(function () {
                 } else if (link.href.match(/apple.com/)) {
                     id = new URL(link.href).pathname.split('/', 5).slice(-1)[0].replace('id', '');
                     fragment = 'itu';
-                    country = new URL(link.href).pathname.split('/',2)[1];
+                    country = new URL(link.href).pathname.split('/', 2)[1];
                 } else if (link.href.match(/spotify.com/)) {
                     id = new URL(link.href).pathname.split('/', 5).slice(-1)[0];
                     fragment = 'spf';
