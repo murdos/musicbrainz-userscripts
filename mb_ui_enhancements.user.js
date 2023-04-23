@@ -47,7 +47,7 @@ $(document).ready(function () {
         $('h2.discography').before('<h2 class="toptracks">Top Last.fm recordings</h2><ul class="toptracks" />');
         var mbid = window.location.href.match(re)[1];
         let toptracks = $.getJSON(
-            `http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&mbid=${mbid}&api_key=${LASTFM_APIKEY}&format=json`,
+            `https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&mbid=${mbid}&api_key=${LASTFM_APIKEY}&format=json`,
             function (data) {
                 $.each(data.toptracks.track, function (index, track) {
                     if (index >= 5) return true;
