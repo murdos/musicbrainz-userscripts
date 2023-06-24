@@ -93,7 +93,7 @@ function gazellePageHandler() {
     let titleAndArtists = $('#content div.thin h2:eq(0)').text();
     let pattern = /(.*) - (.*) \[.*\] \[.*/;
     if (serverHost.match(/orpheus/)) {
-        pattern = /(.*) - (.*) \[.*/;
+        pattern = /(.*) [-–] (.*) \[.*\]( \[.*)?/;
     }
     let artistName, releaseName;
     if ((m = titleAndArtists.match(pattern))) {
