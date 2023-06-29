@@ -324,11 +324,11 @@ function batch_recording_rels() {
     let $relate_table = table(
         tr(
             td(label('New work with this title:').attr('for', 'bpr-new-work')),
-            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work))
+            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work)).css('white-space', 'nowrap')
         ),
         tr(
             td(label('Existing work (URL/MBID):').attr('for', 'bpr-existing-work')),
-            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work))
+            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work)).css('white-space', 'nowrap')
         ),
         tr(td('New works using recording titles'), td(goBtn(relate_to_new_works))),
         tr(td('Their suggested works'), td(goBtn(relate_to_suggested_works))),
@@ -346,13 +346,13 @@ function batch_recording_rels() {
         $('<tr id="bpr-works-row"></tr>')
             .append(
                 td(label('Load another artist’s works (URL/MBID):').attr('for', 'bpr-load-artist')),
-                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn))
+                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn)).css('white-space', 'nowrap')
             )
             .hide(),
         tr(
             td(
                 $(
-                    '<fieldset class="editnote" style="margin-bottom: 0"><legend>Edit Note</legend><textarea id="bpr-edit-note" class="edit-note" cols="80" rows="5"></textarea></fieldset>'
+                    '<fieldset class="editnote" style="margin-bottom: 0"><legend>Edit Note</legend><textarea id="bpr-edit-note" class="edit-note" style="width: 100%" rows="5"></textarea></fieldset>'
                 )
             ).attr('colspan', '2')
         ),
