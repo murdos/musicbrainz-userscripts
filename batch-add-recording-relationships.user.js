@@ -1,15 +1,11 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2020.9.12.1
+// @version     2023.6.29.1010
 // @author      Michael Wiencek
 // @license     X11
-// @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
-// @updateURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
-// @include     *://musicbrainz.org/artist/*/recordings*
-// @include     *://*.musicbrainz.org/artist/*/recordings*
-// @match       *://musicbrainz.org/artist/*/recordings*
-// @match       *://*.musicbrainz.org/artist/*/recordings*
+// @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
+// @match       *://*.musicbrainz.org/artist/*/recordings
 // ==/UserScript==
 
 // ==License==
@@ -44,6 +40,7 @@ scr.textContent = `(${batch_recording_rels})();`;
 document.body.appendChild(scr);
 
 function batch_recording_rels() {
+    let edit_note_signature = '\n\nBatch-add "performance of" relationships'; // Unfortunately cannot use GM_info.script.name in this userscript
     function setting(name) {
         name = `bpr_${name}`;
 
@@ -339,13 +336,27 @@ function batch_recording_rels() {
         tr(td(label('Lyrics language:').attr('for', 'bpr-work-language')), td($work_options['language']))
     ).hide();
 
+    function make_checkbox(func, default_val, lbl) {
+        let chkbox = $('<input type="checkbox"/>').on('change', func).attr('checked', default_val);
+        return label(chkbox, lbl);
+    }
+    let make_votable = setting('make_votable') === 'true' ? true : false;
+
     let $works_table = table(
         $('<tr id="bpr-works-row"></tr>')
             .append(
                 td(label('Load another artist’s works (URL/MBID):').attr('for', 'bpr-load-artist')),
                 td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn))
             )
-            .hide()
+            .hide(),
+        tr(
+            td(
+                $(
+                    '<fieldset class="editnote" style="margin-bottom: 0"><legend>Edit Note</legend><textarea id="bpr-edit-note" class="edit-note" cols="80" rows="5"></textarea></fieldset>'
+                )
+            ).attr('colspan', '2')
+        ),
+        tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2'))
     );
 
     let $container = table(
@@ -360,11 +371,6 @@ function batch_recording_rels() {
 
     let hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
     let hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
-
-    function make_checkbox(func, default_val, lbl) {
-        let chkbox = $('<input type="checkbox"/>').on('change', func).attr('checked', default_val);
-        return label(chkbox, lbl);
-    }
 
     let $display_table = table(
         tr(
@@ -1103,6 +1109,8 @@ function batch_recording_rels() {
                     data += `&edit-work.${kind}_id=${$obj.val()}`;
                 }
             });
+            data += `&edit-work.edit_note=${document.getElementById('bpr-edit-note').value}${edit_note_signature}`;
+            data += `&edit-work.make_votable=${make_votable ? '1' : '0'}`;
 
             $.post('/work/create', data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
@@ -1197,6 +1205,8 @@ function batch_recording_rels() {
             'rel-editor.rels.0.entity.1.gid': work_mbid,
             'rel-editor.rels.0.entity.0.type': 'recording',
             'rel-editor.rels.0.entity.0.gid': rec_mbid,
+            'rel-editor.edit_note': (document.getElementById('bpr-edit-note').value + edit_note_signature).trim(),
+            'rel-editor.make_votable': make_votable ? '1' : '0',
         };
 
         let attrs = [];
@@ -1308,6 +1318,11 @@ function batch_recording_rels() {
         setting('hide_pending_edits', hide_pending_edits.toString());
     }
     toggle_pending_edits(null, hide_pending_edits);
+
+    function toggle_votable(event, checked) {
+        make_votable = checked !== undefined ? checked : this.checked;
+        setting('make_votable', make_votable.toString());
+    }
 
     function checked_recordings() {
         return $recordings.filter(':visible').filter(function () {
