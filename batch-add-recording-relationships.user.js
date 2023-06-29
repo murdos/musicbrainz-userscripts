@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.30.59
+// @version     2023.6.30.1538
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -34,12 +34,13 @@
 // use or other dealings in this Software without prior written
 // authorization.
 // ==/License==
+
 const scr = document.createElement('script');
-// eslint-disable-next-line prettier/prettier -- cannot prettier-ignore options sepcifically (printWidth: 140); "eslint --fix" splits this big string in a strange way
-scr.textContent = `(${batch_recording_rels})("\\n\\n\\n'''${GM_info.script.name.replace(/"/g, '\\"')}''' ${GM_info.script.version}\\n''Relate to %edit-mode%''");`;
+scr.textContent = `(${batch_recording_rels})(${JSON.stringify(GM_info)});`;
 document.body.appendChild(scr);
 
-function batch_recording_rels(edit_note_signature) {
+function batch_recording_rels(gm_info) {
+    let edit_note_signature = `\n\n\n'''${gm_info.script.name}''' ${gm_info.script.version}\n''Relate to %edit-mode%''`;
     function setting(name) {
         name = `bpr_${name}`;
 
@@ -1109,15 +1110,14 @@ function batch_recording_rels(edit_note_signature) {
 
     function create_new_work(title, callback, edit_mode) {
         function post_edit() {
-            let data = `edit-work.name=${title}`;
+            let data = `edit-work.name=${encodeURIComponent(title)}`;
             Object.entries($work_options).forEach(function ([kind, $obj]) {
                 if ($obj.val()) {
                     data += `&edit-work.${kind}_id=${$obj.val()}`;
                 }
             });
-            data += `&edit-work.edit_note=${document.getElementById('bpr-edit-note').value.trim()}${edit_note_signature.replace(
-                /%edit-mode%/g,
-                edit_mode
+            data += `&edit-work.edit_note=${encodeURIComponent(
+                document.getElementById('bpr-edit-note').value.trim() + edit_note_signature.replace(/%edit-mode%/g, edit_mode)
             )}`;
             data += `&edit-work.make_votable=${make_votable ? '1' : '0'}`;
 
