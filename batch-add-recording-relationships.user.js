@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.30.44
+// @version     2023.6.30.59
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -349,11 +349,10 @@ function batch_recording_rels(edit_note_signature) {
             )
             .hide(),
         tr(
-            td(
-                $(
-                    '<fieldset class="editnote" style="margin-bottom: 0"><legend>Edit Note</legend><textarea id="bpr-edit-note" class="edit-note" style="width: 100%" rows="5"></textarea></fieldset>'
-                )
-            ).attr('colspan', '2')
+            td($('<h3>Edit Note</h3><textarea id="bpr-edit-note" class="edit-note" style="width: 100%" rows="5"></textarea>')).attr(
+                'colspan',
+                '2'
+            )
         ),
         tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2'))
     );
