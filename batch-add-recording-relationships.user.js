@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2020.9.12.1
+// @version     2023.6.29.1755
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
@@ -384,16 +384,26 @@ function batch_recording_rels() {
     $container.find('table').find('td').css('width', 'auto');
     $container.children('tbody').children('tr').children('td').css({ padding: '0.5em', 'vertical-align': 'top' });
 
-    // Get actual work types/languages
+    // Get actual work types
     ws_requests.unshift_get('/dialog?path=%2Fwork%2Fcreate', function (data) {
         let nodes = $.parseHTML(data);
-        Object.entries($work_options).forEach(function populate([kind, $obj]) {
-            $obj.append($(`#id-edit-work\\.${kind}_id`, nodes).children())
-                .val(setting(`work_${kind}`) || 0)
-                .on('change', function () {
-                    setting(`work_${kind}`, this.value);
-                });
-        });
+        $work_options.type
+            .append($(`#id-edit-work\\.type_id`, nodes).children())
+            .val(setting(`work_type`) || 0)
+            .on('change', function () {
+                setting(`work_type`, this.value);
+            });
+    });
+
+    // Get actual (release) languages
+    ws_requests.unshift_get('/release/add', function (data) {
+        let nodes = $.parseHTML(data);
+        $work_options.language
+            .append($(`select#language option[value]`, nodes))
+            .val(setting(`work_language`) || 0)
+            .on('change', function () {
+                setting(`work_language`, this.value);
+            });
     });
 
     $('<span></span>').append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg).insertBefore($relate_table);
@@ -1098,11 +1108,12 @@ function batch_recording_rels() {
     function create_new_work(title, callback) {
         function post_edit() {
             let data = `edit-work.name=${title}`;
-            Object.entries($work_options).forEach(function ([kind, $obj]) {
-                if ($obj.val()) {
-                    data += `&edit-work.${kind}_id=${$obj.val()}`;
-                }
-            });
+            if ($work_options.type.val()) {
+                data += `&edit-work.type_id=${$work_options.type.val()}`;
+            }
+            if ($work_options.language.val()) {
+                data += `&edit-work.languages.0=${$work_options.language.val()}`;
+            }
 
             $.post('/work/create', data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
