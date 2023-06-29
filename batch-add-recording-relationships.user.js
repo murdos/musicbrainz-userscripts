@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.29.1111
+// @version     2023.6.30.44
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -34,13 +34,12 @@
 // use or other dealings in this Software without prior written
 // authorization.
 // ==/License==
-
 const scr = document.createElement('script');
-scr.textContent = `(${batch_recording_rels})();`;
+// eslint-disable-next-line prettier/prettier -- cannot prettier-ignore options sepcifically (printWidth: 140); "eslint --fix" splits this big string in a strange way
+scr.textContent = `(${batch_recording_rels})("\\n\\n\\n'''${GM_info.script.name.replace(/"/g, '\\"')}''' ${GM_info.script.version}\\n''Relate to %edit-mode%''");`;
 document.body.appendChild(scr);
 
-function batch_recording_rels() {
-    let edit_note_signature = '\n\nBatch-add "performance of" relationships'; // Unfortunately cannot use GM_info.script.name in this userscript
+function batch_recording_rels(edit_note_signature) {
     function setting(name) {
         name = `bpr_${name}`;
 
@@ -989,7 +988,7 @@ function batch_recording_rels() {
 
     // Edit creation
 
-    function relate_all_to_work(mbid, title, comment) {
+    function relate_all_to_work(mbid, title, comment, edit_mode) {
         let deferred = $.Deferred();
         let $rows = checked_recordings();
         let total = $rows.length;
@@ -1004,7 +1003,7 @@ function batch_recording_rels() {
 
             $row.children('td').not(':has(input)').first().css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            let promise = relate_to_work($row, mbid, title, comment, false, false);
+            let promise = relate_to_work($row, mbid, title, comment, false, false, edit_mode);
             if (i === total - 1) {
                 promise.done(function () {
                     deferred.resolve();
@@ -1039,10 +1038,14 @@ function batch_recording_rels() {
             $button.attr('disabled', false).css('color', '#565656');
         }
 
-        create_new_work(title, function (data) {
-            let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
-            relate_all_to_work(work[1], title, '').done(callback);
-        });
+        create_new_work(
+            title,
+            function (data) {
+                let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
+                relate_all_to_work(work[1], title, '', 'new titled work').done(callback);
+            },
+            'new titled work'
+        );
     }
 
     function relate_to_existing_work() {
@@ -1060,7 +1063,7 @@ function batch_recording_rels() {
 
             $button.attr('disabled', true).css('color', '#EAEAEA');
 
-            relate_all_to_work($input.data('mbid'), $input.data('name'), $input.data('comment') || '').done(callback);
+            relate_all_to_work($input.data('mbid'), $input.data('name'), $input.data('comment') || '', 'existing work').done(callback);
         } else {
             $input.css('background', '#ffaaaa');
         }
@@ -1085,23 +1088,27 @@ function batch_recording_rels() {
 
             $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            create_new_work(title, function (data) {
-                let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
-                let promise = relate_to_work($row, work[1], title, '', true, true);
+            create_new_work(
+                title,
+                function (data) {
+                    let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
+                    let promise = relate_to_work($row, work[1], title, '', true, true, 'new work using recording title');
 
-                if (--total_rows === 0) {
-                    promise.done(function () {
-                        flush_work_cache();
-                        ws_requests.stopped = false;
-                        ws_requests.start_queue();
-                        $button.attr('disabled', false).css('color', '#565656');
-                    });
-                }
-            });
+                    if (--total_rows === 0) {
+                        promise.done(function () {
+                            flush_work_cache();
+                            ws_requests.stopped = false;
+                            ws_requests.start_queue();
+                            $button.attr('disabled', false).css('color', '#565656');
+                        });
+                    }
+                },
+                'new work using recording title'
+            );
         });
     }
 
-    function create_new_work(title, callback) {
+    function create_new_work(title, callback, edit_mode) {
         function post_edit() {
             let data = `edit-work.name=${title}`;
             Object.entries($work_options).forEach(function ([kind, $obj]) {
@@ -1109,7 +1116,10 @@ function batch_recording_rels() {
                     data += `&edit-work.${kind}_id=${$obj.val()}`;
                 }
             });
-            data += `&edit-work.edit_note=${document.getElementById('bpr-edit-note').value}${edit_note_signature}`;
+            data += `&edit-work.edit_note=${document.getElementById('bpr-edit-note').value.trim()}${edit_note_signature.replace(
+                /%edit-mode%/g,
+                edit_mode
+            )}`;
             data += `&edit-work.make_votable=${make_votable ? '1' : '0'}`;
 
             $.post('/work/create', data, callback).fail(function () {
@@ -1146,7 +1156,7 @@ function batch_recording_rels() {
 
             $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            let promise = relate_to_work($row, mbid, title, '', false, false);
+            let promise = relate_to_work($row, mbid, title, '', false, false, 'suggested work');
             if (i === total - 1) {
                 promise.done(callback);
             }
@@ -1169,7 +1179,7 @@ function batch_recording_rels() {
         );
     }
 
-    function relate_to_work($row, work_mbid, work_title, work_comment, check_loaded, priority) {
+    function relate_to_work($row, work_mbid, work_title, work_comment, check_loaded, priority, edit_mode) {
         let deferred = $.Deferred();
         let performances = $row.data('performances');
 
@@ -1205,7 +1215,9 @@ function batch_recording_rels() {
             'rel-editor.rels.0.entity.1.gid': work_mbid,
             'rel-editor.rels.0.entity.0.type': 'recording',
             'rel-editor.rels.0.entity.0.gid': rec_mbid,
-            'rel-editor.edit_note': (document.getElementById('bpr-edit-note').value + edit_note_signature).trim(),
+            'rel-editor.edit_note': (
+                document.getElementById('bpr-edit-note').value.trim() + edit_note_signature.replace(/%edit-mode%/g, edit_mode)
+            ).trim(),
             'rel-editor.make_votable': make_votable ? '1' : '0',
         };
 
