@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.29.1755
+// @version     2023.6.30.19
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
@@ -11,6 +11,8 @@
 // @match       *://musicbrainz.org/artist/*/recordings*
 // @match       *://*.musicbrainz.org/artist/*/recordings*
 // ==/UserScript==
+
+/* global MB:readonly */
 
 // ==License==
 // Copyright (C) 2014 Michael Wiencek
@@ -399,11 +401,16 @@ function batch_recording_rels() {
     ws_requests.unshift_get('/release/add', function (data) {
         let nodes = $.parseHTML(data);
         $work_options.language
-            .append($(`select#language option[value]`, nodes))
+            .append($(`select#language`, nodes).children())
             .val(setting(`work_language`) || 0)
             .on('change', function () {
                 setting(`work_language`, this.value);
             });
+        // move [No lyrics] equivalent up besides [Multiple languages], to mimick work language list
+        $work_options.language
+            .find(`option[value='${MB.constants.LANGUAGE_MUL_ID}']`)
+            .first()
+            .after($work_options.language.find(`option[value='${MB.constants.LANGUAGE_ZXX_ID}']`).first().prepend('[').append(']'));
     });
 
     $('<span></span>').append('<img src="/static/images/icons/loading.gif"/> ', $recordings_load_msg).insertBefore($relate_table);
