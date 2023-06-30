@@ -28,7 +28,7 @@ $(document).ready(function () {
         let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
         let release = retrieveReleaseInfo(release_url, release_data);
 
-        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api')).replace(/\/$/, '');
+        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api').replace(/\/$/, ''));
         let results = [];
         const promises = track_urls.map((url, index) => $.getJSON(url).then(response => (results[index] = response)));
 
