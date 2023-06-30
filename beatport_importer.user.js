@@ -28,12 +28,12 @@ $(document).ready(function () {
         let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
         let release = retrieveReleaseInfo(release_url, release_data);
 
-        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api')).reverse();
+        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api'));
         let results = [];
         const promises = track_urls.map((url, index) => $.getJSON(url).then(response => (results[index] = response)));
 
         Promise.all(promises)
-            .then(() => results.map(result => result.isrc))
+            .then(() => results.map(({ isrc, number }) => ({ isrc, number })))
             .then(isrcs => {
                 insertLink(release, release_url, isrcs);
             });
@@ -147,7 +147,7 @@ function insertLink(release, release_url, isrcs) {
         '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>'
     )
         .on('click', event => {
-            const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+            const query = isrcs.map(({ isrc, number }) => (isrc == null ? `isrc${number}=` : `isrc${number}=${isrc}`)).join('&');
             event.preventDefault();
             window.open(`https://magicisrc.kepstin.ca?${query}`);
         })
