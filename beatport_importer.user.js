@@ -24,12 +24,14 @@ if (!unsafeWindow) unsafeWindow = window;
 $(document).ready(function () {
     MBImportStyle();
 
-    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-    let release = retrieveReleaseInfo(release_url);
-    insertLink(release, release_url);
+    $.getJSON(`https://www.beatport.com/api/v4/catalog/releases/${ProductDetail.id}`).done(data => {
+        let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+        let release = retrieveReleaseInfo(release_url, data);
+        insertLink(release, release_url);
+    });
 });
 
-function retrieveReleaseInfo(release_url) {
+function retrieveReleaseInfo(release_url, release_data) {
     let releaseDate = ProductDetail.date.published.split('-');
 
     // Release information global to all Beatport releases
@@ -48,6 +50,7 @@ function retrieveReleaseInfo(release_url) {
         type: '',
         urls: [],
         labels: [],
+        barcode: release_data.upc,
         discs: [],
     };
 
