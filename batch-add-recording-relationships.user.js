@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.30.19
+// @version     2023.7.1
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -42,7 +42,6 @@ scr.textContent = `(${batch_recording_rels})(${JSON.stringify(GM_info)});`;
 document.body.appendChild(scr);
 
 function batch_recording_rels(gm_info) {
-    let edit_note_signature = `\n\n\n'''${gm_info.script.name}''' ${gm_info.script.version}\n''Relate to %edit-mode%''`;
     function setting(name) {
         name = `bpr_${name}`;
 
@@ -1127,17 +1126,17 @@ function batch_recording_rels(gm_info) {
 
     function create_new_work(title, callback, edit_mode) {
         function post_edit() {
-            let data = `edit-work.name=${encodeURIComponent(title)}`;
+            let data = {
+                'edit-work.name': title,
+                'edit-work.edit_note': build_edit_note(edit_mode),
+                'edit-work.make_votable': make_votable ? '1' : '0',
+            };
             if ($work_options.type.val()) {
-                data += `&edit-work.type_id=${$work_options.type.val()}`;
+                data['edit-work.type_id'] = $work_options.type.val();
             }
             if ($work_options.language.val()) {
-                data += `&edit-work.languages.0=${$work_options.language.val()}`;
+                data['edit-work.languages.0'] = $work_options.language.val();
             }
-            data += `&edit-work.edit_note=${encodeURIComponent(
-                document.getElementById('bpr-edit-note').value.trim() + edit_note_signature.replace(/%edit-mode%/g, edit_mode)
-            )}`;
-            data += `&edit-work.make_votable=${make_votable ? '1' : '0'}`;
 
             $.post('/work/create', data, callback).fail(function () {
                 edit_requests.unshift(post_edit);
@@ -1232,9 +1231,7 @@ function batch_recording_rels(gm_info) {
             'rel-editor.rels.0.entity.1.gid': work_mbid,
             'rel-editor.rels.0.entity.0.type': 'recording',
             'rel-editor.rels.0.entity.0.gid': rec_mbid,
-            'rel-editor.edit_note': (
-                document.getElementById('bpr-edit-note').value.trim() + edit_note_signature.replace(/%edit-mode%/g, edit_mode)
-            ).trim(),
+            'rel-editor.edit_note': build_edit_note(edit_mode),
             'rel-editor.make_votable': make_votable ? '1' : '0',
         };
 
@@ -1399,5 +1396,11 @@ function batch_recording_rels(gm_info) {
 
     function rowTitleCell($row) {
         return $row.children(`td:has(${TITLE_SELECTOR})`);
+    }
+
+    function build_edit_note(edit_mode) {
+        return `${document.getElementById('bpr-edit-note').value.trim()}\n\n\n'''${gm_info.script.name}''' ${
+            gm_info.script.version
+        }\n''Relate to ${edit_mode}''`.trim();
     }
 }
