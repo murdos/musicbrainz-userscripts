@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.7.1
+// @version     2023.7.2
 // @author      Michael Wiencek
 // @license     X11
 // @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
@@ -359,16 +359,6 @@ function batch_recording_rels(gm_info) {
         tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2'))
     );
 
-    let $container = table(
-        tr(
-            td('<h3>Relate checked recordings to…</h3>'),
-            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em'))
-        ),
-        tr(td($relate_table), td($works_table))
-    )
-        .css({ margin: '0.5em', background: '#F2F2F2', border: '1px #999 solid' })
-        .insertAfter($('div#content h2')[0]);
-
     let hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
     let hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
 
@@ -381,9 +371,18 @@ function batch_recording_rels(gm_info) {
                 make_checkbox(toggle_pending_edits, hide_pending_edits, 'Hide recordings with pending edits')
             )
         )
+    ).css('margin', '0.5em');
+
+    let $container = table(
+        tr(
+            td('<h3>Relate checked recordings to…</h3>'),
+            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em'))
+        ),
+        tr(td($relate_table), td($works_table)),
+        tr(td($display_table).attr('colspan', '2'))
     )
-        .css('margin', '0.5em')
-        .insertAfter($container);
+        .css({ margin: '.5em .5em 2em .5em', background: '#F2F2F2', border: '1px #999 solid' })
+        .insertAfter($('div#content h2')[0]);
 
     let $recordings_load_msg = $('<span>Loading performance relationships…</span>');
 
