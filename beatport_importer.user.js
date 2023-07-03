@@ -3,7 +3,7 @@
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2019.12.21.1
+// @version        2023.6.30.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http://www.beatport.com/release/*
@@ -24,12 +24,23 @@ if (!unsafeWindow) unsafeWindow = window;
 $(document).ready(function () {
     MBImportStyle();
 
-    let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-    let release = retrieveReleaseInfo(release_url);
-    insertLink(release, release_url);
+    $.getJSON(`https://www.beatport.com/api/v4/catalog/releases/${ProductDetail.id}`).done(release_data => {
+        let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+        let release = retrieveReleaseInfo(release_url, release_data);
+
+        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api').replace(/\/$/, ''));
+        let results = [];
+        const promises = track_urls.map((url, index) => $.getJSON(url).then(response => (results[index] = response)));
+
+        Promise.all(promises)
+            .then(() => results.map(({ isrc, number }) => ({ isrc, number })))
+            .then(isrcs => {
+                insertLink(release, release_url, isrcs);
+            });
+    });
 });
 
-function retrieveReleaseInfo(release_url) {
+function retrieveReleaseInfo(release_url, release_data) {
     let releaseDate = ProductDetail.date.published.split('-');
 
     // Release information global to all Beatport releases
@@ -48,6 +59,7 @@ function retrieveReleaseInfo(release_url) {
         type: '',
         urls: [],
         labels: [],
+        barcode: release_data.upc,
         discs: [],
     };
 
@@ -121,7 +133,7 @@ function retrieveReleaseInfo(release_url) {
 }
 
 // Insert button into page under label information
-function insertLink(release, release_url) {
+function insertLink(release, release_url, isrcs) {
     let edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     let parameters = MBImport.buildFormParameters(release, edit_note);
 
@@ -130,6 +142,16 @@ function insertLink(release, release_url) {
             parameters
         )}${MBImport.buildSearchButton(release)}</li>`
     ).hide();
+
+    $(
+        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>'
+    )
+        .on('click', event => {
+            const query = isrcs.map(({ isrc, number }) => (isrc == null ? `isrc${number}=` : `isrc${number}=${isrc}`)).join('&');
+            event.preventDefault();
+            window.open(`https://magicisrc.kepstin.ca?${query}`);
+        })
+        .appendTo(mbUI);
 
     $('.interior-release-chart-content-list').append(mbUI);
     $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
