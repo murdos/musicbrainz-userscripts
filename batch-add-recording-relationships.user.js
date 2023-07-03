@@ -1398,7 +1398,7 @@ function batch_recording_rels(gm_info) {
     }
 
     function build_edit_note(edit_mode) {
-        return `${document.getElementById('bpr-edit-note').value.trim()}\n\n\n'''${gm_info.script.name}''' ${
+        return `${document.getElementById('bpr-edit-note').value.trim()}\n—\n'''${gm_info.script.name}''' ${
             gm_info.script.version
         }\n''Relate to ${edit_mode}''`.trim();
     }
