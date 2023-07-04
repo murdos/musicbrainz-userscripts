@@ -1,14 +1,10 @@
 // ==UserScript==
 // @name        MusicBrainz: Batch-add "performance of" relationships
 // @description Batch link recordings to works from artist Recordings page.
-// @version     2023.6.30.19
+// @version     2023.7.2
 // @author      Michael Wiencek
 // @license     X11
-// @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
-// @updateURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js
-// @include     *://musicbrainz.org/artist/*/recordings*
-// @include     *://*.musicbrainz.org/artist/*/recordings*
-// @match       *://musicbrainz.org/artist/*/recordings*
+// @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
 // @match       *://*.musicbrainz.org/artist/*/recordings*
 // ==/UserScript==
 
@@ -42,10 +38,10 @@
 // ==/License==
 
 const scr = document.createElement('script');
-scr.textContent = `(${batch_recording_rels})();`;
+scr.textContent = `(${batch_recording_rels})(${JSON.stringify(GM_info)});`;
 document.body.appendChild(scr);
 
-function batch_recording_rels() {
+function batch_recording_rels(gm_info) {
     function setting(name) {
         name = `bpr_${name}`;
 
@@ -329,11 +325,11 @@ function batch_recording_rels() {
     let $relate_table = table(
         tr(
             td(label('New work with this title:').attr('for', 'bpr-new-work')),
-            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work))
+            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work)).css('white-space', 'nowrap')
         ),
         tr(
             td(label('Existing work (URL/MBID):').attr('for', 'bpr-existing-work')),
-            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work))
+            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work)).css('white-space', 'nowrap')
         ),
         tr(td('New works using recording titles'), td(goBtn(relate_to_new_works))),
         tr(td('Their suggested works'), td(goBtn(relate_to_suggested_works))),
@@ -341,32 +337,30 @@ function batch_recording_rels() {
         tr(td(label('Lyrics language:').attr('for', 'bpr-work-language')), td($work_options['language']))
     ).hide();
 
-    let $works_table = table(
-        $('<tr id="bpr-works-row"></tr>')
-            .append(
-                td(label('Load another artist’s works (URL/MBID):').attr('for', 'bpr-load-artist')),
-                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn))
-            )
-            .hide()
-    );
-
-    let $container = table(
-        tr(
-            td('<h3>Relate checked recordings to…</h3>'),
-            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em'))
-        ),
-        tr(td($relate_table), td($works_table))
-    )
-        .css({ margin: '0.5em', background: '#F2F2F2', border: '1px #999 solid' })
-        .insertAfter($('div#content h2')[0]);
-
-    let hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
-    let hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
-
     function make_checkbox(func, default_val, lbl) {
         let chkbox = $('<input type="checkbox"/>').on('change', func).attr('checked', default_val);
         return label(chkbox, lbl);
     }
+    let make_votable = setting('make_votable') === 'true' ? true : false;
+
+    let $works_table = table(
+        $('<tr id="bpr-works-row"></tr>')
+            .append(
+                td(label('Load another artist’s works (URL/MBID):').attr('for', 'bpr-load-artist')),
+                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn)).css('white-space', 'nowrap')
+            )
+            .hide(),
+        tr(
+            td($('<h3>Edit Note</h3><textarea id="bpr-edit-note" class="edit-note" style="width: 100%" rows="5"></textarea>')).attr(
+                'colspan',
+                '2'
+            )
+        ),
+        tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2'))
+    );
+
+    let hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
+    let hide_pending_edits = setting('hide_pending_edits') === 'true' ? true : false;
 
     let $display_table = table(
         tr(
@@ -377,9 +371,18 @@ function batch_recording_rels() {
                 make_checkbox(toggle_pending_edits, hide_pending_edits, 'Hide recordings with pending edits')
             )
         )
+    ).css('margin', '0.5em');
+
+    let $container = table(
+        tr(
+            td('<h3>Relate checked recordings to…</h3>'),
+            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em'))
+        ),
+        tr(td($relate_table), td($works_table)),
+        tr(td($display_table).attr('colspan', '2'))
     )
-        .css('margin', '0.5em')
-        .insertAfter($container);
+        .css({ margin: '.5em .5em 2em .5em', background: '#F2F2F2', border: '1px #999 solid' })
+        .insertAfter($('div#content h2')[0]);
 
     let $recordings_load_msg = $('<span>Loading performance relationships…</span>');
 
@@ -1000,7 +1003,7 @@ function batch_recording_rels() {
 
     // Edit creation
 
-    function relate_all_to_work(mbid, title, comment) {
+    function relate_all_to_work(mbid, title, comment, edit_mode) {
         let deferred = $.Deferred();
         let $rows = checked_recordings();
         let total = $rows.length;
@@ -1015,7 +1018,7 @@ function batch_recording_rels() {
 
             $row.children('td').not(':has(input)').first().css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            let promise = relate_to_work($row, mbid, title, comment, false, false);
+            let promise = relate_to_work($row, mbid, title, comment, false, false, edit_mode);
             if (i === total - 1) {
                 promise.done(function () {
                     deferred.resolve();
@@ -1050,10 +1053,14 @@ function batch_recording_rels() {
             $button.attr('disabled', false).css('color', '#565656');
         }
 
-        create_new_work(title, function (data) {
-            let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
-            relate_all_to_work(work[1], title, '').done(callback);
-        });
+        create_new_work(
+            title,
+            function (data) {
+                let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
+                relate_all_to_work(work[1], title, '', 'new titled work').done(callback);
+            },
+            'new titled work'
+        );
     }
 
     function relate_to_existing_work() {
@@ -1071,7 +1078,7 @@ function batch_recording_rels() {
 
             $button.attr('disabled', true).css('color', '#EAEAEA');
 
-            relate_all_to_work($input.data('mbid'), $input.data('name'), $input.data('comment') || '').done(callback);
+            relate_all_to_work($input.data('mbid'), $input.data('name'), $input.data('comment') || '', 'existing work').done(callback);
         } else {
             $input.css('background', '#ffaaaa');
         }
@@ -1096,30 +1103,38 @@ function batch_recording_rels() {
 
             $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            create_new_work(title, function (data) {
-                let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
-                let promise = relate_to_work($row, work[1], title, '', true, true);
+            create_new_work(
+                title,
+                function (data) {
+                    let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
+                    let promise = relate_to_work($row, work[1], title, '', true, true, 'new work using recording title');
 
-                if (--total_rows === 0) {
-                    promise.done(function () {
-                        flush_work_cache();
-                        ws_requests.stopped = false;
-                        ws_requests.start_queue();
-                        $button.attr('disabled', false).css('color', '#565656');
-                    });
-                }
-            });
+                    if (--total_rows === 0) {
+                        promise.done(function () {
+                            flush_work_cache();
+                            ws_requests.stopped = false;
+                            ws_requests.start_queue();
+                            $button.attr('disabled', false).css('color', '#565656');
+                        });
+                    }
+                },
+                'new work using recording title'
+            );
         });
     }
 
-    function create_new_work(title, callback) {
+    function create_new_work(title, callback, edit_mode) {
         function post_edit() {
-            let data = `edit-work.name=${title}`;
+            let data = {
+                'edit-work.name': title,
+                'edit-work.edit_note': build_edit_note(edit_mode),
+                'edit-work.make_votable': make_votable ? '1' : '0',
+            };
             if ($work_options.type.val()) {
-                data += `&edit-work.type_id=${$work_options.type.val()}`;
+                data['edit-work.type_id'] = $work_options.type.val();
             }
             if ($work_options.language.val()) {
-                data += `&edit-work.languages.0=${$work_options.language.val()}`;
+                data['edit-work.languages.0'] = $work_options.language.val();
             }
 
             $.post('/work/create', data, callback).fail(function () {
@@ -1156,7 +1171,7 @@ function batch_recording_rels() {
 
             $title_cell.css('color', 'LightSlateGray').find('a').css('color', 'LightSlateGray');
 
-            let promise = relate_to_work($row, mbid, title, '', false, false);
+            let promise = relate_to_work($row, mbid, title, '', false, false, 'suggested work');
             if (i === total - 1) {
                 promise.done(callback);
             }
@@ -1179,7 +1194,7 @@ function batch_recording_rels() {
         );
     }
 
-    function relate_to_work($row, work_mbid, work_title, work_comment, check_loaded, priority) {
+    function relate_to_work($row, work_mbid, work_title, work_comment, check_loaded, priority, edit_mode) {
         let deferred = $.Deferred();
         let performances = $row.data('performances');
 
@@ -1215,6 +1230,8 @@ function batch_recording_rels() {
             'rel-editor.rels.0.entity.1.gid': work_mbid,
             'rel-editor.rels.0.entity.0.type': 'recording',
             'rel-editor.rels.0.entity.0.gid': rec_mbid,
+            'rel-editor.edit_note': build_edit_note(edit_mode),
+            'rel-editor.make_votable': make_votable ? '1' : '0',
         };
 
         let attrs = [];
@@ -1327,6 +1344,11 @@ function batch_recording_rels() {
     }
     toggle_pending_edits(null, hide_pending_edits);
 
+    function toggle_votable(event, checked) {
+        make_votable = checked !== undefined ? checked : this.checked;
+        setting('make_votable', make_votable.toString());
+    }
+
     function checked_recordings() {
         return $recordings.filter(':visible').filter(function () {
             return $(this).find('input[name=add-to-merge]:checked').length;
@@ -1373,5 +1395,11 @@ function batch_recording_rels() {
 
     function rowTitleCell($row) {
         return $row.children(`td:has(${TITLE_SELECTOR})`);
+    }
+
+    function build_edit_note(edit_mode) {
+        return `${document.getElementById('bpr-edit-note').value.trim()}\n—\n'''${gm_info.script.name}''' ${
+            gm_info.script.version
+        }\n''Relate to ${edit_mode}''`.trim();
     }
 }
