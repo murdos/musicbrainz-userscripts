@@ -21,35 +21,36 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
+$(document).ready(() => {
     MBImportStyle();
 
-    $.getJSON(`https://www.beatport.com/api/v4/catalog/releases/${ProductDetail.id}`).done(release_data => {
-        let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-        let release = retrieveReleaseInfo(release_url, release_data);
+    const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
 
-        const track_urls = release_data.tracks.map(url => url.replace('api.beatport.com', 'www.beatport.com/api').replace(/\/$/, ''));
-        let results = [];
-        const promises = track_urls.map((url, index) => $.getJSON(url).then(response => (results[index] = response)));
+    const data = JSON.parse(document.getElementById('__NEXT_DATA__').innerHTML);
+    const release_data = data.props.pageProps.release;
 
-        Promise.all(promises)
-            .then(() => results.map(({ isrc, number }) => ({ isrc, number })))
-            .then(isrcs => {
-                insertLink(release, release_url, isrcs);
-            });
-    });
+    // Reversing is less reliable, but the API does not provide track numbers.
+    const tracks_table = release_data.tracks.reverse();
+
+    const tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, element => /tracks-release/g.test(element.queryKey))[0];
+    const tracks_data = $.map(tracks_table, url => $.grep(tracks_release.state.data.results, element => element.url === url));
+    const isrcs = tracks_data.map(track => track.isrc);
+
+    const mbrelease = retrieveReleaseInfo(release_url, release_data, tracks_data);
+
+    setTimeout(() => insertLink(mbrelease, release_url, isrcs), 1000);
 });
 
-function retrieveReleaseInfo(release_url, release_data) {
-    let releaseDate = ProductDetail.date.published.split('-');
+function retrieveReleaseInfo(release_url, release_data, tracks_data) {
+    const release_date = release_data.new_release_date.split('-');
 
     // Release information global to all Beatport releases
-    let release = {
+    const mbrelease = {
         artist_credit: [],
-        title: ProductDetail.name,
-        year: releaseDate[0],
-        month: releaseDate[1],
-        day: releaseDate[2],
+        title: release_data.name,
+        year: release_date[0],
+        month: release_date[1],
+        day: release_date[2],
         format: 'Digital Media',
         packaging: 'None',
         country: 'XW',
@@ -64,29 +65,23 @@ function retrieveReleaseInfo(release_url, release_data) {
     };
 
     // URLs
-    release.urls.push({
+    mbrelease.urls.push({
         url: release_url,
         link_type: MBImport.URL_TYPES.purchase_for_download,
     });
 
-    release.labels.push({
-        name: ProductDetail.label.name,
-        catno: ProductDetail.catalog,
+    mbrelease.labels.push({
+        name: release_data.label.name,
+        catno: release_data.catalog_number,
     });
 
-    // Reload Playables if empty
-    if (!Object.prototype.hasOwnProperty.call(unsafeWindow.Playables, 'tracks')) {
-        eval($('#data-objects').text());
-        unsafeWindow.Playables = window.Playables;
-    }
-
     // Tracks
-    let tracks = [];
-    let the_tracks = unsafeWindow.Playables.tracks;
-    let seen_tracks = {}; // to shoot duplicates ...
-    let release_artists = [];
-    $.each(the_tracks, function (idx, track) {
-        if (track.release.id !== ProductDetail.id) {
+    const mbtracks = [];
+
+    const seen_tracks = {}; // to shoot duplicates ...
+    const release_artists = [];
+    $.each(tracks_data, (index, track) => {
+        if (track.release.id != release_data.id) {
             return;
         }
         if (seen_tracks[track.id]) {
@@ -95,65 +90,66 @@ function retrieveReleaseInfo(release_url, release_data) {
         seen_tracks[track.id] = true;
 
         let artists = [];
-        $.each(track.artists, function (idx2, artist) {
+        $.each(track.artists, (index2, artist) => {
             artists.push(artist.name);
             release_artists.push(artist.name);
         });
 
         let title = track.name;
-        if (track.mix && track.mix !== 'Original Mix') {
-            title += ` (${track.mix})`;
+        if (track.mix_name && track.mix_name !== 'Original Mix') {
+            title += ` (${track.mix_name})`;
         }
-        tracks.push({
+        mbtracks.push({
             artist_credit: MBImport.makeArtistCredits(artists),
             title: title,
-            duration: track.duration.minutes,
+            duration: track.length,
         });
     });
 
-    let unique_artists = [];
-    $.each(release_artists, function (i, el) {
+    const unique_artists = [];
+    $.each(release_artists, (index, el) => {
         if ($.inArray(el, unique_artists) === -1) {
             unique_artists.push(el);
         }
     });
 
     if (unique_artists.length > 4) {
-        release.artist_credit = [MBImport.specialArtist('various_artists')];
+        mbrelease.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
-        release.artist_credit = MBImport.makeArtistCredits(unique_artists);
+        mbrelease.artist_credit = MBImport.makeArtistCredits(unique_artists);
     }
-    release.discs.push({
-        tracks: tracks,
-        format: release.format,
+
+    mbrelease.discs.push({
+        tracks: mbtracks,
+        format: mbrelease.format,
     });
 
-    LOGGER.info('Parsed release: ', release);
-    return release;
+    LOGGER.info('Parsed release: ', mbrelease);
+    return mbrelease;
 }
 
 // Insert button into page under label information
-function insertLink(release, release_url, isrcs) {
-    let edit_note = MBImport.makeEditNote(release_url, 'Beatport');
-    let parameters = MBImport.buildFormParameters(release, edit_note);
+function insertLink(mbrelease, release_url, isrcs) {
+    const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
+    const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
 
-    let mbUI = $(
-        `<li class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
+    const mbUI = $(
+        `<div class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
             parameters
-        )}${MBImport.buildSearchButton(release)}</li>`
+        )}${MBImport.buildSearchButton(mbrelease)}</div>`
     ).hide();
 
     $(
         '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>'
     )
         .on('click', event => {
-            const query = isrcs.map(({ isrc, number }) => (isrc == null ? `isrc${number}=` : `isrc${number}=${isrc}`)).join('&');
+            const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
             event.preventDefault();
             window.open(`https://magicisrc.kepstin.ca?${query}`);
         })
         .appendTo(mbUI);
 
-    $('.interior-release-chart-content-list').append(mbUI);
+    $('div[title="Collection controls"]').append(mbUI);
     $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
     $('form.musicbrainz_import button').css({ width: '120px' });
     mbUI.slideDown();
