@@ -152,5 +152,6 @@ function insertLink(mbrelease, release_url, isrcs) {
     $('div[title="Collection controls"]').append(mbUI);
     $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
     $('form.musicbrainz_import button').css({ width: '120px' });
+    $('form.musicbrainz_import button img').css({ display: 'inline-block' });
     mbUI.slideDown();
 }
