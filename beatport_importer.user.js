@@ -3,7 +3,7 @@
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2023.7.22.1
+// @version        2023.9.15.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http://www.beatport.com/release/*
@@ -102,7 +102,7 @@ function retrieveReleaseInfo(release_url, release_data, tracks_data) {
         mbtracks.push({
             artist_credit: MBImport.makeArtistCredits(artists),
             title: title,
-            duration: track.length,
+            duration: track.length_ms,
         });
     });
 
