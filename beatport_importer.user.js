@@ -3,7 +3,7 @@
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2023.9.15.1
+// @version        2023.10.22.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http://www.beatport.com/release/*
@@ -32,7 +32,7 @@ $(document).ready(() => {
     // Reversing is less reliable, but the API does not provide track numbers.
     const tracks_table = release_data.tracks.reverse();
 
-    const tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, element => /tracks-release/g.test(element.queryKey))[0];
+    const tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, element => /tracks/g.test(element.queryKey))[0];
     const tracks_data = $.map(tracks_table, url => $.grep(tracks_release.state.data.results, element => element.url === url));
     const isrcs = tracks_data.map(track => track.isrc);
 
