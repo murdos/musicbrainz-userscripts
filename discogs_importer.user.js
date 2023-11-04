@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2021.8.10.1
+// @version        2023.11.4.2
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -243,24 +243,29 @@ function insertMBLinks(current_page_key) {
     mbLinks.searchAndDisplayMbLink(current_page_info.clean_url, mb_type, mbLinkInsert, cachekey);
 
     const $root = $('body');
-    // artist/label/master pages, release pages (before the 2021-08-09 update)
-    add_mblinks($root, 'div.profile', ['artist', 'label']);
-    add_mblinks($root, 'tr[data-object-type="release"] td.artist,td.title', 'artist');
-    add_mblinks($root, 'tr[data-object-type="release"] td.title', 'release');
-    add_mblinks($root, 'tr[data-object-type="release"]', 'label');
-    add_mblinks($root, 'tr[data-object-type~="master"]', ['master', 'artist', 'label']);
-    // release pages (since the 2021-08-09 update)
-    add_mblinks($root, '#release-header', ['artist', 'label']);
-    setInterval(() => add_mblinks($root, '#release-other-versions', ['artist', 'release', 'label']), 500); // Discogs loads this dynamically, wait a moment
-    add_mblinks($root, '#release-tracklist', 'artist');
-    add_mblinks($root, '#release-companies', [['label', 'place'], 'label']);
-    add_mblinks($root, '#release-credits', ['label', 'artist']);
-    add_mblinks($root, '#release-actions', 'master', true);
-    // release pages (before the 2021-08-09 update, TODO: remove after the new layout becomes permanent)
-    add_mblinks($root, 'div#tracklist', 'artist');
-    add_mblinks($root, 'div#companies', [['label', 'place'], 'label']);
-    add_mblinks($root, 'div#credits', ['label', 'artist']);
-    add_mblinks($root, 'div#page_aside div.section_content:first', 'master', true);
+
+    if (current_page_info.type === 'artist') {
+        add_mblinks($root, 'div[class^=info_]', 'artist');
+        setInterval(() => {
+            add_mblinks($root, 'div[class^=textWithCovers_]', ['artist', 'label', 'master', 'release']);
+            add_mblinks($root, 'tr[class^=versions_]', ['label', 'release']);
+        }, 1500);
+    } else if (current_page_info.type === 'label') {
+        add_mblinks($root, 'div[class^=info_]', 'label');
+        add_mblinks($root, 'div.profile', ['artist', 'label']);
+        add_mblinks($root, '#label_wrap', ['artist', 'master', 'release']);
+        setInterval(() => add_mblinks($root, 'tr.sub.release', ['artist', 'release']), 1000);
+    } else if (current_page_info.type === 'master') {
+        add_mblinks($root, '#Credits', ['artist']);
+        setInterval(() => add_mblinks($root, '#versions tr[class^=row_]', ['label', 'release']), 1000);
+    } else if (current_page_info.type === 'release') {
+        add_mblinks($root, '#release-actions', ['master']);
+        add_mblinks($root, 'div[class^=info_]', ['label']);
+        add_mblinks($root, '#release-companies', [['label', 'place'], 'label']);
+        add_mblinks($root, '#release-credits', ['artist', 'label']);
+        add_mblinks($root, '#release-tracklist', ['artist']);
+        setTimeout(() => add_mblinks($root, '#release-other-versions', ['artist', 'label', 'release']), 1000);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
