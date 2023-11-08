@@ -245,25 +245,35 @@ function insertMBLinks(current_page_key) {
     const $root = $('body');
 
     if (current_page_info.type === 'artist') {
-        add_mblinks($root, 'div[class^=info_]', 'artist');
+        // profile text and relationships
+        add_mblinks($root, 'div[class^=info_]', ['artist', 'label']);
         setInterval(() => {
+            // dynamically paged and filterable (master) release listing
             add_mblinks($root, 'div[class^=textWithCovers_]', ['artist', 'label', 'master', 'release']);
+            // dynamically expanded master release
             add_mblinks($root, 'tr[class^=versions_]', ['label', 'release']);
         }, 1500);
     } else if (current_page_info.type === 'label') {
-        add_mblinks($root, 'div[class^=info_]', 'label');
+        // profile text and relationships
         add_mblinks($root, 'div.profile', ['artist', 'label']);
+        // static, paged (master) release listing
         add_mblinks($root, '#label_wrap', ['artist', 'master', 'release']);
+        // dynamically expanded master release
         setInterval(() => add_mblinks($root, 'tr.sub.release', ['artist', 'release']), 1000);
     } else if (current_page_info.type === 'master') {
+        // credits section (master release summary)
         add_mblinks($root, '#Credits', ['artist']);
+        // dynamically paged and filterable release listing
         setInterval(() => add_mblinks($root, '#versions tr[class^=row_]', ['label', 'release']), 1000);
     } else if (current_page_info.type === 'release') {
+        // master release in the actions sidebar
         add_mblinks($root, '#release-actions', ['master']);
-        add_mblinks($root, 'div[class^=info_]', ['label']);
+        // release labels and series
+        add_mblinks($root, 'div[class^=info_]', [['label', 'series'], 'label']);
         add_mblinks($root, '#release-companies', [['label', 'place'], 'label']);
         add_mblinks($root, '#release-credits', ['artist', 'label']);
         add_mblinks($root, '#release-tracklist', ['artist']);
+        // dynamically paged and filterable listing of other release versions
         setTimeout(() => add_mblinks($root, '#release-other-versions', ['artist', 'label', 'release']), 1000);
     }
 }
