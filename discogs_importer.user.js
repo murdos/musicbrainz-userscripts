@@ -823,7 +823,10 @@ function decodeDiscogsJoinphrase(join) {
 
 const MediaTypes = {
     '8-Track Cartridge': 'Cartridge',
-    Acetate: 'Vinyl',
+    Acetate: 'Acetate',
+    'Acetate7"': '7" Acetate',
+    'Acetate10"': '10" Acetate',
+    'Acetate12"': '12" Acetate',
     Betamax: 'Betamax',
     'Blu-ray': 'Blu-ray',
     'Blu-ray-R': 'Blu-ray',
