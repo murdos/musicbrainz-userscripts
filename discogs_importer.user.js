@@ -131,6 +131,7 @@ function insertMBLinks(current_page_key) {
                         'release-group': { mark: 'G' },
                         place: { mark: 'P' },
                         label: { mark: 'L' },
+                        series: { mark: 'S' },
                     };
                     let mark = '';
                     let entity_name = 'entity';
@@ -261,13 +262,19 @@ function insertMBLinks(current_page_key) {
         // dynamically expanded master release
         setInterval(() => add_mblinks($root, 'tr.sub.release', ['artist', 'release']), 1000);
     } else if (current_page_info.type === 'master') {
-        // credits section (master release summary)
-        add_mblinks($root, '#Credits', ['artist']);
-        // dynamically paged and filterable release listing
-        setInterval(() => add_mblinks($root, '#versions tr[class^=row_]', ['label', 'release']), 1000);
+        // master release artist
+        add_mblinks($root, 'h1', ['artist']);
+        setInterval(() => {
+            // dynamically expanded credits section (master release summary)
+            add_mblinks($root, '#Credits li[class^=artist_]', ['artist']);
+            // dynamically paged and filterable release listing
+            add_mblinks($root, '#versions tr[class^=row_]', ['label', 'release']);
+        }, 1000);
     } else if (current_page_info.type === 'release') {
-        // master release in the actions sidebar
+        // master release in the actions sidebar (link early to prevent duplicate release groups on import!)
         add_mblinks($root, '#release-actions', ['master']);
+        // release artist
+        add_mblinks($root, 'h1', ['artist']);
         // release labels and series
         add_mblinks($root, 'div[class^=info_]', [['label', 'series'], 'label']);
         add_mblinks($root, '#release-companies', [['label', 'place'], 'label']);
