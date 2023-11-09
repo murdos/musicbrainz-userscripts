@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2023.11.4.2
+// @version        2023.11.9.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -830,7 +830,10 @@ function decodeDiscogsJoinphrase(join) {
 
 const MediaTypes = {
     '8-Track Cartridge': 'Cartridge',
-    Acetate: 'Vinyl',
+    Acetate: 'Acetate',
+    'Acetate7"': '7" Acetate',
+    'Acetate10"': '10" Acetate',
+    'Acetate12"': '12" Acetate',
     Betamax: 'Betamax',
     'Blu-ray': 'Blu-ray',
     'Blu-ray-R': 'Blu-ray',
