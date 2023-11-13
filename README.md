@@ -6,7 +6,6 @@
 -   [Import Beatport Classic releases to MusicBrainz](#beatport_classic_importer)
 -   [Import Beatport releases to MusicBrainz](#beatport_importer)
 -   [Import Boomkat releases to Musicbrainz](#boomkat_importer)
--   [Import CD Baby releases to MusicBrainz](#cdbaby_importer)
 -   [Import CD1D releases to MusicBrainz](#cd1d_importer)
 -   [Import Deezer releases into MusicBrainz](#deezer_importer)
 -   [Import Discogs releases to MusicBrainz](#discogs_importer)
@@ -70,13 +69,6 @@ One-click importing of releases from beatport.com/release pages into MusicBrainz
 Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
-
-## <a name="cdbaby_importer"></a> Import CD Baby releases to MusicBrainz
-
-One-click importing of releases from cdbaby.com into MusicBrainz.
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cdbaby_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js)
 
 ## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
 
@@ -195,7 +187,7 @@ Direct links to the recording edit page are added to instruments' recordings pag
 Batch link recordings to works from artist Recordings page.
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/batch-add-recording-relationships.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js)
 
 ## <a name="expand-collapse-release-groups"></a> MusicBrainz: Expand/collapse release groups
 
