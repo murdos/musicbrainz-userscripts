@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2023.11.9.1
+// @version        2024.02.4.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -249,18 +249,20 @@ function insertMBLinks(current_page_key) {
         // profile text and relationships
         add_mblinks($root, 'div[class^=info_]', ['artist', 'label']);
         setInterval(() => {
-            // dynamically paged and filterable (master) release listing
-            add_mblinks($root, 'div[class^=textWithCovers_]', ['artist', 'label', 'master', 'release']);
+            // dynamically loaded, paged and filterable (master) release listing
+            add_mblinks($root, 'table[class^=releases_]', ['artist', 'label', 'master', 'release']);
             // dynamically expanded master release
-            add_mblinks($root, 'tr[class^=versions_]', ['label', 'release']);
+            add_mblinks($root, 'tr[class^=versionsTextWithCoversRow_]', ['label', 'release']);
         }, 1500);
     } else if (current_page_info.type === 'label') {
         // profile text and relationships
-        add_mblinks($root, 'div.profile', ['artist', 'label']);
-        // static, paged (master) release listing
-        add_mblinks($root, '#label_wrap', ['artist', 'master', 'release']);
-        // dynamically expanded master release
-        setInterval(() => add_mblinks($root, 'tr.sub.release', ['artist', 'release']), 1000);
+        add_mblinks($root, 'div[class^=info_]', ['artist', 'label']);
+        setInterval(() => {
+            // dynamically loaded and paged (master) release listing
+            add_mblinks($root, 'table[class^=labelReleasesTable_]', ['artist', 'master', 'release']);
+            // dynamically expanded master release
+            add_mblinks($root, 'tr[class^=versionsTextWithCoversRow_', ['artist', 'release']);
+        }, 1500);
     } else if (current_page_info.type === 'master') {
         // master release artist
         add_mblinks($root, 'h1', ['artist']);
