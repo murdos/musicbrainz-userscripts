@@ -261,7 +261,7 @@ function insertMBLinks(current_page_key) {
             // dynamically loaded and paged (master) release listing
             add_mblinks($root, 'table[class^=labelReleasesTable_]', ['artist', 'master', 'release']);
             // dynamically expanded master release
-            add_mblinks($root, 'tr[class^=versionsTextWithCoversRow_', ['artist', 'release']);
+            add_mblinks($root, 'tr[class^=versionsTextWithCoversRow_]', ['artist', 'release']);
         }, 1500);
     } else if (current_page_info.type === 'master') {
         // master release artist
