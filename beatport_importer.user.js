@@ -3,7 +3,7 @@
 // @author         VxJasonxV
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2023.10.22.1
+// @version        2024.03.28.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @include        http://www.beatport.com/release/*
@@ -153,5 +153,21 @@ function insertLink(mbrelease, release_url, isrcs) {
     $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
     $('form.musicbrainz_import button').css({ width: '120px' });
     $('form.musicbrainz_import button img').css({ display: 'inline-block' });
+
+    const lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
+    const spanHTML = mbrelease.barcode
+        ? `<a href="https://atisket.pulsewidth.org.uk/?upc=${encodeURIComponent(mbrelease.barcode)}">
+            ${mbrelease.barcode}
+        </a>`
+        : '[none]';
+    const releaseInfoBarcode = $(
+        `<div class="${lastReleaseInfo.attr('class')}">
+            <p>Barcode</p>
+            <span>${spanHTML}</span>
+        </div>`
+    ).hide();
+    lastReleaseInfo.after(releaseInfoBarcode);
+
     mbUI.slideDown();
+    releaseInfoBarcode.slideDown();
 }
