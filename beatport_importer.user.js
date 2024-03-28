@@ -153,5 +153,21 @@ function insertLink(mbrelease, release_url, isrcs) {
     $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
     $('form.musicbrainz_import button').css({ width: '120px' });
     $('form.musicbrainz_import button img').css({ display: 'inline-block' });
+
+    const lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
+    const spanHTML = mbrelease.barcode
+        ? `<a href="https://atisket.pulsewidth.org.uk/?upc=${encodeURIComponent(mbrelease.barcode)}">
+            ${mbrelease.barcode}
+        </a>`
+        : '[none]';
+    const releaseInfoBarcode = $(
+        `<div class="${lastReleaseInfo.attr('class')}">
+            <p>Barcode</p>
+            <span>${spanHTML}</span>
+        </div>`
+    ).hide();
+    lastReleaseInfo.after(releaseInfoBarcode);
+
     mbUI.slideDown();
+    releaseInfoBarcode.slideDown();
 }
