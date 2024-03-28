@@ -266,6 +266,8 @@ function insertMBLinks(current_page_key) {
     } else if (current_page_info.type === 'master') {
         // master release artist
         add_mblinks($root, 'h1', ['artist']);
+        // master release tracklist
+        add_mblinks($root, 'table[class^=tracklist_] td[class^=artist_]', ['artist']);
         setInterval(() => {
             // dynamically expanded credits section (master release summary)
             add_mblinks($root, '#Credits li[class^=artist_]', ['artist']);
