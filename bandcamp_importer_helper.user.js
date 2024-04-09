@@ -8,8 +8,8 @@
 // @include     http*://*.bandcamp.com/
 // @include     http*://*.bandcamp.com/releases
 // @exclude     http*://*.bandcamp.com/*/*
-// @require     lib/logger.js
-// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @require     https://raw.github.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @icon        https://raw.github.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant       unsafeWindow
 // ==/UserScript==
 
