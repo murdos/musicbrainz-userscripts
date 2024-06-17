@@ -6,7 +6,7 @@
 // @license        X11
 // @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.j
+// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @include        /^https?:\/\/(\w+\.)?musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+)?(\?.+?)?$/
 // @grant          none
 // @run-at         document-idle
