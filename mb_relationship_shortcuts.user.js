@@ -55,6 +55,7 @@ const streamingIconClasses = {
     'soundcloud.com': 'soundcloud',
     'open.spotify.com': 'spotify',
     'tidal.com': 'tidal',
+    'beatport.com': 'beatport',
 };
 
 /**
