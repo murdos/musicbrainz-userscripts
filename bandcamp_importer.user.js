@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Import Bandcamp releases to MusicBrainz
 // @description    Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2022.5.6.1
+// @version        2024.9.6.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -405,12 +405,11 @@ $(document).ready(function () {
     bci_link.querySelector('a').style.fontWeight = 'bold';
     const upc = unsafeWindow.TralbumData.current.upc;
     if (typeof upc != 'undefined' && upc !== null) {
-        document
-            .querySelector('div #trackInfoInner')
-            .insertAdjacentHTML(
-                'beforeend',
-                `<div id="mbaimport_upc" style="margin-bottom: 2em; font-size: smaller;"> UPC: ${upc}</br>
-                Import: <a href="https://harmony.pulsewidth.org.uk/release?url=&gtin=${upc}">Harmony</a> | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">Atisket</a></div>`
-            );
+        document.querySelector('div #trackInfoInner').insertAdjacentHTML(
+            'beforeend',
+            `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}<br/>
+            Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}">Harmony</a>
+            | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`
+        );
     }
 });
