@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Import Deezer releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from deezer.com into MusicBrainz
-// @version        2024.9.9.1
+// @description    One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
+// @version        2024.9.9.2
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @include        http*://www.deezer.com/*/album/*
@@ -55,8 +55,8 @@ $(document).ready(function () {
                                 releaseRaw.tracks.data.push(...tracksRaw.data);
                                 if (tracksRaw.next) loadTracks(tracksRaw.next);
                                 else {
-                                    let release = parseDeezerRelease(releaseUrl, releaseRaw);
-                                    insertLink(release, releaseUrl);
+                                    let [release, isrcs] = parseDeezerRelease(releaseUrl, releaseRaw);
+                                    insertLink(release, releaseUrl, isrcs);
                                 }
                             },
                             onerror: function (res) {
@@ -98,6 +98,8 @@ function parseDeezerRelease(releaseUrl, data) {
         discs: [],
     };
 
+    let isrcs = [];
+
     $.each(data.contributors, function (index, artist) {
         if (artist.role != 'Main') return true;
 
@@ -120,6 +122,9 @@ function parseDeezerRelease(releaseUrl, data) {
             duration: track.duration * 1000,
             artist_credit: [],
         };
+
+        if (track.isrc) isrcs.push(track.isrc);
+        else isrcs.push(null);
 
         // ignore pointless "(Original Mix)" in title version
         if (track.title_version && !track.title_version.match(/^\s*\(Original Mix\)\s*$/i)) {
@@ -147,7 +152,7 @@ function parseDeezerRelease(releaseUrl, data) {
     release.type = data.record_type;
     release.barcode = data.upc;
 
-    return release;
+    return [release, isrcs];
 }
 
 function waitForEl(selector, callback) {
@@ -160,7 +165,7 @@ function waitForEl(selector, callback) {
     }
 }
 
-function insertLink(release, release_url) {
+function insertLink(release, release_url, isrcs) {
     let editNote = MBImport.makeEditNote(release_url, 'Deezer');
     let parameters = MBImport.buildFormParameters(release, editNote);
 
@@ -169,8 +174,17 @@ function insertLink(release, release_url) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div>`
+            </div><div class="toolbar-item"></div>`
     ).hide();
+    $(
+        `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`
+    )
+        .on('click', event => {
+            const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+            event.preventDefault();
+            window.open(`https://magicisrc.kepstin.ca?${query}`);
+        })
+        .appendTo(mbUI.last());
     waitForEl('[data-testid="toolbar"]', function () {
         $('[data-testid="toolbar"]').append(mbUI);
         mbUI.show();
