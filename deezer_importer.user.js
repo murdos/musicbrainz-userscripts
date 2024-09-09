@@ -2,7 +2,7 @@
 // @name           Import Deezer releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from deezer.com into MusicBrainz
-// @version        2019.1.30.1
+// @version        2024.9.9.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @include        http*://www.deezer.com/*/album/*
@@ -35,15 +35,37 @@ $(document).ready(function () {
         MBImportStyle();
         let releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
         let releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
-        let deezerApiUrl = `https://api.deezer.com/album/${releaseId}`;
+        let deezerApiUrl = `https://api.deezer.com/album/${releaseId}?limit=1`; // limit track result to 1, we will request tracks in a separate API call (that returns more complete data)
+        let deezerTrackUrl = `https://api.deezer.com/album/${releaseId}/tracks?limit=100`;
 
         gmXHR({
             method: 'GET',
             url: deezerApiUrl,
             onload: function (resp) {
                 try {
-                    let release = parseDeezerRelease(releaseUrl, JSON.parse(resp.responseText));
-                    insertLink(release, releaseUrl);
+                    let releaseRaw = JSON.parse(resp.responseText);
+                    releaseRaw.tracks.data = [];
+                    // request album tracks from separate endpoint (includes track ISRCs and disk numbers)
+                    let loadTracks = function (next) {
+                        gmXHR({
+                            method: 'GET',
+                            url: next,
+                            onload: function (res) {
+                                let tracksRaw = JSON.parse(res.responseText);
+                                releaseRaw.tracks.data.push(...tracksRaw.data);
+                                if (tracksRaw.next) loadTracks(tracksRaw.next);
+                                else {
+                                    let release = parseDeezerRelease(releaseUrl, releaseRaw);
+                                    insertLink(release, releaseUrl);
+                                }
+                            },
+                            onerror: function (res) {
+                                LOGGER.error('AJAX status:', res.status);
+                                LOGGER.error('AJAX response:', res.responseText);
+                            },
+                        });
+                    };
+                    loadTracks(deezerTrackUrl);
                 } catch (e) {
                     LOGGER.error('Failed to parse release: ', e);
                 }
@@ -91,15 +113,9 @@ function parseDeezerRelease(releaseUrl, data) {
         release.artist_credit.push(ac);
     });
 
-    let disc = {
-        format: 'Digital Media',
-        title: '',
-        tracks: [],
-    };
-
-    $.each(data.tracks.data, function (index, track) {
+    for (const track of data.tracks.data) {
         let t = {
-            number: index + 1,
+            number: track.track_position,
             title: track.title_short,
             duration: track.duration * 1000,
             artist_credit: [],
@@ -112,10 +128,16 @@ function parseDeezerRelease(releaseUrl, data) {
 
         t.artist_credit.push({ artist_name: track.artist.name });
 
-        disc.tracks.push(t);
-    });
+        // add new disk object(s) if not added yet
+        while (release.discs.length < track.disk_number)
+            release.discs.push({
+                format: 'Digital Media',
+                title: '',
+                tracks: [],
+            });
 
-    release.discs.push(disc);
+        release.discs[track.disk_number - 1].tracks.push(t);
+    }
 
     release.urls.push({
         link_type: MBImport.URL_TYPES.stream_for_free,
