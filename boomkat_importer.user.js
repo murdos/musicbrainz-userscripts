@@ -10,22 +10,24 @@
 // @require     lib/mbimportstyle.js
 // ==/UserScript==
 
-async function onLoad() {
+function onLoad() {
     MBImportStyle();
 
     const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-    let release = await retrieveReleaseInfo(release_url);
+    let release = retrieveReleaseInfo(release_url);
     insertLink(release, release_url, true);
 
     // Update the release info when a different tab/format is
     // selected. We need a timeout here due to a slight delay between
     // clicking the tab and the tab's classes (and the tracklist)
     // being updated.
-    document.querySelector('ul.tabs li.tab-title a').addEventListener('click', function () {
-        setTimeout(function () {
-            release = retrieveReleaseInfo(release_url);
-            updateLink(release, release_url, false);
-        }, 150);
+    document.querySelectorAll('ul.tabs li.tab-title a').forEach(function (elem) {
+        elem.addEventListener('click', function () {
+            setTimeout(function () {
+                release = retrieveReleaseInfo();
+                updateLink(release, release, false);
+            }, 500);
+        });
     });
 }
 
@@ -58,7 +60,7 @@ function getLinkType(media) {
     return MBImport.URL_TYPES.purchase_for_mail_order;
 }
 
-async function retrieveReleaseInfo(release_url) {
+function retrieveReleaseInfo(release_url) {
     const releaseDateStr = document.querySelector('span.release-date-placeholder').textContent.replace('Release date: ', '');
     const releaseDate = new Date(releaseDateStr);
     const artist = document.querySelector('h1.detail--artists').textContent.trim();
@@ -96,17 +98,8 @@ async function retrieveReleaseInfo(release_url) {
     });
 
     // Tracks
-    // Boomkat loads the tracklist dynamically. Using setTimeout()
-    // here is not consistent for reasons I have not yet figured out.
-    // For now, just fetch the tracks the same way Boomkat does.
-    const releaseID = document.querySelector('a.play-all').dataset.audioPlayerRelease;
-    const tracklistURL = `https://boomkat.com/tracklist/${releaseID}`;
-    let tracks = [];
-    const response = await fetch(tracklistURL);
-    const body = await response.text();
-    const doc = document.implementation.createHTMLDocument('');
-    doc.body.innerHTML = body;
-    doc.querySelectorAll('div.table-row.track.mp3.clearfix a').forEach(function (link) {
+    const tracks = [];
+    document.querySelectorAll('div.table-row.track.mp3.clearfix a').forEach(function (link) {
         tracks.push({
             artist_credit: MBImport.makeArtistCredits([link.dataset.artist]),
             title: link.dataset.name,
@@ -122,26 +115,34 @@ async function retrieveReleaseInfo(release_url) {
 }
 
 function updateLink(release, release_url) {
-    document.querySelector('.musicbrainz-import').remove();
-    document.querySelector('.musicbrainz_import_add').remove();
+    document.querySelectorAll('.musicbrainz-import').forEach(function (elem) {
+        elem.remove();
+    });
     insertLink(release, release_url, false);
 }
 
-// Insert button into page under label information
+// Insert button into page
 function insertLink(release, release_url) {
     const edit_note = MBImport.makeEditNote(release_url, 'Boomkat');
 
-    const formButton = document.createElement('li');
+    const div = document.createElement('div');
+    div.className = 'product-note';
+
+    const formButton = document.createElement('span');
     formButton.className = 'tab-title musicbrainz-import';
     formButton.innerHTML = MBImport.buildFormHTML(MBImport.buildFormParameters(release, edit_note));
+    formButton.style.display = 'inline-block';
 
-    const searchButton = document.createElement('li');
+    const searchButton = document.createElement('span');
     searchButton.className = 'tab-title musicbrainz-import';
     searchButton.innerHTML = MBImport.buildSearchButton(release);
+    searchButton.style.display = 'inline-block';
 
-    const tabs = document.querySelector('ul.tabs.product-page-tabs');
-    tabs.appendChild(formButton);
-    tabs.appendChild(searchButton);
+    div.appendChild(formButton);
+    div.appendChild(searchButton);
+
+    const albumHeader = document.querySelector('h2.detail_album');
+    albumHeader.after(div);
 }
 
 if (document.readyState !== 'loading') {
