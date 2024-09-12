@@ -69,6 +69,7 @@ One-click importing of releases from beatport.com/release pages into MusicBrainz
 Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js)
 
 ## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
 
@@ -170,7 +171,7 @@ One-click importing of releases from vgmdb.net into MusicBrainz
 
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
-Use the 1200px images for the pop‐up/previews on Release cover art pages. (Also adds 1200px “thumbnail” links.)
+Use the 1200px images for the pop‐up/previews on Release cover art pages.
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_1200px_caa.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_1200px_caa.user.js)
