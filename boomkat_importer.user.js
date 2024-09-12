@@ -3,6 +3,8 @@
 // @description Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
 // @version     2024.09.10.1
 // @license     X11
+// @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
+// @updateURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
 // @namespace   https://github.com/murdos/musicbrainz-userscripts
 // @include     https://boomkat.com/products/*
 // @require     lib/mbimport.js
@@ -10,30 +12,25 @@
 // @require     lib/mbimportstyle.js
 // ==/UserScript==
 
-function onLoad() {
+async function onLoad() {
     MBImportStyle();
 
     const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-    let release = retrieveReleaseInfo(release_url);
-    insertLink(release, release_url, true);
+    await fetchTracksAndInsertLink(release_url);
 
     // Update the release info when a different tab/format is
-    // selected. We need a timeout here due to a slight delay between
-    // clicking the tab and the tab's classes (and the tracklist)
-    // being updated.
+    // selected. We pass the event target down to fetchTracksAndInsertLink
+    // so we can easily fetch the format type from the clicked link.
+    // Without this, we'd need to resort to delays which are... inconsistent
+    // on Boomkat.
     document.querySelectorAll('ul.tabs li.tab-title a').forEach(function (elem) {
-        elem.addEventListener('click', function () {
-            setTimeout(function () {
-                release = retrieveReleaseInfo();
-                updateLink(release, release, false);
-            }, 500);
+        elem.addEventListener('click', async function (event) {
+            await fetchTracksAndInsertLink(release_url, event.target);
         });
     });
 }
 
-function getFormat() {
-    const format = document.querySelector('ul.tabs .tab-title.active a').textContent.trim();
-
+function getFormat(format) {
     if (format.match(/MP3|WAV|FLAC/i)) {
         return 'Digital Media';
     }
@@ -60,7 +57,12 @@ function getLinkType(media) {
     return MBImport.URL_TYPES.purchase_for_mail_order;
 }
 
-function retrieveReleaseInfo(release_url) {
+async function fetchTracksAndInsertLink(release_url, element) {
+    const release = await retrieveReleaseInfo(release_url, element);
+    insertLink(release, release_url);
+}
+
+async function retrieveReleaseInfo(release_url, element) {
     const releaseDateStr = document.querySelector('span.release-date-placeholder').textContent.replace('Release date: ', '');
     const releaseDate = new Date(releaseDateStr);
     const artist = document.querySelector('h1.detail--artists').textContent.trim();
@@ -88,7 +90,13 @@ function retrieveReleaseInfo(release_url) {
     });
 
     // Format/packaging
-    release.format = getFormat();
+    let format;
+    if (element != null) {
+        format = element.textContent.trim();
+    } else {
+        format = document.querySelector('ul.tabs .tab-title.active a').textContent.trim();
+    }
+    release.format = getFormat(format);
     release.packaging = release.format == 'Digital Media' ? 'None' : '';
 
     // URLs
@@ -98,8 +106,17 @@ function retrieveReleaseInfo(release_url) {
     });
 
     // Tracks
+    // Boomkat loads the tracklist dynamically. Using setTimeout()
+    // here is not consistent for reasons I have not yet figured out.
+    // For now, just fetch the tracks the same way Boomkat does.
+    const releaseID = document.querySelector('a.play-all').dataset.audioPlayerRelease;
+    const tracklistURL = `https://boomkat.com/tracklist/${releaseID}`;
     const tracks = [];
-    document.querySelectorAll('div.table-row.track.mp3.clearfix a').forEach(function (link) {
+    const response = await fetch(tracklistURL);
+    const body = await response.text();
+    const doc = document.implementation.createHTMLDocument('');
+    doc.body.innerHTML = body;
+    doc.querySelectorAll('div.table-row.track.mp3.clearfix a').forEach(function (link) {
         tracks.push({
             artist_credit: MBImport.makeArtistCredits([link.dataset.artist]),
             title: link.dataset.name,
@@ -114,15 +131,13 @@ function retrieveReleaseInfo(release_url) {
     return release;
 }
 
-function updateLink(release, release_url) {
+// Insert button into page
+function insertLink(release, release_url) {
+    // Remove any existing buttons
     document.querySelectorAll('.musicbrainz-import').forEach(function (elem) {
         elem.remove();
     });
-    insertLink(release, release_url, false);
-}
 
-// Insert button into page
-function insertLink(release, release_url) {
     const edit_note = MBImport.makeEditNote(release_url, 'Boomkat');
 
     const div = document.createElement('div');
