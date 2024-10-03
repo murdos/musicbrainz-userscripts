@@ -408,7 +408,7 @@ $(document).ready(function () {
         document.querySelector('div #trackInfoInner').insertAdjacentHTML(
             'beforeend',
             `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}<br/>
-            Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}">Harmony</a>
+            Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}&deezer=&itunes=&spotify=&tidal=&beatport">Harmony</a>
             | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`
         );
     }
