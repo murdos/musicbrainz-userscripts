@@ -57,12 +57,12 @@ function getLinkType(media) {
     return MBImport.URL_TYPES.purchase_for_mail_order;
 }
 
-async function fetchTracksAndInsertLink(release_url, element) {
-    const release = await retrieveReleaseInfo(release_url, element);
+async function fetchTracksAndInsertLink(release_url, formatElement) {
+    const release = await retrieveReleaseInfo(release_url, formatElement);
     insertLink(release, release_url);
 }
 
-async function retrieveReleaseInfo(release_url, element) {
+async function retrieveReleaseInfo(release_url, formatElement) {
     const releaseDateStr = document.querySelector('span.release-date-placeholder').textContent.replace('Release date: ', '');
     const releaseDate = new Date(releaseDateStr);
     const artist = document.querySelector('h1.detail--artists').textContent.trim();
@@ -91,8 +91,8 @@ async function retrieveReleaseInfo(release_url, element) {
 
     // Format/packaging
     let format;
-    if (element != null) {
-        format = element.textContent.trim();
+    if (formatElement != null) {
+        format = formatElement.textContent.trim();
     } else {
         format = document.querySelector('ul.tabs .tab-title.active a').textContent.trim();
     }
