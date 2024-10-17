@@ -2,15 +2,15 @@
 // @name           Import Juno Download releases to MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from junodownload.com/products pages into MusicBrainz
-// @version        2021.11.21.1
+// @version        2024.10.17.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @include        http*://www.junodownload.com/products/*
 // @include        http*://secure.junodownload.com/products/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 

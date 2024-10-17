@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           Import Encyclopedisque releases to MusicBrainz
-// @version        2020.9.13.1
+// @version        2024.10.17.1
 // @namespace      http://userscripts.org/users/22504
 // @description    Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
@@ -8,10 +8,10 @@
 // @include        http://www.encyclopedisque.fr/disque/*.html
 // @include        http://www.encyclopedisque.fr/artiste/*.html
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/mblinks.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mblinks.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 

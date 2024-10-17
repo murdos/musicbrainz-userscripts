@@ -3,7 +3,7 @@
 // @name         Import Naxos Music Library releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @author       loujine
-// @version      2020.9.12
+// @version      2024.10.17.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
@@ -11,8 +11,8 @@
 // @compatible   firefox+tampermonkey
 // @license      MIT
 // @include      http*://*naxosmusiclibrary.com/catalogue/item.asp*
-// @require      lib/mbimport.js
-// @require      lib/mbimportstyle.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==

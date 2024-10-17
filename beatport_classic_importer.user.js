@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name           Import Beatport Classic releases to MusicBrainz
 // @description    One-click importing of releases from classic.beatport.com/release pages into MusicBrainz
-// @version        2018.2.18.1
+// @version        2024.10.17.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_classic_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_classic_importer.user.js
 // @include        http*://classic.beatport.com/release/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant          unsafeWindow
 // ==/UserScript==

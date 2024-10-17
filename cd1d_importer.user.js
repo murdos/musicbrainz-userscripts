@@ -8,13 +8,13 @@
 // @include     http://1d-paysdelaloire.com/*/album/*
 // @include     http://1d-rhonealpes.com/*/album/*
 // @include     http://cd1d.com/*/album/*
-// @version     2018.2.18.1
+// @version     2024.10.17.1
 // @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require     lib/mbimport.js
-// @require     lib/logger.js
-// @require     lib/mbimportstyle.js
+// @require     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 

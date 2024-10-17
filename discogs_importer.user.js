@@ -2,7 +2,7 @@
 
 // @name           Import Discogs releases to MusicBrainz
 // @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2024.03.28.1
+// @version        2024.10.17.1
 // @namespace      http://userscripts.org/users/22504
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -11,10 +11,10 @@
 // @exclude        http*://*.discogs.com/*release/*?f=xml*
 // @exclude        http*://www.discogs.com/release/add
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimport.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/logger.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mblinks.js
+// @require        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/lib/mbimportstyle.js
 // @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
