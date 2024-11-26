@@ -2,7 +2,7 @@
 // @name           Import VGMdb releases into MusicBrainz
 // @namespace      https://github.com/murdos/musicbrainz-userscripts/
 // @description    One-click importing of releases from vgmdb.net into MusicBrainz
-// @version        2021.11.12.1
+// @version        2022.4.29.1
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @include        /^https://vgmdb.net/(album|artist|org)/\d+/
@@ -41,7 +41,7 @@ function parseApi(apiResponse) {
         year: releaseDate.year,
         month: releaseDate.month,
         day: releaseDate.day,
-        labels: [{ name: mapLabel(apiDict.organizations), catno: apiDict.catalog }],
+        labels: mapCatNo(apiDict.catalog, mapLabel(apiDict.organizations)),
         barcode: apiDict.barcode,
         urls: mapUrls(apiDict.vgmdb_link, apiDict.stores, apiDict.websites),
         discs: mapDiscs(apiDict.discs, apiDict.media_format),
@@ -114,6 +114,31 @@ function mapLabel(organizations) {
     } else {
         return null;
     }
+}
+
+/*
+ * Returns a list of catalog numbers.
+ * "N/A" -> []
+ * "ABCD-12345" -> [{ catno: "ABCD-12345", name }]
+ * "ABCD-12345~6" -> [{ catno: "ABCD-12345", name }, { catno: "ABCD-12346", name }]
+ * "ABCD-59~60" -> [{ catno: "ABCD-59", name }, { catno: "ABCD-60", name }]
+ */
+function mapCatNo(catNoStr, name) {
+    if (catNoStr === 'N/A') {
+        return [];
+    }
+    const parts = catNoStr.split('~');
+    const first = parts[0];
+    const catNos = [{ name, catno: first }];
+    const endStr = parts[1];
+    if (endStr) {
+        const end = parseInt(endStr);
+        const start = parseInt(first.slice(0 - endStr.length));
+        for (let i = start + 1; i <= end; ++i) {
+            catNos.push({ name, catno: first.slice(0, 0 - i.toString().length) + i.toString() });
+        }
+    }
+    return catNos;
 }
 
 /*
