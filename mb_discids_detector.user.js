@@ -1,14 +1,14 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name           Musicbrainz DiscIds Detector
 // @namespace      http://userscripts.org/users/22504
-// @version        2023.6.24.1
+// @version        2024.11.26.1
 // @description    Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @include        http://avaxhome.ws/music/*
 // @include        https://orpheus.network/torrents.php?id=*
 // @include        https://passtheheadphones.me/torrents.php?id=*
-// @include        https://redacted.ch/torrents.php?id=*
+// @include        https://redacted.sh/torrents.php?id=*
 // @include        http*://lztr.us/torrents.php?id=*
 // @include        http*://lztr.me/torrents.php?id=*
 // @include        http*://mutracker.org/torrents.php?id=*
@@ -27,7 +27,7 @@ var CHECK_IMAGE =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/gD+AP7rGNSCAAAACXBIWXMAAABIAAAASABGyWs+AAAACXZwQWcAAAAQAAAAEABcxq3DAAADKklEQVQ4y32TS2hcZRiGn/8/Z87MNNc2zczEmptO0jSXagJtXCjWhhSEXpCI4EYENy6KG8FFBYtgEbzQ4k5QqNp2VyMtJVGpRU0tGDNoQxvrmCbkMslkSJrJXM6cOef8v4ukQqX4wbP5eL/327wv/M/Em+qNeFO9ASDEwzUPrM+fP8dqOhXqeGJ/f21ddCAYCsfRyFLJvru2mvnh9mTil8am1uJLQ8ceNOhoa+XC8HfMJm81x1q63glV179oBMLVhpQYEiQKzy0VNtZWLs9OT53s6X3qrxPHX+bSyNVNgyujV8lvrDXG2vZ/7oWig64nAY0hwZCCgIRwUGBJRSGbvp6cHH91R33078ODTyNOnXqPxcRl88ibX5wuBJuP5x2BVhop2PwuBA01kn2tJo4HtxfL5DIzZ7+/8MHrOx7tcMQ3I9dwnWKvF+kfTdlVEc/10f59A0HAgMEui90xgxvTLn8u+9SYhXUnNX60smr7z7Jx3wG8UOSZhUI4spJTrGwo0lssZxVSQlOdZGrJYyzpks4qlvLBWhWMHOgb7Mfsq4PfXOvx+bwgk/WxSwrfUwRNQSgAh7oCFB3N1xNllrMK04A5V7PLMOOvCSFMgFzJl6u2Jl8Gx9XkCppSWdEWNWiPGZy9XmIs6WJKKHuasq+p3qlkOwhz9B54dnbOkorOR0yG9gZJ3fP5cNTm4J4Akws+FyfKOK5GCFAatm/T4ObmB7RWxt74k9hrC0LVtLwwmw2FwyY8323hK2iLGnz2U4lMTiHvR04IGiqLxbrS7x/np3NJozoEmcTFTLTz2U7bivTcXNSsFxWHeyyGE2XGZ7x/j7WGyhA0W3e/LU58eiY1N+0IgLc++or1VLLb6hz6MmPGe/M2NFTBzIpH3lYoX6MQhC1NkzV/p2Jp5JX6eP+vn7wxsJnEXXUVnL6T59K7J/u2tR96365oey7nVQTKnsDzNFr5hETBq3ZmbrB47cS5M2+PdTbHmJpL89+OGbv3dLc81n/kWLih+yDhnTGtEcpeXXHSUz/OJ64M3/ojMS3BUw9rI2BsIUxBsLYyEJYC1nNuqawpARrwtwDgHxTwbTT5CxY9AAAALnpUWHRjcmVhdGUtZGF0ZQAAeNozMjCw0DWw0DUyCTEwsDIyszIw0jUwtTIwAABB3gURQfNnBAAAAC56VFh0bW9kaWZ5LWRhdGUAAHjaMzIwsNA1sNA1MggxNLMyNLYyNtM1MLUyMAAAQgUFF56jVzIAAAAASUVORK5CYII%3D';
 
 $(document).ready(function () {
-    if (window.location.host.match(/orpheus\.network|redacted\.ch|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org|notwhat\.cd/)) {
+    if (window.location.host.match(/orpheus\.network|redacted\.sh|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org|notwhat\.cd/)) {
         LOGGER.info('Gazelle site detected');
         gazellePageHandler();
     } else if (window.location.host.match(/avaxhome\.ws/)) {
