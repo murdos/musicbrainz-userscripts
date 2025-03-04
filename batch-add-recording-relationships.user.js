@@ -204,7 +204,7 @@ function batch_recording_rels(gm_info) {
                     self.next();
                 },
                 this.rate + timeout,
-                this
+                this,
             );
         } else {
             setTimeout(
@@ -212,7 +212,7 @@ function batch_recording_rels(gm_info) {
                     self.next();
                 },
                 this.rate,
-                this
+                this,
             );
         }
     };
@@ -260,7 +260,7 @@ function batch_recording_rels(gm_info) {
                     self.next();
                 },
                 timeout,
-                this
+                this,
             );
         }
     };
@@ -316,7 +316,7 @@ function batch_recording_rels(gm_info) {
                 norm_title = normalizeTitle($title.text().match(WITHOUT_PAREN_CLAUSES_REGEX)[1]);
 
             return [mbid, norm_title];
-        })
+        }),
     );
 
     let $work_options = Object.fromEntries(['type', 'language'].map(kind => [kind, $(`<select id="bpr-work-${kind}"></select>`)]));
@@ -325,16 +325,16 @@ function batch_recording_rels(gm_info) {
     let $relate_table = table(
         tr(
             td(label('New work with this title:').attr('for', 'bpr-new-work')),
-            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work)).css('white-space', 'nowrap')
+            td('<input type="text" id="bpr-new-work"/>', goBtn(relate_to_new_titled_work)).css('white-space', 'nowrap'),
         ),
         tr(
             td(label('Existing work (URL/MBID):').attr('for', 'bpr-existing-work')),
-            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work)).css('white-space', 'nowrap')
+            td(entity_lookup('existing-work', 'work'), goBtn(relate_to_existing_work)).css('white-space', 'nowrap'),
         ),
         tr(td('New works using recording titles'), td(goBtn(relate_to_new_works))),
         tr(td('Their suggested works'), td(goBtn(relate_to_suggested_works))),
         tr(td(label('Work type:').attr('for', 'bpr-work-type')), td($work_options['type'])),
-        tr(td(label('Lyrics language:').attr('for', 'bpr-work-language')), td($work_options['language']))
+        tr(td(label('Lyrics language:').attr('for', 'bpr-work-language')), td($work_options['language'])),
     ).hide();
 
     function make_checkbox(func, default_val, lbl) {
@@ -347,16 +347,16 @@ function batch_recording_rels(gm_info) {
         $('<tr id="bpr-works-row"></tr>')
             .append(
                 td(label('Load another artist’s works (URL/MBID):').attr('for', 'bpr-load-artist')),
-                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn)).css('white-space', 'nowrap')
+                td(entity_lookup('load-artist', 'artist'), goBtn(load_artist_works_btn)).css('white-space', 'nowrap'),
             )
             .hide(),
         tr(
             td($('<h3>Edit Note</h3><textarea id="bpr-edit-note" class="edit-note" style="width: 100%" rows="5"></textarea>')).attr(
                 'colspan',
-                '2'
-            )
+                '2',
+            ),
         ),
-        tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2'))
+        tr(td(make_checkbox(toggle_votable, make_votable, 'Make all edits votable')).attr('colspan', '2')),
     );
 
     let hide_performed_recs = setting('hide_performed_recs') === 'true' ? true : false;
@@ -368,18 +368,18 @@ function batch_recording_rels(gm_info) {
             td(
                 make_checkbox(toggle_performed_recordings, hide_performed_recs, 'Hide recordings with performance ARs'),
                 '&#160;',
-                make_checkbox(toggle_pending_edits, hide_pending_edits, 'Hide recordings with pending edits')
-            )
-        )
+                make_checkbox(toggle_pending_edits, hide_pending_edits, 'Hide recordings with pending edits'),
+            ),
+        ),
     ).css('margin', '0.5em');
 
     let $container = table(
         tr(
             td('<h3>Relate checked recordings to…</h3>'),
-            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em'))
+            td('<h3>Cached works</h3>', $('<span>(These are used to auto-suggest works.)</span>').css('font-size', '0.9em')),
         ),
         tr(td($relate_table), td($works_table)),
-        tr(td($display_table).attr('colspan', '2'))
+        tr(td($display_table).attr('colspan', '2')),
     )
         .css({ margin: '.5em .5em 2em .5em', background: '#F2F2F2', border: '1px #999 solid' })
         .insertAfter($('div#content h2')[0]);
@@ -435,13 +435,13 @@ function batch_recording_rels(gm_info) {
                 '<span class="bpr-attr partial">part.</span>/' +
                     '<span class="bpr-attr live">live</span>/' +
                     '<span class="bpr-attr instrumental">inst.</span>/' +
-                    '<span class="bpr-attr cover">cover</span>'
+                    '<span class="bpr-attr cover">cover</span>',
             )
                 .css('cursor', 'pointer')
                 .data('checked', false),
             '&#160;',
-            $date_element
-        ).addClass('bpr_attrs')
+            $date_element,
+        ).addClass('bpr_attrs'),
     );
 
     $(document)
@@ -531,7 +531,7 @@ function batch_recording_rels(gm_info) {
         get_filtered_page(0);
     } else {
         queue_recordings_request(
-            `/ws/2/recording?artist=${ARTIST_MBID}&inc=work-rels&limit=100&offset=${(CURRENT_PAGE - 1) * 100}&fmt=json`
+            `/ws/2/recording?artist=${ARTIST_MBID}&inc=work-rels&limit=100&offset=${(CURRENT_PAGE - 1) * 100}&fmt=json`,
         );
     }
 
@@ -726,7 +726,7 @@ function batch_recording_rels(gm_info) {
                 style_buttons($('<button>Remove</button>')).click(function () {
                     $table_row.remove();
                     remove_artist_works(mbid);
-                })
+                }),
             );
         }
 
@@ -863,7 +863,7 @@ function batch_recording_rels(gm_info) {
             rowTitleCell($rec).append(
                 $('<div class="suggested-work"></div>')
                     .append($('<span>Looking for matching work…</span>'), '&#160;', $progress)
-                    .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em', color: 'orange' })
+                    .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em', color: 'orange' }),
             );
 
             let current = 0;
@@ -923,9 +923,9 @@ function batch_recording_rels(gm_info) {
                     '&#160;',
                     $('<a></a>').attr('href', `/work/${mbid}`).text(title),
                     comment ? '&#160;' : null,
-                    comment ? $('<span></span>').text(`(${comment})`) : null
+                    comment ? $('<span></span>').text(`(${comment})`) : null,
                 )
-                .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em' })
+                .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em' }),
         );
         $rec.data('suggested_work_mbid', mbid);
         $rec.data('suggested_work_title', title);
@@ -944,7 +944,7 @@ function batch_recording_rels(gm_info) {
                 .getItem(item_key)
                 .split('\n')
                 .filter(artist => artist.slice(0, 36) !== mbid)
-                .join('\n')
+                .join('\n'),
         );
     }
 
@@ -1059,7 +1059,7 @@ function batch_recording_rels(gm_info) {
                 let work = data.match(/\/work\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
                 relate_all_to_work(work[1], title, '', 'new titled work').done(callback);
             },
-            'new titled work'
+            'new titled work',
         );
     }
 
@@ -1118,7 +1118,7 @@ function batch_recording_rels(gm_info) {
                         });
                     }
                 },
-                'new work using recording title'
+                'new work using recording title',
             );
         });
     }
@@ -1189,8 +1189,8 @@ function batch_recording_rels(gm_info) {
                 .append(
                     $('<a></a>').attr('href', `/work/${mbid}`).text(title),
                     comment ? '&#160;' : null,
-                    comment ? $('<span></span>').text(`(${comment})`) : null
-                )
+                    comment ? $('<span></span>').text(`(${comment})`) : null,
+                ),
         );
     }
 

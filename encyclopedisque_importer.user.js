@@ -114,7 +114,8 @@ function parseEncyclopedisquePage() {
         // Release date
         if (infoType === 'Sortie :') {
             const infoValue = releaseInfo.querySelector('td:nth-of-type(2)').textContent.trim();
-            const releaseRegexp = /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^)]*)?\)?/;
+            const releaseRegexp =
+                /\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)?\s*([\d?]{4})?\s*(?:chez)?\s*((?:\S+\s?)*)\s*\(?([^)]*)?\)?/;
             const m = infoValue.match(releaseRegexp);
             if (m[1] !== undefined) {
                 release.month = MONTHS[m[1]];

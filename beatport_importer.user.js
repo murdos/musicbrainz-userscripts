@@ -135,12 +135,12 @@ function insertLink(mbrelease, release_url, isrcs) {
 
     const mbUI = $(
         `<div class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
-            parameters
-        )}${MBImport.buildSearchButton(mbrelease)}</div>`
+            parameters,
+        )}${MBImport.buildSearchButton(mbrelease)}</div>`,
     ).hide();
 
     $(
-        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>'
+        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>',
     )
         .on('click', event => {
             const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
@@ -164,7 +164,7 @@ function insertLink(mbrelease, release_url, isrcs) {
         `<div class="${lastReleaseInfo.attr('class')}">
             <p>Barcode</p>
             <span>${spanHTML}</span>
-        </div>`
+        </div>`,
     ).hide();
     lastReleaseInfo.after(releaseInfoBarcode);
 

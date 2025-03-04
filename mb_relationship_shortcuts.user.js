@@ -71,7 +71,7 @@ const streamingIconClasses = {
 function injectShortcutIcon(mbid, targetUrl, iconClass) {
     if (!iconClass) return;
     $(`#${mbid} td.relationships`).append(
-        `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`
+        `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`,
     );
 }
 

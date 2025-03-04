@@ -71,7 +71,7 @@ function avaxHomePageHandler() {
                         .parents('div.spoiler')
                         .prevAll('div.center:first')
                         .append(
-                            `<br /><strong>${discs.length > 1 ? `Disc ${discNumber}: ` : ''}MB DiscId </strong><span id="${discid}" />`
+                            `<br /><strong>${discs.length > 1 ? `Disc ${discNumber}: ` : ''}MB DiscId </strong><span id="${discid}" />`,
                         );
                 },
                 function (mb_toc_numbers, discid, discNumber, found) {
@@ -81,7 +81,7 @@ function avaxHomePageHandler() {
                         html = `${html}<img src="${CHECK_IMAGE}" />`;
                     }
                     $(`#${discid.replace('.', '\\.')}`).html(html);
-                }
+                },
             );
         });
 }
@@ -172,7 +172,7 @@ function gazellePageHandler() {
                                 targetContainer.append(
                                     `<br /><strong>${
                                         discs.length > 1 ? `Disc ${discNumber}: ` : ''
-                                    }MB DiscId: </strong><span id="${torrentId}_disc${discNumber}" />`
+                                    }MB DiscId: </strong><span id="${torrentId}_disc${discNumber}" />`,
                                 );
                             },
                             function (mb_toc_numbers, discid, discNumber, found) {
@@ -183,7 +183,7 @@ function gazellePageHandler() {
                                 }
                                 LOGGER.debug(`#${torrentId}_disc${discNumber}`);
                                 $(`#${torrentId}_disc${discNumber}`).html(html);
-                            }
+                            },
                         );
                     });
                 });
@@ -194,7 +194,7 @@ function gazellePageHandler() {
 
 function computeAttachURL(mb_toc_numbers, artistName, releaseName) {
     let url = `${'http://musicbrainz.org/cdtoc/attach?toc='}${mb_toc_numbers.join('%20')}&artist-name=${encodeURIComponent(
-        artistName
+        artistName,
     )}&release-name=${encodeURIComponent(releaseName)}`;
     return url;
 }
@@ -273,7 +273,7 @@ var MBDiscid = (function () {
             '(\\d+)' + // 4 - start sector
             '\\s*\\|\\s*' +
             '(\\d+)' + // 5 - end sector
-            '\\s*$'
+            '\\s*$',
     );
     this.log_input_to_entries = function (text) {
         let discs = [];
@@ -357,7 +357,7 @@ var MBDiscid = (function () {
         };
 
         let length_seconds = Math.floor(
-            (parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1) / SECTORS_PER_SECOND
+            (parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1) / SECTORS_PER_SECOND,
         );
         let checksum = 0;
         $.each(entries, function (index, entry) {

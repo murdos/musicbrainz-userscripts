@@ -21,7 +21,7 @@ $(document).ready(function () {
 
     // Highlight table rows
     $('head').append(
-        '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>'
+        '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>',
     );
 
     let re;
@@ -39,7 +39,7 @@ $(document).ready(function () {
                     let url = track.mbid ? `/recording/${track.mbid}` : track.url;
                     $('ul.toptracks').append(`<li><a href="${url}">${track.name}</a></li>`);
                 });
-            }
+            },
         );
     }
 
@@ -57,7 +57,7 @@ $(document).ready(function () {
     // Better fix for http://tickets.musicbrainz.org/browse/MBS-1943
     re = new RegExp(
         'musicbrainz.org/(artist|release-group|release|recording|work|label)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('External links')"));
@@ -67,7 +67,7 @@ $(document).ready(function () {
                 .nextAll('ul.external_links')
                 .filter(function () {
                     return !pageHasRGLinks || $(this).nextAll("h2:contains('Release group external links')").length > 0;
-                })
+                }),
         );
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('Release group external links')"));
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('Release group external links')").nextAll('ul.external_links'));
@@ -76,7 +76,7 @@ $(document).ready(function () {
     // Remove the affiliate section
     re = new RegExp(
         'musicbrainz.org/(artist|release-group|release|recording|work|label)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $('#sidebar-affiliates').remove();
@@ -85,7 +85,7 @@ $(document).ready(function () {
     // Batch merge -> open in a new tab/windows
     re = new RegExp(
         'musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/(recordings|releases|works)',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $('form')
@@ -128,7 +128,7 @@ $(document).ready(function () {
             let youtube_id = $youtube_link.prop('href').match(/http:\/\/www\.youtube\.com\/watch\?v=(.*)/)[1];
             $('table.details').width('60%');
             $("h2:contains('Relationships')").after(
-                `<iframe width="360" height="275" frameborder="0" style="float: right;" src="https://www.youtube.com/embed/${youtube_id}?rel=0" allowfullscreen=""></iframe>`
+                `<iframe width="360" height="275" frameborder="0" style="float: right;" src="https://www.youtube.com/embed/${youtube_id}?rel=0" allowfullscreen=""></iframe>`,
             );
         }
     }

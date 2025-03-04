@@ -102,7 +102,7 @@ function insertIMGlinks() {
     imgnewhref = `${imgnewhref}-full${imgnewtype}`;
     //LOGGER.debug('insertIMGlinks 4:: ', imgnewhref);
     $('div.panel.pdp-main-panel').append(
-        `<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`
+        `<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`,
     );
 }
 
@@ -118,7 +118,7 @@ function insertAPISection() {
         });
 
     let fmaStatusBlock = $(
-        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a>'
+        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a>',
     );
     fmaUI.append(fmaStatusBlock);
 
@@ -194,7 +194,7 @@ function insertMBSection(release) {
     //LOGGER.debug(release);
 
     let mbUI = $(
-        '<div class="search-nav-wrap-2"></div>'
+        '<div class="search-nav-wrap-2"></div>',
         //'<div id="musicbrainz" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">MusicBrainz</span></h4></div>'
     ).hide();
     if (DEBUG)
@@ -203,7 +203,7 @@ function insertMBSection(release) {
         });
 
     let mbContentBlock = $(
-        '<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>'
+        '<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>',
     );
     mbUI.append(mbContentBlock);
 
@@ -306,7 +306,7 @@ function insertAPIKEYSection() {
     LOGGER.debug('FMA insertAPIKEYSection Function Executing');
 
     let mbUI = $(
-        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>'
+        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>',
     ).hide();
     if (DEBUG)
         mbUI.css({

@@ -256,14 +256,14 @@ function insertLink(release) {
         let title = 'Force album artist on classical import. Album artist will be various artists if there are multiple composers.';
         mbUI.append(
             $(
-                `<label for="force_album_artist" class="musicbrainz_import" title="${title}"><input id="force_album_artist" type="checkbox" title="${title}">Force album artist</label>`
-            )
+                `<label for="force_album_artist" class="musicbrainz_import" title="${title}"><input id="force_album_artist" type="checkbox" title="${title}">Force album artist</label>`,
+            ),
         );
     }
 
     mbUI.append(
         $('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'),
-        $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`)
+        $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`),
     );
 
     $('#info div.meta').append(mbUI);
@@ -333,7 +333,7 @@ $(document).ready(function () {
         $('#product-cover-link').attr('href', maximgurl);
         $('#product-cover-link').attr(
             'title',
-            `${$('#product-cover-link').attr('title')} (Qobuz importer: ${maximg.width}x${maximg.height} image)`
+            `${$('#product-cover-link').attr('title')} (Qobuz importer: ${maximg.width}x${maximg.height} image)`,
         );
     };
     maximg.src = maximgurl;
