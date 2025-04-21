@@ -301,10 +301,10 @@ $(document).ready(function () {
     /***/
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
 
-    const isDiscographyPage = !!unsafeWindow.TralbumData.url?.match(/\/music\/?$/);
+    const isDiscographyPage = unsafeWindow.TralbumData.url && !!unsafeWindow.TralbumData.url.match(/\/music\/?$/);
 
     if (isDiscographyPage) {
-        const hostname = unsafeWindow.TralbumData.url.replace("/music", "");
+        const hostname = unsafeWindow.TralbumData.url.replace('/music', '');
 
         $('ol#music-grid > li > a').each(function () {
             const $link = $(this);
@@ -313,13 +313,17 @@ $(document).ready(function () {
             if (bandcampReleaseUrl && bandcampReleaseUrl.match(/^(\/album|\/track)/)) {
                 const full_url = hostname + bandcampReleaseUrl;
 
-                mblinks.searchAndDisplayMbLink(full_url, 'release', function (link) {
-                    $('p.title', $link).prepend(link);
-                }, `release:${full_url}`);
+                mblinks.searchAndDisplayMbLink(
+                    full_url,
+                    'release',
+                    function (link) {
+                        $('p.title', $link).prepend(link);
+                    },
+                    `release:${full_url}`
+                );
             }
         });
-    }
-    else {
+    } else {
         MBImportStyle();
 
         let release = BandcampImport.retrieveReleaseInfo();
