@@ -13,7 +13,7 @@ jobs:
             - name: 'Install dependencies'
               run: npm install
             - name: 'Run linter'
-              run: npm run lint
+              run: ESLINT_USE_FLAT_CONFIG=false npm run lint
     auto-merge:
         name: 'dependabot-auto-merge'
         needs: linter
