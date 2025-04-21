@@ -69,7 +69,7 @@ function inject_release_group_button(parent) {
         },
         function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release group (HTTP status ${status})</td></tr>`;
-        }
+        },
     );
 
     parent.insertBefore(button, parent.firstChild);
@@ -93,7 +93,7 @@ function inject_release_button(parent, _table_parent, _table, _mbid) {
         },
         function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release (HTTP status ${status})</td></tr>`;
-        }
+        },
     );
 
     parent.insertBefore(button, parent.childNodes[0]);
@@ -116,7 +116,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
             else button.innerHTML = '&#9654;';
             dom_callback(toggled);
         },
-        false
+        false,
     );
 
     button.addEventListener(
@@ -138,7 +138,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
                             button.removeEventListener('mousedown', arguments.callee, false);
                             button.addEventListener('mousedown', this_event, false);
                         },
-                        false
+                        false,
                     );
                     error_callback(req.status);
                 }
@@ -147,7 +147,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
             req.open('GET', url, true);
             req.send(null);
         },
-        false
+        false,
     );
 
     return button;

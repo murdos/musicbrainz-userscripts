@@ -272,7 +272,7 @@ function mapTracks(vgmdbTracks) {
  */
 function extractVgmdbMedia(s) {
     const match = s.match(
-        /(Cassette|Vinyl|Flexi Disc|DVD|Digital|SA-CD|Other|CD Video|VHS|Blu-ray|Laser Disc|Floppy Disc|USB|Download Card|UHQCD|Blu-spec CD|Blu-spec CD2|HQCD|SHM-CD|PLAYBUTTON|MiniDisc|CD)/g
+        /(Cassette|Vinyl|Flexi Disc|DVD|Digital|SA-CD|Other|CD Video|VHS|Blu-ray|Laser Disc|Floppy Disc|USB|Download Card|UHQCD|Blu-spec CD|Blu-spec CD2|HQCD|SHM-CD|PLAYBUTTON|MiniDisc|CD)/g,
     );
 
     return match ? match[0] : null;

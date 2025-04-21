@@ -79,7 +79,7 @@ function insertMBSection(release) {
 
     if (release.maybe_buggy) {
         let warning_buggy = $(
-            '<p><small><b>Warning</b>: this release has perhaps a buggy title, please check twice the data you import.</small><p'
+            '<p><small><b>Warning</b>: this release has perhaps a buggy title, please check twice the data you import.</small><p',
         ).css({
             color: 'red',
             'margin-top': '4px',
@@ -172,7 +172,7 @@ function ParseLootPage() {
             release_format = releaseartisttitle[2];
         } else {
             LOGGER.debug(
-                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for Compilations'
+                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for Compilations',
             );
             release_maybe_buggy = true;
             releasetitle = '';
@@ -190,7 +190,7 @@ function ParseLootPage() {
             release_format = releaseartisttitle[4];
         } else {
             LOGGER.debug(
-                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for non Compilations'
+                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for non Compilations',
             );
             release_maybe_buggy = true;
             releasetitle = '';
