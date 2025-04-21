@@ -171,7 +171,7 @@ function insertAPISection() {
         });
 
     let fmaStatusBlock = $(
-        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a><a class="lbut-lt" id="lbut-lt-fma-api-tracks">Track info retrieved</a>'
+        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a><a class="lbut-lt" id="lbut-lt-fma-api-tracks">Track info retrieved</a>',
     );
     fmaUI.append(fmaStatusBlock);
 
@@ -262,7 +262,7 @@ function insertMBSection(release) {
     //LOGGER.debug(release);
 
     let mbUI = $(
-        '<div id="musicbrainz" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">MusicBrainz</span></h4></div>'
+        '<div id="musicbrainz" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">MusicBrainz</span></h4></div>',
     ).hide();
     if (DEBUG)
         mbUI.css({
@@ -327,7 +327,7 @@ function insertAPIKEYSection() {
     LOGGER.debug('FMA insertAPIKEYSection Function Executing');
 
     let mbUI = $(
-        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>'
+        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>',
     ).hide();
     if (DEBUG)
         mbUI.css({
@@ -606,7 +606,7 @@ function Parsefmarelease(albumobject, trackobject) {
         Math,
         trackarray.map(function (o) {
             return o.disc_number;
-        })
+        }),
     );
     //LOGGER.debug("Highest number disc:" + largest_disc);
 

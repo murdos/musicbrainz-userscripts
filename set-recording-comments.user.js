@@ -52,8 +52,8 @@ function setRecordingComments() {
 
     $('head').append(
         $('<style></style>').text(
-            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }'
-        )
+            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }',
+        ),
     );
 
     const delay = setInterval(function () {
@@ -148,7 +148,7 @@ function setRecordingComments() {
       <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
   </tr>\
-</table>'
+</table>',
     );
 
     $('#set-recording-comments').hide();

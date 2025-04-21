@@ -121,7 +121,7 @@ function insertLink(release, release_url) {
     let parameters = MBImport.buildFormParameters(release, edit_note);
 
     let mbUI = $(
-        `<div class="musicbrainz-import">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`
+        `<div class="musicbrainz-import">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`,
     ).hide();
 
     $('.release-detail-metadata').append(mbUI);
