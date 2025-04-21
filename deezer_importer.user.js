@@ -147,7 +147,7 @@ function insertLink(release, release_url) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div>`
+            </div>`,
     ).hide();
     waitForEl('[data-testid="toolbar"]', function () {
         $('[data-testid="toolbar"]').append(mbUI);

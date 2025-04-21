@@ -140,8 +140,8 @@ function insertLink(release, releaseUrl) {
 
     let mbUI = $(
         `<div class="col-12 col-lg-9 mt-3"><div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(
-            release
-        )}</div></div>`
+            release,
+        )}</div></div>`,
     ).hide();
 
     $('.product-share').parent().after(mbUI);

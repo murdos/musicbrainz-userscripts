@@ -141,7 +141,7 @@ const BandcampImport = {
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
             $('h2.trackTitle').append(
-                `<p style="font-size: 70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`
+                `<p style="font-size: 70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`,
             );
 
             // append unknown tracks to the release
@@ -316,7 +316,7 @@ $(document).ready(function () {
         function (link) {
             $('p#band-name-location span.title').append(link);
         },
-        `label:${root_url}`
+        `label:${root_url}`,
     );
     const labelback = document.querySelector('a.back-to-label-link');
     if (labelback) {
@@ -332,7 +332,7 @@ $(document).ready(function () {
                 function (link) {
                     $('a.back-to-label-link span.back-link-text').append(link);
                 },
-                `label:${label_url}`
+                `label:${label_url}`,
             );
         }
     }
@@ -396,7 +396,7 @@ $(document).ready(function () {
     const fullsizeimageurl = tralbumArt.querySelector('a').getAttribute('href').replace('_10', '_0');
     tralbumArt.insertAdjacentHTML(
         'afterend',
-        `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`
+        `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`,
     );
 
     const bci_link = document.querySelector('div#bci_link');
@@ -409,7 +409,7 @@ $(document).ready(function () {
             'beforeend',
             `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}<br/>
             Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}&category=default">Harmony</a>
-            | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`
+            | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`,
         );
     }
 });
