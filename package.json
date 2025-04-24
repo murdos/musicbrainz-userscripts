@@ -2,7 +2,7 @@
     "name": "musicbrainz-userscripts",
     "version": "1.0.0",
     "description": "Collection of userscripts for MusicBrainz",
-    "main": "index.js",
+    "type": "module",
     "directories": {
         "lib": "lib"
     },
@@ -31,10 +31,11 @@
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
         "@eslint-community/eslint-utils": "^4.6.1",
+        "@eslint/js": "^9.25.1",
         "eslint": "^9.25.1",
-        "eslint-config-prettier": "^10.1.2",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.2.6",
+        "globals": "^16.0.0",
         "prettier": "^3.5.3"
     }
 }
