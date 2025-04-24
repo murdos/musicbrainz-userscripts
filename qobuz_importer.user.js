@@ -19,7 +19,7 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 const DEBUG = false;
-//DEBUG = true;
+
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
@@ -326,10 +326,10 @@ $(document).ready(function () {
     // replace image zoom link by the maximum size image link
     let maximgurl = $('#product-cover-link').attr('href').replace('_600', '_max');
     let maximg = new Image();
-    maximg.onerror = function (evt) {
+    maximg.onerror = function () {
         LOGGER.debug('No max image');
     };
-    maximg.onload = function (evt) {
+    maximg.onload = function () {
         $('#product-cover-link').attr('href', maximgurl);
         $('#product-cover-link').attr(
             'title',

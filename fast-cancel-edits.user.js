@@ -136,7 +136,7 @@ function fastCancelScript() {
         }
     });
 
-    var pushRequest = (function () {
+    const pushRequest = (function () {
         let queue = [],
             last = 0,
             active = false,

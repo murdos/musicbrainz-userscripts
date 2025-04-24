@@ -807,7 +807,7 @@ function batch_recording_rels(gm_info) {
     }
 
     function request_works(url, offset, count, callback) {
-        $.get(`${url}&offset=${offset}`, function (data, textStatus, jqXHR) {
+        $.get(`${url}&offset=${offset}`, function (data) {
             if (count < 0) {
                 count = data['work-count'];
             }
