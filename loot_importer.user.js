@@ -165,9 +165,9 @@ function ParseLootPage() {
     releaseartist = AlbumName[1].innerText;
     if (releaseartist == 'Various Artists') {
         // Everything is: title(format)
-        releaseartisttitle_regex = /(.*?)\((.*)\)/; //match external parenthesis
+        const releaseartisttitle_regex = /(.*?)\((.*)\)/; //match external parenthesis
         if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
-            releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+            const releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
             releasetitle = releaseartisttitle[1].trim();
             release_format = releaseartisttitle[2];
         } else {
@@ -180,10 +180,10 @@ function ParseLootPage() {
         }
     } else {
         // artist - title(format)
-        releaseartisttitle_regex = /(.*) (-|–) (.*?)\((.*)\)/;
+        const releaseartisttitle_regex = /(.*) (-|–) (.*?)\((.*)\)/;
 
         if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
-            releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+            const releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
 
             releasetitle = releaseartisttitle[3].trim();
             releaseartist = releaseartisttitle[1];
@@ -262,22 +262,22 @@ function ParseLootPage() {
         let tracklisting = allinfolist[disciterate].getElementsByTagName('tr');
         LOGGER.debug(' The Table: (tracklisting)', tracklisting);
 
-        for (let trackiterate = 0; trackiterate < tracklisting.length; trackiterate++) {
-            descriptiontrack = new Object();
+        for (const element of tracklisting) {
+            const descriptiontrack = new Object();
 
-            let currenttrack = tracklisting[trackiterate].querySelectorAll('td');
+            let currenttrack = element.querySelectorAll('td');
             //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title
             var artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
 
             // need to check if this can be replaced with single regex for now check artist-title if
             // not matching check just title
             if (currenttrack[1].innerText.match(artisttitle_regex)) {
-                var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
                 descriptiontrack.title = artisttitle[3];
                 descriptiontrack.artist = artisttitle[1];
             } else {
                 var artisttitle_regex = /(.*)/; // regex: title
-                var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
                 descriptiontrack.title = artisttitle[1];
                 descriptiontrack.artist = releaseartist;
             }
@@ -315,17 +315,17 @@ function ParseLootPage() {
     }
 
     //LOGGER.debug(disclistarray);
-    release = new Object();
+    const release = {};
 
     // Check if anything is untoward and highlight to importer
     release.maybe_buggy = release_maybe_buggy;
 
     // Release artist credit
-    release.artist_credit = new Array();
+    release.artist_credit = [];
 
     let artist_name = releaseartist;
 
-    let various_artists = releaseartist == 'Various Artists';
+    let various_artists = releaseartist === 'Various Artists';
     if (various_artists) {
         release.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
@@ -346,7 +346,7 @@ function ParseLootPage() {
     release.country = Countries[releasecountry];
     release.language = Languages[releaselanguage];
 
-    release.discs = new Array();
+    release.discs = [];
     for (let l = 0; l < disccount.length; l++) {
         let disc = {
             position: l + 1,
@@ -359,7 +359,7 @@ function ParseLootPage() {
     release.labels = prodlabels;
 
     // Release URL
-    release.urls = new Array();
+    release.urls = [];
     release.urls.push({
         url: window.location.href,
         link_type: MBImport.URL_TYPES.purchase_for_mail_order,

@@ -33,7 +33,7 @@ const CD1DImporter = {
             };
         });
         // remove "parent" formats : ie. digital when mp3 and flac are present
-        for (var i = 0; i < formats.length; i++) {
+        for (let i = 0; i < formats.length; i++) {
             for (let j = i + 1; j < formats.length; j++) {
                 if (formats[j].id.length > 1) {
                     if (formats[i].id[1] == formats[j].id[1]) {
@@ -48,7 +48,7 @@ const CD1DImporter = {
             }
         }
         let cleanformats = [];
-        for (var i = 0; i < formats.length; i++) {
+        for (let i = 0; i < formats.length; i++) {
             if (!formats[i].toremove) {
                 cleanformats.push({
                     id: formats[i].id.join('-'),
@@ -64,7 +64,7 @@ const CD1DImporter = {
         let tracklists = `div#${id} div.tracklist table.tracklist-content`;
         let discs = [];
         $(tracklists).each(function () {
-            disc = $(this)
+            const disc = $(this)
                 .find('tbody tr')
                 .map(function () {
                     // $(this) is used more than once; cache it for performance.
@@ -225,7 +225,7 @@ const CD1DImporter = {
             .get();
 
         // Tracks
-        $.each(this.getTracks(format.id), function (ndisc, disc) {
+        $.each(this.getTracks(format.id), function () {
             let thisdisc = {
                 tracks: [],
                 format: release.format,

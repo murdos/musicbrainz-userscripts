@@ -28,7 +28,7 @@ $(document).ready(function () {
 
 function retrieveReleaseInfo(release_url) {
     function contains_or(selector, list) {
-        selectors = [];
+        const selectors = [];
         $.each(list, function (ind, value) {
             selectors.push(`${selector}:contains("${value.replace('"', '\\"')}")`);
         });

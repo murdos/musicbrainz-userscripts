@@ -188,7 +188,7 @@ function insertAPISection() {
 }
 
 // Update FreeMusicArchive API Status section on FMA page
-var updateAPISection = {
+const updateAPISection = {
     AlbumId: function (albumid) {
         this.albumid = albumid;
         $('#lbut-lt-fma-api-album-id').text(this.albumid);
@@ -369,7 +369,7 @@ function insertAPIKEYSection() {
 function album_api() {
     let fmaWsUrl = `https://freemusicarchive.org/api/get/albums.json?api_key=${FMA_API}&album_id=${release_attributes.albumid}`;
 
-    var promise_variable = $.getJSON(fmaWsUrl, function () {
+    const promise_variable = $.getJSON(fmaWsUrl, function () {
         updateAPISection.AlbumAjaxStatus('busy');
         LOGGER.debug(`promise_variable [state] in [getJSON] ${promise_variable.state()}`);
     }).done(function (albumjson) {
@@ -387,7 +387,7 @@ function album_api() {
 function track_api_parameters() {
     let fmaWsUrl = `https://freemusicarchive.org/api/get/tracks.json?api_key=${FMA_API}&album_id=${release_attributes.albumid}&limit=20`;
 
-    var promise_track_api_params = $.getJSON(fmaWsUrl, function () {
+    const promise_track_api_params = $.getJSON(fmaWsUrl, function () {
         LOGGER.debug(`promise_track_api_params [state] in [getJSON] ${promise_track_api_params.state()}`);
     }).done(function (trackinfojson) {
         LOGGER.debug(' >> Track INFO > DONE');
@@ -404,7 +404,7 @@ function track_api(page) {
         release_attributes.albumid
     }&limit=20&page=${parseInt(page)}`;
 
-    var promise_track_api = $.getJSON(fmaWsUrl, function () {
+    const promise_track_api = $.getJSON(fmaWsUrl, function () {
         LOGGER.debug(`promise_track_api_params [state] in [getJSON] ${promise_track_api.state()}`);
     }).done(function (tracksjson) {
         LOGGER.debug(` >> Track page ${page} > DONE `);
@@ -434,7 +434,7 @@ function parseFMApage() {
     if (FMAtype == 'album') {
         //LOGGER.debug("FMA parseFMApage Function Executing on ", FMAtype);
         let FMAEmbedCode = $('.inp-embed-code input').attr('value');
-        FMAEmbedCodeRegex = /(\/embed\/album\/)(.+?(?=.xml))/; // regex to find the album id from the input object
+        const FMAEmbedCodeRegex = /(\/embed\/album\/)(.+?(?=.xml))/; // regex to find the album id from the input object
         let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
         release_attributes.albumid = FMAAlbumIdMatch[2].trim(); // assign the ID to a variable
         LOGGER.info('FreeMusicArchive Album identified as: ', release_attributes.albumid);
@@ -578,7 +578,6 @@ function Parsefmarelease(albumobject, trackobject) {
         name: release_attributes.label,
     });
 
-    let discarray = [];
     let trackarray = [];
 
     // release_attributes.total_pages
@@ -610,10 +609,10 @@ function Parsefmarelease(albumobject, trackobject) {
     );
     //LOGGER.debug("Highest number disc:" + largest_disc);
 
-    for (var disccount = 1; disccount <= largest_disc; disccount++) {
+    for (let disccount = 1; disccount <= largest_disc; disccount++) {
         // use this to map all the objects from trackarray with disc_number value of disccount to a new object
-        let tracklist_per_disc = $.map(trackarray, function (obj, index) {
-            if (obj.disc_number == disccount) {
+        let tracklist_per_disc = $.map(trackarray, function (obj) {
+            if (obj.disc_number === disccount) {
                 return obj;
             }
         });
@@ -629,7 +628,7 @@ function Parsefmarelease(albumobject, trackobject) {
         // });
 
         // current solution to remove disc_number
-        for (i = tracklist_per_disc.length - 1; i >= 0; i--) {
+        for (let i = tracklist_per_disc.length - 1; i >= 0; i--) {
             delete tracklist_per_disc[i].disc_number;
         }
 

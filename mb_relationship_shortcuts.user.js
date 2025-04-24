@@ -213,7 +213,7 @@ $(document).ready(function () {
     // Call the MB webservice
     const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    $.get(url, function (data, textStatus, jqXHR) {
+    $.get(url, function (data) {
         // Parse each child
         $(data)
             .find(child.type)
