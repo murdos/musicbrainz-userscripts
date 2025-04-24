@@ -1,40 +1,40 @@
 // ==UserScript==
-// @name          MusicBrainz: Expand/collapse release groups
-// @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
-// @namespace     http://userscripts.org/users/266906
-// @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2022.1.6.1
-// @license       GPL
-// @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
-// @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
-// @grant         none
-// @include       *://musicbrainz.org/artist/*
-// @include       *://musicbrainz.org/label/*
-// @include       *://musicbrainz.org/release-group/*
-// @include       *://musicbrainz.org/series/*
-// @include       *://beta.musicbrainz.org/artist/*
-// @include       *://beta.musicbrainz.org/label/*
-// @include       *://beta.musicbrainz.org/release-group/*
-// @include       *://beta.musicbrainz.org/series/*
-// @include       *://test.musicbrainz.org/artist/*
-// @include       *://test.musicbrainz.org/label/*
-// @include       *://test.musicbrainz.org/release-group/*
-// @include       *://test.musicbrainz.org/series/*
-// @match         *://musicbrainz.org/artist/*
-// @match         *://musicbrainz.org/label/*
-// @match         *://musicbrainz.org/release-group/*
-// @match         *://musicbrainz.org/series/*
-// @match         *://beta.musicbrainz.org/artist/*
-// @match         *://beta.musicbrainz.org/label/*
-// @match         *://beta.musicbrainz.org/release-group/*
-// @match         *://beta.musicbrainz.org/series/*
-// @match         *://test.musicbrainz.org/artist/*
-// @match         *://test.musicbrainz.org/label/*
-// @match         *://test.musicbrainz.org/release-group/*
-// @match         *://test.musicbrainz.org/series/*
-// @exclude       *musicbrainz.org/label/*/*
-// @exclude       *musicbrainz.org/release-group/*/*
-// @exclude       *musicbrainz.org/series/*/*
+// @name         MusicBrainz: Expand/collapse release groups
+// @description  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
+// @namespace    http://userscripts.org/users/266906
+// @author       Michael Wiencek <mwtuea@gmail.com>
+// @version      2022.1.6.1
+// @license      GPL
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
+// @grant        none
+// @include      *://musicbrainz.org/artist/*
+// @include      *://musicbrainz.org/label/*
+// @include      *://musicbrainz.org/release-group/*
+// @include      *://musicbrainz.org/series/*
+// @include      *://beta.musicbrainz.org/artist/*
+// @include      *://beta.musicbrainz.org/label/*
+// @include      *://beta.musicbrainz.org/release-group/*
+// @include      *://beta.musicbrainz.org/series/*
+// @include      *://test.musicbrainz.org/artist/*
+// @include      *://test.musicbrainz.org/label/*
+// @include      *://test.musicbrainz.org/release-group/*
+// @include      *://test.musicbrainz.org/series/*
+// @match        *://musicbrainz.org/artist/*
+// @match        *://musicbrainz.org/label/*
+// @match        *://musicbrainz.org/release-group/*
+// @match        *://musicbrainz.org/series/*
+// @match        *://beta.musicbrainz.org/artist/*
+// @match        *://beta.musicbrainz.org/label/*
+// @match        *://beta.musicbrainz.org/release-group/*
+// @match        *://beta.musicbrainz.org/series/*
+// @match        *://test.musicbrainz.org/artist/*
+// @match        *://test.musicbrainz.org/label/*
+// @match        *://test.musicbrainz.org/release-group/*
+// @match        *://test.musicbrainz.org/series/*
+// @exclude      *musicbrainz.org/label/*/*
+// @exclude      *musicbrainz.org/release-group/*/*
+// @exclude      *musicbrainz.org/series/*/*
 // ==/UserScript==
 
 const MBID_REGEX = /[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/;

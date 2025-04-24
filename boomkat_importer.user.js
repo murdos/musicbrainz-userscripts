@@ -1,15 +1,15 @@
 // ==UserScript==
-// @name        Import Boomkat releases to Musicbrainz
-// @description Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version     2024.09.10.1
-// @license     X11
-// @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
-// @updateURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
-// @namespace   https://github.com/murdos/musicbrainz-userscripts
-// @include     https://boomkat.com/products/*
-// @require     lib/mbimport.js
-// @require     lib/logger.js
-// @require     lib/mbimportstyle.js
+// @name         Import Boomkat releases to Musicbrainz
+// @description  Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
+// @version      2024.09.10.1
+// @license      X11
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @include      https://boomkat.com/products/*
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
 // ==/UserScript==
 
 async function onLoad() {

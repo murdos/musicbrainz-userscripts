@@ -1,21 +1,21 @@
 // ==UserScript==
-// @name        Import CD1D releases to MusicBrainz
-// @description Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
-// @namespace   http://userscripts.org/users/517952
-// @include     http://1d-aquitaine.com/*/album/*
-// @include     http://1d-midipyrenees.com/*/album/*
-// @include     http://1d-paca.com/*/album/*
-// @include     http://1d-paysdelaloire.com/*/album/*
-// @include     http://1d-rhonealpes.com/*/album/*
-// @include     http://cd1d.com/*/album/*
-// @version     2018.2.18.1
-// @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require     lib/mbimport.js
-// @require     lib/logger.js
-// @require     lib/mbimportstyle.js
-// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import CD1D releases to MusicBrainz
+// @description  Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
+// @namespace    http://userscripts.org/users/517952
+// @include      http://1d-aquitaine.com/*/album/*
+// @include      http://1d-midipyrenees.com/*/album/*
+// @include      http://1d-paca.com/*/album/*
+// @include      http://1d-paysdelaloire.com/*/album/*
+// @include      http://1d-rhonealpes.com/*/album/*
+// @include      http://cd1d.com/*/album/*
+// @version      2018.2.18.1
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */

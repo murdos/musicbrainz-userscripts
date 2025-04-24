@@ -1,18 +1,18 @@
 // ==UserScript==
-// @name           Import FMA releases to MusicBrainz
-// @description    Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
-// @version        2018.2.18.1
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
-// @include        http*://freemusicarchive.org/music/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant          none
+// @name         Import FMA releases to MusicBrainz
+// @description  Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
+// @version      2018.2.18.1
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
+// @include      http*://freemusicarchive.org/music/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @grant        none
 // ==/UserScript==
 
 /*
