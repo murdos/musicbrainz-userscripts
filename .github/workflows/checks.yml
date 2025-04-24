@@ -9,11 +9,11 @@ jobs:
             - uses: actions/checkout@v4
             - uses: actions/setup-node@v4.4.0
               with:
-                node-version: 20
+                  node-version: 20
             - name: 'Install dependencies'
               run: npm install
             - name: 'Run linter'
-              run: ESLINT_USE_FLAT_CONFIG=false npm run lint
+              run: npm run lint
     auto-merge:
         name: 'dependabot-auto-merge'
         needs: linter
