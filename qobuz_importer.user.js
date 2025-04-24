@@ -18,16 +18,16 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var DEBUG = false;
+const DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
 
 // list of qobuz artist id which should be mapped to Various Artists
-var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
-    various_composers_ids = [573076],
-    is_classical = false, // release detected as classical
+const various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
+    various_composers_ids = [573076];
+let is_classical = false, // release detected as classical
     album_artist_data = {}, // for switching album artists on classical
     raw_release_data;
 

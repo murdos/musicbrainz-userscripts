@@ -62,7 +62,7 @@
 
 //**************************************************************************//
 
-var scr = document.createElement('script');
+const scr = document.createElement('script');
 scr.textContent = `(${fastCancelScript})();`;
 document.body.appendChild(scr);
 

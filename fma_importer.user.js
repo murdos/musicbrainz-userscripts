@@ -29,24 +29,24 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 // API Key assigned to registered user on FMA
-var FMA_API = 'FMA API KEY Missing';
+let FMA_API = 'FMA API KEY Missing';
 
-var DEBUG = false; // true | false
+const DEBUG = false; // true | false
 
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
 
 // promise to ensure all api calls are done before we parse the release
-var tracks_deferred = $.Deferred();
-var retrieve_tracks_promise = tracks_deferred.promise();
+const tracks_deferred = $.Deferred();
+const retrieve_tracks_promise = tracks_deferred.promise();
 
 // object to store all global attributes collected for the release
-var release_attributes = {}; // albumid, total_pages, artist_name, label
+const release_attributes = {}; // albumid, total_pages, artist_name, label
 
 // arrays to store the data retrieved from API to parse for MB release
-var album_api_array = []; // album information [0]
-var tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
+const album_api_array = []; // album information [0]
+const tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
 $(document).ready(function () {
     // if we have something on local storage place that
@@ -68,8 +68,8 @@ $(document).ready(function () {
 
     LOGGER.info('Document Ready & FMA Userscript Executing');
 
-    let fmaPage = parseFMApage();
-    let mblinks = new MBLinks('FMA_CACHE', 7 * 24 * 60);
+    parseFMApage();
+    const mblinks = new MBLinks('FMA_CACHE', 7 * 24 * 60);
 
     if (DEBUG) {
         insertAPISection();

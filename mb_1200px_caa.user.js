@@ -16,9 +16,9 @@
 // @grant          none
 // ==/UserScript==
 
-var ca_page = document.querySelector('div#content');
+const ca_page = document.querySelector('div#content');
 
-var ca_items = ca_page.querySelectorAll('div.artwork-cont');
+const ca_items = ca_page.querySelectorAll('div.artwork-cont');
 
 ca_items.forEach(function (ca_item) {
     /* Use 1200px “thumbnails” for the pop‐ups/previews */

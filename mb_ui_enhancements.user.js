@@ -158,7 +158,7 @@ $(document).ready(function () {
                 .find('li')
                 .each(function () {
                     let newHTML = '';
-                    var isrc = $(this).text();
+                    const isrc = $(this).text();
                     newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
                     newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
                     newHTML += '</code></bdi></a>';

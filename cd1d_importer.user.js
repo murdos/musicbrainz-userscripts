@@ -23,7 +23,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var CD1DImporter = {
+const CD1DImporter = {
     getFormats: function () {
         // get a list of existing formats, return id of the fragment and name
         let formats = $('#container-1 ul li.ui-state-default').map(function () {
