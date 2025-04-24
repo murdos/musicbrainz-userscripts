@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name        MusicBrainz: Batch-add "performance of" relationships
-// @description Batch link recordings to works from artist Recordings page.
-// @version     2023.7.2
-// @author      Michael Wiencek
-// @license     X11
-// @downloadURL https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
-// @match       *://*.musicbrainz.org/artist/*/recordings*
+// @name         MusicBrainz: Batch-add "performance of" relationships
+// @description  Batch link recordings to works from artist Recordings page.
+// @version      2023.7.2
+// @author       Michael Wiencek
+// @license      X11
+// @downloadURL  https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js
+// @match        *://*.musicbrainz.org/artist/*/recordings*
 // ==/UserScript==
 
 /* global MB:readonly */

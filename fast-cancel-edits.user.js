@@ -1,36 +1,36 @@
 // ==UserScript==
-// @name        MusicBrainz: Fast cancel edits
-// @description Mass cancel open edits with optional edit notes.
-// @version     2018.2.18.1
-// @author      Michael Wiencek
-// @license     X11
-// @downloadURL https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js
-// @updateURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js
-// @include     *://musicbrainz.org/user/*/edits/open*
-// @include     *://musicbrainz.org/*/*/open_edits*
-// @include     *://musicbrainz.org/*/*/edits*
-// @include     *://musicbrainz.org/search/edits*
-// @include     *://*.musicbrainz.org/user/*/edits/open*
-// @include     *://*.musicbrainz.org/*/*/open_edits*
-// @include     *://*.musicbrainz.org/*/*/edits*
-// @include     *://*.musicbrainz.org/search/edits*
-// @include     *://*.mbsandbox.org/user/*/edits/open*
-// @include     *://*.mbsandbox.org/*/*/open_edits*
-// @include     *://*.mbsandbox.org/*/*/edits*
-// @include     *://*.mbsandbox.org/search/edits*
-// @match       *://musicbrainz.org/user/*/edits/open*
-// @match       *://musicbrainz.org/*/*/open_edits*
-// @match       *://musicbrainz.org/*/*/edits*
-// @match       *://musicbrainz.org/search/edits*
-// @match       *://*.musicbrainz.org/user/*/edits/open*
-// @match       *://*.musicbrainz.org/*/*/open_edits*
-// @match       *://*.musicbrainz.org/*/*/edits*
-// @match       *://*.musicbrainz.org/search/edits*
-// @match       *://*.mbsandbox.org/user/*/edits/open*
-// @match       *://*.mbsandbox.org/*/*/open_edits*
-// @match       *://*.mbsandbox.org/*/*/edits*
-// @match       *://*.mbsandbox.org/search/edits*
-// @grant       none
+// @name         MusicBrainz: Fast cancel edits
+// @description  Mass cancel open edits with optional edit notes.
+// @version      2018.2.18.1
+// @author       Michael Wiencek
+// @license      X11
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js
+// @include      *://musicbrainz.org/user/*/edits/open*
+// @include      *://musicbrainz.org/*/*/open_edits*
+// @include      *://musicbrainz.org/*/*/edits*
+// @include      *://musicbrainz.org/search/edits*
+// @include      *://*.musicbrainz.org/user/*/edits/open*
+// @include      *://*.musicbrainz.org/*/*/open_edits*
+// @include      *://*.musicbrainz.org/*/*/edits*
+// @include      *://*.musicbrainz.org/search/edits*
+// @include      *://*.mbsandbox.org/user/*/edits/open*
+// @include      *://*.mbsandbox.org/*/*/open_edits*
+// @include      *://*.mbsandbox.org/*/*/edits*
+// @include      *://*.mbsandbox.org/search/edits*
+// @match        *://musicbrainz.org/user/*/edits/open*
+// @match        *://musicbrainz.org/*/*/open_edits*
+// @match        *://musicbrainz.org/*/*/edits*
+// @match        *://musicbrainz.org/search/edits*
+// @match        *://*.musicbrainz.org/user/*/edits/open*
+// @match        *://*.musicbrainz.org/*/*/open_edits*
+// @match        *://*.musicbrainz.org/*/*/edits*
+// @match        *://*.musicbrainz.org/search/edits*
+// @match        *://*.mbsandbox.org/user/*/edits/open*
+// @match        *://*.mbsandbox.org/*/*/open_edits*
+// @match        *://*.mbsandbox.org/*/*/edits*
+// @match        *://*.mbsandbox.org/search/edits*
+// @grant        none
 // ==/UserScript==
 
 // ==License==

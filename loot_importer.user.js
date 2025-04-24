@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name           Import Loot releases to MusicBrainz
-// @description    Add a button to import Loot.co.za releases to MusicBrainz
-// @version        2019.1.5.1
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
-// @include        http*://www.loot.co.za/product/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Loot releases to MusicBrainz
+// @description  Add a button to import Loot.co.za releases to MusicBrainz
+// @version      2019.1.5.1
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
+// @include      http*://www.loot.co.za/product/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant

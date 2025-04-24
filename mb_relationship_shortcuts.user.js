@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name           Display shortcut for relationships on MusicBrainz
-// @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2022.4.21.1
-// @author         Aurelien Mino <aurelien.mino@gmail.com>
-// @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @include        http*://*musicbrainz.org/artist/*
-// @include        http*://*musicbrainz.org/release-group/*
-// @include        http*://*musicbrainz.org/label/*
-// @exclude        */artist/*/recordings*
-// @require        https://code.jquery.com/jquery-3.6.0.min.js
+// @name         Display shortcut for relationships on MusicBrainz
+// @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
+// @version      2022.4.21.1
+// @author       Aurelien Mino <aurelien.mino@gmail.com>
+// @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @include      http*://*musicbrainz.org/artist/*
+// @include      http*://*musicbrainz.org/release-group/*
+// @include      http*://*musicbrainz.org/label/*
+// @exclude      */artist/*/recordings*
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat

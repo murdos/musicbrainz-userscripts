@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name        Import Bandcamp releases to MusicBrainz Album Link Helper
-// @description Add a link to Bandcamp's album canonical URL on pages without /album/, for one to import the release into MusicBrainz
-// @version     2022.4.10.1
-// @namespace   http://userscripts.org/users/22504
-// @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js
-// @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js
-// @include     http*://*.bandcamp.com/
-// @include     http*://*.bandcamp.com/releases
-// @exclude     http*://*.bandcamp.com/*/*
-// @require     lib/logger.js
-// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant       unsafeWindow
+// @name         Import Bandcamp releases to MusicBrainz Album Link Helper
+// @description  Add a link to Bandcamp's album canonical URL on pages without /album/, for one to import the release into MusicBrainz
+// @version      2022.4.10.1
+// @namespace    http://userscripts.org/users/22504
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js
+// @include      http*://*.bandcamp.com/
+// @include      http*://*.bandcamp.com/releases
+// @exclude      http*://*.bandcamp.com/*/*
+// @require      lib/logger.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @grant        unsafeWindow
 // ==/UserScript==
 
 if (!unsafeWindow) unsafeWindow = window;
