@@ -10,7 +10,8 @@
         "prettier:format": "prettier --write \"{,**/}*.{js,json,md,yml}\"",
         "lint": "npm run eslint",
         "lint-fix": "npm run eslint -- --fix",
-        "eslint": "eslint ."
+        "eslint": "eslint .",
+        "prepare": "husky"
     },
     "repository": {
         "type": "git",
@@ -36,6 +37,12 @@
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.2.6",
         "globals": "^16.0.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.5.1",
         "prettier": "^3.5.3"
+    },
+    "lint-staged": {
+        "*.{json,md,yml}": "prettier --write",
+        "*.js": "eslint --fix"
     }
 }
