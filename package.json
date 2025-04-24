@@ -7,7 +7,7 @@
         "lib": "lib"
     },
     "scripts": {
-        "prettier:format": "prettier --write \"{,**/}*.{js,json,md,yml}\"",
+        "prettier:format": "prettier --write .",
         "lint": "npm run eslint",
         "lint-fix": "npm run eslint -- --fix",
         "eslint": "eslint ."
@@ -30,11 +30,11 @@
     },
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
-        "@eslint-community/eslint-utils": "^4.6.1",
         "@eslint/js": "^9.25.1",
         "eslint": "^9.25.1",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.2.6",
+        "eslint-plugin-userscripts": "^0.5.6",
         "globals": "^16.0.0",
         "prettier": "^3.5.3"
     }
