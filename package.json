@@ -36,7 +36,7 @@
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.4.0",
         "eslint-plugin-userscripts": "^0.5.6",
-        "globals": "^16.0.0",
+        "globals": "^16.1.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.1",
         "prettier": "^3.5.3"
