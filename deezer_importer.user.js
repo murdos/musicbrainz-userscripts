@@ -2,7 +2,7 @@
 // @name         Import Deezer releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from deezer.com into MusicBrainz
-// @version      2019.1.30.1
+// @version      2025.6.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @include      http*://www.deezer.com/*/album/*
@@ -150,6 +150,9 @@ function insertLink(release, release_url) {
             </div>`,
     ).hide();
     waitForEl('[data-testid="toolbar"]', function () {
+        $('[data-testid="toolbar"]').css({
+            'align-items': 'center',
+        });
         $('[data-testid="toolbar"]').append(mbUI);
         mbUI.show();
     });
