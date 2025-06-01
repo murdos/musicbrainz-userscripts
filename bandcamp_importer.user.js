@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.04.22.1
+// @version      2025.06.01
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -305,6 +305,7 @@ $(document).ready(function () {
 
     if (isDiscographyPage) {
         const hostname = unsafeWindow.TralbumData.url.replace('/music', '');
+        const urls_data = [];
 
         $('ol#music-grid > li > a').each(function () {
             const $link = $(this);
@@ -312,17 +313,20 @@ $(document).ready(function () {
 
             if (bandcampReleaseUrl && bandcampReleaseUrl.match(/^(\/album|\/track)/)) {
                 const full_url = hostname + bandcampReleaseUrl;
-
-                mblinks.searchAndDisplayMbLink(
-                    full_url,
-                    'release',
-                    function (link) {
+                urls_data.push({
+                    url: full_url,
+                    mb_type: 'release',
+                    insert_func: function (link) {
                         $('p.title', $link).prepend(link);
                     },
-                    `release:${full_url}`,
-                );
+                    key: `release:${full_url}`,
+                });
             }
         });
+
+        if (urls_data.length > 0) {
+            mblinks.searchAndDisplayMbLinks(urls_data);
+        }
     } else {
         MBImportStyle();
 
