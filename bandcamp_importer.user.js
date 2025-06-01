@@ -114,7 +114,7 @@ const BandcampImport = {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {
-                let m = bctrack.title.match(/^(.+) - (.+)$/);
+                let m = bctrack.title.match(/^(.+?) - (.+)$/);
                 if (m) {
                     title = m[2];
                     artist = [m[1]];
