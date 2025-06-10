@@ -648,7 +648,7 @@ function parseDiscogsRelease(discogsRelease) {
     // Barcode
     if (discogsRelease.identifiers) {
         $.each(discogsRelease.identifiers, function (index, identifier) {
-            if (identifier.type === 'Barcode') {
+            if (identifier.type === 'Barcode' && identifier.value !== null) {
                 release.barcode = identifier.value.replace(/ /g, '');
                 return false;
             }
