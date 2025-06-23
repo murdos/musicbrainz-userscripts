@@ -39,7 +39,7 @@
         "globals": "^16.2.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",
-        "prettier": "^3.5.3"
+        "prettier": "^3.6.0"
     },
     "lint-staged": {
         "*.{json,md,yml}": "prettier --write",
