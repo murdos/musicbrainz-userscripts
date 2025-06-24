@@ -180,7 +180,10 @@ function insertLink(release, release_url, isrcs) {
         `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`
     )
         .on('click', event => {
-            const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+            const query = [
+                'edit-note=' + encodeURIComponent(editNote),
+                ...isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)),
+            ].join('&');
             event.preventDefault();
             window.open(`https://magicisrc.kepstin.ca?${query}`);
         })
