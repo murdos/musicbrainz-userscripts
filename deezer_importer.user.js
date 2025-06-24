@@ -174,7 +174,7 @@ function insertLink(release, release_url, isrcs) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div>`,
+            </div><div class="toolbar-item"></div>`
     ).hide();
     $(
         `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`
