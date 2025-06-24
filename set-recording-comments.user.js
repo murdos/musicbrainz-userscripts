@@ -1,15 +1,15 @@
 // ==UserScript==
-// @name           MusicBrainz: Set recording comments for a release
-// @description    Batch set recording comments from a Release page.
-// @version        2024.6.18.1
-// @author         Michael Wiencek
-// @license        X11
-// @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @include        /^https?:\/\/(\w+\.)?musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
-// @grant          none
-// @run-at         document-idle
+// @name         MusicBrainz: Set recording comments for a release
+// @description  Batch set recording comments from a Release page.
+// @version      2024.6.18.1
+// @author       Michael Wiencek
+// @license      X11
+// @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
+// @include      /^https?:\/\/(\w+\.)?musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
+// @grant        none
+// @run-at       document-idle
 // ==/UserScript==
 
 // ==License==
@@ -52,8 +52,8 @@ function setRecordingComments() {
 
     $('head').append(
         $('<style></style>').text(
-            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }'
-        )
+            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }',
+        ),
     );
 
     const delay = setInterval(function () {
@@ -148,7 +148,7 @@ function setRecordingComments() {
       <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
   </tr>\
-</table>'
+</table>',
     );
 
     $('#set-recording-comments').hide();

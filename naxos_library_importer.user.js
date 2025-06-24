@@ -1,4 +1,3 @@
-'use strict';
 // ==UserScript==
 // @name         Import Naxos Music Library releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
@@ -17,6 +16,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
+'use strict';
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 

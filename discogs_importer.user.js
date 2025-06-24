@@ -1,21 +1,21 @@
 // ==UserScript==
 
-// @name           Import Discogs releases to MusicBrainz
-// @description    Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version        2024.03.28.1
-// @namespace      http://userscripts.org/users/22504
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @include        http*://www.discogs.com/*
-// @include        http*://*.discogs.com/*release/*
-// @exclude        http*://*.discogs.com/*release/*?f=xml*
-// @exclude        http*://www.discogs.com/release/add
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Discogs releases to MusicBrainz
+// @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
+// @version      2024.03.28.1
+// @namespace    http://userscripts.org/users/22504
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
+// @include      http*://www.discogs.com/*
+// @include      http*://*.discogs.com/*release/*
+// @exclude      http*://*.discogs.com/*release/*?f=xml*
+// @exclude      http*://www.discogs.com/release/add
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -40,7 +40,7 @@ $(document).ready(function () {
     MBSearchItStyle();
 
     const current_page_key = getDiscogsLinkKey(
-        window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/')
+        window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/'),
     );
     if (!current_page_key) return;
 
@@ -73,7 +73,7 @@ $(document).ready(function () {
                     let mbContentBlock = $('<div class="section_content"></div>');
                     mbUI.append(mbContentBlock);
                     let mbError = $(
-                        `<p><small>${e}<br /><b>Please <a href="https://github.com/murdos/musicbrainz-userscripts/issues">report</a> this error, along the current page URL.</b></small></p>`
+                        `<p><small>${e}<br /><b>Please <a href="https://github.com/murdos/musicbrainz-userscripts/issues">report</a> this error, along the current page URL.</b></small></p>`,
                     );
                     mbContentBlock.prepend(mbError);
                     insertMbUI(mbUI);
@@ -114,7 +114,7 @@ function insertMBLinks(current_page_key) {
                     .filter(function (e) {
                         return e != '';
                     })
-                    .join(',')
+                    .join(','),
             );
             if (link_infos[mlink] && link_infos[mlink].type === discogs_type) {
                 const discogs_url = link_infos[mlink].clean_url;
@@ -144,8 +144,8 @@ function insertMBLinks(current_page_key) {
                         .prepend(
                             `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${MBImport.searchUrlFor(
                                 mb_type,
-                                $link.text()
-                            )}"><small>${mark}</small>?</a></span>`
+                                $link.text(),
+                            )}"><small>${mark}</small>?</a></span>`,
                         );
                 }
                 const insert_normal = function (link) {
@@ -322,7 +322,8 @@ const link_infos = {};
 // Parse discogs url to extract info, returns a key and set link_infos for this key
 // the key is in the form discogs_type/discogs_id
 function getDiscogsLinkKey(url) {
-    const re = /^https?:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^?#]*)(?:\?noanv=1|\?anv=[^=]+)?$/i;
+    const re =
+        /^https?:\/\/(?:www|api)\.discogs\.com\/(?:(?:(?!sell).+|sell.+)\/)?(master|release|artist|label)s?\/(\d+)(?:[^?#]*)(?:\?noanv=1|\?anv=[^=]+)?$/i;
     const m = re.exec(url);
     if (m !== null) {
         const key = `${m[1]}/${m[2]}`;
@@ -431,7 +432,7 @@ function insertMBSection(release, current_page_key) {
 
     if (release.maybe_buggy) {
         const warning_buggy = $(
-            '<p><small><b>Warning</b>: this release has perhaps a buggy tracklist, please check twice the data you import.</small><p'
+            '<p><small><b>Warning</b>: this release has perhaps a buggy tracklist, please check twice the data you import.</small><p',
         ).css({ color: 'red', 'margin-top': '4px', 'margin-bottom': '4px' });
         mbContentBlock.prepend(warning_buggy);
     }

@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name        Import Metal Archives releases into MusicBrainz
-// @namespace   https://github.com/murdos/musicbrainz-userscripts/
-// @version     2018.2.18.1
-// @description Add a button on Metal Archives release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
-// @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
-// @update      https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
-// @include     http*://www.metal-archives.com/albums/*/*/*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @require     lib/mbimport.js
-// @require     lib/mbimportstyle.js
-// @require     lib/logger.js
-// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Metal Archives releases into MusicBrainz
+// @namespace    https://github.com/murdos/musicbrainz-userscripts/
+// @version      2018.2.18.1
+// @description  Add a button on Metal Archives release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js
+// @include      http*://www.metal-archives.com/albums/*/*/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @require      lib/mbimport.js
+// @require      lib/mbimportstyle.js
+// @require      lib/logger.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -30,12 +30,12 @@ function setreleasedate(release, datestring) {
         release.year = datestring;
     } else if (datestring.indexOf(',') != -1) {
         let commaindex = datestring.indexOf(',');
-        var d = new Date(datestring.substring(0, commaindex - 2) + datestring.substring(commaindex));
+        const d = new Date(datestring.substring(0, commaindex - 2) + datestring.substring(commaindex));
         release.year = d.getFullYear();
         release.month = d.getMonth() + 1;
         release.day = d.getDate();
     } else {
-        var d = new Date(`2 ${datestring}`);
+        const d = new Date(`2 ${datestring}`);
         release.year = d.getFullYear();
         release.month = d.getMonth() + 1;
     }
@@ -43,19 +43,19 @@ function setreleasedate(release, datestring) {
 }
 
 function getGenericalData() {
-    let rdata = new Array();
-    let keydata = $('dl.float_left dt, dl.float_right dt')
+    const keydata = $('dl.float_left dt, dl.float_right dt')
         .map(function () {
             let s = $.trim($(this).text());
             return s.substring(0, s.length - 1);
         })
         .get();
-    let valuedata = $('dl.float_left dd,dl.float_right dd')
+    const valuedata = $('dl.float_left dd,dl.float_right dd')
         .map(function () {
             return $.trim($(this).text());
         })
         .get();
-    for (i = 0; i < keydata.length; i++) {
+    const rdata = [];
+    for (let i = 0; i < keydata.length; i++) {
         rdata[keydata[i]] = valuedata[i];
     }
     return rdata;
@@ -234,7 +234,7 @@ Split video
 */
 
 //ReleaseTypes[MAtype]=["primary type","secondary type on mb"];
-var ReleaseTypes = {
+const ReleaseTypes = {
     'Full-length': ['album'],
     'Live album': ['album', 'live'],
     Demo: ['album', 'demo'],
@@ -246,7 +246,7 @@ var ReleaseTypes = {
 };
 
 //ReleaseFormat[MAformat]="MBformat";
-var ReleaseFormat = {
+const ReleaseFormat = {
     CD: 'CD',
     '2CD': 'CD',
     Vinyl: 'Vinyl',

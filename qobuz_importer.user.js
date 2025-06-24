@@ -1,33 +1,33 @@
 // ==UserScript==
-// @name           Import Qobuz releases to MusicBrainz
-// @description    Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version        2019.03.26.0
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
-// @include        /^https?://www\.qobuz\.com/[^/]+/album/[^/]+/[^/]+$/
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @run-at         document-start
+// @name         Import Qobuz releases to MusicBrainz
+// @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
+// @version      2019.03.26.0
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
+// @include      /^https?://www\.qobuz\.com/[^/]+/album/[^/]+/[^/]+$/
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @run-at       document-start
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var DEBUG = false;
-//DEBUG = true;
+const DEBUG = false;
+
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
 
 // list of qobuz artist id which should be mapped to Various Artists
-var various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
-    various_composers_ids = [573076],
-    is_classical = false, // release detected as classical
+const various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
+    various_composers_ids = [573076];
+let is_classical = false, // release detected as classical
     album_artist_data = {}, // for switching album artists on classical
     raw_release_data;
 
@@ -91,10 +91,7 @@ function parseRelease(data) {
 
     release.packaging = 'None';
     release.barcode = data.upc;
-    release.country = 'XW';
-    if (i18n_global && i18n_global.zone) {
-        release.country = i18n_global.zone;
-    }
+    release.country = 'XW'; // TODO: refine
     release.status = 'official';
     release.urls = [];
     release.urls.push({
@@ -256,17 +253,17 @@ function insertLink(release) {
         let title = 'Force album artist on classical import. Album artist will be various artists if there are multiple composers.';
         mbUI.append(
             $(
-                `<label for="force_album_artist" class="musicbrainz_import" title="${title}"><input id="force_album_artist" type="checkbox" title="${title}">Force album artist</label>`
-            )
+                `<label for="force_album_artist" class="musicbrainz_import" title="${title}"><input id="force_album_artist" type="checkbox" title="${title}">Force album artist</label>`,
+            ),
         );
     }
 
     mbUI.append(
         $('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'),
-        $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`)
+        $(`<p><textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea></p>`),
     );
 
-    $('#info div.meta').append(mbUI);
+    $('.album-meta .album-meta__title').prepend(mbUI);
     $('form.musicbrainz_import').css({
         display: 'inline-block',
         margin: '1px',
@@ -298,45 +295,58 @@ function insertLink(release) {
     mbUI.slideDown();
 }
 
-// Hook all XMLHttpRequest to use the data fetched by the official web-player.
-(function () {
-    const send = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function () {
-        this.addEventListener('load', function () {
-            let wsUrl = 'https://www.qobuz.com/api.json/0.2/album/get?album_id=';
-            let repUrl = arguments[0].currentTarget.responseURL;
-            if (repUrl.startsWith(wsUrl)) {
-                raw_release_data = JSON.parse(this.responseText);
-                if (raw_release_data.status === 'error') {
-                    LOGGER.error(raw_release_data);
-                    insertErrorMessage(raw_release_data);
-                } else {
-                    let release = parseRelease(raw_release_data);
-                    insertLink(release);
-                }
+function extractAlbumData() {
+    return new Promise((resolve, reject) => {
+        const script_elements = document.querySelectorAll('script[type="application/ld+json"]');
+        for (const script of script_elements) {
+            const json_data = JSON.parse(script.textContent);
+            if (json_data['@type'] === 'Product' && json_data.sku) {
+                let sku = json_data.sku;
+                // Use the Qobuz API to get the album data for the SKU
+                const req = new XMLHttpRequest();
+                req.open('GET', `https://www.qobuz.com/api.json/0.2/album/get?album_id=${sku}`, true);
+                req.setRequestHeader('X-App-Id', '712109809');
+                req.onreadystatechange = function () {
+                    if (req.readyState === 4) {
+                        if (req.status === 200) {
+                            const raw_release_data = JSON.parse(req.responseText);
+                            resolve(raw_release_data);
+                        } else {
+                            console.error('Qobuz API request failed', sku, req.status, req.statusText);
+                            reject({ message: 'Qobuz API request failed', code: req.status });
+                        }
+                    }
+                };
+                req.onerror = function () {
+                    reject({ message: 'Qobuz API request network error', code: '?' });
+                };
+                req.send();
             }
-        });
-        return send.apply(this, arguments);
-    };
-})();
+        }
+    });
+}
 
 $(document).ready(function () {
     MBImportStyle();
 
-    // replace image zoom link by the maximum size image link
-    let maximgurl = $('#product-cover-link').attr('href').replace('_600', '_max');
-    let maximg = new Image();
-    maximg.onerror = function (evt) {
-        LOGGER.debug('No max image');
-    };
-    maximg.onload = function (evt) {
-        $('#product-cover-link').attr('href', maximgurl);
-        $('#product-cover-link').attr(
-            'title',
-            `${$('#product-cover-link').attr('title')} (Qobuz importer: ${maximg.width}x${maximg.height} image)`
-        );
-    };
-    maximg.src = maximgurl;
+    extractAlbumData()
+        .then(raw_release_data => {
+            let release = parseRelease(raw_release_data);
+            insertLink(release);
+        })
+        .catch(error => {
+            console.error('Error extracting album data:', error);
+            insertErrorMessage(error);
+        });
+
+    // Replace the image zoom link with the maximum size image link
+    const ogImageMetaElement = document.querySelector('meta[property="og:image"]');
+    if (ogImageMetaElement) {
+        let maxImgURL = ogImageMetaElement.getAttribute('content').replace('_600', '_max');
+        document.querySelectorAll('img.album-cover__image').forEach(imgElement => {
+            imgElement.setAttribute('src', maxImgURL);
+        });
+    }
 });
 
 $(document).on('click', '#isrcs', function () {

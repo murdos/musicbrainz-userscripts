@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name           Musicbrainz UI enhancements
-// @description    Various UI enhancements for Musicbrainz
-// @version        2023.4.23.1
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
-// @icon           http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
-// @namespace      http://userscripts.org/users/22504
-// @include        http*://*musicbrainz.org/*
-// @require        http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
-// @require        https://raw.github.com/murdos/mbediting.js/master/mbediting.js
+// @name         Musicbrainz UI enhancements
+// @description  Various UI enhancements for Musicbrainz
+// @version      2023.4.23.1
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
+// @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
+// @namespace    http://userscripts.org/users/22504
+// @include      http*://*musicbrainz.org/*
+// @require      http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
+// @require      https://raw.github.com/murdos/mbediting.js/master/mbediting.js
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -17,11 +17,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 $(document).ready(function () {
     // Follow the instructions found at https://www.last.fm/api/authentication
     // then paste your API Key between the single quotes in the variable below.
-    LASTFM_APIKEY = '';
+    const LASTFM_APIKEY = '';
 
     // Highlight table rows
     $('head').append(
-        '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>'
+        '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>',
     );
 
     let re;
@@ -30,8 +30,8 @@ $(document).ready(function () {
     re = new RegExp('musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$', 'i');
     if (LASTFM_APIKEY && window.location.href.match(re)) {
         $('h2.discography').before('<h2 class="toptracks">Top Last.fm recordings</h2><ul class="toptracks" />');
-        var mbid = window.location.href.match(re)[1];
-        let toptracks = $.getJSON(
+        const mbid = window.location.href.match(re)[1];
+        $.getJSON(
             `https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&mbid=${mbid}&api_key=${LASTFM_APIKEY}&format=json`,
             function (data) {
                 $.each(data.toptracks.track, function (index, track) {
@@ -39,7 +39,7 @@ $(document).ready(function () {
                     let url = track.mbid ? `/recording/${track.mbid}` : track.url;
                     $('ul.toptracks').append(`<li><a href="${url}">${track.name}</a></li>`);
                 });
-            }
+            },
         );
     }
 
@@ -57,7 +57,7 @@ $(document).ready(function () {
     // Better fix for http://tickets.musicbrainz.org/browse/MBS-1943
     re = new RegExp(
         'musicbrainz.org/(artist|release-group|release|recording|work|label)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('External links')"));
@@ -67,7 +67,7 @@ $(document).ready(function () {
                 .nextAll('ul.external_links')
                 .filter(function () {
                     return !pageHasRGLinks || $(this).nextAll("h2:contains('Release group external links')").length > 0;
-                })
+                }),
         );
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('Release group external links')"));
         $("#sidebar h2:contains('Rating')").before($("#sidebar h2:contains('Release group external links')").nextAll('ul.external_links'));
@@ -76,7 +76,7 @@ $(document).ready(function () {
     // Remove the affiliate section
     re = new RegExp(
         'musicbrainz.org/(artist|release-group|release|recording|work|label)/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $('#sidebar-affiliates').remove();
@@ -85,7 +85,7 @@ $(document).ready(function () {
     // Batch merge -> open in a new tab/windows
     re = new RegExp(
         'musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/(recordings|releases|works)',
-        'i'
+        'i',
     );
     if (window.location.href.match(re)) {
         $('form')
@@ -109,8 +109,8 @@ $(document).ready(function () {
     re = new RegExp('musicbrainz.org/(.*/(open_)?edits|edit/d+)', 'i');
     if (window.location.href.match(re)) {
         $("div.edit-description ~ h2:contains('cover art')").each(function () {
-            $editdetails = $(this).parents('.edit-header').siblings('.edit-details');
-            mbid = $editdetails
+            const $editdetails = $(this).parents('.edit-header').siblings('.edit-details');
+            const mbid = $editdetails
                 .find("a[href*='musicbrainz.org/release/']")
                 .attr('href')
                 .match(/\/release\/(.{36})/)[1];
@@ -128,7 +128,7 @@ $(document).ready(function () {
             let youtube_id = $youtube_link.prop('href').match(/http:\/\/www\.youtube\.com\/watch\?v=(.*)/)[1];
             $('table.details').width('60%');
             $("h2:contains('Relationships')").after(
-                `<iframe width="360" height="275" frameborder="0" style="float: right;" src="https://www.youtube.com/embed/${youtube_id}?rel=0" allowfullscreen=""></iframe>`
+                `<iframe width="360" height="275" frameborder="0" style="float: right;" src="https://www.youtube.com/embed/${youtube_id}?rel=0" allowfullscreen=""></iframe>`,
             );
         }
     }
@@ -136,7 +136,7 @@ $(document).ready(function () {
     // When attaching CDTOC, autoselect artist when there's only one result
     re = new RegExp('musicbrainz.org/cdtoc/attach.*&filter-artist.query=.*', 'i');
     if (window.location.href.match(re)) {
-        $artists = $('ul.radio-list li');
+        const $artists = $('ul.radio-list li');
         if ($artists.length == 1) {
             $artists.find('input:radio').attr('checked', true);
         }
@@ -158,7 +158,7 @@ $(document).ready(function () {
                 .find('li')
                 .each(function () {
                     let newHTML = '';
-                    var isrc = $(this).text();
+                    const isrc = $(this).text();
                     newHTML += `<a href='/isrc/${isrc}'><bdi><code>`;
                     newHTML += `${isrc.substring(0, 5)}<b>${isrc.substring(5, 7)}</b>${isrc.substring(7)}`;
                     newHTML += '</code></bdi></a>';
@@ -171,7 +171,7 @@ $(document).ready(function () {
     re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})#?$', 'i');
     if (window.location.href.match(re)) {
         let ISRC_COLUMN_POSITION = 2;
-        var mbid = window.location.href.match(re)[1];
+        const mbid = window.location.href.match(re)[1];
         // Get tracks data from webservice
         let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
         $.getJSON(wsurl, function (data) {
@@ -193,13 +193,13 @@ $(document).ready(function () {
                 let HANDLED_ATTRIBUTE = 'ui_enh_isrcs_handled';
                 $('table.medium').attr(HANDLED_ATTRIBUTE, 'no');
                 $('table.medium').bind('DOMNodeInserted', function (event) {
-                    $target = $(event.target);
+                    const $target = $(event.target);
                     if (
-                        $target.prop('nodeName') == 'TBODY' &&
-                        $target.parent().attr(HANDLED_ATTRIBUTE) == 'no' &&
+                        $target.prop('nodeName') === 'TBODY' &&
+                        $target.parent().attr(HANDLED_ATTRIBUTE) === 'no' &&
                         $target.find('tr.subh').length > 0
                     ) {
-                        $medium = $target.parent();
+                        const $medium = $target.parent();
                         $medium.attr(HANDLED_ATTRIBUTE, 'pending');
                         handleMedium($medium, tracks);
                         $medium.attr(HANDLED_ATTRIBUTE, 'done');
@@ -222,13 +222,13 @@ $(document).ready(function () {
 
             // Handle each track
             $medium.find('tbody tr[id]').each(function (index, medium_track) {
-                track_mbid = $(medium_track).attr('id');
+                const track_mbid = $(medium_track).attr('id');
                 let isrcsLinks = '';
                 if (Object.prototype.hasOwnProperty.call(ws_tracks, track_mbid)) {
-                    track = ws_tracks[track_mbid];
+                    const track = ws_tracks[track_mbid];
                     let recording = track.recording;
                     // Recording comment
-                    if (recording.disambiguation != '') {
+                    if (recording.disambiguation !== '') {
                         let td_title_index = $(`#${track_mbid}`).find('td:eq(1)').hasClass('video') ? 2 : 1;
                         $(`#${track_mbid}`)
                             .find(`td:eq(${td_title_index}) a:eq(0)`)
@@ -236,7 +236,7 @@ $(document).ready(function () {
                     }
                     // ISRCS
                     if (recording.isrcs.length != 0) {
-                        let links = jQuery.map(recording.isrcs, function (isrc, i) {
+                        let links = jQuery.map(recording.isrcs, function (isrc) {
                             return `<a href='/isrc/${isrc}'>${isrc}</a>`;
                         });
                         isrcsLinks = links.join(', ');

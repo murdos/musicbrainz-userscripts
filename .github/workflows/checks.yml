@@ -6,8 +6,10 @@ jobs:
         name: 'lint checks'
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2.3.0
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 20
             - name: 'Install dependencies'
               run: npm install
             - name: 'Run linter'
@@ -19,16 +21,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: automerge
-              uses: actions/github-script@0.2.0
+              uses: actions/github-script@v7.0.1
               with:
                   script: |
-                      github.pullRequests.createReview({
+                      github.rest.pullRequests.createReview({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
                         pull_number: context.payload.pull_request.number,
                         event: 'APPROVE'
                       })
-                      github.pullRequests.merge({
+                      github.rest.pullRequests.merge({
                         owner: context.payload.repository.owner.login,
                         repo: context.payload.repository.name,
                         pull_number: context.payload.pull_request.number

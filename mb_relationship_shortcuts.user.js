@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name           Display shortcut for relationships on MusicBrainz
-// @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2022.4.21.1
-// @author         Aurelien Mino <aurelien.mino@gmail.com>
-// @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @include        http*://*musicbrainz.org/artist/*
-// @include        http*://*musicbrainz.org/release-group/*
-// @include        http*://*musicbrainz.org/label/*
-// @exclude        */artist/*/recordings*
-// @require        https://code.jquery.com/jquery-3.6.0.min.js
+// @name         Display shortcut for relationships on MusicBrainz
+// @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
+// @version      2022.4.21.1
+// @author       Aurelien Mino <aurelien.mino@gmail.com>
+// @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @include      http*://*musicbrainz.org/artist/*
+// @include      http*://*musicbrainz.org/release-group/*
+// @include      http*://*musicbrainz.org/label/*
+// @exclude      */artist/*/recordings*
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
@@ -35,6 +35,7 @@ const urlRelationsIconClasses = {
     secondhandsongs: 'secondhandsongs',
     vgmdb: 'vgmdb',
     wikidata: 'wikidata',
+    'discography entry': 'home',
 };
 
 const otherDatabasesIconClasses = {
@@ -56,6 +57,10 @@ const streamingIconClasses = {
     'open.spotify.com': 'spotify',
     'tidal.com': 'tidal',
     'beatport.com': 'beatport',
+    'youtube.com': 'youtube',
+    'archive.org': 'archive',
+    'mediafire.com': 'mediafire',
+    'store.steampowered.com': 'steam',
 };
 
 /**
@@ -66,7 +71,7 @@ const streamingIconClasses = {
 function injectShortcutIcon(mbid, targetUrl, iconClass) {
     if (!iconClass) return;
     $(`#${mbid} td.relationships`).append(
-        `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`
+        `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`,
     );
 }
 
@@ -112,6 +117,13 @@ td.relationships span.favicon.ended {
 .lyrics-favicon {
     /* archived version, originally from http://www.nomy.nu/img/lyrics-icon.gif */
     background-image: url(data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==);
+}
+.mediafire-favicon {
+background-image: url(https://www.mediafire.com/favicon.ico);
+}
+.steam-favicon {
+background-image: url(https://store.steampowered.com/favicon.ico);
+background-size: 16px;
 }`;
 
 // prevent JQuery conflicts, see https://wiki.greasespot.net/@grant
@@ -201,7 +213,7 @@ $(document).ready(function () {
     // Call the MB webservice
     const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    $.get(url, function (data, textStatus, jqXHR) {
+    $.get(url, function (data) {
         // Parse each child
         $(data)
             .find(child.type)

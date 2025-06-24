@@ -1,19 +1,19 @@
 // ==UserScript==
-// @name           Import Beatport releases to MusicBrainz
-// @author         VxJasonxV
-// @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version        2024.03.28.1
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
-// @include        http://www.beatport.com/release/*
-// @include        https://www.beatport.com/release/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant          unsafeWindow
+// @name         Import Beatport releases to MusicBrainz
+// @author       VxJasonxV
+// @namespace    https://github.com/murdos/musicbrainz-userscripts/
+// @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
+// @version      2024.03.28.1
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
+// @include      http://www.beatport.com/release/*
+// @include      https://www.beatport.com/release/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @grant        unsafeWindow
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -135,12 +135,12 @@ function insertLink(mbrelease, release_url, isrcs) {
 
     const mbUI = $(
         `<div class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
-            parameters
-        )}${MBImport.buildSearchButton(mbrelease)}</div>`
+            parameters,
+        )}${MBImport.buildSearchButton(mbrelease)}</div>`,
     ).hide();
 
     $(
-        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>'
+        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>',
     )
         .on('click', event => {
             const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
@@ -164,7 +164,7 @@ function insertLink(mbrelease, release_url, isrcs) {
         `<div class="${lastReleaseInfo.attr('class')}">
             <p>Barcode</p>
             <span>${spanHTML}</span>
-        </div>`
+        </div>`,
     ).hide();
     lastReleaseInfo.after(releaseInfoBarcode);
 

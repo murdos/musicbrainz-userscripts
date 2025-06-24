@@ -1,18 +1,18 @@
 // ==UserScript==
-// @name           Import Deezer releases into MusicBrainz
-// @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version        2024.9.9.2
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
-// @include        http*://www.deezer.com/*/album/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant          GM_xmlhttpRequest
-// @grant          GM.xmlHttpRequest
+// @name         Import Deezer releases into MusicBrainz
+// @namespace    https://github.com/murdos/musicbrainz-userscripts/
+// @description  One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
+// @version      2025.6.24
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
+// @include      http*://www.deezer.com/*/album/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -174,7 +174,7 @@ function insertLink(release, release_url, isrcs) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div><div class="toolbar-item"></div>`
+            </div>`,
     ).hide();
     $(
         `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`
@@ -186,6 +186,9 @@ function insertLink(release, release_url, isrcs) {
         })
         .appendTo(mbUI.last());
     waitForEl('[data-testid="toolbar"]', function () {
+        $('[data-testid="toolbar"]').css({
+            'align-items': 'center',
+        });
         $('[data-testid="toolbar"]').append(mbUI);
         mbUI.show();
     });

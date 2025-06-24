@@ -2,15 +2,16 @@
     "name": "musicbrainz-userscripts",
     "version": "1.0.0",
     "description": "Collection of userscripts for MusicBrainz",
-    "main": "index.js",
+    "type": "module",
     "directories": {
         "lib": "lib"
     },
     "scripts": {
-        "prettier:format": "prettier --write \"{,**/}*.{js,json,md,yml}\"",
+        "prettier:format": "prettier --write .",
         "lint": "npm run eslint",
         "lint-fix": "npm run eslint -- --fix",
-        "eslint": "eslint ."
+        "eslint": "eslint .",
+        "prepare": "husky"
     },
     "repository": {
         "type": "git",
@@ -30,10 +31,18 @@
     },
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
-        "eslint": "^7.32.0",
-        "eslint-config-prettier": "^8.1.0",
-        "eslint-plugin-import": "^2.23.4",
-        "eslint-plugin-prettier": "^3.3.1",
-        "prettier": "^2.2.1"
+        "@eslint/js": "^9.29.0",
+        "eslint": "^9.29.0",
+        "eslint-plugin-import": "^2.32.0",
+        "eslint-plugin-prettier": "^5.5.0",
+        "eslint-plugin-userscripts": "^0.5.6",
+        "globals": "^16.2.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
+        "prettier": "^3.5.3"
+    },
+    "lint-staged": {
+        "*.{json,md,yml}": "prettier --write",
+        "*.js": "eslint --fix"
     }
 }
