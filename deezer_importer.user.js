@@ -174,14 +174,14 @@ function insertLink(release, release_url, isrcs) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div><div class="toolbar-item"></div>`
+            </div><div class="toolbar-item"></div>`,
     ).hide();
     $(
-        `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`
+        `<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>`,
     )
         .on('click', event => {
             const query = [
-                'edit-note=' + encodeURIComponent(editNote),
+                `edit-note=${encodeURIComponent(editNote)}`,
                 ...isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)),
             ].join('&');
             event.preventDefault();
