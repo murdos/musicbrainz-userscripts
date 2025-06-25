@@ -80,7 +80,7 @@ Add a button on CD1D.com release pages allowing to open MusicBrainz release edit
 
 ## <a name="deezer_importer"></a> Import Deezer releases into MusicBrainz
 
-One-click importing of releases from deezer.com into MusicBrainz
+One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/deezer_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js)
