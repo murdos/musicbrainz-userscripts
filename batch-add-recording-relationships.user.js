@@ -738,7 +738,7 @@ function batch_recording_rels(gm_info) {
             })
             .prependTo($button_cell);
 
-        $msg.text(`Loading works for ${name}...`).css('color', 'green'), $table_row.append($msg, $button_cell);
+        ($msg.text(`Loading works for ${name}...`).css('color', 'green'), $table_row.append($msg, $button_cell));
         $('tr#bpr-works-row').css('display', 'none').before($table_row);
 
         let works_date = localStorage.getItem(`bpr_works_date ${mbid}`);
