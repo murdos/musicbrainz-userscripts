@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2024.03.28.1
+// @version      2025.07.01.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
