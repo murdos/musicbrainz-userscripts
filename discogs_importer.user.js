@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2025.07.01.1
+// @version      2025.08.13
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -468,6 +468,14 @@ function insertMBSection(release, current_page_key) {
     $('form.musicbrainz_import').css({ width: '49%', display: 'inline-block' });
     $('form.musicbrainz_import_search').css({ float: 'right' });
     $('form.musicbrainz_import > button').css({ width: '100%', 'box-sizing': 'border-box' });
+
+    // Fix tracklist with long credits text overlap issue by setting track height to auto
+    const tracklistCss = `
+        [class*="trackCredits"][class*="expanded"] {
+            height: auto !important;
+        }
+    `;
+    document.head.insertAdjacentHTML('beforeend', `<style>${tracklistCss}</style>`);
 
     mbUI.slideDown();
 }
