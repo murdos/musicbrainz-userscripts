@@ -291,6 +291,27 @@ if (window.location.hostname === 'web.archive.org') {
     });
 }
 
+/**
+ * Bandcamp URLs can be relative or absolute. This function normalizes them to always be relative to the hostname.
+ */
+const getPathName = url => {
+    if (url.startsWith('/')) {
+        return url.split('?')[0].split('#')[0];
+    } else if (url.startsWith('http')) {
+        const parsed = new URL(url);
+        return parsed.pathname;
+    }
+    return null;
+};
+
+const getHostname = url => {
+    if (url.startsWith('http')) {
+        const parsed = new URL(url);
+        return `${parsed.protocol}//${parsed.hostname}`;
+    }
+    return null;
+};
+
 $(document).ready(function () {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
@@ -310,9 +331,13 @@ $(document).ready(function () {
         $('ol#music-grid > li > a').each(function () {
             const $link = $(this);
             const bandcampReleaseUrl = $link.attr('href');
+            const pathName = getPathName(bandcampReleaseUrl);
 
-            if (bandcampReleaseUrl && bandcampReleaseUrl.match(/^(\/album|\/track)/)) {
-                const full_url = hostname + bandcampReleaseUrl;
+            if (pathName && pathName.match(/^(\/album|\/track)/)) {
+                const isRelative = bandcampReleaseUrl.startsWith('/');
+                const linkHostname = isRelative ? hostname : getHostname(bandcampReleaseUrl);
+                const full_url = linkHostname + pathName;
+
                 urls_data.push({
                     url: full_url,
                     mb_type: 'release',
