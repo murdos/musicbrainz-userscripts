@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.08.14
+// @version      2025.08.22
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -321,7 +321,8 @@ $(document).ready(function () {
     if (!unsafeWindow.TralbumData) return;
     /***/
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
-
+    const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
+    const hasAlbumData = unsafeWindow.TralbumData && Object.entries(unsafeWindow.TralbumData).length > 0; // Sometimes TralbumData is an empty object, see issue #676
     const isDiscographyPage = unsafeWindow.TralbumData.url && !!unsafeWindow.TralbumData.url.match(/\/music\/?$/);
 
     if (isDiscographyPage) {
@@ -352,7 +353,7 @@ $(document).ready(function () {
         if (urls_data.length > 0) {
             mblinks.searchAndDisplayMbLinks(urls_data);
         }
-    } else {
+    } else if (hasAlbumData) {
         MBImportStyle();
 
         let release = BandcampImport.retrieveReleaseInfo();
@@ -462,6 +463,62 @@ $(document).ready(function () {
             Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}&category=default">Harmony</a>
             | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`,
             );
+        }
+    }
+
+    if (hasBandData) {
+        const cleanURL = `${unsafeWindow.location.protocol}//${unsafeWindow.location.hostname}`;
+
+        let isLinkInserted = false;
+        const linkStyle = {
+            position: 'absolute',
+            marginLeft: '3px',
+        };
+
+        const insertLinkCb = function (link) {
+            if (!isLinkInserted) {
+                $('div.stub-page-content h1').append(link);
+                $('div.stub-page-content h1 a').css(linkStyle);
+                isLinkInserted = true;
+            }
+        };
+
+        // The URL could either be a band or a label page, we don't know which, so we search for both.
+        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', function (link) {
+            insertLinkCb(link);
+        });
+
+        mblinks.searchAndDisplayMbLink(cleanURL, 'label', function (link) {
+            insertLinkCb(link);
+        });
+
+        if (!isLinkInserted) {
+            // Offer lookup in MB
+            MBSearchItStyle();
+            const entityName = unsafeWindow.BandData.name;
+            const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
+            const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
+
+            $('div.stub-page-content h1').append(`
+                <span class="mb_wrapper">
+                    <span class="mb_valign mb_searchit">
+                        <a class="mb_search_link"
+                            class="musicbrainz_import"
+                            target="_blank"
+                            title="Search this artist on MusicBrainz (open in a new tab)" 
+                            href="${artistSearchUrl}"
+                        ><small>A</small>?</a>
+                    </span>
+                    <span class="mb_valign mb_searchit">
+                        <a 
+                            class="mb_search_link musicbrainz_import"
+                            target="_blank"
+                            title="Search this label on MusicBrainz (open in a new tab)"
+                            href="${labelSearchUrl}"
+                        ><small>L</small>?</a>
+                    </span>
+                </span>
+            `);
         }
     }
 });
