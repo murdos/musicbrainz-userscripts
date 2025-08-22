@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2025.08.13
+// @version      2025.08.22
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -98,6 +98,10 @@ $(document).ready(function () {
 function insertMBLinks(current_page_key) {
     function searchAndDisplayMbLinkInSection($tr, discogs_type, mb_type, nosearch) {
         if (!mb_type) mb_type = defaultMBtype(discogs_type);
+
+        // Collect URLs for batching
+        const urls_data = [];
+
         $tr.find(`a[mlink^="${discogs_type}/"]`).each(function () {
             const $link = $(this);
             if ($link.attr('mlink_stop')) return; // for places
@@ -148,24 +152,26 @@ function insertMBLinks(current_page_key) {
                             )}"><small>${mark}</small>?</a></span>`,
                         );
                 }
-                const insert_normal = function (link) {
-                    $link.closest('span.mb_valign').before(`<span class="mb_valign">${link}</span>`);
-                    $link.closest('span.mb_wrapper').find('.mb_searchit').remove();
-                };
 
-                const insert_stop = function (link) {
-                    insert_normal(link);
-                    $link.attr('mlink_stop', true);
-                };
+                urls_data.push({
+                    url: discogs_url,
+                    mb_type,
+                    insert_func: function(link) {
+                        $link.closest('span.mb_valign').before(`<span class="mb_valign">${link}</span>`);
+                        $link.closest('span.mb_wrapper').find('.mb_searchit').remove();
 
-                let insert_func = insert_normal;
-                if (mb_type == 'place') {
-                    // if a place link was added we stop, we don't want further queries for this 'label'
-                    insert_func = insert_stop;
-                }
-                mbLinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
+                        if (mb_type == 'place') {
+                            $link.attr('mlink_stop', true);
+                        }
+                    },
+                    key: cachekey
+                });
             }
         });
+
+        if (urls_data.length > 0) {
+            mbLinks.searchAndDisplayMbLinks(urls_data);
+        }
     }
 
     function debug_color(what, n, id) {
