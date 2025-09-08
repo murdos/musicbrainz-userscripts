@@ -31,7 +31,7 @@
     },
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
-        "@eslint/js": "^9.34.0",
+        "@eslint/js": "^9.35.0",
         "eslint": "^9.34.0",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-prettier": "^5.5.4",
