@@ -3,11 +3,10 @@
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2024.03.28.1
+// @version      2025.09.28
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js
-// @include      http://www.beatport.com/release/*
-// @include      https://www.beatport.com/release/*
+// @match        https://www.beatport.com/release/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
