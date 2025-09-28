@@ -2,10 +2,10 @@
 // @name         Import Deezer releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from deezer.com into MusicBrainz
-// @version      2025.6.2
+// @version      2025.9.28
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
-// @include      http*://www.deezer.com/*/album/*
+// @match        https://www.deezer.com/*/album/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
