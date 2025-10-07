@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.09.28
+// @version      2025.10.07.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -354,12 +354,11 @@ function lookupReleaseAndDisplayLinks({ release, mblinks }) {
 
     const insertReleaseLinkCb = function (link) {
         if (!isReleaseLinkInserted) {
-            $('.album-meta .album-meta__title').append(link);
-            $('.album-meta .album-meta__title a').css({
+            $('.album-title').append(link);
+            $('.album-title a').css({
                 position: 'relative',
                 top: '-11px',
-                right: '6px',
-                display: 'inline-block',
+                display: 'inline-block', // for margin-top to work inside inline
                 marginTop: '6px',
             });
             isReleaseLinkInserted = true;
@@ -379,10 +378,10 @@ function lookupReleaseAndDisplayLinks({ release, mblinks }) {
  */
 function lookupArtistAndDisplayLinks({ release, mblinks }) {
     const insertArtistLinkCb = function (link) {
-        $('.album-meta .album-meta__artist').append(link);
-        $('.album-meta .album-meta__artist a').css({
+        $('.artist-name').append(link);
+        $('.artist-name a').css({
             position: 'relative',
-            right: '-3px',
+            top: '-11px',
         });
     };
 
