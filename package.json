@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "description": "Collection of userscripts for MusicBrainz",
     "type": "module",
-    "directories": {
-        "lib": "lib"
-    },
     "scripts": {
+        "build": "tsx src/build/build.ts",
+        "build:watch": "tsx src/build/build.ts --watch",
+        "type-check": "tsc --noEmit",
         "prettier:format": "prettier --write .",
         "lint": "npm run eslint",
         "lint-fix": "npm run eslint -- --fix",
@@ -31,7 +31,17 @@
     },
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
+        "@babel/core": "^7.27.1",
+        "@babel/preset-env": "^7.27.2",
+        "@babel/preset-typescript": "^7.27.1",
         "@eslint/js": "^9.35.0",
+        "@rollup/plugin-alias": "^5.1.1",
+        "@rollup/plugin-babel": "^6.0.4",
+        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@types/greasemonkey": "^4.0.7",
+        "@types/jquery": "^2.0.54",
+        "@types/node": "^24.8.0",
         "eslint": "^9.37.0",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-prettier": "^5.5.4",
@@ -39,7 +49,10 @@
         "globals": "^16.4.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.4",
-        "prettier": "^3.6.2"
+        "prettier": "^3.6.2",
+        "rollup": "^4.40.2",
+        "tsx": "^4.19.4",
+        "typescript": "^5.8.3"
     },
     "lint-staged": {
         "*.{json,md,yml}": "prettier --write",
