@@ -38,7 +38,7 @@ jobs:
             - name: Copy built files to dist branch
               run: |
                   # Remove old built files
-                  find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" -delete
+                  find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./dist/*" -delete
 
                   # Copy new built files
                   cp -r dist/* .
@@ -56,7 +56,7 @@ jobs:
                     echo "No changes to commit"
                   else
                     git add .
-                    git commit -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
+                    git commit --no-verify -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
                     git push origin dist
                   fi
 
