@@ -1,7 +1,7 @@
 export default {
     name: 'Import Beatport releases to MusicBrainz',
     description: 'One-click importing of releases from beatport.com/release pages into MusicBrainz',
-    version: '2025.09.28',
+    version: '2025.10.20.2',
     author: 'VxJasonxV',
     namespace: 'https://github.com/murdos/musicbrainz-userscripts/',
     downloadURL: 'https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js',

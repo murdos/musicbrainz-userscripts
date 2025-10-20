@@ -53,8 +53,8 @@ Add a link to Bandcamp's album canonical URL on pages without /album/, for one t
 
 One-click importing of releases from beatport.com/release pages into MusicBrainz
 
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/beatport_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js)
 
 ## <a name="boomkat_importer"></a> Import Boomkat releases to Musicbrainz
 
