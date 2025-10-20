@@ -5,6 +5,9 @@ import prettier from 'eslint-plugin-prettier/recommended';
 import userscripts from 'eslint-plugin-userscripts';
 
 export default defineConfig([
+    {
+        ignores: ['node_modules/**/*', 'dist/**/*'],
+    },
     js.configs.recommended,
     prettier,
     {
