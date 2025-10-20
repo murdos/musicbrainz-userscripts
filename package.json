@@ -40,7 +40,7 @@
         "@rollup/plugin-commonjs": "^28.0.3",
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/greasemonkey": "^4.0.7",
-        "@types/jquery": "^2.0.54",
+        "@types/jquery": "^3.5.33",
         "@types/node": "^24.8.0",
         "eslint": "^9.37.0",
         "eslint-plugin-import": "^2.32.0",
