@@ -13,7 +13,7 @@ declare global {
 }
 
 // Make jQuery available globally
-declare const jQuery: typeof import('jquery');
-declare const $: typeof import('jquery');
+declare const jQuery: typeof import('jquery'); // eslint-disable-line
+declare const $: typeof import('jquery'); // eslint-disable-line
 
 export {};

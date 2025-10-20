@@ -1,4 +1,4 @@
-enum LogLevel {
+export enum LogLevel {
     DEBUG = 'debug',
     INFO = 'info',
     ERROR = 'error',
@@ -13,15 +13,15 @@ export class Logger {
         this.LOG_LEVEL = level;
     }
 
-    debug(...args: any[]): void {
+    debug(...args: unknown[]): void {
         this._log(LogLevel.DEBUG, args);
     }
 
-    info(...args: any[]): void {
+    info(...args: unknown[]): void {
         this._log(LogLevel.INFO, args);
     }
 
-    error(...args: any[]): void {
+    error(...args: unknown[]): void {
         this._log(LogLevel.ERROR, args);
     }
 
@@ -29,7 +29,7 @@ export class Logger {
         this.LOG_LEVEL = level;
     }
 
-    private _log(level: LogLevel, args: any[]): void {
+    private _log(level: LogLevel, args: unknown[]): void {
         if (level < this.LOG_LEVEL) {
             return;
         }

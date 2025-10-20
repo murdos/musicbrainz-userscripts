@@ -52,10 +52,12 @@
         "prettier": "^3.6.2",
         "rollup": "^4.40.2",
         "tsx": "^4.19.4",
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.46.1",
+        "zod": "^4.1.12"
     },
     "lint-staged": {
         "*.{json,md,yml}": "prettier --write",
-        "*.js": "eslint --fix"
+        "*.{js,ts,tsx}": "eslint --fix"
     }
 }

@@ -2,7 +2,7 @@ import type { ArtistCredit } from '~/types/importers';
 
 // Convert a list of artists to a list of artist credits with joinphrases
 export function makeArtistCredits(artists_list: string[]): ArtistCredit[] {
-    let artists: ArtistCredit[] = artists_list.map(function (item) {
+    const artists: ArtistCredit[] = artists_list.map(function (item) {
         return { artist_name: item };
     });
     if (artists.length > 2) {

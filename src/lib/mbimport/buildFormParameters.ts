@@ -5,7 +5,6 @@ import { hmsToMilliSeconds } from '~/lib/shared/time-functions';
 import { guessReleaseType } from './guessReleaseType';
 
 function buildArtistCreditsFormParameters(parameters: FormParameter[], paramPrefix: string, artist_credit: ArtistCredit[]): void {
-    if (!artist_credit) return;
     for (let i = 0; i < artist_credit.length; i++) {
         const ac = artist_credit[i];
         if (ac) {
@@ -115,8 +114,8 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
                         total_duration += duration_ms;
                     }
                     appendParameter(parameters, `mediums.${i}.track.${j}.length`, tracklength);
-                    // @ts-ignore TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
-                    appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording);
+                    // @ts-expect-error TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
+                    if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // eslint-disable-line @typescript-eslint/no-unsafe-argument
                     buildArtistCreditsFormParameters(parameters, `mediums.${i}.track.${j}.`, track.artist_credit);
                 }
             }
