@@ -1,10 +1,10 @@
 import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
 import { MBImport } from '~/lib/mbimport';
-import { Logger } from '~/lib/logger';
+import { Logger, LogLevel } from '~/lib/logger';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import type { BeatportPageData, BeatportReleaseData, BeatportTrackData } from './types';
 
-const LOGGER = new Logger('beatport_importer');
+const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 window.$ = window.jQuery = jQuery.noConflict(true);
@@ -14,7 +14,7 @@ $(document).ready(() => {
 
     const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
 
-    const data: BeatportPageData = JSON.parse(document.getElementById('__NEXT_DATA__')!.innerHTML);
+    const data = JSON.parse(document.getElementById('__NEXT_DATA__')!.innerHTML) as unknown as BeatportPageData;
     const release_data = data.props.pageProps.release;
 
     // Reversing is less reliable, but the API does not provide track numbers.
@@ -23,7 +23,7 @@ $(document).ready(() => {
     const tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, element =>
         element ? /tracks/g.test(element.queryKey) : false,
     )[0];
-    const tracks_data_array = tracks_release?.state?.data?.results;
+    const tracks_data_array = tracks_release?.state?.data.results;
     if (!tracks_data_array) {
         LOGGER.error('Could not find tracks data');
         return;
@@ -35,7 +35,9 @@ $(document).ready(() => {
 
     const mbrelease = retrieveReleaseInfo(release_url, release_data, tracks_data);
 
-    setTimeout(() => insertLink(mbrelease, release_url, isrcs), 1000);
+    setTimeout(() => {
+        insertLink(mbrelease, release_url, isrcs);
+    }, 1000);
 });
 
 function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseData, tracks_data: BeatportTrackData[]): Release {

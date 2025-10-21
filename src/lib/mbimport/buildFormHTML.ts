@@ -5,7 +5,7 @@ export function buildFormHTML(parameters: FormParameter[]): string {
     // Build form
     let innerHTML = `<form class="musicbrainz_import musicbrainz_import_add" action="https://musicbrainz.org/release/add" method="post" target="_blank" accept-charset="UTF-8" charset="${document.characterSet}">`;
     parameters.forEach(function (parameter) {
-        const value = `${parameter.value}`;
+        const value = parameter.value.toString();
         innerHTML += `<input type='hidden' value='${value.replace(/'/g, '&apos;')}' name='${parameter.name}'/>`;
     });
 

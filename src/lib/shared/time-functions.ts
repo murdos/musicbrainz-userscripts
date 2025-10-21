@@ -1,6 +1,6 @@
 // convert HH:MM:SS or MM:SS to milliseconds
 export function hmsToMilliSeconds(str: number | string | undefined): number {
-    if (typeof str == 'undefined' || str === null || str === '' || isNaN(Number(str))) return NaN;
+    if (typeof str == 'undefined' || str === '' || isNaN(Number(str))) return NaN;
     if (typeof str == 'number') return str;
     const t = str.split(':');
     let s = 0;

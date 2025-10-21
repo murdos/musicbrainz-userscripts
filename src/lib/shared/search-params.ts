@@ -28,7 +28,7 @@ export function searchParams(release: Release): FormParameter[] {
         }
     }
 
-    let query =
+    const query =
         `artist:(${luceneEscape(release_artist)})` +
         ` release:(${luceneEscape(release.title)})` +
         ` tracks:(${totaltracks})${release.country ? ` country:${release.country}` : ''}`;

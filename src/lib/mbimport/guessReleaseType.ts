@@ -7,9 +7,9 @@ export function guessReleaseType(title: string, num_tracks: number, duration_ms:
         has_single = false;
         has_EP = false;
     }
-    let perhaps_single = (has_single && num_tracks <= 4) || num_tracks <= 2;
-    let perhaps_EP = has_EP || (num_tracks > 2 && num_tracks <= 6);
-    let perhaps_album = num_tracks > 8;
+    const perhaps_single = (has_single && num_tracks <= 4) || num_tracks <= 2;
+    const perhaps_EP = has_EP || (num_tracks > 2 && num_tracks <= 6);
+    const perhaps_album = num_tracks > 8;
     if (isNaN(duration_ms)) {
         // no duration, try to guess with title and number of tracks
         if (perhaps_single && !perhaps_EP && !perhaps_album) return 'single';
