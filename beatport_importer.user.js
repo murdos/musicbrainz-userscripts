@@ -4,10 +4,10 @@
 // @version      2025.10.20.2
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
-// @match        https://www.beatport.com/release/*
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
+// @match        https://www.beatport.com/release/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
@@ -80,7 +80,7 @@
       // Build form
       var innerHTML = "<form class=\"musicbrainz_import musicbrainz_import_add\" action=\"https://musicbrainz.org/release/add\" method=\"post\" target=\"_blank\" accept-charset=\"UTF-8\" charset=\"".concat(document.characterSet, "\">");
       parameters.forEach(function (parameter) {
-        var value = "".concat(parameter.value);
+        var value = parameter.value.toString();
         innerHTML += "<input type='hidden' value='".concat(value.replace(/'/g, '&apos;'), "' name='").concat(parameter.name, "'/>");
       });
       innerHTML += '<button type="submit" title="Import this release into MusicBrainz (open a new tab)"><img src="https://raw.githubusercontent.com/metabrainz/design-system/master/brand/logos/MusicBrainz/SVG/MusicBrainz_logo_icon.svg" width="16" height="16" />Import into MB</button>';
@@ -90,7 +90,7 @@
 
     // convert HH:MM:SS or MM:SS to milliseconds
     function hmsToMilliSeconds(str) {
-      if (typeof str == 'undefined' || str === null || str === '' || isNaN(Number(str))) return NaN;
+      if (typeof str == 'undefined' || str === '' || isNaN(Number(str))) return NaN;
       if (typeof str == 'number') return str;
       var t = str.split(':');
       var s = 0;
@@ -139,7 +139,6 @@
     }
 
     function buildArtistCreditsFormParameters(parameters, paramPrefix, artist_credit) {
-      if (!artist_credit) return;
       for (var i = 0; i < artist_credit.length; i++) {
         var ac = artist_credit[i];
         if (ac) {
@@ -248,8 +247,8 @@
                 total_duration += duration_ms;
               }
               appendParameter(parameters, "mediums.".concat(_i3, ".track.").concat(j, ".length"), tracklength);
-              // @ts-ignore TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
-              appendParameter(parameters, "mediums.".concat(_i3, ".track.").concat(j, ".recording"), track.recording);
+              // @ts-expect-error TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
+              if (track.recording) appendParameter(parameters, "mediums.".concat(_i3, ".track.").concat(j, ".recording"), track.recording); // eslint-disable-line @typescript-eslint/no-unsafe-argument
               buildArtistCreditsFormParameters(parameters, "mediums.".concat(_i3, ".track.").concat(j, "."), track.artist_credit);
             }
           }
@@ -522,7 +521,7 @@
       LogLevel["INFO"] = "info";
       LogLevel["ERROR"] = "error";
       return LogLevel;
-    }(LogLevel || {});
+    }({});
     var Logger = /*#__PURE__*/function () {
       function Logger(scriptName) {
         var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : LogLevel.ERROR;
@@ -595,7 +594,7 @@
       _add_css(css_import_button);
     }
 
-    var LOGGER = new Logger('beatport_importer');
+    var LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
     // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
     window.$ = window.jQuery = jQuery.noConflict(true);
@@ -611,7 +610,7 @@
       var tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, function (element) {
         return element ? /tracks/g.test(element.queryKey) : false;
       })[0];
-      var tracks_data_array = tracks_release === null || tracks_release === void 0 || (_tracks_release$state = tracks_release.state) === null || _tracks_release$state === void 0 || (_tracks_release$state = _tracks_release$state.data) === null || _tracks_release$state === void 0 ? void 0 : _tracks_release$state.results;
+      var tracks_data_array = tracks_release === null || tracks_release === void 0 || (_tracks_release$state = tracks_release.state) === null || _tracks_release$state === void 0 ? void 0 : _tracks_release$state.data.results;
       if (!tracks_data_array) {
         LOGGER.error('Could not find tracks data');
         return;
@@ -626,7 +625,7 @@
       });
       var mbrelease = retrieveReleaseInfo(release_url, release_data, tracks_data);
       setTimeout(function () {
-        return insertLink(mbrelease, release_url, isrcs);
+        insertLink(mbrelease, release_url, isrcs);
       }, 1000);
     });
     function retrieveReleaseInfo(release_url, release_data, tracks_data) {
