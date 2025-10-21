@@ -7,18 +7,21 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
+            - uses: pnpm/action-setup@v4.2.0
+              with:
+                  run_install: false
             - uses: actions/setup-node@v6.0.0
               with:
-                  node-version-file: "package.json"
-                  cache: 'npm'
+                  node-version-file: 'package.json'
+                  cache: 'pnpm'
             - name: 'Install dependencies'
-              run: npm install
+              run: pnpm install --frozen-lockfile
             - name: 'Run type checking'
-              run: npm run type-check
+              run: pnpm type-check
             - name: 'Run linter'
-              run: npm run lint
+              run: pnpm lint
             - name: 'Build userscripts'
-              run: npm run build
+              run: pnpm build
     auto-merge:
         name: 'dependabot-auto-merge'
         needs: linter
