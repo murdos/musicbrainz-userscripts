@@ -22,25 +22,3 @@ jobs:
               run: pnpm lint
             - name: 'Build userscripts'
               run: pnpm build
-    auto-merge:
-        name: 'dependabot-auto-merge'
-        needs: linter
-        if: github.actor == 'dependabot[bot]'
-        runs-on: ubuntu-latest
-        steps:
-            - name: automerge
-              uses: actions/github-script@v8.0.0
-              with:
-                  script: |
-                      github.rest.pullRequests.createReview({
-                        owner: context.payload.repository.owner.login,
-                        repo: context.payload.repository.name,
-                        pull_number: context.payload.pull_request.number,
-                        event: 'APPROVE'
-                      })
-                      github.rest.pullRequests.merge({
-                        owner: context.payload.repository.owner.login,
-                        repo: context.payload.repository.name,
-                        pull_number: context.payload.pull_request.number
-                      })
-                  github-token: ${{github.token}}
