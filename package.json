@@ -54,7 +54,7 @@
         "rollup": "^4.52.5",
         "tsx": "^4.19.4",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.46.1",
+        "typescript-eslint": "^8.46.2",
         "zod": "^4.1.12"
     },
     "packageManager": "pnpm@9.4.0",
