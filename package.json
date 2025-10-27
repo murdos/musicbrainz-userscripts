@@ -31,7 +31,7 @@
     },
     "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
-        "@babel/core": "^7.27.1",
+        "@babel/core": "^7.28.5",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-typescript": "^7.27.1",
         "@eslint/js": "^9.38.0",
