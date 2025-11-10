@@ -25,7 +25,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 if (!unsafeWindow) unsafeWindow = window;
 
 String.prototype.fix_bandcamp_url = function () {
-    return this.replace('http://', 'https://');
+    let url = this;
+    const archiveRegex = /^https?:\/\/web\.archive\.org\/web\/\d+[a-z_]*\/(https?:\/\/.*)$/i;
+    const match = url.match(archiveRegex);
+    if (match) {
+        url = match[1];
+    }
+    return url.replace('http://', 'https://');
 };
 
 const BandcampImport = {
@@ -190,7 +196,7 @@ const BandcampImport = {
         const ccIcons = document.querySelector('div#license a.cc-icons');
         if (ccIcons) {
             release.urls.push({
-                url: ccIcons.getAttribute('href'),
+                url: ccIcons.getAttribute('href').fix_bandcamp_url(),
                 link_type: link_type.license,
             });
         }
@@ -258,37 +264,28 @@ const BandcampImport = {
 };
 
 if (window.location.hostname === 'web.archive.org') {
-    window.addEventListener('beforescriptexecute', function (e) {
-        let prev = e.target.previousElementSibling;
+    const targetWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+    let _realWombat;
 
-        if (!prev || !prev.src) {
-            return;
-        }
-
-        let patchproc = function () {
-            if (!window._WBWombat) {
-                return;
-            }
-
-            // Patch the Wombat options to exclude Musicbrainz URLs
-            let oldWombat = window._WBWombat;
-            window._WBWombat = function (wbwindow, wbinfo) {
-                wbinfo.wombat_opts.no_rewrite_prefixes.push('https://musicbrainz.org/');
-                wbinfo.wombat_opts.no_rewrite_prefixes.push('http://musicbrainz.org/');
-                wbinfo.wombat_opts.no_rewrite_prefixes.push('//musicbrainz.org/');
-                return oldWombat(wbwindow, wbinfo);
+    Object.defineProperty(targetWindow, '_WBWombat', {
+        configurable: true,
+        enumerable: true,
+        get: function () {
+            return _realWombat;
+        },
+        set: function (originalWombatFunc) {
+            _realWombat = function (wbwindow, wbinfo) {
+                if (wbinfo && wbinfo.wombat_opts) {
+                    if (!wbinfo.wombat_opts.no_rewrite_prefixes) {
+                        wbinfo.wombat_opts.no_rewrite_prefixes = [];
+                    }
+                    wbinfo.wombat_opts.no_rewrite_prefixes.push('https://musicbrainz.org/');
+                    wbinfo.wombat_opts.no_rewrite_prefixes.push('http://musicbrainz.org/');
+                    wbinfo.wombat_opts.no_rewrite_prefixes.push('//musicbrainz.org/');
+                }
+                return originalWombatFunc(wbwindow, wbinfo);
             };
-        };
-
-        // Insert our payload after Wombat's been loaded, but before its initialised
-        if (prev.src.search(/\/_static\/js\/wombat.js/) != -1) {
-            window.removeEventListener('beforescriptexecute', arguments.callee);
-
-            let script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.text = `(${patchproc})()`;
-            prev.parentNode.insertBefore(script, e.target);
-        }
+        },
     });
 }
 
@@ -375,10 +372,10 @@ $(document).ready(function () {
         if (labelback) {
             const labelbacklink = labelback.getAttribute('href');
             if (labelbacklink) {
-                label_url = labelbacklink
+                let cleanLabelLink = labelbacklink.fix_bandcamp_url();
+                label_url = cleanLabelLink
                     .match(/^(https?:\/\/[^/]+)/)[1]
-                    .split('?')[0]
-                    .fix_bandcamp_url();
+                    .split('?')[0];
                 mblinks.searchAndDisplayMbLink(
                     label_url,
                     'label',
@@ -506,12 +503,12 @@ $(document).ready(function () {
                         <a class="mb_search_link"
                             class="musicbrainz_import"
                             target="_blank"
-                            title="Search this artist on MusicBrainz (open in a new tab)" 
+                            title="Search this artist on MusicBrainz (open in a new tab)"
                             href="${artistSearchUrl}"
                         ><small>A</small>?</a>
                     </span>
                     <span class="mb_valign mb_searchit">
-                        <a 
+                        <a
                             class="mb_search_link musicbrainz_import"
                             target="_blank"
                             title="Search this label on MusicBrainz (open in a new tab)"
