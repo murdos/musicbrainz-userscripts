@@ -149,9 +149,8 @@ function insertLink(mbrelease: Release, release_url: string, isrcs: (string | nu
         .appendTo(mbUI);
 
     $('div[title="Collection controls"]').append(mbUI);
-    $('form.musicbrainz_import').css({ display: 'inline-block', 'margin-left': '5px' });
+    $('div.musicbrainz-import').css({ display: 'flex', gap: '5px', flexWrap: 'wrap' });
     $('form.musicbrainz_import button').css({ width: '120px' });
-    $('form.musicbrainz_import button img').css({ display: 'inline-block' });
 
     const lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
     const spanHTML = mbrelease.barcode
