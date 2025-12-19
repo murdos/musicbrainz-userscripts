@@ -2,41 +2,75 @@ import { type ArtistCredit, type Disc, type Label, type Release, type Track, typ
 import { MBImport } from '~/lib/mbimport';
 import { Logger, LogLevel } from '~/lib/logger';
 import { MBImportStyle } from '~/lib/mbimportstyle';
-import type { BeatportPageData, BeatportReleaseData, BeatportTrackData } from './types';
+import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
+import { getBeatportReleaseData } from './utils/getBeatportReleaseData';
+import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 window.$ = window.jQuery = jQuery.noConflict(true);
 
-$(document).ready(() => {
-    MBImportStyle();
+const MB_IMPORT_ELEMENT = 'div.musicbrainz-import';
+const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
+
+/**
+ * Remove existing MusicBrainz import UI to avoid duplicates
+ */
+const cleanup = () => {
+    $(MB_IMPORT_ELEMENT).remove();
+    $(`#${MB_IMPORT_BARCODE_ELEMENT}`).remove();
+};
+
+async function processReleasePage() {
+    const releaseData = await getBeatportReleaseData(LOGGER);
+
+    const isReleasePage = window.location.pathname.includes('/release/');
+    if (!releaseData || !isReleasePage) {
+        return;
+    }
 
     const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
 
-    const data = JSON.parse(document.getElementById('__NEXT_DATA__')!.innerHTML) as unknown as BeatportPageData;
-    const release_data = data.props.pageProps.release;
+    try {
+        const release = releaseData.pageProps.release;
 
-    // Reversing is less reliable, but the API does not provide track numbers.
-    const tracks_table = release_data.tracks.reverse();
+        // Reversing is less reliable, but the API does not provide track numbers.
+        const tracks_table = release.tracks.reverse();
 
-    const tracks_release = $.grep(data.props.pageProps.dehydratedState.queries, element =>
-        element ? /tracks/g.test(element.queryKey) : false,
-    )[0];
-    const tracks_data_array = tracks_release?.state?.data.results;
-    if (!tracks_data_array) {
-        LOGGER.error('Could not find tracks data');
-        return;
+        const tracks_release = $.grep(releaseData.pageProps.dehydratedState.queries, element =>
+            element ? /tracks/g.test(element.queryKey) : false,
+        )[0];
+        const tracks_data_array = tracks_release?.state?.data.results;
+        if (!tracks_data_array) {
+            LOGGER.error('Could not find tracks data');
+            return;
+        }
+        const tracks_data = $.map(tracks_table, (url: string) =>
+            $.grep(tracks_data_array, element => (element ? element.url === url : false)),
+        ) as BeatportTrackData[];
+        const isrcs = tracks_data.map(track => track.isrc || null);
+
+        const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
+
+        insertMBButtons(mbrelease, release_url, isrcs);
+    } catch (error) {
+        LOGGER.error('Error processing release page:', error);
     }
-    const tracks_data = $.map(tracks_table, (url: string) =>
-        $.grep(tracks_data_array, element => (element ? element.url === url : false)),
-    ) as BeatportTrackData[];
-    const isrcs = tracks_data.map(track => track.isrc || null);
+}
 
-    const mbrelease = retrieveReleaseInfo(release_url, release_data, tracks_data);
+// Subscribe to SPA navigation events
+subscribeToSPANavigation({
+    beforeNavigate: cleanup,
+    onNavigate: processReleasePage,
+});
 
+$(document).ready(() => {
+    MBImportStyle();
+
+    // Process initial page load
     setTimeout(() => {
-        insertLink(mbrelease, release_url, isrcs);
+        void processReleasePage();
     }, 1000);
 });
 
@@ -128,7 +162,7 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
 }
 
 // Insert button into page under label information
-function insertLink(mbrelease: Release, release_url: string, isrcs: (string | null)[]): void {
+function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string | null)[]): void {
     const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
 
@@ -136,7 +170,7 @@ function insertLink(mbrelease: Release, release_url: string, isrcs: (string | nu
         `<div class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
             parameters,
         )}${MBImport.buildSearchButton(mbrelease)}</div>`,
-    ).hide();
+    );
 
     $(
         '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>',
@@ -149,7 +183,7 @@ function insertLink(mbrelease: Release, release_url: string, isrcs: (string | nu
         .appendTo(mbUI);
 
     $('div[title="Collection controls"]').append(mbUI);
-    $('div.musicbrainz-import').css({ display: 'flex', gap: '5px', flexWrap: 'wrap' });
+    $(MB_IMPORT_ELEMENT).css({ display: 'flex', gap: '5px', flexWrap: 'wrap' });
     $('form.musicbrainz_import button').css({ width: '120px' });
 
     const lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
@@ -159,13 +193,10 @@ function insertLink(mbrelease: Release, release_url: string, isrcs: (string | nu
         </a>`
         : '[none]';
     const releaseInfoBarcode = $(
-        `<div class="${lastReleaseInfo.attr('class')}">
+        `<div class="${lastReleaseInfo.attr('class')}" id="${MB_IMPORT_BARCODE_ELEMENT}">
             <p>Barcode</p>
             <span>${spanHTML}</span>
         </div>`,
-    ).hide();
+    );
     lastReleaseInfo.after(releaseInfoBarcode);
-
-    mbUI.slideDown();
-    releaseInfoBarcode.slideDown();
 }
