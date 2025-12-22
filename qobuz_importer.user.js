@@ -268,6 +268,7 @@ function insertLink(release) {
         display: 'flex',
         alignItems: 'center',
         gap: '2px',
+        flexWrap: 'wrap',
     });
 
     $('.album-meta .album-meta__title').before(mbUI);
@@ -287,22 +288,20 @@ function insertLink(release) {
     });
     $('label.musicbrainz_import').css({
         'white-space': 'nowrap',
-        'border-radius': '5px',
-        display: 'inline-block',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
         cursor: 'pointer',
         'font-family': 'Arial',
         'font-size': '12px',
         padding: '2px 6px',
-        margin: '0 2px 0 1px',
-        'text-decoration': 'none',
-        border: '1px solid rgba(180,180,180,0.8)',
-        'background-color': 'rgba(240,240,240,0.8)',
+        margin: '0',
         color: '#334',
         height: '26px',
         'box-sizing': 'border-box',
     });
     $('label.musicbrainz_import input').css({
-        margin: '0 4px 0 0',
+        cursor: 'pointer',
     });
     mbUI.slideDown();
 }
