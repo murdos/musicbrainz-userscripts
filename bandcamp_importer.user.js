@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.12.22.1
+// @version      2025.12.23.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -323,14 +323,29 @@ $(document).ready(function () {
     /***/
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
     const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
-    const hasAlbumData = unsafeWindow.TralbumData && Object.entries(unsafeWindow.TralbumData).length > 0; // Sometimes TralbumData is an empty object, see issue #676
-    const isDiscographyPage = unsafeWindow.TralbumData.url && !!unsafeWindow.TralbumData.url.match(/\/music\/?$/);
+    const hasAlbumData = unsafeWindow.TralbumData && 'current' in unsafeWindow.TralbumData; // Sometimes TralbumData is an empty object, see issue #676
+    const isDiscographyPage =
+        unsafeWindow.TralbumData.url &&
+        (!!unsafeWindow.TralbumData.url.match(/\/music\/?$/) || !!unsafeWindow.TralbumData.url.match(/\/indexpage\/?$/));
 
     if (isDiscographyPage) {
-        const hostname = unsafeWindow.TralbumData.url.replace('/music', '');
+        /**
+         * Discography pages can be in two formats:
+         * - music: /music/ (default)
+         * - indexpage: /indexpage/ (new format) e.g. https://arbee.bandcamp.com
+         */
+        const discographyFormat = unsafeWindow.TralbumData.url.match(/\/music\/?$/)
+            ? 'music'
+            : unsafeWindow.TralbumData.url.match(/\/indexpage\/?$/)
+              ? 'indexpage'
+              : null;
+        const hostname = unsafeWindow.TralbumData.url.replace('/music', '').replace('/indexpage', '');
         const urls_data = [];
 
-        $('ol#music-grid > li > a').each(function () {
+        const releaseLinksMatcher = discographyFormat === 'music' ? 'ol#music-grid > li > a' : 'span.indexpage_list div.ipCellLabel1 a';
+        const insertionLocationMatcher = discographyFormat === 'music' ? 'p.title' : undefined;
+
+        $(releaseLinksMatcher).each(function () {
             const $link = $(this);
             const bandcampReleaseUrl = $link.attr('href');
             const pathName = getPathName(bandcampReleaseUrl);
@@ -344,7 +359,11 @@ $(document).ready(function () {
                     url: full_url,
                     mb_type: 'release',
                     insert_func: function (link) {
-                        $('p.title', $link).prepend(link);
+                        if (insertionLocationMatcher) {
+                            $(insertionLocationMatcher, $link).prepend(link);
+                        } else {
+                            $link.prepend(link);
+                        }
                     },
                     key: `release:${full_url}`,
                 });
