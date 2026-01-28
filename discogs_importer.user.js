@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2025.08.13
+// @version      2026.01.28
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -406,11 +406,27 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 
 function insertMbUI(mbUI) {
     let e;
+
+    // New Discogs layout (works on your saved page)
+    if ((e = $('#release-actions')) && e.length) {
+        e.before(mbUI);
+        return;
+    }
+    if ((e = $('#release-stats')) && e.length) {
+        e.before(mbUI);
+        return;
+    }
+
+    // Fallback: stick it near the top of the sidebar if we can find it
+    if ((e = $('div.side__gnpk').first()) && e.length) {
+        e.before(mbUI);
+        return;
+    }
+
+    // Old layout fallbacks (keep these just in case)
     if ((e = $('#release-marketplace')) && e.length) {
         e.before(mbUI);
-    }
-    // FIXME: the following selectors are broken since the 2021-08-09 release page update, not sure why there are three alternative selectors
-    else if ((e = $('div.section.collections')) && e.length) {
+    } else if ((e = $('div.section.collections')) && e.length) {
         e.after(mbUI);
     } else if ((e = $('#statistics')) && e.length) {
         e.before(mbUI);
@@ -418,6 +434,7 @@ function insertMbUI(mbUI) {
         e.before(mbUI);
     }
 }
+
 
 // Insert links in Discogs page
 function insertMBSection(release, current_page_key) {
