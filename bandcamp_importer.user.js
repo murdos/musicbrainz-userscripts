@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.02.06.1
+// @version      2026.02.07.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -503,42 +503,47 @@ $(document).ready(function () {
             }
         };
 
-        // The URL could either be a band or a label page, we don't know which, so we search for both.
-        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', function (link) {
-            insertLinkCb(link);
-        });
+        function showLookupButtonsIfNoLink() {
+            if (!isLinkInserted) {
+                MBSearchItStyle();
+                const entityName = unsafeWindow.BandData.name;
+                const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
+                const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
 
-        mblinks.searchAndDisplayMbLink(cleanURL, 'label', function (link) {
-            insertLinkCb(link);
-        });
-
-        if (!isLinkInserted) {
-            // Offer lookup in MB
-            MBSearchItStyle();
-            const entityName = unsafeWindow.BandData.name;
-            const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
-            const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
-
-            $('div.stub-page-content h1').append(`
-                <span class="mb_wrapper">
-                    <span class="mb_valign mb_searchit">
-                        <a class="mb_search_link"
-                            class="musicbrainz_import"
-                            target="_blank"
-                            title="Search this artist on MusicBrainz (open in a new tab)" 
-                            href="${artistSearchUrl}"
-                        ><small>A</small>?</a>
+                $('div.stub-page-content h1').append(`
+                    <span class="mb_wrapper">
+                        <span class="mb_valign mb_searchit">
+                            <a class="mb_search_link"
+                                class="musicbrainz_import"
+                                target="_blank"
+                                title="Search this artist on MusicBrainz (open in a new tab)" 
+                                href="${artistSearchUrl}"
+                            ><small>A</small>?</a>
+                        </span>
+                        <span class="mb_valign mb_searchit">
+                            <a 
+                                class="mb_search_link musicbrainz_import"
+                                target="_blank"
+                                title="Search this label on MusicBrainz (open in a new tab)"
+                                href="${labelSearchUrl}"
+                            ><small>L</small>?</a>
+                        </span>
                     </span>
-                    <span class="mb_valign mb_searchit">
-                        <a 
-                            class="mb_search_link musicbrainz_import"
-                            target="_blank"
-                            title="Search this label on MusicBrainz (open in a new tab)"
-                            href="${labelSearchUrl}"
-                        ><small>L</small>?</a>
-                    </span>
-                </span>
-            `);
+                `);
+            }
         }
+
+        // The URL could either be a band or a label page, we don't know which, so we search for both.
+        // Show lookup buttons only after both searches have completed and neither found a link.
+        let pendingSearches = 2;
+        const onSearchComplete = function () {
+            pendingSearches -= 1;
+            if (pendingSearches === 0) {
+                showLookupButtonsIfNoLink();
+            }
+        };
+
+        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
+        mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, undefined, onSearchComplete);
     }
 });
