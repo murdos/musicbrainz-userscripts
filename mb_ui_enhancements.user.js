@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.02.07.1
+// @version      2026.02.07.2
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -12,6 +12,8 @@
 // @resource     copyIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/copy.svg
 // @resource     checkIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/check.svg
 // @resource     errorIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/error.svg
+// @resource     searchIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search.svg
+// @resource     searchArtistIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search-artist.svg
 // @grant        GM_getResourceURL
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
@@ -34,6 +36,20 @@ function setCopyTitleMenu() {
     );
 }
 setCopyTitleMenu();
+
+// Google search release title: menu command to enable/disable (default enabled)
+function setGoogleSearchMenu() {
+    if (typeof GM_registerMenuCommand !== 'function') return;
+    GM_registerMenuCommand(
+        `${GM_getValue('googleSearchEnabled', true) ? '☑' : '☐'} Google search release title buttons`,
+        function () {
+            GM_setValue('googleSearchEnabled', !GM_getValue('googleSearchEnabled', true));
+            setGoogleSearchMenu();
+        },
+        { autoClose: false, id: 'googleSearch' },
+    );
+}
+setGoogleSearchMenu();
 
 $(document).ready(function () {
     // Follow the instructions found at https://www.last.fm/api/authentication
@@ -193,44 +209,108 @@ $(document).ready(function () {
     if (window.location.href.match(re)) {
         const mbid = window.location.href.match(re)[1];
 
-        // Copy release title icon (outside the title <span> and <a> in the release header)
-        const $titleSpan = $('div.releaseheader h1 span.mp');
-        if (
+        const $releaseHeader = $('div.wrap-anywhere.releaseheader, div.releaseheader').first();
+        const $h1 = $releaseHeader.children('h1');
+        const releaseTitle = $h1.length ? $h1.text().replace(/\s+/g, ' ').trim() : '';
+        const shouldShowCopyButton =
             GM_getValue('copyTitleEnabled', true) &&
-            $titleSpan.length &&
             navigator.clipboard &&
             navigator.clipboard.writeText &&
-            typeof GM_getResourceURL === 'function'
-        ) {
-            const titleText = $titleSpan.find('bdi').text();
+            typeof GM_getResourceURL === 'function';
+
+        if (releaseTitle && $releaseHeader.length) {
             const iconCSS = { width: '18px', height: '18px', verticalAlign: 'top' };
-            const $img = $('<img />')
-                .attr({ src: GM_getResourceURL('copyIcon'), alt: 'Copy', title: 'Copy release title' })
-                .css({ ...iconCSS, cursor: 'pointer' });
-            const $checkImg = $('<img />')
-                .attr({ src: GM_getResourceURL('checkIcon'), alt: 'Copied' })
-                .css(iconCSS);
-            const $errorImg = $('<img />')
-                .attr({ src: GM_getResourceURL('errorIcon'), alt: 'Copy failed' })
-                .css(iconCSS);
-            const $wrap = $('<span class="copy-title-btn" />').css({ display: 'inline-block' }).append($img);
-            $wrap.on('click', function () {
-                navigator.clipboard.writeText(titleText).then(
-                    function () {
-                        $wrap.empty().append($checkImg);
-                        setTimeout(function () {
-                            $wrap.empty().append($img);
-                        }, 3000);
-                    },
-                    function () {
-                        $wrap.empty().append($errorImg);
-                        setTimeout(function () {
-                            $wrap.empty().append($img);
-                        }, 3000);
-                    },
-                );
+            const $iconsContainer = $('<span class="release-title-actions" />').css({
+                display: 'inline-block',
+                marginLeft: '2px',
             });
-            $titleSpan.after($wrap);
+
+            if (GM_getValue('googleSearchEnabled', true) && typeof GM_getResourceURL === 'function') {
+                const $searchImg = $('<img />')
+                    .attr({ src: GM_getResourceURL('searchIcon'), alt: 'Search', role: 'img' })
+                    .css(iconCSS);
+
+                const titleExactQuery = `"${releaseTitle.replace(/"/g, '')}"`;
+                const googleTitleUrl = `https://www.google.com/search?q=${encodeURIComponent(titleExactQuery)}`;
+                const $googleTitleLink = $('<a />')
+                    .attr({
+                        href: googleTitleUrl,
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                        title: 'Search release title on Google',
+                    })
+                    .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
+                    .append($searchImg.clone());
+                $iconsContainer.append($googleTitleLink);
+
+                const artistText = $releaseHeader.find('p.subheader > bdi').text().replace(/\s+/g, ' ').trim();
+                const artists = artistText
+                    ? artistText
+                          .split(/\s*\/\s*/)
+                          .map(function (s) {
+                              return s.trim();
+                          })
+                          .filter(Boolean)
+                    : [];
+                const exactPhrases = artists.concat([releaseTitle]);
+                const exactQuery = exactPhrases
+                    .map(function (p) {
+                        return `"${p.replace(/"/g, '')}"`;
+                    })
+                    .join(' ');
+                const googleExactUrl = `https://www.google.com/search?q=${encodeURIComponent(exactQuery)}`;
+                const $searchArtistImg = $('<img />')
+                    .attr({ src: GM_getResourceURL('searchArtistIcon'), alt: 'Search artist and title', role: 'img' })
+                    .css(iconCSS);
+                const $googleExactLink = $('<a />')
+                    .attr({
+                        href: googleExactUrl,
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                        title: 'Search Google for exact match (artist(s) + release title)',
+                    })
+                    .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
+                    .append($searchArtistImg);
+                $iconsContainer.append($googleExactLink);
+            }
+
+            if (shouldShowCopyButton) {
+                const $img = $('<img />')
+                    .attr({ src: GM_getResourceURL('copyIcon'), alt: 'Copy', title: 'Copy release title' })
+                    .css({ ...iconCSS, cursor: 'pointer' });
+                const $checkImg = $('<img />')
+                    .attr({ src: GM_getResourceURL('checkIcon'), alt: 'Copied' })
+                    .css(iconCSS);
+                const $errorImg = $('<img />')
+                    .attr({ src: GM_getResourceURL('errorIcon'), alt: 'Copy failed' })
+                    .css(iconCSS);
+                const $wrap = $('<span />').css({ display: 'inline-block' }).append($img);
+                $wrap.on('click', function () {
+                    navigator.clipboard.writeText(releaseTitle).then(
+                        function () {
+                            $wrap.empty().append($checkImg);
+                            setTimeout(function () {
+                                $wrap.empty().append($img);
+                            }, 3000);
+                        },
+                        function () {
+                            $wrap.empty().append($errorImg);
+                            setTimeout(function () {
+                                $wrap.empty().append($img);
+                            }, 3000);
+                        },
+                    );
+                });
+                $iconsContainer.append($wrap);
+            }
+
+            const $titleLine = $('<span class="release-title-line" />').css({
+                display: 'flex',
+                alignItems: 'flex-start',
+                flexWrap: 'nowrap',
+            });
+            $h1.wrap($titleLine);
+            $h1.parent().append($iconsContainer);
         }
 
         let ISRC_COLUMN_POSITION = 2;
