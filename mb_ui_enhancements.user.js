@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.02.07.2
+// @version      2026.02.07.3
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
 // @namespace    http://userscripts.org/users/22504
-// @include      http*://*musicbrainz.org/*
+// @match        https://*musicbrainz.org/*
+// @match        http://*musicbrainz.org/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require      https://raw.github.com/murdos/mbediting.js/master/mbediting.js
 // @resource     copyIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/copy.svg
