@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2023.4.23.1
+// @version      2026.02.07.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -9,10 +9,31 @@
 // @include      http*://*musicbrainz.org/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require      https://raw.github.com/murdos/mbediting.js/master/mbediting.js
+// @resource     copyIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/copy.svg
+// @resource     checkIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/check.svg
+// @resource     errorIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/error.svg
+// @grant        GM_getResourceURL
+// @grant        GM_registerMenuCommand
+// @grant        GM_getValue
+// @grant        GM_setValue
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
+
+// Copy release title: menu command to enable/disable (default enabled)
+function setCopyTitleMenu() {
+    if (typeof GM_registerMenuCommand !== 'function') return;
+    GM_registerMenuCommand(
+        `${GM_getValue('copyTitleEnabled', true) ? '☑' : '☐'} Copy release title button`,
+        function () {
+            GM_setValue('copyTitleEnabled', !GM_getValue('copyTitleEnabled', true));
+            setCopyTitleMenu();
+        },
+        { autoClose: false, id: 'copyTitle' },
+    );
+}
+setCopyTitleMenu();
 
 $(document).ready(function () {
     // Follow the instructions found at https://www.last.fm/api/authentication
@@ -170,8 +191,49 @@ $(document).ready(function () {
     // Display ISRCs and recording comment on release tracklisting
     re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})#?$', 'i');
     if (window.location.href.match(re)) {
-        let ISRC_COLUMN_POSITION = 2;
         const mbid = window.location.href.match(re)[1];
+
+        // Copy release title icon (outside the title <span> and <a> in the release header)
+        const $titleSpan = $('div.releaseheader h1 span.mp');
+        if (
+            GM_getValue('copyTitleEnabled', true) &&
+            $titleSpan.length &&
+            navigator.clipboard &&
+            navigator.clipboard.writeText &&
+            typeof GM_getResourceURL === 'function'
+        ) {
+            const titleText = $titleSpan.find('bdi').text();
+            const iconCSS = { width: '18px', height: '18px', verticalAlign: 'top' };
+            const $img = $('<img />')
+                .attr({ src: GM_getResourceURL('copyIcon'), alt: 'Copy', title: 'Copy release title' })
+                .css({ ...iconCSS, cursor: 'pointer' });
+            const $checkImg = $('<img />')
+                .attr({ src: GM_getResourceURL('checkIcon'), alt: 'Copied' })
+                .css(iconCSS);
+            const $errorImg = $('<img />')
+                .attr({ src: GM_getResourceURL('errorIcon'), alt: 'Copy failed' })
+                .css(iconCSS);
+            const $wrap = $('<span class="copy-title-btn" />').css({ display: 'inline-block' }).append($img);
+            $wrap.on('click', function () {
+                navigator.clipboard.writeText(titleText).then(
+                    function () {
+                        $wrap.empty().append($checkImg);
+                        setTimeout(function () {
+                            $wrap.empty().append($img);
+                        }, 3000);
+                    },
+                    function () {
+                        $wrap.empty().append($errorImg);
+                        setTimeout(function () {
+                            $wrap.empty().append($img);
+                        }, 3000);
+                    },
+                );
+            });
+            $titleSpan.after($wrap);
+        }
+
+        let ISRC_COLUMN_POSITION = 2;
         // Get tracks data from webservice
         let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
         $.getJSON(wsurl, function (data) {
