@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.2.12.1
+// @version      2026.2.12.2
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -61,6 +61,11 @@ $(document).ready(function () {
     // Highlight table rows
     $('head').append(
         '<style>table.tbl > tbody > tr:hover { background-color: #ffeea8 } table.tbl > tbody > tr:hover > td { background-color: rgba(0, 0, 0, 0) }</style>',
+    );
+
+    // Hover effects for release title action buttons
+    $('head').append(
+        '<style>.release-title-action-btn { opacity: 0.8; transition: transform 0.15s ease, opacity 0.15s ease; } .release-title-action-btn:hover { opacity: 1; transform: scale(1.15); } .release-title-action-btn:active { transform: scale(1.05); }</style>',
     );
 
     let re;
@@ -241,6 +246,7 @@ $(document).ready(function () {
                         rel: 'noopener noreferrer',
                         title: 'Search release title on Google',
                     })
+                    .addClass('release-title-action-btn')
                     .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
                     .append($searchImg.clone());
                 $iconsContainer.append($googleTitleLink);
@@ -267,6 +273,7 @@ $(document).ready(function () {
                         rel: 'noopener noreferrer',
                         title: 'Search Google for exact match (artist(s) + release title)',
                     })
+                    .addClass('release-title-action-btn')
                     .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
                     .append($searchArtistImg);
                 $iconsContainer.append($googleExactLink);
@@ -282,7 +289,7 @@ $(document).ready(function () {
                 const $errorImg = $('<img />')
                     .attr({ src: GM_getResourceURL('errorIcon'), alt: 'Copy failed' })
                     .css(iconCSS);
-                const $wrap = $('<span />').css({ display: 'inline-block' }).append($img);
+                const $wrap = $('<span />').addClass('release-title-action-btn').css({ display: 'inline-block' }).append($img);
                 $wrap.on('click', function () {
                     navigator.clipboard.writeText(releaseTitle).then(
                         function () {
