@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.2.12.2
+// @version      2026.2.12.3
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -211,11 +211,10 @@ $(document).ready(function () {
         });
     }
 
-    // Display ISRCs and recording comment on release tracklisting
-    re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})#?$', 'i');
+    // Release header buttons (search, copy) - on all release pages including sub-pages (cover-art, aliases, tags, etc.)
+    re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})(?:/[^?#]*)?(?:#.*)?$', 'i');
     if (window.location.href.match(re)) {
         const mbid = window.location.href.match(re)[1];
-
         const $releaseHeader = $('div.wrap-anywhere.releaseheader, div.releaseheader').first();
         const $h1 = $releaseHeader.children('h1');
         const releaseTitle = $h1.length ? $h1.text().replace(/\s+/g, ' ').trim() : '';
@@ -318,81 +317,85 @@ $(document).ready(function () {
             $h1.parent().append($iconsContainer);
         }
 
-        let ISRC_COLUMN_POSITION = 2;
-        // Get tracks data from webservice
-        let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
-        $.getJSON(wsurl, function (data) {
-            // Store tracks data from webservice in a hash table
-            let tracks = {};
-            $.each(data.media, function (index, medium) {
-                $.each(medium.tracks, function (i, track) {
-                    tracks[track.id] = track;
+        // ISRCs and recording comment - only on main release page (tracklisting exists there)
+        const mainReleaseRe = /musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}#?$/i;
+        if (mainReleaseRe.test(window.location.href)) {
+            let ISRC_COLUMN_POSITION = 2;
+            // Get tracks data from webservice
+            let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
+            $.getJSON(wsurl, function (data) {
+                // Store tracks data from webservice in a hash table
+                let tracks = {};
+                $.each(data.media, function (index, medium) {
+                    $.each(medium.tracks, function (i, track) {
+                        tracks[track.id] = track;
+                    });
                 });
+                // Different behavior depending on the number of mediums
+                if ($('table.medium').length <= 10) {
+                    // All mediums are already displayed: handle them now
+                    $('table.medium').each(function () {
+                        handleMedium($(this), tracks);
+                    });
+                } else {
+                    // Each medium will be handled when it's loaded
+                    let HANDLED_ATTRIBUTE = 'ui_enh_isrcs_handled';
+                    $('table.medium').attr(HANDLED_ATTRIBUTE, 'no');
+                    $('table.medium').bind('DOMNodeInserted', function (event) {
+                        const $target = $(event.target);
+                        if (
+                            $target.prop('nodeName') === 'TBODY' &&
+                            $target.parent().attr(HANDLED_ATTRIBUTE) === 'no' &&
+                            $target.find('tr.subh').length > 0
+                        ) {
+                            const $medium = $target.parent();
+                            $medium.attr(HANDLED_ATTRIBUTE, 'pending');
+                            handleMedium($medium, tracks);
+                            $medium.attr(HANDLED_ATTRIBUTE, 'done');
+                        }
+                    });
+                }
             });
-            // Different behavior depending on the number of mediums
-            if ($('table.medium').length <= 10) {
-                // All mediums are already displayed: handle them now
-                $('table.medium').each(function () {
-                    handleMedium($(this), tracks);
+
+            function handleMedium($medium, ws_tracks) {
+                // Extend colspan for medium table header
+                $medium.find('thead tr').each(function () {
+                    $(this)
+                        .find('th:eq(0)')
+                        .attr('colspan', $(this).find('th:eq(0)').attr('colspan') * 1 + 1);
                 });
-            } else {
-                // Each medium will be handled when it's loaded
-                let HANDLED_ATTRIBUTE = 'ui_enh_isrcs_handled';
-                $('table.medium').attr(HANDLED_ATTRIBUTE, 'no');
-                $('table.medium').bind('DOMNodeInserted', function (event) {
-                    const $target = $(event.target);
-                    if (
-                        $target.prop('nodeName') === 'TBODY' &&
-                        $target.parent().attr(HANDLED_ATTRIBUTE) === 'no' &&
-                        $target.find('tr.subh').length > 0
-                    ) {
-                        const $medium = $target.parent();
-                        $medium.attr(HANDLED_ATTRIBUTE, 'pending');
-                        handleMedium($medium, tracks);
-                        $medium.attr(HANDLED_ATTRIBUTE, 'done');
+                // Table sub-header
+                $medium
+                    .find(`tbody tr.subh th:nth-last-child(${ISRC_COLUMN_POSITION})`)
+                    .before("<th style='width: 150px;' class='isrc c'> ISRC </th>");
+
+                // Handle each track
+                $medium.find('tbody tr[id]').each(function (index, medium_track) {
+                    const track_mbid = $(medium_track).attr('id');
+                    let isrcsLinks = '';
+                    if (Object.prototype.hasOwnProperty.call(ws_tracks, track_mbid)) {
+                        const track = ws_tracks[track_mbid];
+                        let recording = track.recording;
+                        // Recording comment
+                        if (recording.disambiguation !== '') {
+                            let td_title_index = $(`#${track_mbid}`).find('td:eq(1)').hasClass('video') ? 2 : 1;
+                            $(`#${track_mbid}`)
+                                .find(`td:eq(${td_title_index}) a:eq(0)`)
+                                .after(` <span class="comment">(${recording.disambiguation})</span>`);
+                        }
+                        // ISRCS
+                        if (recording.isrcs.length != 0) {
+                            let links = jQuery.map(recording.isrcs, function (isrc) {
+                                return `<a href='/isrc/${isrc}'>${isrc}</a>`;
+                            });
+                            isrcsLinks = links.join(', ');
+                        }
                     }
+                    $(`#${track_mbid}`)
+                        .find(`td:nth-last-child(${ISRC_COLUMN_POSITION})`)
+                        .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
                 });
             }
-        });
-
-        function handleMedium($medium, ws_tracks) {
-            // Extend colspan for medium table header
-            $medium.find('thead tr').each(function () {
-                $(this)
-                    .find('th:eq(0)')
-                    .attr('colspan', $(this).find('th:eq(0)').attr('colspan') * 1 + 1);
-            });
-            // Table sub-header
-            $medium
-                .find(`tbody tr.subh th:nth-last-child(${ISRC_COLUMN_POSITION})`)
-                .before("<th style='width: 150px;' class='isrc c'> ISRC </th>");
-
-            // Handle each track
-            $medium.find('tbody tr[id]').each(function (index, medium_track) {
-                const track_mbid = $(medium_track).attr('id');
-                let isrcsLinks = '';
-                if (Object.prototype.hasOwnProperty.call(ws_tracks, track_mbid)) {
-                    const track = ws_tracks[track_mbid];
-                    let recording = track.recording;
-                    // Recording comment
-                    if (recording.disambiguation !== '') {
-                        let td_title_index = $(`#${track_mbid}`).find('td:eq(1)').hasClass('video') ? 2 : 1;
-                        $(`#${track_mbid}`)
-                            .find(`td:eq(${td_title_index}) a:eq(0)`)
-                            .after(` <span class="comment">(${recording.disambiguation})</span>`);
-                    }
-                    // ISRCS
-                    if (recording.isrcs.length != 0) {
-                        let links = jQuery.map(recording.isrcs, function (isrc) {
-                            return `<a href='/isrc/${isrc}'>${isrc}</a>`;
-                        });
-                        isrcsLinks = links.join(', ');
-                    }
-                }
-                $(`#${track_mbid}`)
-                    .find(`td:nth-last-child(${ISRC_COLUMN_POSITION})`)
-                    .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
-            });
         }
     }
 
