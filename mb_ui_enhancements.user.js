@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.02.07.4
+// @version      2026.2.12.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -245,15 +245,11 @@ $(document).ready(function () {
                     .append($searchImg.clone());
                 $iconsContainer.append($googleTitleLink);
 
-                const artistText = $releaseHeader.find('p.subheader > bdi').text().replace(/\s+/g, ' ').trim();
-                const artists = artistText
-                    ? artistText
-                          .split(/\s*\/\s*/)
-                          .map(function (s) {
-                              return s.trim();
-                          })
-                          .filter(Boolean)
-                    : [];
+                const artists = [];
+                $releaseHeader.find('p.subheader > bdi a[href*="/artist/"]').each(function () {
+                    const name = $(this).text().replace(/\s+/g, ' ').trim();
+                    if (name) artists.push(name);
+                });
                 const exactPhrases = artists.concat([releaseTitle]);
                 const exactQuery = exactPhrases
                     .map(function (p) {
