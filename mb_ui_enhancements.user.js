@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.2.12.3
+// @version      2026.2.12.4
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -11,11 +11,11 @@
 // @run-at       document-start
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js
 // @require      https://raw.github.com/murdos/mbediting.js/master/mbediting.js
-// @resource     copyIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/copy.svg
-// @resource     checkIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/check.svg
-// @resource     errorIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/error.svg
-// @resource     searchIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search.svg
-// @resource     searchArtistIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search-artist.svg
+// @resource     copyIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/copy.svg?v=2026.2.12.3
+// @resource     checkIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/check.svg?v=2026.2.12.3
+// @resource     errorIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/error.svg?v=2026.2.12.3
+// @resource     searchIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search.svg?v=2026.2.12.3
+// @resource     searchArtistIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search-artist.svg?v=2026.2.12.3
 // @grant        GM_getResourceURL
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
