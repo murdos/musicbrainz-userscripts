@@ -37,7 +37,7 @@
         "@eslint/js": "^9.38.0",
         "@rollup/plugin-alias": "^6.0.0",
         "@rollup/plugin-babel": "^6.0.4",
-        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-commonjs": "^29.0.0",
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/greasemonkey": "^4.0.7",
         "@types/jquery": "^2.0.54",
