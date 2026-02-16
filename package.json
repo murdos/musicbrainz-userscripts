@@ -59,7 +59,7 @@
     },
     "packageManager": "pnpm@9.15.9",
     "engines": {
-        "node": "22.x"
+        "node": "24.x"
     },
     "lint-staged": {
         "*.{json,md,yml}": "prettier --write",
