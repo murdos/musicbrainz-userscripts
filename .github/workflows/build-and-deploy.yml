@@ -1,0 +1,75 @@
+name: Build and Deploy
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+        name: 'Build userscripts and deploy to dist branch'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout master branch
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - uses: pnpm/action-setup@v4.2.0
+              with:
+                  run_install: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6.2.0
+              with:
+                  node-version-file: 'package.json'
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Run type checking
+              run: pnpm type-check
+
+            - name: Build userscripts
+              run: pnpm build
+
+            - name: Checkout dist branch
+              run: |
+                  git fetch origin dist:dist
+                  git checkout dist
+
+            - name: Copy built files to dist branch
+              run: |
+                  # Remove old built files
+                  find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./dist/*" -delete
+
+                  # Copy new built files
+                  cp -r dist/* .
+
+                  # Remove the dist directory from the dist branch
+                  rm -rf dist
+
+            - name: Commit and push changes
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+
+                  # Check if there are any changes
+                  if git diff --quiet; then
+                    echo "No changes to commit"
+                  else
+                    git add .
+                    git commit --no-verify -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
+                    git push origin dist
+                  fi
+
+            - name: Create summary
+              run: |
+                  echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "Built userscripts from commit: \`$(git rev-parse HEAD)\`" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "### Built Files:" >> $GITHUB_STEP_SUMMARY
+                  find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
+                    echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+                  done

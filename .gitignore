@@ -5,5 +5,7 @@
 .idea/
 *.iml
 
-# NPM
 node_modules/
+
+# Build output
+dist/

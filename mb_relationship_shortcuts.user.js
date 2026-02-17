@@ -1,16 +1,17 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2022.4.21.1
+// @version      2026.1.21
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @include      http*://*musicbrainz.org/artist/*
-// @include      http*://*musicbrainz.org/release-group/*
-// @include      http*://*musicbrainz.org/label/*
+// @match        *://*.musicbrainz.org/artist/*
+// @match        *://*.musicbrainz.org/release-group/*
+// @match        *://*.musicbrainz.org/label/*
 // @exclude      */artist/*/recordings*
+// @exclude      */edit
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
@@ -43,6 +44,8 @@ const otherDatabasesIconClasses = {
     'www.musik-sammler.de': 'musiksammler',
     'rateyourmusic.com': 'rateyourmusic',
     'www.worldcat.org': 'worldcat',
+    'nocs.acum.org.il': 'acum',
+    'stereo-ve-mono.com': 'stereo-ve-mono',
 };
 
 const streamingIconClasses = {

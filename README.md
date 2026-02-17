@@ -2,7 +2,6 @@
 
 - [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
-- [Import Bandcamp releases to MusicBrainz Album Link Helper](#bandcamp_importer_helper)
 - [Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
 - [Import CD1D releases to MusicBrainz](#cd1d_importer)
@@ -42,19 +41,12 @@ Add a button on Bandcamp's album pages to open MusicBrainz release editor with p
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
 
-## <a name="bandcamp_importer_helper"></a> Import Bandcamp releases to MusicBrainz Album Link Helper
-
-Add a link to Bandcamp's album canonical URL on pages without /album/, for one to import the release into MusicBrainz
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer_helper.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js)
-
 ## <a name="beatport_importer"></a> Import Beatport releases to MusicBrainz
 
 One-click importing of releases from beatport.com/release pages into MusicBrainz
 
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/beatport_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js)
 
 ## <a name="boomkat_importer"></a> Import Boomkat releases to Musicbrainz
 

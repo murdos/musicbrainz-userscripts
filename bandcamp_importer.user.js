@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.09.05
+// @version      2026.02.08.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -11,7 +11,7 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
-// @require      lib/mblinks.js
+// @require      lib/mblinks.js?version=v2026.02.08.1
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant        unsafeWindow
@@ -320,14 +320,29 @@ $(document).ready(function () {
     /***/
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
     const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
-    const hasAlbumData = unsafeWindow.TralbumData && Object.entries(unsafeWindow.TralbumData).length > 0; // Sometimes TralbumData is an empty object, see issue #676
-    const isDiscographyPage = unsafeWindow.TralbumData.url && !!unsafeWindow.TralbumData.url.match(/\/music\/?$/);
+    const hasAlbumData = unsafeWindow.TralbumData && 'current' in unsafeWindow.TralbumData; // Sometimes TralbumData is an empty object, see issue #676
+    const isDiscographyPage =
+        unsafeWindow.TralbumData.url &&
+        (!!unsafeWindow.TralbumData.url.match(/\/music\/?$/) || !!unsafeWindow.TralbumData.url.match(/\/indexpage\/?$/));
 
     if (isDiscographyPage) {
-        const hostname = unsafeWindow.TralbumData.url.replace('/music', '');
+        /**
+         * Discography pages can be in two formats:
+         * - music: /music/ (default)
+         * - indexpage: /indexpage/ (new format) e.g. https://arbee.bandcamp.com
+         */
+        const discographyFormat = unsafeWindow.TralbumData.url.match(/\/music\/?$/)
+            ? 'music'
+            : unsafeWindow.TralbumData.url.match(/\/indexpage\/?$/)
+              ? 'indexpage'
+              : null;
+        const hostname = unsafeWindow.TralbumData.url.replace('/music', '').replace('/indexpage', '');
         const urls_data = [];
 
-        $('ol#music-grid > li > a').each(function () {
+        const releaseLinksMatcher = discographyFormat === 'music' ? 'ol#music-grid > li > a' : 'span.indexpage_list div.ipCellLabel1 a';
+        const insertionLocationMatcher = discographyFormat === 'music' ? 'p.title' : undefined;
+
+        $(releaseLinksMatcher).each(function () {
             const $link = $(this);
             const bandcampReleaseUrl = $link.attr('href');
             const pathName = getPathName(bandcampReleaseUrl);
@@ -341,7 +356,11 @@ $(document).ready(function () {
                     url: full_url,
                     mb_type: 'release',
                     insert_func: function (link) {
-                        $('p.title', $link).prepend(link);
+                        if (insertionLocationMatcher) {
+                            $(insertionLocationMatcher, $link).prepend(link);
+                        } else {
+                            $link.prepend(link);
+                        }
                     },
                     key: `release:${full_url}`,
                 });
@@ -475,48 +494,58 @@ $(document).ready(function () {
 
         const insertLinkCb = function (link) {
             if (!isLinkInserted) {
+                // Append the artist/label link on Stub discography pages
                 $('div.stub-page-content h1').append(link);
                 $('div.stub-page-content h1 a').css(linkStyle);
+
+                // Append the artist/label link on actual discography pages
+                $('p#band-name-location span.title').append(link);
+                $('p#band-name-location span.title a').css(linkStyle);
                 isLinkInserted = true;
             }
         };
 
-        // The URL could either be a band or a label page, we don't know which, so we search for both.
-        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', function (link) {
-            insertLinkCb(link);
-        });
+        function showLookupButtonsIfNoLink() {
+            if (!isLinkInserted) {
+                MBSearchItStyle();
+                const entityName = unsafeWindow.BandData.name;
+                const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
+                const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
 
-        mblinks.searchAndDisplayMbLink(cleanURL, 'label', function (link) {
-            insertLinkCb(link);
-        });
-
-        if (!isLinkInserted) {
-            // Offer lookup in MB
-            MBSearchItStyle();
-            const entityName = unsafeWindow.BandData.name;
-            const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
-            const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
-
-            $('div.stub-page-content h1').append(`
-                <span class="mb_wrapper">
-                    <span class="mb_valign mb_searchit">
-                        <a class="mb_search_link"
-                            class="musicbrainz_import"
-                            target="_blank"
-                            title="Search this artist on MusicBrainz (open in a new tab)"
-                            href="${artistSearchUrl}"
-                        ><small>A</small>?</a>
+                $('div.stub-page-content h1').append(`
+                    <span class="mb_wrapper">
+                        <span class="mb_valign mb_searchit">
+                            <a class="mb_search_link"
+                                class="musicbrainz_import"
+                                target="_blank"
+                                title="Search this artist on MusicBrainz (open in a new tab)" 
+                                href="${artistSearchUrl}"
+                            ><small>A</small>?</a>
+                        </span>
+                        <span class="mb_valign mb_searchit">
+                            <a 
+                                class="mb_search_link musicbrainz_import"
+                                target="_blank"
+                                title="Search this label on MusicBrainz (open in a new tab)"
+                                href="${labelSearchUrl}"
+                            ><small>L</small>?</a>
+                        </span>
                     </span>
-                    <span class="mb_valign mb_searchit">
-                        <a
-                            class="mb_search_link musicbrainz_import"
-                            target="_blank"
-                            title="Search this label on MusicBrainz (open in a new tab)"
-                            href="${labelSearchUrl}"
-                        ><small>L</small>?</a>
-                    </span>
-                </span>
-            `);
+                `);
+            }
         }
+
+        // The URL could either be a band or a label page, we don't know which, so we search for both.
+        // Show lookup buttons only after both searches have completed and neither found a link.
+        let pendingSearches = 2;
+        const onSearchComplete = function () {
+            pendingSearches -= 1;
+            if (pendingSearches === 0) {
+                showLookupButtonsIfNoLink();
+            }
+        };
+
+        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
+        mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, undefined, onSearchComplete);
     }
 });
