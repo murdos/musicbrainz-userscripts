@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Import VGMdb releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
-// @description  One-click importing of releases from vgmdb.net into MusicBrainz
-// @version      2021.11.12.1
+// @description  One-click importing of releases from vgmdb.net into MusicBrainz. Currently broken: VGMdb API is unavailable - check their BlueSky for updates
+// @version      2026.2.18.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @include      /^https://vgmdb.net/(album|artist|org)/\d+/
+// @run-at       document-start
 // @require      https://code.jquery.com/jquery-3.5.1.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
@@ -13,6 +14,8 @@
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant        GM.xmlHttpRequest
 // ==/UserScript==
+
+const VGMDB_BLUESKY_UPDATE_LINK = 'https://bsky.app/profile/vgmdb.net/post/3lcvclcpny22d';
 
 $(document).ready(function () {
     MBImportStyle();
@@ -24,11 +27,41 @@ $(document).ready(function () {
         method: 'GET',
         url: apiUrl,
         onload: function (resp) {
-            const release = parseApi(resp.responseText);
-            insertButtons(release);
+            if (resp.status !== 200 || looksLikeHtml(resp.responseText)) {
+                insertApiUnavailableNotice();
+                return;
+            }
+            try {
+                const release = parseApi(resp.responseText);
+                insertButtons(release);
+            } catch (e) {
+                insertApiUnavailableNotice();
+            }
+        },
+        onerror: function () {
+            insertApiUnavailableNotice();
         },
     });
 });
+
+function looksLikeHtml(text) {
+    return !text || text.trim().startsWith('<');
+}
+
+function insertApiUnavailableNotice() {
+    const noticeHtml = `<div style="background-color: #5c2d2d; width: 100%; border: 1px solid #b34a4a;">
+<div style="padding: 6px 10px">
+<h3 style="color: #ffb3b3;">⚠️ MusicBrainz ⚠️</h3>
+</div>
+</div>
+<div style="background-color: #3d2525; padding: 10px; border: 1px solid #b34a4a; border-top: none;">
+<p style="margin: 0; color: #ffcccc;">The VGMdb API is currently unavailable. This script cannot import releases until it is restored.</p>
+<p style="margin: 10px 0 0 0;"><a href="${VGMDB_BLUESKY_UPDATE_LINK}" target="_blank" rel="noopener noreferrer" style="color: #ff9d9d; text-decoration: underline;">Check VGMdb's BlueSky for updates</a></p>
+</div>
+<br style="clear: left" />`;
+
+    $('#rightcolumn').prepend(noticeHtml);
+}
 
 function parseApi(apiResponse) {
     const apiDict = JSON.parse(apiResponse);
