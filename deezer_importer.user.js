@@ -2,7 +2,7 @@
 // @name         Import Deezer releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from deezer.com into MusicBrainz
-// @version      2025.9.28
+// @version      2026.1.25
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @match        https://www.deezer.com/*/album/*
@@ -18,12 +18,43 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
+// --- PAGINATION HELPER ---
+function fetchAllDeezerTracks(gmXHR, firstUrl, callback) {
+    let allTracks = [];
+    function fetch(url) {
+        gmXHR({
+            method: 'GET',
+            url: url,
+            onload: function (resp) {
+                try {
+                    let result = JSON.parse(resp.responseText);
+                    allTracks = allTracks.concat(result.data);
+                    if (result.next) {
+                        fetch(result.next);
+                    } else {
+                        callback(allTracks);
+                    }
+                } catch (e) {
+                    LOGGER.error('Failed to fetch tracks:', e);
+                    callback(allTracks);
+                }
+            },
+            onerror: function (resp) {
+                LOGGER.error('Track AJAX status:', resp.status);
+                LOGGER.error('Track AJAX response:', resp.responseText);
+                callback(allTracks);
+            }
+        });
+    }
+    fetch(firstUrl);
+}
+
 $(document).ready(function () {
     let gmXHR;
 
     if (typeof GM_xmlhttpRequest != 'undefined') {
         gmXHR = GM_xmlhttpRequest;
-    } else if (GM.xmlHttpRequest != 'undefined') {
+    } else if (typeof GM.xmlHttpRequest != 'undefined') {
         gmXHR = GM.xmlHttpRequest;
     } else {
         LOGGER.error('Userscript requires GM_xmlHttpRequest or GM.xmlHttpRequest');
@@ -36,14 +67,27 @@ $(document).ready(function () {
         let releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
         let releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
         let deezerApiUrl = `https://api.deezer.com/album/${releaseId}`;
+        let deezerTracksUrl = `https://api.deezer.com/album/${releaseId}/tracks`;
 
         gmXHR({
             method: 'GET',
             url: deezerApiUrl,
             onload: function (resp) {
                 try {
-                    let release = parseDeezerRelease(releaseUrl, JSON.parse(resp.responseText));
-                    insertLink(release, releaseUrl);
+                    let releaseData = JSON.parse(resp.responseText);
+
+                    // ALWAYS fetch all tracks pages, never trust tracks.data
+                    fetchAllDeezerTracks(
+                        gmXHR,
+                        releaseData.tracks && releaseData.tracks.href
+                        ? releaseData.tracks.href
+                        : deezerTracksUrl,
+                        function (allTracks) {
+                            releaseData.tracks.data = allTracks;
+                            let release = parseDeezerRelease(releaseUrl, releaseData);
+                            insertLink(release, releaseUrl);
+                        }
+                    );
                 } catch (e) {
                     LOGGER.error('Failed to parse release: ', e);
                 }
@@ -93,8 +137,8 @@ function parseDeezerRelease(releaseUrl, data) {
 
     let disc = {
         format: 'Digital Media',
-        title: '',
-        tracks: [],
+            title: '',
+            tracks: [],
     };
 
     $.each(data.tracks.data, function (index, track) {
@@ -144,10 +188,10 @@ function insertLink(release, release_url) {
 
     let mbUI = $(
         `<div class="toolbar-item">
-            ${MBImport.buildFormHTML(parameters)}
-            </div><div class="toolbar-item">
-            ${MBImport.buildSearchButton(release)}
-            </div>`,
+        ${MBImport.buildFormHTML(parameters)}
+        </div><div class="toolbar-item">
+        ${MBImport.buildSearchButton(release)}
+        </div>`,
     ).hide();
     waitForEl('[data-testid="toolbar"]', function () {
         $('[data-testid="toolbar"]').css({
