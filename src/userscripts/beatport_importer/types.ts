@@ -93,20 +93,23 @@ export type BeatportTrackData = {
     url?: string;
 };
 
+export type BeatportSSRState = {
+    buildId?: string;
+    props: BeatportPageData;
+};
+
 export type BeatportPageData = {
-    props: {
-        pageProps: {
-            release: BeatportReleaseData;
-            dehydratedState: {
-                queries: Array<{
-                    queryKey: string;
-                    state?: {
-                        data: {
-                            results: BeatportTrackData[];
-                        };
+    pageProps: {
+        release: BeatportReleaseData;
+        dehydratedState: {
+            queries: Array<{
+                queryKey: string;
+                state?: {
+                    data: {
+                        results: BeatportTrackData[];
                     };
-                }>;
-            };
+                };
+            }>;
         };
     };
 };
