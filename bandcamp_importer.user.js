@@ -310,6 +310,44 @@ const getHostname = url => {
     return null;
 };
 
+/**
+ * Collects discography release link data from elements matching the given selector.
+ * @param {Object} options
+ * @param {string} options.linksMatcher - jQuery selector for release/track links
+ * @param {string} options.hostname - Base hostname for constructing full URLs
+ * @param {string} [options.insertionLocationMatcher] - Optional selector for insertion point (e.g. 'p.title' for music format)
+ * @returns {Array} Array of url_data objects for mblinks.searchAndDisplayMbLinks
+ */
+const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocationMatcher }) => {
+    const urls_data = [];
+    $(linksMatcher).each(function () {
+        const $link = $(this);
+        const bandcampReleaseUrl = $link.attr('href');
+        const pathName = getPathName(bandcampReleaseUrl);
+
+        if (pathName && pathName.match(/^(\/album|\/track)/)) {
+            const isRelative = bandcampReleaseUrl.startsWith('/');
+            const linkHostname = isRelative ? hostname : getHostname(bandcampReleaseUrl);
+            const full_url = linkHostname + pathName;
+
+            urls_data.push({
+                url: full_url,
+                mb_type: 'release',
+                insert_func: function (link) {
+                    const $target = insertionLocationMatcher ? $(insertionLocationMatcher, $link) : $link;
+                    if ($target.length) {
+                        $target.prepend(link);
+                    } else {
+                        $link.prepend(link);
+                    }
+                },
+                key: `release:${full_url}`,
+            });
+        }
+    });
+    return urls_data;
+};
+
 $(document).ready(function () {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
@@ -337,35 +375,17 @@ $(document).ready(function () {
               ? 'indexpage'
               : null;
         const hostname = unsafeWindow.TralbumData.url.replace('/music', '').replace('/indexpage', '');
-        const urls_data = [];
-
         const releaseLinksMatcher = discographyFormat === 'music' ? 'ol#music-grid > li > a' : 'span.indexpage_list div.ipCellLabel1 a';
         const insertionLocationMatcher = discographyFormat === 'music' ? 'p.title' : undefined;
 
-        $(releaseLinksMatcher).each(function () {
-            const $link = $(this);
-            const bandcampReleaseUrl = $link.attr('href');
-            const pathName = getPathName(bandcampReleaseUrl);
-
-            if (pathName && pathName.match(/^(\/album|\/track)/)) {
-                const isRelative = bandcampReleaseUrl.startsWith('/');
-                const linkHostname = isRelative ? hostname : getHostname(bandcampReleaseUrl);
-                const full_url = linkHostname + pathName;
-
-                urls_data.push({
-                    url: full_url,
-                    mb_type: 'release',
-                    insert_func: function (link) {
-                        if (insertionLocationMatcher) {
-                            $(insertionLocationMatcher, $link).prepend(link);
-                        } else {
-                            $link.prepend(link);
-                        }
-                    },
-                    key: `release:${full_url}`,
-                });
-            }
-        });
+        const urls_data = [
+            ...collectDiscographyReleaseLinks({
+                linksMatcher: 'ol.featured-grid > li.featured-item > a',
+                hostname,
+                insertionLocationMatcher,
+            }),
+            ...collectDiscographyReleaseLinks({ linksMatcher: releaseLinksMatcher, hostname, insertionLocationMatcher }),
+        ];
 
         if (urls_data.length > 0) {
             mblinks.searchAndDisplayMbLinks(urls_data);
