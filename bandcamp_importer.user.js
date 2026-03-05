@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.03.05.2
+// @version      2026.03.05.3
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -39,6 +39,9 @@ const BandcampImport = {
     retrieveReleaseInfo: function () {
         let bandcampAlbumData = unsafeWindow.TralbumData;
         let bandcampEmbedData = unsafeWindow.EmbedData;
+        const bandcampMobileData = unsafeWindow.TralbumJSONLD;
+
+        const artist = bandcampAlbumData.artist || bandcampMobileData.byArtist.name;
 
         let release = {
             discs: [],
@@ -110,10 +113,10 @@ const BandcampImport = {
         }
 
         // Release artist credit
-        if (bandcampAlbumData.artist.match(/^various(?: artists)?$/i) && various_artists) {
+        if (artist.match(/^various(?: artists)?$/i) && various_artists) {
             release.artist_credit = [MBImport.specialArtist('various_artists')];
         } else {
-            release.artist_credit = MBImport.makeArtistCredits([bandcampAlbumData.artist]);
+            release.artist_credit = MBImport.makeArtistCredits([artist]);
         }
 
         let tracks_streamable = 0;
@@ -222,7 +225,7 @@ const BandcampImport = {
     },
 
     // Insert links in page
-    insertLink: function (release) {
+    insertLink: function (release, isMobile) {
         if (release.type == 'track') {
             // only import album or single, tracks belong to an album
             return false;
@@ -231,13 +234,17 @@ const BandcampImport = {
         let edit_note = MBImport.makeEditNote(release.url, 'Bandcamp');
         let parameters = MBImport.buildFormParameters(release, edit_note);
         // Build form
-        let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`).hide();
+        let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`);
 
         // Append MB import link
-        $('#name-section').append(mbUI);
-        document.querySelector('#mb_buttons').style.marginTop = '6px';
+        if (isMobile) {
+            $('#band-navbar > ul').append($('<li>').css({ display: 'flex', alignItems: 'center', alignSelf: 'center' }).append(mbUI));
+        } else {
+            $('#name-section').append(mbUI);
+            document.querySelector('#mb_buttons').style.marginTop = '6px';
+        }
+
         document.querySelectorAll('form.musicbrainz_import').forEach(form => (form.style.display = 'inline-block'));
-        mbUI.slideDown();
     },
 
     // helper to convert bandcamp date to MB date
@@ -356,6 +363,7 @@ $(document).ready(function () {
      */
     if (!unsafeWindow.TralbumData) return;
     /***/
+    const isMobile = typeof unsafeWindow.TralbumJSONLD !== 'undefined';
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
     const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
     const hasAlbumData = unsafeWindow.TralbumData && 'current' in unsafeWindow.TralbumData; // Sometimes TralbumData is an empty object, see issue #676
@@ -454,7 +462,7 @@ $(document).ready(function () {
             release.labels[0].mbid = label_mbid;
         }
 
-        BandcampImport.insertLink(release);
+        BandcampImport.insertLink(release, isMobile);
         LOGGER.info('Parsed release: ', release);
 
         if (release.type == 'track') {
@@ -479,9 +487,15 @@ $(document).ready(function () {
         $('div.tralbum-tags a:not(:last-child).tag').after(', ');
 
         // append a link to the full size image
-        const tralbumArt = document.querySelector('div#tralbumArt');
-        const fullsizeimageurl = tralbumArt.querySelector('a').getAttribute('href').replace('_10', '_0');
-        tralbumArt.insertAdjacentHTML(
+        let coverArtElement;
+        const fullsizeimageurl = document.querySelector('meta[property="og:image"]').getAttribute('content').replace('_5', '_0');
+        if (isMobile) {
+            coverArtElement = document.querySelector('section#tralbum-art-carousel');
+        } else {
+            coverArtElement = document.querySelector('div#tralbumArt');
+        }
+
+        coverArtElement.insertAdjacentHTML(
             'afterend',
             `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`,
         );
@@ -490,6 +504,9 @@ $(document).ready(function () {
         bci_link.style.paddingTop = '0.5em';
         bci_link.style.textAlign = 'right';
         bci_link.querySelector('a').style.fontWeight = 'bold';
+        if (isMobile) {
+            bci_link.style.paddingInline = '10px';
+        }
         const upc = unsafeWindow.TralbumData.current.upc;
         if (typeof upc != 'undefined' && upc !== null) {
             document.querySelector('div #trackInfoInner').insertAdjacentHTML(
