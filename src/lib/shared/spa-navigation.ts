@@ -1,22 +1,26 @@
 type SubscribeToSPANavigationProps = {
     onNavigate: () => Promise<void>;
     delay?: number;
+    /** Polling interval in ms; when set, polls for URL changes (works in sandboxed environments like Firefox/Greasemonkey) */
+    pollInterval?: number;
 };
 
 /**
  * Subscribe to Single Page Application (SPA) navigation events.
- * Works with frameworks like Next.js that use pushState/replaceState for client-side routing.
+ * Uses pushState/replaceState interception when possible; falls back to URL polling in sandboxed environments
+ * (e.g. Firefox/Greasemonkey) where the page uses a different history object.
  *
  * @param onNavigate - Callback function to execute when navigation occurs
  * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
+ * @param pollInterval - If set, polls location.href for changes; use when pushState interception doesn't work (default: 400ms, 0 to disable)
  * @returns Cleanup function to unsubscribe from navigation events
  */
-export function subscribeToSPANavigation({ onNavigate, delay = 200 }: SubscribeToSPANavigationProps): () => void {
+export function subscribeToSPANavigation({ onNavigate, delay = 200, pollInterval = 400 }: SubscribeToSPANavigationProps): () => void {
     let currentUrl = window.location.href;
     const originalPushState = history.pushState.bind(history);
     const originalReplaceState = history.replaceState.bind(history);
 
-    const handleNavigation = () => {
+    const scheduleOnNavigate = () => {
         const newUrl = window.location.href;
         if (newUrl !== currentUrl) {
             currentUrl = newUrl;
@@ -26,19 +30,33 @@ export function subscribeToSPANavigation({ onNavigate, delay = 200 }: SubscribeT
         }
     };
 
-    // Intercept pushState (used by Next.js and most SPAs)
-    history.pushState = function (...args) {
-        originalPushState.apply(history, args);
-        handleNavigation();
-    };
+    let pushStatePatched = false;
+    let replaceStatePatched = false;
+    try {
+        history.pushState = function (...args) {
+            originalPushState.apply(history, args);
+            scheduleOnNavigate();
+        };
+        pushStatePatched = true;
+    } catch {
+        // pushState is read-only in some sandboxed environments
+    }
 
-    // Intercept replaceState
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(history, args);
-        handleNavigation();
-    };
+    try {
+        history.replaceState = function (...args) {
+            originalReplaceState.apply(history, args);
+            scheduleOnNavigate();
+        };
+        replaceStatePatched = true;
+    } catch {
+        // replaceState is read-only in some sandboxed environments
+    }
 
-    // Listen for browser navigation (back/forward)
+    let pollTimer: ReturnType<typeof setInterval> | undefined;
+    if (pollInterval > 0) {
+        pollTimer = setInterval(scheduleOnNavigate, pollInterval);
+    }
+
     const popstateHandler = () => {
         currentUrl = window.location.href;
         setTimeout(() => {
@@ -47,10 +65,10 @@ export function subscribeToSPANavigation({ onNavigate, delay = 200 }: SubscribeT
     };
     window.addEventListener('popstate', popstateHandler);
 
-    // Return cleanup function
     return () => {
-        history.pushState = originalPushState;
-        history.replaceState = originalReplaceState;
+        if (pollTimer) clearInterval(pollTimer);
+        if (pushStatePatched) history.pushState = originalPushState;
+        if (replaceStatePatched) history.replaceState = originalReplaceState;
         window.removeEventListener('popstate', popstateHandler);
     };
 }
