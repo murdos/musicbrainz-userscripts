@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="36" viewBox="0 0 90 36">
+    <defs>
+        <linearGradient id="install-bg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5bb75b" />
+            <stop offset="100%" stop-color="#409340" />
+        </linearGradient>
+        <g id="download-icon" fill="white">
+            <path
+                d="M312.32,165.76 L285.013333,132.906667 L192,210.56 L192,0 L149.333333,0 L149.333333,210.56 L56.32,132.906667 L29.0133333,165.76 L170.666667,283.733333 L312.32,165.76 Z M0,341.333333 L341.333333,341.333333 L341.333333,384 L0,384 L0,341.333333 Z"
+            />
+        </g>
+    </defs>
+    <rect width="90" height="36" rx="3" ry="3" fill="url(#install-bg)" stroke="#5bb75b" stroke-width="0.8" />
+    <g transform="translate(14, 9) scale(0.044)">
+        <use href="#download-icon" />
+    </g>
+    <text x="53" y="23" font-family="Arial, sans-serif" font-size="14" font-weight="300" fill="white" text-anchor="middle">Install</text>
+</svg>

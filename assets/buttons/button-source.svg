@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="36" viewBox="0 0 108 36">
+    <defs>
+        <linearGradient id="source-bg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4189c8" />
+            <stop offset="100%" stop-color="#2b669a" />
+        </linearGradient>
+        <g id="doc-icon">
+            <path d="M10.5 4.5V8.5H6.5M10.5 4.5H18.5V20.5H6.5V8.5L10.5 4.5Z" stroke="white" stroke-width="1.2" fill="none" />
+            <path d="M16 12H12.5H9" stroke="white" stroke-width="1.2" />
+            <path d="M14 15H12.5H9" stroke="white" stroke-width="1.2" />
+        </g>
+    </defs>
+    <rect width="108" height="36" rx="3" ry="3" fill="url(#source-bg)" stroke="#458dcc" stroke-width="0.8" />
+    <g transform="translate(14, 6) scale(0.9)">
+        <use href="#doc-icon" />
+    </g>
+    <text x="64" y="23" font-family="Arial, sans-serif" font-size="14" font-weight="300" fill="white" text-anchor="middle">Source</text>
+</svg>
