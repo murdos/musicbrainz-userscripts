@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.03.14.3
+// @version      2026.03.14.4
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -729,20 +729,24 @@
 
   /**
    * Subscribe to Single Page Application (SPA) navigation events.
-   * Works with frameworks like Next.js that use pushState/replaceState for client-side routing.
+   * Uses pushState/replaceState interception when possible; falls back to URL polling in sandboxed environments
+   * (e.g. Firefox/Greasemonkey) where the page uses a different history object.
    *
    * @param onNavigate - Callback function to execute when navigation occurs
    * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
+   * @param pollInterval - If set, polls location.href for changes; use when pushState interception doesn't work (default: 400ms, 0 to disable)
    * @returns Cleanup function to unsubscribe from navigation events
    */
   function subscribeToSPANavigation(_ref) {
     var onNavigate = _ref.onNavigate,
       _ref$delay = _ref.delay,
-      delay = _ref$delay === void 0 ? 200 : _ref$delay;
+      delay = _ref$delay === void 0 ? 200 : _ref$delay,
+      _ref$pollInterval = _ref.pollInterval,
+      pollInterval = _ref$pollInterval === void 0 ? 400 : _ref$pollInterval;
     var currentUrl = window.location.href;
     var originalPushState = history.pushState.bind(history);
     var originalReplaceState = history.replaceState.bind(history);
-    var handleNavigation = function handleNavigation() {
+    var scheduleOnNavigate = function scheduleOnNavigate() {
       var newUrl = window.location.href;
       if (newUrl !== currentUrl) {
         currentUrl = newUrl;
@@ -751,26 +755,36 @@
         }, delay);
       }
     };
-
-    // Intercept pushState (used by Next.js and most SPAs)
-    history.pushState = function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-      originalPushState.apply(history, args);
-      handleNavigation();
-    };
-
-    // Intercept replaceState
-    history.replaceState = function () {
-      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-      originalReplaceState.apply(history, args);
-      handleNavigation();
-    };
-
-    // Listen for browser navigation (back/forward)
+    var pushStatePatched = false;
+    var replaceStatePatched = false;
+    try {
+      history.pushState = function () {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+        originalPushState.apply(history, args);
+        scheduleOnNavigate();
+      };
+      pushStatePatched = true;
+    } catch (_unused) {
+      // pushState is read-only in some sandboxed environments
+    }
+    try {
+      history.replaceState = function () {
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+        originalReplaceState.apply(history, args);
+        scheduleOnNavigate();
+      };
+      replaceStatePatched = true;
+    } catch (_unused2) {
+      // replaceState is read-only in some sandboxed environments
+    }
+    var pollTimer;
+    if (pollInterval > 0) {
+      pollTimer = setInterval(scheduleOnNavigate, pollInterval);
+    }
     var popstateHandler = function popstateHandler() {
       currentUrl = window.location.href;
       setTimeout(function () {
@@ -778,11 +792,10 @@
       }, delay);
     };
     window.addEventListener('popstate', popstateHandler);
-
-    // Return cleanup function
     return function () {
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
+      if (pollTimer) clearInterval(pollTimer);
+      if (pushStatePatched) history.pushState = originalPushState;
+      if (replaceStatePatched) history.replaceState = originalReplaceState;
       window.removeEventListener('popstate', popstateHandler);
     };
   }
@@ -797,10 +810,11 @@
   /**
    * Install a fetch interceptor to capture Beatport's release data responses.
    * Call once at script load, before any navigation can occur.
+   * Skips installation if fetch is read-only (e.g. Firefox/Greasemonkey sandbox).
    */
   function installFetchInterceptor(logger) {
     var originalFetch = window.fetch.bind(window);
-    window.fetch = /*#__PURE__*/function () {
+    var interceptor = /*#__PURE__*/function () {
       var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(input, init) {
         var response, url, releaseMatch, releaseId;
         return _regenerator().w(function (_context) {
@@ -829,10 +843,15 @@
           }
         }, _callee);
       }));
-      return function (_x, _x2) {
+      return function interceptor(_x, _x2) {
         return _ref.apply(this, arguments);
       };
     }();
+    try {
+      window.fetch = interceptor;
+    } catch (_unused) {
+      // fetch is read-only in Firefox/Greasemonkey sandbox; script works without interceptor
+    }
   }
   function getLocaleFromPath() {
     var _match$;
@@ -885,7 +904,6 @@
             }
             return _context2.a(2, null);
           case 1:
-            // Use intercepted response from Beatport's own fetch (SPA navigation) to avoid duplicate request
             cached = interceptedReleaseCache.get(releaseIdFromURL);
             if (!cached) {
               _context2.n = 2;
@@ -900,15 +918,14 @@
               break;
             }
             data = JSON.parse(initialNextDataElement.innerHTML);
-            initialReleaseId = (_data$props$pageProps = data.props.pageProps.release) === null || _data$props$pageProps === void 0 ? void 0 : _data$props$pageProps.id.toString(); // __NEXT_DATA__ has matching release (direct load or refresh)
+            initialReleaseId = (_data$props$pageProps = data.props.pageProps.release) === null || _data$props$pageProps === void 0 ? void 0 : _data$props$pageProps.id.toString();
+            buildId = data.buildId;
             if (!(initialReleaseId === releaseIdFromURL)) {
               _context2.n = 3;
               break;
             }
             return _context2.a(2, data.props);
           case 3:
-            // __NEXT_DATA__ is from a different page (e.g. Home) or different release - fetch from API
-            buildId = data.buildId;
             if (!buildId) {
               _context2.n = 4;
               break;
@@ -942,11 +959,11 @@
     $(MB_IMPORT_ELEMENT).remove();
     $("#".concat(MB_IMPORT_BARCODE_ELEMENT)).remove();
   };
-  function processReleasePage(_x) {
+  function processReleasePage() {
     return _processReleasePage.apply(this, arguments);
   } // Subscribe to SPA navigation events
   function _processReleasePage() {
-    _processReleasePage = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(ranFrom) {
+    _processReleasePage = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var isReleasePage, releaseData, release_url, _tracks_release$state, release, tracks_table, tracks_release, tracks_data_array, tracks_data, isrcs, mbrelease, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
@@ -959,7 +976,6 @@
             }
             return _context.a(2);
           case 1:
-            console.log('ranFrom', ranFrom);
             _context.n = 2;
             return getBeatportReleaseData(LOGGER);
           case 2:
@@ -1011,7 +1027,7 @@
   }
   subscribeToSPANavigation({
     onNavigate: function onNavigate() {
-      return processReleasePage('SPA navigation');
+      return processReleasePage();
     }
   });
   $(document).ready(function () {
@@ -1019,7 +1035,7 @@
 
     // Process initial page load
     setTimeout(function () {
-      void processReleasePage('initial page load');
+      void processReleasePage();
     }, 1000);
   });
   function retrieveReleaseInfo(release_url, release_data, tracks_data) {
@@ -1097,7 +1113,6 @@
       tracks: mbtracks,
       format: mbrelease.format
     });
-    LOGGER.info('Parsed release: ', mbrelease);
     return mbrelease;
   }
 
