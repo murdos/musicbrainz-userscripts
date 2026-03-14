@@ -3,7 +3,10 @@ import { MBImport } from '~/lib/mbimport';
 import { Logger, LogLevel } from '~/lib/logger';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
-import { getBeatportReleaseData } from './utils/getBeatportReleaseData';
+import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
+
+// Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
+installFetchInterceptor();
 import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
@@ -22,11 +25,22 @@ const cleanup = () => {
     $(`#${MB_IMPORT_BARCODE_ELEMENT}`).remove();
 };
 
-async function processReleasePage() {
-    const releaseData = await getBeatportReleaseData(LOGGER);
+async function processReleasePage(ranFrom: string) {
+    // Clean up stale elements from previous page. Done here rather than beforeNavigate
+    // so it runs after the DOM has updated, avoiding the visual glitch of elements
+    // disappearing before the new page content appears.
+    cleanup();
 
     const isReleasePage = window.location.pathname.includes('/release/');
-    if (!releaseData || !isReleasePage) {
+    if (!isReleasePage) {
+        return;
+    }
+
+    console.log('ranFrom', ranFrom);
+
+    const releaseData = await getBeatportReleaseData(LOGGER);
+    if (!releaseData || !releaseData.pageProps.release) {
+        LOGGER.error('Could not find release data on the release page');
         return;
     }
 
@@ -61,8 +75,7 @@ async function processReleasePage() {
 
 // Subscribe to SPA navigation events
 subscribeToSPANavigation({
-    beforeNavigate: cleanup,
-    onNavigate: processReleasePage,
+    onNavigate: () => processReleasePage('SPA navigation'),
 });
 
 $(document).ready(() => {
@@ -70,7 +83,7 @@ $(document).ready(() => {
 
     // Process initial page load
     setTimeout(() => {
-        void processReleasePage();
+        void processReleasePage('initial page load');
     }, 1000);
 });
 
