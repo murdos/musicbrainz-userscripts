@@ -12,11 +12,11 @@ const interceptedReleaseCache = new Map<string, BeatportPageData>();
  * Install a fetch interceptor to capture Beatport's release data responses.
  * Call once at script load, before any navigation can occur.
  */
-export function installFetchInterceptor(): void {
+export function installFetchInterceptor(logger: Logger): void {
     const originalFetch = window.fetch.bind(window);
     window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
         const response = await originalFetch(input, init);
-        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
         const releaseMatch = url.match(/beatport\.com\/_next\/data\/[^/]+\/[a-z]{2}(?:-[a-z]{2})?\/release\/[^/]+\/(\d+)\.json/);
         const releaseId = releaseMatch?.[1];
         if (releaseId && response.ok) {
@@ -25,12 +25,13 @@ export function installFetchInterceptor(): void {
                 .json()
                 .then((data: unknown) => {
                     const pageData = data as BeatportPageData;
-                    if (pageData?.pageProps?.release?.id?.toString() === releaseId) {
+                    const releaseIdFromData = pageData.pageProps.release?.id.toString();
+                    if (releaseIdFromData === releaseId) {
                         interceptedReleaseCache.set(releaseId, pageData);
                     }
                 })
-                .catch(() => {
-                    /* ignore parse errors */
+                .catch((error: unknown) => {
+                    logger.error('Error parsing release data: ', error as Error);
                 });
         }
         return response;
@@ -72,7 +73,7 @@ export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPa
     const initialNextDataElement = document.getElementById('__NEXT_DATA__');
     if (initialNextDataElement) {
         const data = JSON.parse(initialNextDataElement.innerHTML) as unknown as BeatportSSRState;
-        const initialReleaseId = data.props.pageProps.release?.id?.toString();
+        const initialReleaseId = data.props.pageProps.release?.id.toString();
 
         // __NEXT_DATA__ has matching release (direct load or refresh)
         if (initialReleaseId === releaseIdFromURL) {

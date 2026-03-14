@@ -1,15 +1,16 @@
-import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
-import { MBImport } from '~/lib/mbimport';
 import { Logger, LogLevel } from '~/lib/logger';
+import { MBImport } from '~/lib/mbimport';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
+import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
 import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
 
-// Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
-installFetchInterceptor();
 import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
+
+// Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
+installFetchInterceptor(LOGGER);
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 window.$ = window.jQuery = jQuery.noConflict(true);
@@ -26,9 +27,6 @@ const cleanup = () => {
 };
 
 async function processReleasePage(ranFrom: string) {
-    // Clean up stale elements from previous page. Done here rather than beforeNavigate
-    // so it runs after the DOM has updated, avoiding the visual glitch of elements
-    // disappearing before the new page content appears.
     cleanup();
 
     const isReleasePage = window.location.pathname.includes('/release/');
