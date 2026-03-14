@@ -1,5 +1,4 @@
 type SubscribeToSPANavigationProps = {
-    beforeNavigate?: () => void;
     onNavigate: () => Promise<void>;
     delay?: number;
 };
@@ -8,12 +7,11 @@ type SubscribeToSPANavigationProps = {
  * Subscribe to Single Page Application (SPA) navigation events.
  * Works with frameworks like Next.js that use pushState/replaceState for client-side routing.
  *
- * @param beforeNavigate - Callback function to execute before navigation occurs
  * @param onNavigate - Callback function to execute when navigation occurs
  * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
  * @returns Cleanup function to unsubscribe from navigation events
  */
-export function subscribeToSPANavigation({ beforeNavigate, onNavigate, delay = 200 }: SubscribeToSPANavigationProps): () => void {
+export function subscribeToSPANavigation({ onNavigate, delay = 200 }: SubscribeToSPANavigationProps): () => void {
     let currentUrl = window.location.href;
     const originalPushState = history.pushState.bind(history);
     const originalReplaceState = history.replaceState.bind(history);
@@ -22,7 +20,6 @@ export function subscribeToSPANavigation({ beforeNavigate, onNavigate, delay = 2
         const newUrl = window.location.href;
         if (newUrl !== currentUrl) {
             currentUrl = newUrl;
-            beforeNavigate?.();
             setTimeout(() => {
                 void onNavigate();
             }, delay);
@@ -44,7 +41,6 @@ export function subscribeToSPANavigation({ beforeNavigate, onNavigate, delay = 2
     // Listen for browser navigation (back/forward)
     const popstateHandler = () => {
         currentUrl = window.location.href;
-        beforeNavigate?.();
         setTimeout(() => {
             void onNavigate();
         }, delay);

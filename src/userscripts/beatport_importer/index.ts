@@ -1,12 +1,16 @@
-import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
-import { MBImport } from '~/lib/mbimport';
 import { Logger, LogLevel } from '~/lib/logger';
+import { MBImport } from '~/lib/mbimport';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
-import { getBeatportReleaseData } from './utils/getBeatportReleaseData';
+import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
+import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
+
 import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
+
+// Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
+installFetchInterceptor(LOGGER);
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 window.$ = window.jQuery = jQuery.noConflict(true);
@@ -22,11 +26,19 @@ const cleanup = () => {
     $(`#${MB_IMPORT_BARCODE_ELEMENT}`).remove();
 };
 
-async function processReleasePage() {
-    const releaseData = await getBeatportReleaseData(LOGGER);
+async function processReleasePage(ranFrom: string) {
+    cleanup();
 
     const isReleasePage = window.location.pathname.includes('/release/');
-    if (!releaseData || !isReleasePage) {
+    if (!isReleasePage) {
+        return;
+    }
+
+    console.log('ranFrom', ranFrom);
+
+    const releaseData = await getBeatportReleaseData(LOGGER);
+    if (!releaseData || !releaseData.pageProps.release) {
+        LOGGER.error('Could not find release data on the release page');
         return;
     }
 
@@ -61,8 +73,7 @@ async function processReleasePage() {
 
 // Subscribe to SPA navigation events
 subscribeToSPANavigation({
-    beforeNavigate: cleanup,
-    onNavigate: processReleasePage,
+    onNavigate: () => processReleasePage('SPA navigation'),
 });
 
 $(document).ready(() => {
@@ -70,7 +81,7 @@ $(document).ready(() => {
 
     // Process initial page load
     setTimeout(() => {
-        void processReleasePage();
+        void processReleasePage('initial page load');
     }, 1000);
 });
 

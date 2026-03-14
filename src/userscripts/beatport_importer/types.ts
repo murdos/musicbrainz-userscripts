@@ -100,7 +100,7 @@ export type BeatportSSRState = {
 
 export type BeatportPageData = {
     pageProps: {
-        release: BeatportReleaseData;
+        release: BeatportReleaseData | undefined;
         dehydratedState: {
             queries: Array<{
                 queryKey: string;
