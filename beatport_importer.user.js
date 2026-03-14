@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.03.14.1
+// @version      2026.03.14.2
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -255,6 +255,76 @@
       return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
     }
   }
+
+  var LogLevel = /*#__PURE__*/function (LogLevel) {
+    LogLevel["DEBUG"] = "debug";
+    LogLevel["INFO"] = "info";
+    LogLevel["ERROR"] = "error";
+    return LogLevel;
+  }({});
+  var Logger = /*#__PURE__*/function () {
+    function Logger(scriptName) {
+      var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : LogLevel.ERROR;
+      _classCallCheck(this, Logger);
+      _defineProperty(this, "LOG_LEVEL", LogLevel.INFO);
+      this.scriptName = scriptName;
+      this.LOG_LEVEL = level;
+    }
+    return _createClass(Logger, [{
+      key: "debug",
+      value: function debug() {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+        this._log(LogLevel.DEBUG, args);
+      }
+    }, {
+      key: "info",
+      value: function info() {
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+        this._log(LogLevel.INFO, args);
+      }
+    }, {
+      key: "error",
+      value: function error() {
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+        this._log(LogLevel.ERROR, args);
+      }
+    }, {
+      key: "setLevel",
+      value: function setLevel(level) {
+        this.LOG_LEVEL = level;
+      }
+    }, {
+      key: "_log",
+      value: function _log(level, args) {
+        if (level < this.LOG_LEVEL) {
+          return;
+        }
+        var logMethod = console.log;
+        switch (level) {
+          case LogLevel.DEBUG:
+            logMethod = console.debug;
+            break;
+          case LogLevel.INFO:
+            logMethod = console.info;
+            break;
+          case LogLevel.ERROR:
+            logMethod = console.error;
+            break;
+        }
+        try {
+          logMethod.apply(this, ["[".concat(this.scriptName, "]")].concat(_toConsumableArray(args)));
+        } catch (_unused) {
+          // do nothing
+        }
+      }
+    }]);
+  }();
 
   function luceneEscape(text) {
     var newText = text.replace(/[-[\]{}()*+?~:\\^!"/]/g, '\\$&');
@@ -649,76 +719,6 @@
     specialArtist: specialArtist
   };
 
-  var LogLevel = /*#__PURE__*/function (LogLevel) {
-    LogLevel["DEBUG"] = "debug";
-    LogLevel["INFO"] = "info";
-    LogLevel["ERROR"] = "error";
-    return LogLevel;
-  }({});
-  var Logger = /*#__PURE__*/function () {
-    function Logger(scriptName) {
-      var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : LogLevel.ERROR;
-      _classCallCheck(this, Logger);
-      _defineProperty(this, "LOG_LEVEL", LogLevel.INFO);
-      this.scriptName = scriptName;
-      this.LOG_LEVEL = level;
-    }
-    return _createClass(Logger, [{
-      key: "debug",
-      value: function debug() {
-        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-        this._log(LogLevel.DEBUG, args);
-      }
-    }, {
-      key: "info",
-      value: function info() {
-        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-          args[_key2] = arguments[_key2];
-        }
-        this._log(LogLevel.INFO, args);
-      }
-    }, {
-      key: "error",
-      value: function error() {
-        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-          args[_key3] = arguments[_key3];
-        }
-        this._log(LogLevel.ERROR, args);
-      }
-    }, {
-      key: "setLevel",
-      value: function setLevel(level) {
-        this.LOG_LEVEL = level;
-      }
-    }, {
-      key: "_log",
-      value: function _log(level, args) {
-        if (level < this.LOG_LEVEL) {
-          return;
-        }
-        var logMethod = console.log;
-        switch (level) {
-          case LogLevel.DEBUG:
-            logMethod = console.debug;
-            break;
-          case LogLevel.INFO:
-            logMethod = console.info;
-            break;
-          case LogLevel.ERROR:
-            logMethod = console.error;
-            break;
-        }
-        try {
-          logMethod.apply(this, ["[".concat(this.scriptName, "]")].concat(_toConsumableArray(args)));
-        } catch (_unused) {
-          // do nothing
-        }
-      }
-    }]);
-  }();
-
   function _add_css(css) {
     document.head.insertAdjacentHTML('beforeend', "<style>".concat(css.replace(/\s+/g, ' '), "</style>"));
   }
@@ -731,14 +731,12 @@
    * Subscribe to Single Page Application (SPA) navigation events.
    * Works with frameworks like Next.js that use pushState/replaceState for client-side routing.
    *
-   * @param beforeNavigate - Callback function to execute before navigation occurs
    * @param onNavigate - Callback function to execute when navigation occurs
    * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
    * @returns Cleanup function to unsubscribe from navigation events
    */
   function subscribeToSPANavigation(_ref) {
-    var beforeNavigate = _ref.beforeNavigate,
-      onNavigate = _ref.onNavigate,
+    var onNavigate = _ref.onNavigate,
       _ref$delay = _ref.delay,
       delay = _ref$delay === void 0 ? 200 : _ref$delay;
     var currentUrl = window.location.href;
@@ -748,7 +746,6 @@
       var newUrl = window.location.href;
       if (newUrl !== currentUrl) {
         currentUrl = newUrl;
-        beforeNavigate === null || beforeNavigate === void 0 || beforeNavigate();
         setTimeout(function () {
           void onNavigate();
         }, delay);
@@ -776,7 +773,6 @@
     // Listen for browser navigation (back/forward)
     var popstateHandler = function popstateHandler() {
       currentUrl = window.location.href;
-      beforeNavigate === null || beforeNavigate === void 0 || beforeNavigate();
       setTimeout(function () {
         void onNavigate();
       }, delay);
@@ -791,68 +787,148 @@
     };
   }
 
-  var getBeatportReleaseData = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(logger) {
-      var _window$location$path;
-      var initialNextDataElement, data, buildId, initialReleaseId, releaseIdFromURL, name_placeholder, pageDataURL, response, pageData, _t;
-      return _regenerator().w(function (_context) {
-        while (1) switch (_context.p = _context.n) {
-          case 0:
-            initialNextDataElement = document.getElementById('__NEXT_DATA__');
-            if (initialNextDataElement) {
+  /**
+   * Cache for release data intercepted from Beatport's own fetch requests.
+   * When the user navigates via SPA, Beatport fetches the release JSON — we capture
+   * it here to avoid making a duplicate request.
+   */
+  var interceptedReleaseCache = new Map();
+
+  /**
+   * Install a fetch interceptor to capture Beatport's release data responses.
+   * Call once at script load, before any navigation can occur.
+   */
+  function installFetchInterceptor(logger) {
+    var originalFetch = window.fetch.bind(window);
+    window.fetch = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(input, init) {
+        var response, url, releaseMatch, releaseId;
+        return _regenerator().w(function (_context) {
+          while (1) switch (_context.n) {
+            case 0:
               _context.n = 1;
-              break;
-            }
-            return _context.a(2, null);
-          case 1:
-            data = JSON.parse(initialNextDataElement.innerHTML);
-            buildId = data.buildId;
-            initialReleaseId = data.props.pageProps.release.id.toString();
+              return originalFetch(input, init);
+            case 1:
+              response = _context.v;
+              url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+              releaseMatch = url.match(/beatport\.com\/_next\/data\/[^/]+\/[a-z]{2}(?:-[a-z]{2})?\/release\/[^/]+\/(\d+)\.json/);
+              releaseId = releaseMatch === null || releaseMatch === void 0 ? void 0 : releaseMatch[1];
+              if (releaseId && response.ok) {
+                response.clone().json().then(function (data) {
+                  var _pageData$pageProps$r;
+                  var pageData = data;
+                  var releaseIdFromData = (_pageData$pageProps$r = pageData.pageProps.release) === null || _pageData$pageProps$r === void 0 ? void 0 : _pageData$pageProps$r.id.toString();
+                  if (releaseIdFromData === releaseId) {
+                    interceptedReleaseCache.set(releaseId, pageData);
+                  }
+                }).catch(function (error) {
+                  logger.error('Error parsing release data: ', error);
+                });
+              }
+              return _context.a(2, response);
+          }
+        }, _callee);
+      }));
+      return function (_x, _x2) {
+        return _ref.apply(this, arguments);
+      };
+    }();
+  }
+  function getLocaleFromPath() {
+    var _match$;
+    var match = window.location.pathname.match(/^\/([a-z]{2}(?:-[a-z]{2})?)\//);
+    return (_match$ = match === null || match === void 0 ? void 0 : match[1]) !== null && _match$ !== void 0 ? _match$ : 'en';
+  }
+  function fetchReleaseFromNextDataApi(_x3, _x4, _x5) {
+    return _fetchReleaseFromNextDataApi.apply(this, arguments);
+  }
+  function _fetchReleaseFromNextDataApi() {
+    _fetchReleaseFromNextDataApi = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(buildId, releaseId, logger) {
+      var locale, name_placeholder, pageDataURL, response, pageData, _t;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
+          case 0:
+            locale = getLocaleFromPath();
+            name_placeholder = '0'; // NextJS ignores this parameter
+            pageDataURL = "https://www.beatport.com/_next/data/".concat(buildId, "/").concat(locale, "/release/").concat(name_placeholder, "/").concat(releaseId, ".json?id=").concat(releaseId);
+            _context3.p = 1;
+            _context3.n = 2;
+            return fetch(pageDataURL);
+          case 2:
+            response = _context3.v;
+            _context3.n = 3;
+            return response.json();
+          case 3:
+            pageData = _context3.v;
+            return _context3.a(2, pageData);
+          case 4:
+            _context3.p = 4;
+            _t = _context3.v;
+            logger.error('Error fetching release data:', _t);
+            return _context3.a(2, null);
+        }
+      }, _callee3, null, [[1, 4]]);
+    }));
+    return _fetchReleaseFromNextDataApi.apply(this, arguments);
+  }
+  var getBeatportReleaseData = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(logger) {
+      var _window$location$path;
+      var releaseIdFromURL, cached, initialNextDataElement, _data$props$pageProps, data, initialReleaseId, buildId;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.n) {
+          case 0:
             releaseIdFromURL = (_window$location$path = window.location.pathname.match(/release\/[^/]+\/(\d+)/)) === null || _window$location$path === void 0 ? void 0 : _window$location$path[1];
             if (releaseIdFromURL) {
-              _context.n = 2;
+              _context2.n = 1;
               break;
             }
-            return _context.a(2, null);
+            return _context2.a(2, null);
+          case 1:
+            // Use intercepted response from Beatport's own fetch (SPA navigation) to avoid duplicate request
+            cached = interceptedReleaseCache.get(releaseIdFromURL);
+            if (!cached) {
+              _context2.n = 2;
+              break;
+            }
+            interceptedReleaseCache.delete(releaseIdFromURL);
+            return _context2.a(2, cached);
           case 2:
-            if (!(releaseIdFromURL === initialReleaseId)) {
-              _context.n = 3;
+            initialNextDataElement = document.getElementById('__NEXT_DATA__');
+            if (!initialNextDataElement) {
+              _context2.n = 4;
               break;
             }
-            return _context.a(2, data.props);
+            data = JSON.parse(initialNextDataElement.innerHTML);
+            initialReleaseId = (_data$props$pageProps = data.props.pageProps.release) === null || _data$props$pageProps === void 0 ? void 0 : _data$props$pageProps.id.toString(); // __NEXT_DATA__ has matching release (direct load or refresh)
+            if (!(initialReleaseId === releaseIdFromURL)) {
+              _context2.n = 3;
+              break;
+            }
+            return _context2.a(2, data.props);
           case 3:
-            if (!(releaseIdFromURL !== initialReleaseId)) {
-              _context.n = 8;
+            // __NEXT_DATA__ is from a different page (e.g. Home) or different release - fetch from API
+            buildId = data.buildId;
+            if (!buildId) {
+              _context2.n = 4;
               break;
             }
-            name_placeholder = '0'; // NextJS ignores this parameter
-            pageDataURL = "https://www.beatport.com/_next/data/".concat(buildId, "/en/release/").concat(name_placeholder, "/").concat(releaseIdFromURL, ".json");
-            _context.p = 4;
-            _context.n = 5;
-            return fetch(pageDataURL);
-          case 5:
-            response = _context.v;
-            _context.n = 6;
-            return response.json();
-          case 6:
-            pageData = _context.v;
-            return _context.a(2, pageData);
-          case 7:
-            _context.p = 7;
-            _t = _context.v;
-            logger.error('Error fetching release data:', _t);
-            return _context.a(2, null);
-          case 8:
-            return _context.a(2, null);
+            return _context2.a(2, fetchReleaseFromNextDataApi(buildId, releaseIdFromURL, logger));
+          case 4:
+            logger.error('Cannot fetch release data: no __NEXT_DATA__ or buildId found');
+            return _context2.a(2, null);
         }
-      }, _callee, null, [[4, 7]]);
+      }, _callee2);
     }));
-    return function getBeatportReleaseData(_x) {
-      return _ref.apply(this, arguments);
+    return function getBeatportReleaseData(_x6) {
+      return _ref2.apply(this, arguments);
     };
   }();
 
   var LOGGER = new Logger('beatport_importer', LogLevel.INFO);
+
+  // Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
+  installFetchInterceptor(LOGGER);
 
   // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
   window.$ = window.jQuery = jQuery.noConflict(true);
@@ -866,28 +942,37 @@
     $(MB_IMPORT_ELEMENT).remove();
     $("#".concat(MB_IMPORT_BARCODE_ELEMENT)).remove();
   };
-  function processReleasePage() {
+  function processReleasePage(_x) {
     return _processReleasePage.apply(this, arguments);
   } // Subscribe to SPA navigation events
   function _processReleasePage() {
-    _processReleasePage = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var releaseData, isReleasePage, release_url, _tracks_release$state, release, tracks_table, tracks_release, tracks_data_array, tracks_data, isrcs, mbrelease, _t;
+    _processReleasePage = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(ranFrom) {
+      var isReleasePage, releaseData, release_url, _tracks_release$state, release, tracks_table, tracks_release, tracks_data_array, tracks_data, isrcs, mbrelease, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            _context.n = 1;
-            return getBeatportReleaseData(LOGGER);
-          case 1:
-            releaseData = _context.v;
+            cleanup();
             isReleasePage = window.location.pathname.includes('/release/');
-            if (!(!releaseData || !isReleasePage)) {
-              _context.n = 2;
+            if (isReleasePage) {
+              _context.n = 1;
               break;
             }
             return _context.a(2);
+          case 1:
+            console.log('ranFrom', ranFrom);
+            _context.n = 2;
+            return getBeatportReleaseData(LOGGER);
           case 2:
+            releaseData = _context.v;
+            if (!(!releaseData || !releaseData.pageProps.release)) {
+              _context.n = 3;
+              break;
+            }
+            LOGGER.error('Could not find release data on the release page');
+            return _context.a(2);
+          case 3:
             release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
-            _context.p = 3;
+            _context.p = 4;
             release = releaseData.pageProps.release; // Reversing is less reliable, but the API does not provide track numbers.
             tracks_table = release.tracks.reverse();
             tracks_release = $.grep(releaseData.pageProps.dehydratedState.queries, function (element) {
@@ -895,12 +980,12 @@
             })[0];
             tracks_data_array = tracks_release === null || tracks_release === void 0 || (_tracks_release$state = tracks_release.state) === null || _tracks_release$state === void 0 ? void 0 : _tracks_release$state.data.results;
             if (tracks_data_array) {
-              _context.n = 4;
+              _context.n = 5;
               break;
             }
             LOGGER.error('Could not find tracks data');
             return _context.a(2);
-          case 4:
+          case 5:
             tracks_data = $.map(tracks_table, function (url) {
               return $.grep(tracks_data_array, function (element) {
                 return element ? element.url === url : false;
@@ -911,29 +996,30 @@
             });
             mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
             insertMBButtons(mbrelease, release_url, isrcs);
-            _context.n = 6;
+            _context.n = 7;
             break;
-          case 5:
-            _context.p = 5;
+          case 6:
+            _context.p = 6;
             _t = _context.v;
             LOGGER.error('Error processing release page:', _t);
-          case 6:
+          case 7:
             return _context.a(2);
         }
-      }, _callee, null, [[3, 5]]);
+      }, _callee, null, [[4, 6]]);
     }));
     return _processReleasePage.apply(this, arguments);
   }
   subscribeToSPANavigation({
-    beforeNavigate: cleanup,
-    onNavigate: processReleasePage
+    onNavigate: function onNavigate() {
+      return processReleasePage('SPA navigation');
+    }
   });
   $(document).ready(function () {
     MBImportStyle();
 
     // Process initial page load
     setTimeout(function () {
-      void processReleasePage();
+      void processReleasePage('initial page load');
     }, 1000);
   });
   function retrieveReleaseInfo(release_url, release_data, tracks_data) {
