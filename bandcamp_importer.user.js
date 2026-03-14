@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.03.05.4
+// @version      2026.03.14.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -488,24 +488,28 @@ $(document).ready(function () {
 
         // append a link to the full size image
         let coverArtElement;
-        const fullsizeimageurl = document.querySelector('meta[property="og:image"]').getAttribute('content').replace('_5', '_0');
+        const fullsizeimageurl = document.querySelector('meta[property="og:image"]')?.getAttribute('content')?.replace('_5', '_0');
         if (isMobile) {
             coverArtElement = document.querySelector('section#tralbum-art-carousel');
         } else {
             coverArtElement = document.querySelector('div#tralbumArt');
         }
 
-        coverArtElement.insertAdjacentHTML(
-            'afterend',
-            `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`,
-        );
+        if (fullsizeimageurl && coverArtElement) {
+            coverArtElement.insertAdjacentHTML(
+                'afterend',
+                `<div id='bci_link'><a class='custom-color' href='${fullsizeimageurl}' title='Open original image in a new tab (Bandcamp importer)' target='_blank'>Original image</a></div>`,
+            );
+        }
 
         const bci_link = document.querySelector('div#bci_link');
-        bci_link.style.paddingTop = '0.5em';
-        bci_link.style.textAlign = 'right';
-        bci_link.querySelector('a').style.fontWeight = 'bold';
-        if (isMobile) {
-            bci_link.style.paddingInline = '10px';
+        if (bci_link) {
+            bci_link.style.paddingTop = '0.5em';
+            bci_link.style.textAlign = 'right';
+            bci_link.querySelector('a').style.fontWeight = 'bold';
+            if (isMobile) {
+                bci_link.style.paddingInline = '10px';
+            }
         }
         const upc = unsafeWindow.TralbumData.current.upc;
         if (typeof upc != 'undefined' && upc !== null) {
