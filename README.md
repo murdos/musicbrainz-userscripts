@@ -1,30 +1,31 @@
 # MusicBrainz UserScripts
 
--   [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
--   [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
--   [Import Bandcamp releases to MusicBrainz Album Link Helper](#bandcamp_importer_helper)
--   [Import Beatport Classic releases to MusicBrainz](#beatport_classic_importer)
--   [Import Beatport releases to MusicBrainz](#beatport_importer)
--   [Import CD Baby releases to MusicBrainz](#cdbaby_importer)
--   [Import CD1D releases to MusicBrainz](#cd1d_importer)
--   [Import DG/Decca releases to MusicBrainz](#dgdecca_importer)
--   [Import Deezer releases into MusicBrainz](#deezer_importer)
--   [Import Discogs releases to MusicBrainz](#discogs_importer)
--   [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
--   [Import FMA releases to MusicBrainz](#fma_importer)
--   [Import Juno Download releases to MusicBrainz](#juno_download_importer)
--   [Import Loot releases to MusicBrainz](#loot_importer)
--   [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
--   [Import Qobuz releases to MusicBrainz](#qobuz_importer)
--   [Import Takealot releases to MusicBrainz](#takealot_importer)
--   [MusicBrainz: 1200px CAA](#mb_1200px_caa)
--   [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
--   [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
--   [MusicBrainz: Expand/collapse release groups](#expand-collapse-release-groups)
--   [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
--   [MusicBrainz: Set recording comments for a release](#set-recording-comments)
--   [Musicbrainz DiscIds Detector](#mb_discids_detector)
--   [Musicbrainz UI enhancements](#mb_ui_enhancements)
+- [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
+- [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
+- [Import Beatport releases to MusicBrainz](#beatport_importer)
+- [Import Boomkat releases to Musicbrainz](#boomkat_importer)
+- [Import CD1D releases to MusicBrainz](#cd1d_importer)
+- [Import Deezer releases into MusicBrainz](#deezer_importer)
+- [Import Discogs releases to MusicBrainz](#discogs_importer)
+- [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+- [Import FMA releases to MusicBrainz](#fma_importer)
+- [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
+- [Import Juno Download releases to MusicBrainz](#juno_download_importer)
+- [Import Loot releases to MusicBrainz](#loot_importer)
+- [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
+- [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
+- [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
+- [Import Qobuz releases to MusicBrainz](#qobuz_importer)
+- [Import Takealot releases to MusicBrainz](#takealot_importer)
+- [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
+- [MusicBrainz: 1200px CAA](#mb_1200px_caa)
+- [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
+- [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
+- [MusicBrainz: Expand/collapse release groups](#expand-collapse-release-groups)
+- [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
+- [MusicBrainz: Set recording comments for a release](#set-recording-comments)
+- [Musicbrainz DiscIds Detector](#mb_discids_detector)
+- [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
 ## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
 
@@ -40,33 +41,19 @@ Add a button on Bandcamp's album pages to open MusicBrainz release editor with p
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
 
-## <a name="bandcamp_importer_helper"></a> Import Bandcamp releases to MusicBrainz Album Link Helper
-
-Add a link to Bandcamp's album canonical URL on pages without /album/, for one to import the release into MusicBrainz
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer_helper.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer_helper.user.js)
-
-## <a name="beatport_classic_importer"></a> Import Beatport Classic releases to MusicBrainz
-
-One-click importing of releases from classic.beatport.com/release pages into MusicBrainz
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_classic_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_classic_importer.user.js)
-
 ## <a name="beatport_importer"></a> Import Beatport releases to MusicBrainz
 
 One-click importing of releases from beatport.com/release pages into MusicBrainz
 
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/beatport_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/beatport_importer.user.js)
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/beatport_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js)
 
-## <a name="cdbaby_importer"></a> Import CD Baby releases to MusicBrainz
+## <a name="boomkat_importer"></a> Import Boomkat releases to Musicbrainz
 
-One-click importing of releases from cdbaby.com into MusicBrainz.
+Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
 
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cdbaby_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/cdbaby_importer.user.js)
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js)
 
 ## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
 
@@ -74,13 +61,6 @@ Add a button on CD1D.com release pages allowing to open MusicBrainz release edit
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
-
-## <a name="dgdecca_importer"></a> Import DG/Decca releases to MusicBrainz
-
-Add a button to import DG/Decca releases to MusicBrainz
-
-[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/dgdecca_importer.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/dgdecca_importer.user.js)
 
 ## <a name="deezer_importer"></a> Import Deezer releases into MusicBrainz
 
@@ -110,6 +90,13 @@ Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fma_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js)
 
+## <a name="hdtracks_importer"></a> Import HDtracks releases into MusicBrainz
+
+One-click importing of releases from hdtracks.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/hdtracks_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/hdtracks_importer.user.js)
+
 ## <a name="juno_download_importer"></a> Import Juno Download releases to MusicBrainz
 
 One-click importing of releases from junodownload.com/products pages into MusicBrainz
@@ -131,6 +118,20 @@ Add a button on Metal Archives release pages allowing to open MusicBrainz releas
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/metalarchives_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js)
 
+## <a name="naxos_library3_importer"></a> Import Naxos Music Library 3 releases to MusicBrainz
+
+Add a button to import Naxos Music Library 3 releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/naxos_library3_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library3_importer.user.js)
+
+## <a name="naxos_library_importer"></a> Import Naxos Music Library releases to MusicBrainz
+
+Add a button to import Naxos Music Library releases to MusicBrainz
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/naxos_library_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library_importer.user.js)
+
 ## <a name="qobuz_importer"></a> Import Qobuz releases to MusicBrainz
 
 Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
@@ -145,9 +146,18 @@ Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/takealot_importer.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js)
 
+## <a name="vgmdb_importer"></a> Import VGMdb releases into MusicBrainz
+
+One-click importing of releases from vgmdb.net into MusicBrainz.
+
+**⚠️ Currently broken:** The VGMdb API is unavailable (returns 503). The script displays a notice to users and links to [VGMdb's BlueSky](https://bsky.app/profile/vgmdb.net/post/3lcvclcpny22d) for status updates.
+
+[![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/vgmdb_importer.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js)
+
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
-Use the 1200px images for the pop‐up/previews on Release cover art pages. (Also adds 1200px “thumbnail” links.)
+Use the 1200px images for the pop‐up/previews on Release cover art pages.
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_1200px_caa.user.js)
 [![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_1200px_caa.user.js)
@@ -164,7 +174,7 @@ Direct links to the recording edit page are added to instruments' recordings pag
 Batch link recordings to works from artist Recordings page.
 
 [![Source](https://github.com/jerone/UserScripts/blob/master/_resources/Source-button.png)](https://github.com/murdos/musicbrainz-userscripts/blob/master/batch-add-recording-relationships.user.js)
-[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/batch-add-recording-relationships.user.js)
+[![Install](https://raw.github.com/jerone/UserScripts/master/_resources/Install-button.png)](https://github.com/murdos/musicbrainz-userscripts/raw/master/batch-add-recording-relationships.user.js)
 
 ## <a name="expand-collapse-release-groups"></a> MusicBrainz: Expand/collapse release groups
 

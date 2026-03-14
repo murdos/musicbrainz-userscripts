@@ -1,17 +1,15 @@
 // ==UserScript==
-// @name           MusicBrainz: Set recording comments for a release
-// @description    Batch set recording comments from a Release page.
-// @version        2019.5.10.1
-// @author         Michael Wiencek
-// @license        X11
-// @namespace      790382e7-8714-47a7-bfbd-528d0caa2333
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @match          *://*.musicbrainz.org/release/*
-// @match          *://*.mbsandbox.org/release/*
-// @exclude        *musicbrainz.org/release/*/*
-// @exclude        *.mbsandbox.org/release/*/*
-// @grant          none
+// @name         MusicBrainz: Set recording comments for a release
+// @description  Batch set recording comments from a Release page.
+// @version      2024.6.18.1
+// @author       Michael Wiencek
+// @license      X11
+// @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
+// @include      /^https?:\/\/(\w+\.)?musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
+// @grant        none
+// @run-at       document-idle
 // ==/UserScript==
 
 // ==License==
@@ -41,9 +39,11 @@
 // authorization.
 // ==/License==
 
-var scr = document.createElement('script');
-scr.textContent = `$(${setRecordingComments});`;
-document.body.appendChild(scr);
+setTimeout(function () {
+    const scr = document.createElement('script');
+    scr.textContent = `$(${setRecordingComments});`;
+    document.body.appendChild(scr);
+}, 1000);
 
 function setRecordingComments() {
     let $tracks;
@@ -52,11 +52,11 @@ function setRecordingComments() {
 
     $('head').append(
         $('<style></style>').text(
-            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }'
-        )
+            'input.recording-comment { background: inherit; border: 1px #999 solid; width: 32em; margin-left: 0.5em; }',
+        ),
     );
 
-    var delay = setInterval(function () {
+    const delay = setInterval(function () {
         $tracks = $('.medium tbody tr[id]');
 
         if ($tracks.length) {
@@ -70,6 +70,10 @@ function setRecordingComments() {
                 node = $td.children('td > .mp, td > .name-variation, td > a[href^=\\/recording\\/]').filter(':first'),
                 $input = $('<input />').addClass('recording-comment').insertAfter(node);
 
+            let link = $("a[href^='/recording/']", $td).first().attr('href');
+            let mbid = link.match(MBID_REGEX)[0];
+            $input.data('mbid', mbid);
+
             if (!editing) {
                 $input.hide();
             }
@@ -80,21 +84,26 @@ function setRecordingComments() {
         let release = location.pathname.match(MBID_REGEX)[0];
 
         $.get(`/ws/2/release/${release}?inc=recordings&fmt=json`, function (data) {
-            let comments = _.map(_.map(_.flatten(_.map(data.media, 'tracks')), 'recording'), 'disambiguation');
+            let recordings = Array.from(data.media)
+                .map(medium => medium.tracks)
+                .flat()
+                .map(track => track.recording);
 
-            for (let i = 0, len = comments.length; i < len; i++) {
-                let comment = comments[i];
-                $inputs.eq(i).val(comment).data('old', comment);
-            }
+            $inputs.each(function () {
+                let mbid = $(this).data('mbid');
+                let recording = recordings.find(recording => recording.id === mbid);
+                let comment = recording ? recording.disambiguation : '';
+                $(this).val(comment).data('old', comment);
+            });
         });
     }, 1000);
 
-    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)) {
+    if (!location.pathname.match(/^\/release\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/)) {
         return;
     }
 
-    var MBID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/,
-        editing = false,
+    const MBID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/;
+    let editing = false,
         activeRequest = null;
 
     $('body').on('input.rc', '.recording-comment', function () {
@@ -139,7 +148,7 @@ function setRecordingComments() {
       <button id="submit-recording-comments" class="styled-button">Submit changes (visible and marked red)</button>\
     </td>\
   </tr>\
-</table>'
+</table>',
     );
 
     $('#set-recording-comments').hide();
@@ -148,7 +157,7 @@ function setRecordingComments() {
         $inputs.filter(':visible').val(this.value).trigger('input.rc');
     });
 
-    var $submitButton = $('#submit-recording-comments').on('click', function () {
+    const $submitButton = $('#submit-recording-comments').on('click', function () {
         if (activeRequest) {
             activeRequest.abort();
             activeRequest = null;

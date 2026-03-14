@@ -1,54 +1,135 @@
 // ==UserScript==
-// @name           Display shortcut for relationships on MusicBrainz
-// @description    Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version        2020.3.31.1
-// @author         Aurelien Mino <aurelien.mino@gmail.com>
-// @licence        GPL (http://www.gnu.org/copyleft/gpl.html)
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
-// @include        http*://*musicbrainz.org/artist/*
-// @include        http*://*musicbrainz.org/release-group/*
-// @include        http*://*musicbrainz.org/label/*
-// @require        https://code.jquery.com/jquery-3.2.1.min.js
+// @name         Display shortcut for relationships on MusicBrainz
+// @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
+// @version      2026.1.21
+// @author       Aurelien Mino <aurelien.mino@gmail.com>
+// @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @match        *://*.musicbrainz.org/artist/*
+// @match        *://*.musicbrainz.org/release-group/*
+// @match        *://*.musicbrainz.org/label/*
+// @exclude      */artist/*/recordings*
+// @exclude      */edit
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
-var relationsIconsURLs = {
-    url: {
-        'amazon asin': 'https://musicbrainz.org/static/images/favicons/amazon-32.png',
-        discogs: 'https://musicbrainz.org/static/images/favicons/discogs-32.png',
-        wikidata: 'https://musicbrainz.org/static/images/favicons/wikidata-32.png',
-        imdb: 'https://musicbrainz.org/static/images/favicons/imdb-32.png',
-        'creative commons licensed download': 'http://creativecommons.org/favicon.ico',
-        'cover art link': 'http://www.cdcovers.cc/favicon.ico',
-        secondhandsongs: 'https://musicbrainz.org/static/images/favicons/secondhandsongs-32.png',
-        lyrics: 'http://www.nomy.nu/img/lyrics-icon.gif',
-        allmusic: 'https://musicbrainz.org/static/images/favicons/allmusic-16.png',
-    },
+const relationsIconsURLs = {
     'release-group': {
-        'single from': 'http://www.amaesingtools.com/images/left_arrow_icon.gif',
+        // http://www.amaesingtools.com/images/left_arrow_icon.gif
+        'single from': `data:image/gif;base64,R0lGODlhDwALAJEAAP2ZAZmZmf///wAAACH5BAAAAAAALAAAAAAPAAsAAAIflI+pq2ABY0DAiYmwqOyaCoaHxjHaZp0e9UhQB8dCAQA7`,
     },
     release: {
-        'part of set': 'http://web.archive.org/web/20060709091901/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-inter.png',
         remaster: 'http://web.archive.org/web/20060708200714/http://wiki.musicbrainz.org/-/musicbrainz/img/moin-www.png',
     },
 };
 
-var otherDatabasesIconURLs = {
-    'd-nb.info': 'https://musicbrainz.org/static/images/favicons/dnb-16.png',
-    'www.musik-sammler.de': 'https://musicbrainz.org/static/images/favicons/musiksammler-32.png',
-    'www.worldcat.org': 'https://musicbrainz.org/static/images/favicons/worldcat-32.png',
-    'rateyourmusic.com': 'https://musicbrainz.org/static/images/favicons/rateyourmusic-32.png',
+const urlRelationsIconClasses = {
+    allmusic: 'allmusic',
+    'amazon asin': 'amazon',
+    'creative commons licensed download': 'creativecommons',
+    discogs: 'discogs',
+    imdb: 'imdb',
+    lyrics: 'lyrics',
+    secondhandsongs: 'secondhandsongs',
+    vgmdb: 'vgmdb',
+    wikidata: 'wikidata',
+    'discography entry': 'home',
 };
 
-var incOptions = {
+const otherDatabasesIconClasses = {
+    'd-nb.info': 'dnb',
+    'www.musik-sammler.de': 'musiksammler',
+    'rateyourmusic.com': 'rateyourmusic',
+    'www.worldcat.org': 'worldcat',
+    'nocs.acum.org.il': 'acum',
+    'stereo-ve-mono.com': 'stereo-ve-mono',
+};
+
+const streamingIconClasses = {
+    'music.amazon.': 'amazonmusic',
+    'music.apple.com': 'applemusic',
+    'bandcamp.com': 'bandcamp',
+    'www.deezer.com': 'deezer',
+    'www.hdtracks.com': 'hdtracks',
+    'itunes.apple.com': 'itunes',
+    'qobuz.com': 'qobuz',
+    'soundcloud.com': 'soundcloud',
+    'open.spotify.com': 'spotify',
+    'tidal.com': 'tidal',
+    'beatport.com': 'beatport',
+    'youtube.com': 'youtube',
+    'archive.org': 'archive',
+    'mediafire.com': 'mediafire',
+    'store.steampowered.com': 'steam',
+};
+
+/**
+ * @param {string} mbid
+ * @param {string} targetUrl
+ * @param {string} iconClass
+ */
+function injectShortcutIcon(mbid, targetUrl, iconClass) {
+    if (!iconClass) return;
+    $(`#${mbid} td.relationships`).append(
+        `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`,
+    );
+}
+
+/**
+ * @param {string} url
+ * @param {Object} iconClassMap
+ */
+function findIconClassOfUrl(url, iconClassMap) {
+    for (let partialUrl in iconClassMap) {
+        if (url.includes(partialUrl)) {
+            return iconClassMap[partialUrl];
+        }
+    }
+}
+
+const incOptions = {
     'release-group': ['release-group-rels', 'url-rels'],
     release: ['release-rels', 'url-rels', 'discids'],
     recording: ['work-rels'],
     work: ['url-rels'],
 };
 
-// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
+const userscriptCSS = `
+td.relationships span.favicon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 2px;
+}
+td.relationships span.favicon.ended {
+    opacity: 25%; /* make ended rels less visible */
+}
+
+/* additional custom favicons which are not shipped by MBS */
+.hdtracks-favicon {
+    background-image: url(https://www.hdtracks.com/favicon.ico);
+    background-size: 16px;
+}
+.creativecommons-favicon {
+    background-image: url(https://creativecommons.org/favicon.ico);
+}
+.lyrics-favicon {
+    /* archived version, originally from http://www.nomy.nu/img/lyrics-icon.gif */
+    background-image: url(data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==);
+}
+.mediafire-favicon {
+background-image: url(https://www.mediafire.com/favicon.ico);
+}
+.steam-favicon {
+background-image: url(https://store.steampowered.com/favicon.ico);
+background-size: 16px;
+}`;
+
+// prevent JQuery conflicts, see https://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
@@ -57,6 +138,7 @@ $(document).ready(function () {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};
+    let m;
     if ((m = window.location.href.match('/artist/(.{36})[^/]*$'))) {
         parent.type = 'artist';
         parent.mbid = m[1];
@@ -74,7 +156,9 @@ $(document).ready(function () {
         return;
     }
 
-    let mbidRE = /(release|release-group|work)\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/;
+    document.head.insertAdjacentHTML('beforeend', `<style id='relationship-shortcuts-userscript-css'>${userscriptCSS}</style>`);
+
+    const mbidRE = /(release|release-group|work)\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/;
 
     // Determine target column
     let columnindex = 0;
@@ -82,7 +166,8 @@ $(document).ready(function () {
         $(this)
             .children('td')
             .each(function () {
-                if ($(this).find('a').attr('href') !== undefined && $(this).find('a').attr('href').match(mbidRE)) {
+                const href = $(this).find('a').attr('href');
+                if (href !== undefined && href.match(mbidRE)) {
                     return false;
                 }
                 columnindex++;
@@ -94,7 +179,7 @@ $(document).ready(function () {
     $("table.tbl tr[class!='subh']").each(function () {
         let $tr = $(this);
 
-        $tr.children(`th:eq(${columnindex})`).after("<th style='width: 150px;'>Relationships</th>");
+        $tr.children(`th:eq(${columnindex})`).after('<th>Relationships</th>');
         $tr.children(`td:eq(${columnindex})`).after("<td class='relationships'></td>");
 
         $(this)
@@ -129,10 +214,9 @@ $(document).ready(function () {
     let offset = (page - 1) * 100;
 
     // Call the MB webservice
-    let url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
-    //console.log("MB WS url: " + url);
+    const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    $.get(url, function (data, textStatus, jqXHR) {
+    $.get(url, function (data) {
         // Parse each child
         $(data)
             .find(child.type)
@@ -140,27 +224,34 @@ $(document).ready(function () {
                 let mbid = $(this).attr('id');
 
                 // URL relationships
+                let alreadyInjectedUrls = [];
                 $(this)
                     .find("relation-list[target-type='url'] relation")
                     .each(function () {
-                        let reltype = $(this).attr('type');
-                        let target = $(this).children('target').text();
-                        if (Object.prototype.hasOwnProperty.call(relationsIconsURLs.url, reltype)) {
-                            $(`#${mbid} td.relationships`).append(
-                                `<a href='${target.replace(/'/g, '&apos;')}'>` +
-                                    `<img style='max-height: 16px;' src='${relationsIconsURLs.url[reltype]}' />&nbsp;` +
-                                    `</a>`
-                            );
-                        } else
-                            for (let rel in otherDatabasesIconURLs) {
-                                if (target.indexOf(rel) != -1) {
-                                    $(`#${mbid} td.relationships`).append(
-                                        `<a href='${target.replace(/'/g, '&apos;')}'>` +
-                                            `<img style='max-height: 16px;' src='${otherDatabasesIconURLs[rel]}' />&nbsp;` +
-                                            `</a>`
-                                    );
-                                }
+                        let relType = $(this).attr('type');
+                        let targetUrl = $(this).children('target').text();
+                        let ended = $(this).children('ended').text() === 'true';
+
+                        // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
+                        if (alreadyInjectedUrls.includes(targetUrl)) return;
+                        alreadyInjectedUrls.push(targetUrl);
+
+                        let iconClass;
+                        if (relType in urlRelationsIconClasses) {
+                            iconClass = urlRelationsIconClasses[relType];
+                        } else if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
+                        } else {
+                            // Other database?
+                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+                        }
+
+                        if (iconClass) {
+                            if (ended) {
+                                iconClass = ['ended', iconClass].join(' ');
                             }
+                            injectShortcutIcon(mbid, targetUrl, iconClass);
+                        }
                     });
 
                 // Other relationships
@@ -177,9 +268,9 @@ $(document).ready(function () {
                         $(this)
                             .children('relation')
                             .each(function () {
-                                let reltype = $(this).attr('type');
-                                let target = $(this).children('target').text();
-                                let url = targettype == 'url' ? target : `/${targettype}/${target}`;
+                                const reltype = $(this).attr('type');
+                                const target = $(this).children('target').text();
+                                const url = targettype == 'url' ? target : `/${targettype}/${target}`;
 
                                 if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
                                     if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [url];

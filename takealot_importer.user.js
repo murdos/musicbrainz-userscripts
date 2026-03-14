@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name           Import Takealot releases to MusicBrainz
-// @description    Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
-// @version        2019.1.5.1
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
-// @include        http*://www.takealot.com/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Takealot releases to MusicBrainz
+// @description  Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
+// @version      2019.1.5.1
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
+// @include      http*://www.takealot.com/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,27 +28,27 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var DEBUG = false; // true | false
+const DEBUG = false; // true | false
 
 if (DEBUG) {
     LOGGER.setLevel('debug');
 }
 
 // promise to ensure all api calls are done before we parse the release
-var tracks_deferred = $.Deferred();
-var retrieve_tracks_promise = tracks_deferred.promise();
+const tracks_deferred = $.Deferred();
+const retrieve_tracks_promise = tracks_deferred.promise();
 
 // object to store all global attributes collected for the release
-var release_attributes = {}; // albumid, total_pages, artist_name, label
+const release_attributes = {}; // albumid, total_pages, artist_name, label
 
 // arrays to store the data retrieved from API to parse for MB release
-var album_api_array = []; // album information [0]
-var tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
+const album_api_array = []; // album information [0]
+const tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
 $(document).ready(function () {
     LOGGER.info('Document Ready & Takealot Userscript Executing');
 
-    let fmaPage = parseFMApage();
+    parseFMApage();
     let mblinks = new MBLinks('FMA_CACHE', 7 * 24 * 60);
 
     if (DEBUG) {
@@ -102,7 +102,7 @@ function insertIMGlinks() {
     imgnewhref = `${imgnewhref}-full${imgnewtype}`;
     //LOGGER.debug('insertIMGlinks 4:: ', imgnewhref);
     $('div.panel.pdp-main-panel').append(
-        `<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`
+        `<p><img src="http://musicbrainz.org/favicon.ico" /><a href="${imgnewhref}">MB High Res Image</a></p>`,
     );
 }
 
@@ -118,7 +118,7 @@ function insertAPISection() {
         });
 
     let fmaStatusBlock = $(
-        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a>'
+        '<a class="lbut-lt" id="lbut-lt-fma-api-album-id">»</a> <a class="lbut-lt" id="lbut-lt-fma-api-key-id">»</a> <a id="lbut-lt-fma-api-album" class="lbut-lt">Album info retrieved</a>',
     );
     fmaUI.append(fmaStatusBlock);
 
@@ -135,7 +135,7 @@ function insertAPISection() {
 }
 
 // Update FreeMusicArchive API Status section on FMA page
-var updateAPISection = {
+const updateAPISection = {
     AlbumId: function (albumid) {
         this.albumid = albumid;
         $('#lbut-lt-fma-api-album-id').text(this.albumid);
@@ -194,7 +194,7 @@ function insertMBSection(release) {
     //LOGGER.debug(release);
 
     let mbUI = $(
-        '<div class="search-nav-wrap-2"></div>'
+        '<div class="search-nav-wrap-2"></div>',
         //'<div id="musicbrainz" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">MusicBrainz</span></h4></div>'
     ).hide();
     if (DEBUG)
@@ -203,7 +203,7 @@ function insertMBSection(release) {
         });
 
     let mbContentBlock = $(
-        '<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>'
+        '<div class="trim"><div class="cat-navigation left"><a href="https://www.musicbrainz.com">MusicBrainz</a></div></div>',
     );
     mbUI.append(mbContentBlock);
 
@@ -306,7 +306,7 @@ function insertAPIKEYSection() {
     LOGGER.debug('FMA insertAPIKEYSection Function Executing');
 
     let mbUI = $(
-        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>'
+        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>',
     ).hide();
     if (DEBUG)
         mbUI.css({
@@ -348,7 +348,7 @@ function insertAPIKEYSection() {
 function album_api() {
     let fmaWsUrl = `https://api.takealot.com/rest/v-1-6-0/productlines/lookup?idProduct=${release_attributes.albumid}`;
 
-    var promise_variable = $.getJSON(fmaWsUrl, function () {
+    const promise_variable = $.getJSON(fmaWsUrl, function () {
         updateAPISection.AlbumAjaxStatus('busy');
         LOGGER.debug(`promise_variable [state] in [getJSON] ${promise_variable.state()}`);
     }).done(function (albumjson) {
@@ -383,7 +383,7 @@ function parseFMApage() {
         FMAtype = 'artist';
     }
 
-    if (FMAtype == 'album') {
+    if (FMAtype === 'album') {
         //LOGGER.debug("FMA parseFMApage Function Executing on ", FMAtype);
         // <input type="hidden" id="idProduct" value="53513920">
 
@@ -624,13 +624,14 @@ function Parsefmarelease(albumobject, trackobject) {
         LOGGER.debug(`The last track:${lasttrack}`);
 
         // Define all te formats here
-        takealot_format_1_1_regex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*) - (.*)/;
-        takealot_format_1_2_regex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*)/;
+        const takealot_format_1_1_regex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*) - (.*)/;
+        const takealot_format_1_2_regex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*)/;
 
         let takealot_format_1_1_test = takealot_format_1_1_regex.test(lasttrack);
         let takealot_format_1_2_test = takealot_format_1_2_regex.test(lasttrack);
 
-        var takealot_format = '';
+        let takealot_format = '';
+        let disctracktitleregex;
 
         if (takealot_format_1_1_test) {
             // set the disctracktitleregex to format 1.1
@@ -647,7 +648,7 @@ function Parsefmarelease(albumobject, trackobject) {
             takealot_format = 'unmatched';
         }
 
-        lastdiscnumberregex = /\[ Disc (.*) Track./; // regex to match disc number from last track
+        const lastdiscnumberregex = /\[ Disc (.*) Track./; // regex to match disc number from last track
         let lastdiscnumbermatch = lasttrack.match(lastdiscnumberregex);
         lastdiscnumber = parseInt(lastdiscnumbermatch[1]);
         LOGGER.debug('Last Disc Number: ', lastdiscnumber);
@@ -657,27 +658,24 @@ function Parsefmarelease(albumobject, trackobject) {
             LOGGER.debug('Disc iterate: ', k);
 
             // Tracks
-            var tracklistarray = new Array(); // create the track list array
+            const tracklistarray = []; // create the track list array
 
-            for (let j = 0; j < alltracklist.length; j++) {
-                // changed j to 0 and length-1 as Artist is at end
+            for (const element of alltracklist) {
                 // do regex here and if current disc listed in track = k then push the track into the array for that disc
-                let trackdetails = alltracklist[j];
                 // sample: [ Disc 01 Track 01 ] What Do You Mean? - Justin Bieber
                 // do this up in regex tester now...
                 //disctracktitleregex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*) - (.*)/;
-                let disctracktitle = trackdetails.match(disctracktitleregex);
+                let disctracktitle = element.match(disctracktitleregex);
 
                 let currentdiscnumber = parseInt(disctracktitle[1]);
 
-                if (currentdiscnumber == k) {
-                    var track = {};
-                    let track_artist_credit = [];
+                if (currentdiscnumber === k) {
+                    const track = {};
 
                     track.number = parseInt(disctracktitle[2]);
                     track.title = disctracktitle[3];
 
-                    //LOGGER.debug('TAL FORMAT *** ', takealot_format);
+                    LOGGER.debug('TAL FORMAT *** ', takealot_format);
 
                     if (takealot_format === 'v1_type1') {
                         track.artist_credit = MBImport.makeArtistCredits([disctracktitle[4]]);
@@ -711,7 +709,7 @@ function Parsefmarelease(albumobject, trackobject) {
         takealot_format = 'v2_type1';
 
         // Tracks
-        var tracklistarray = new Array(); // create the track list array
+        let tracklistarray = new Array(); // create the track list array
 
         for (let j = 0; j < lines.length; j++) {
             //code here using lines[i] which will give you each line
@@ -729,7 +727,7 @@ function Parsefmarelease(albumobject, trackobject) {
             lastdiscnumber = 1;
 
             if (currentdiscnumber == 1) {
-                var track = {};
+                let track = {};
                 let track_artist_credit = [];
 
                 track.number = j + 1;
@@ -774,18 +772,20 @@ function Parsefmarelease(albumobject, trackobject) {
 //                                   Takealot -> MusicBrainz mapping                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var DiscFormats = [];
-DiscFormats['CD'] = 'CD';
-DiscFormats['DVD'] = 'DVD';
-DiscFormats['Audio CD'] = 'CD';
+const DiscFormats = {
+    CD: 'CD',
+    DVD: 'DVD',
+    'Audio CD': 'CD',
+};
 
-var Languages = [];
-Languages['Afrikaans'] = 'afr';
-Languages['afrikaans'] = 'afr';
+const Languages = {
+    Afrikaans: 'afr',
+    afrikaans: 'afr',
+};
 
-var Countries = [];
-Countries['South Africa'] = 'ZA';
-Countries['SA'] = 'ZA';
+const Countries = {
+    'South Africa': 'ZA',
+    SA: 'ZA',
+};
 
-var PackagingFormats = [];
-PackagingFormats['CD'] = 'jewel case';
+const PackagingFormats = { CD: 'jewel case' };

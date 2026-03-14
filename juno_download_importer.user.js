@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name           Import Juno Download releases to MusicBrainz
-// @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from junodownload.com/products pages into MusicBrainz
-// @version        2020.3.19.1
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
-// @include        http*://www.junodownload.com/products/*
-// @include        http*://secure.junodownload.com/products/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Juno Download releases to MusicBrainz
+// @namespace    https://github.com/murdos/musicbrainz-userscripts/
+// @description  One-click importing of releases from junodownload.com/products pages into MusicBrainz
+// @version      2021.11.21.1
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
+// @include      http*://www.junodownload.com/products/*
+// @include      http*://secure.junodownload.com/products/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -55,7 +55,7 @@ function parseReleaseDate(rdate) {
 function retrieveReleaseInfo(release_url) {
     let release = {
         artist_credit: [],
-        title: $('meta[itemProp="name"]').attr('content').trim(),
+        title: $('h2.product-title a').text().trim(),
         year: 0,
         month: 0,
         day: 0,
@@ -85,8 +85,8 @@ function retrieveReleaseInfo(release_url) {
     });
 
     release.labels.push({
-        name: $('meta[itemProp="author"]').attr('content').trim(),
-        catno: $('strong:contains("Cat:")').parent().contents().slice(2, 3).text().trim(),
+        name: $('div[itemProp="publisher"] meta[itemProp="name"]').attr('content').trim(),
+        catno: $('strong:contains("Cat:")').parent().contents().slice(1, 2).text().trim(),
     });
 
     let tracks = [];
@@ -140,8 +140,8 @@ function insertLink(release, releaseUrl) {
 
     let mbUI = $(
         `<div class="col-12 col-lg-9 mt-3"><div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(
-            release
-        )}</div></div>`
+            release,
+        )}</div></div>`,
     ).hide();
 
     $('.product-share').parent().after(mbUI);

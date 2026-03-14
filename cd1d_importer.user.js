@@ -1,21 +1,21 @@
 // ==UserScript==
-// @name        Import CD1D releases to MusicBrainz
-// @description Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
-// @namespace   http://userscripts.org/users/517952
-// @include     http://1d-aquitaine.com/*/album/*
-// @include     http://1d-midipyrenees.com/*/album/*
-// @include     http://1d-paca.com/*/album/*
-// @include     http://1d-paysdelaloire.com/*/album/*
-// @include     http://1d-rhonealpes.com/*/album/*
-// @include     http://cd1d.com/*/album/*
-// @version     2018.2.18.1
-// @downloadURL https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @updateURL   https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require     lib/mbimport.js
-// @require     lib/logger.js
-// @require     lib/mbimportstyle.js
-// @icon        https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import CD1D releases to MusicBrainz
+// @description  Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
+// @namespace    http://userscripts.org/users/517952
+// @include      http://1d-aquitaine.com/*/album/*
+// @include      http://1d-midipyrenees.com/*/album/*
+// @include      http://1d-paca.com/*/album/*
+// @include      http://1d-paysdelaloire.com/*/album/*
+// @include      http://1d-rhonealpes.com/*/album/*
+// @include      http://cd1d.com/*/album/*
+// @version      2018.2.18.1
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */
@@ -23,7 +23,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var CD1DImporter = {
+const CD1DImporter = {
     getFormats: function () {
         // get a list of existing formats, return id of the fragment and name
         let formats = $('#container-1 ul li.ui-state-default').map(function () {
@@ -33,7 +33,7 @@ var CD1DImporter = {
             };
         });
         // remove "parent" formats : ie. digital when mp3 and flac are present
-        for (var i = 0; i < formats.length; i++) {
+        for (let i = 0; i < formats.length; i++) {
             for (let j = i + 1; j < formats.length; j++) {
                 if (formats[j].id.length > 1) {
                     if (formats[i].id[1] == formats[j].id[1]) {
@@ -48,7 +48,7 @@ var CD1DImporter = {
             }
         }
         let cleanformats = [];
-        for (var i = 0; i < formats.length; i++) {
+        for (let i = 0; i < formats.length; i++) {
             if (!formats[i].toremove) {
                 cleanformats.push({
                     id: formats[i].id.join('-'),
@@ -64,7 +64,7 @@ var CD1DImporter = {
         let tracklists = `div#${id} div.tracklist table.tracklist-content`;
         let discs = [];
         $(tracklists).each(function () {
-            disc = $(this)
+            const disc = $(this)
                 .find('tbody tr')
                 .map(function () {
                     // $(this) is used more than once; cache it for performance.
@@ -225,7 +225,7 @@ var CD1DImporter = {
             .get();
 
         // Tracks
-        $.each(this.getTracks(format.id), function (ndisc, disc) {
+        $.each(this.getTracks(format.id), function () {
             let thisdisc = {
                 tracks: [],
                 format: release.format,
