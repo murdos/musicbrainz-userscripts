@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.03.14.4
+// @version      2026.03.14.5
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -122,6 +122,27 @@
   }
   function _nonIterableSpread() {
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function ownKeys(e, r) {
+    var t = Object.keys(e);
+    if (Object.getOwnPropertySymbols) {
+      var o = Object.getOwnPropertySymbols(e);
+      r && (o = o.filter(function (r) {
+        return Object.getOwnPropertyDescriptor(e, r).enumerable;
+      })), t.push.apply(t, o);
+    }
+    return t;
+  }
+  function _objectSpread2(e) {
+    for (var r = 1; r < arguments.length; r++) {
+      var t = null != arguments[r] ? arguments[r] : {};
+      r % 2 ? ownKeys(Object(t), true).forEach(function (r) {
+        _defineProperty(e, r, t[r]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) {
+        Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
+      });
+    }
+    return e;
   }
   function _regenerator() {
     /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
@@ -858,18 +879,36 @@
     var match = window.location.pathname.match(/^\/([a-z]{2}(?:-[a-z]{2})?)\//);
     return (_match$ = match === null || match === void 0 ? void 0 : match[1]) !== null && _match$ !== void 0 ? _match$ : 'en';
   }
-  function fetchReleaseFromNextDataApi(_x3, _x4, _x5) {
+  function getReleaseSlugFromPath() {
+    var _match$2;
+    var match = window.location.pathname.match(/\/release\/([^/]+)\/\d+/);
+    return (_match$2 = match === null || match === void 0 ? void 0 : match[1]) !== null && _match$2 !== void 0 ? _match$2 : null;
+  }
+  function fetchReleaseFromNextDataApi(_x3, _x4, _x5, _x6) {
     return _fetchReleaseFromNextDataApi.apply(this, arguments);
   }
+  /**
+   * For releases with 100+ tracks, Beatport paginates the track data. Each page returns only
+   * that page's tracks (page 1 = 100, page 2 = 9 for a 109-track release). The initial data
+   * may be from whichever page the user is viewing, so we always fetch all pages to ensure
+   * we get the complete track list regardless of the current view.
+   */
   function _fetchReleaseFromNextDataApi() {
-    _fetchReleaseFromNextDataApi = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(buildId, releaseId, logger) {
-      var locale, name_placeholder, pageDataURL, response, pageData, _t;
+    _fetchReleaseFromNextDataApi = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(buildId, releaseId, logger, page) {
+      var locale, slug, name_placeholder, pageDataURL, response, pageData, _t;
       return _regenerator().w(function (_context3) {
         while (1) switch (_context3.p = _context3.n) {
           case 0:
             locale = getLocaleFromPath();
-            name_placeholder = '0'; // NextJS ignores this parameter
+            slug = getReleaseSlugFromPath();
+            name_placeholder = slug !== null && slug !== void 0 ? slug : '0'; // Use actual slug when available for pagination
             pageDataURL = "https://www.beatport.com/_next/data/".concat(buildId, "/").concat(locale, "/release/").concat(name_placeholder, "/").concat(releaseId, ".json?id=").concat(releaseId);
+            if (page != null && page > 1) {
+              pageDataURL += "&per_page=100&page=".concat(page);
+              if (slug) {
+                pageDataURL += "&description=".concat(encodeURIComponent(slug));
+              }
+            }
             _context3.p = 1;
             _context3.n = 2;
             return fetch(pageDataURL);
@@ -890,10 +929,107 @@
     }));
     return _fetchReleaseFromNextDataApi.apply(this, arguments);
   }
+  function ensureFullTrackData(_x7, _x8, _x9, _x0) {
+    return _ensureFullTrackData.apply(this, arguments);
+  }
+  function _ensureFullTrackData() {
+    _ensureFullTrackData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(pageData, buildId, releaseId, logger) {
+      var _tracksQuery$state$da, _tracksQuery$state;
+      var release, tracksQuery, currentTrackCount, totalPages, allResults, page, _pageTracksQuery$stat, _pageTracksQuery$stat2, paginatedData, pageTracksQuery, pageResults, updatedQueries;
+      return _regenerator().w(function (_context4) {
+        while (1) switch (_context4.n) {
+          case 0:
+            release = pageData.pageProps.release;
+            if (!(!release || release.track_count <= 100)) {
+              _context4.n = 1;
+              break;
+            }
+            return _context4.a(2, pageData);
+          case 1:
+            tracksQuery = pageData.pageProps.dehydratedState.queries.find(function (q) {
+              return /tracks/.test(q.queryKey);
+            });
+            currentTrackCount = (_tracksQuery$state$da = tracksQuery === null || tracksQuery === void 0 || (_tracksQuery$state = tracksQuery.state) === null || _tracksQuery$state === void 0 ? void 0 : _tracksQuery$state.data.results.length) !== null && _tracksQuery$state$da !== void 0 ? _tracksQuery$state$da : 0;
+            if (!(currentTrackCount >= release.track_count)) {
+              _context4.n = 2;
+              break;
+            }
+            return _context4.a(2, pageData);
+          case 2:
+            totalPages = Math.ceil(release.track_count / 100);
+            allResults = [];
+            page = 1;
+          case 3:
+            if (!(page <= totalPages)) {
+              _context4.n = 7;
+              break;
+            }
+            logger.info("Fetching page ".concat(page, "/").concat(totalPages, " to get full track list (").concat(release.track_count, " tracks)"));
+            _context4.n = 4;
+            return fetchReleaseFromNextDataApi(buildId, releaseId, logger, page);
+          case 4:
+            paginatedData = _context4.v;
+            if (paginatedData) {
+              _context4.n = 5;
+              break;
+            }
+            return _context4.a(3, 6);
+          case 5:
+            pageTracksQuery = paginatedData.pageProps.dehydratedState.queries.find(function (q) {
+              return /tracks/.test(q.queryKey);
+            });
+            pageResults = (_pageTracksQuery$stat = pageTracksQuery === null || pageTracksQuery === void 0 || (_pageTracksQuery$stat2 = pageTracksQuery.state) === null || _pageTracksQuery$stat2 === void 0 ? void 0 : _pageTracksQuery$stat2.data.results) !== null && _pageTracksQuery$stat !== void 0 ? _pageTracksQuery$stat : [];
+            allResults.push.apply(allResults, _toConsumableArray(pageResults));
+          case 6:
+            page++;
+            _context4.n = 3;
+            break;
+          case 7:
+            if (!(allResults.length < release.track_count)) {
+              _context4.n = 8;
+              break;
+            }
+            logger.info('Could not fetch all paginated track data, using partial data');
+            return _context4.a(2, pageData);
+          case 8:
+            // Merge full track data into our page data
+            updatedQueries = pageData.pageProps.dehydratedState.queries.map(function (q) {
+              if (!/tracks/.test(q.queryKey)) return q;
+              var updatedState = q.state ? _objectSpread2(_objectSpread2({}, q.state), {}, {
+                data: _objectSpread2(_objectSpread2({}, q.state.data), {}, {
+                  results: allResults
+                })
+              }) : undefined;
+              return updatedState != null ? _objectSpread2(_objectSpread2({}, q), {}, {
+                state: updatedState
+              }) : q;
+            });
+            return _context4.a(2, {
+              pageProps: _objectSpread2(_objectSpread2({}, pageData.pageProps), {}, {
+                dehydratedState: _objectSpread2(_objectSpread2({}, pageData.pageProps.dehydratedState), {}, {
+                  queries: updatedQueries
+                })
+              })
+            });
+        }
+      }, _callee4);
+    }));
+    return _ensureFullTrackData.apply(this, arguments);
+  }
+  function getBuildId() {
+    var el = document.getElementById('__NEXT_DATA__');
+    if (!el) return undefined;
+    try {
+      var data = JSON.parse(el.innerHTML);
+      return data.buildId;
+    } catch (_unused2) {
+      return undefined;
+    }
+  }
   var getBeatportReleaseData = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(logger) {
       var _window$location$path;
-      var releaseIdFromURL, cached, initialNextDataElement, _data$props$pageProps, data, initialReleaseId, buildId;
+      var releaseIdFromURL, pageData, buildId, cached, initialNextDataElement, _data$props$pageProps, data, initialReleaseId;
       return _regenerator().w(function (_context2) {
         while (1) switch (_context2.n) {
           case 0:
@@ -904,16 +1040,14 @@
             }
             return _context2.a(2, null);
           case 1:
+            pageData = null;
             cached = interceptedReleaseCache.get(releaseIdFromURL);
-            if (!cached) {
-              _context2.n = 2;
-              break;
+            if (cached) {
+              interceptedReleaseCache.delete(releaseIdFromURL);
+              pageData = cached;
             }
-            interceptedReleaseCache.delete(releaseIdFromURL);
-            return _context2.a(2, cached);
-          case 2:
             initialNextDataElement = document.getElementById('__NEXT_DATA__');
-            if (!initialNextDataElement) {
+            if (!(initialNextDataElement && !pageData)) {
               _context2.n = 4;
               break;
             }
@@ -921,23 +1055,44 @@
             initialReleaseId = (_data$props$pageProps = data.props.pageProps.release) === null || _data$props$pageProps === void 0 ? void 0 : _data$props$pageProps.id.toString();
             buildId = data.buildId;
             if (!(initialReleaseId === releaseIdFromURL)) {
-              _context2.n = 3;
+              _context2.n = 2;
               break;
             }
-            return _context2.a(2, data.props);
-          case 3:
+            pageData = data.props;
+            _context2.n = 4;
+            break;
+          case 2:
             if (!buildId) {
               _context2.n = 4;
               break;
             }
-            return _context2.a(2, fetchReleaseFromNextDataApi(buildId, releaseIdFromURL, logger));
+            _context2.n = 3;
+            return fetchReleaseFromNextDataApi(buildId, releaseIdFromURL, logger);
+          case 3:
+            pageData = _context2.v;
           case 4:
+            if (pageData) {
+              _context2.n = 5;
+              break;
+            }
             logger.error('Cannot fetch release data: no __NEXT_DATA__ or buildId found');
             return _context2.a(2, null);
+          case 5:
+            buildId !== null && buildId !== void 0 ? buildId : buildId = getBuildId();
+            if (!buildId) {
+              _context2.n = 7;
+              break;
+            }
+            _context2.n = 6;
+            return ensureFullTrackData(pageData, buildId, releaseIdFromURL, logger);
+          case 6:
+            pageData = _context2.v;
+          case 7:
+            return _context2.a(2, pageData);
         }
       }, _callee2);
     }));
-    return function getBeatportReleaseData(_x6) {
+    return function getBeatportReleaseData(_x1) {
       return _ref2.apply(this, arguments);
     };
   }();
