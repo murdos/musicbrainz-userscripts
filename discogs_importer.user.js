@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2026.01.29
+// @version      2026.03.14.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -784,7 +784,7 @@ function parseDiscogsRelease(discogsRelease) {
 
         // Create release if needed
         let discindex = releaseNumber - 1;
-        if (!release.discs[discindex]) {
+        while (!release.discs[discindex]) {
             let newdisc = {
                 tracks: [],
                 format: release_formats[discindex],
