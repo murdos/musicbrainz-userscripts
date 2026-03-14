@@ -26,15 +26,13 @@ const cleanup = () => {
     $(`#${MB_IMPORT_BARCODE_ELEMENT}`).remove();
 };
 
-async function processReleasePage(ranFrom: string) {
+async function processReleasePage() {
     cleanup();
 
     const isReleasePage = window.location.pathname.includes('/release/');
     if (!isReleasePage) {
         return;
     }
-
-    console.log('ranFrom', ranFrom);
 
     const releaseData = await getBeatportReleaseData(LOGGER);
     if (!releaseData || !releaseData.pageProps.release) {
@@ -73,7 +71,7 @@ async function processReleasePage(ranFrom: string) {
 
 // Subscribe to SPA navigation events
 subscribeToSPANavigation({
-    onNavigate: () => processReleasePage('SPA navigation'),
+    onNavigate: () => processReleasePage(),
 });
 
 $(document).ready(() => {
@@ -81,7 +79,7 @@ $(document).ready(() => {
 
     // Process initial page load
     setTimeout(() => {
-        void processReleasePage('initial page load');
+        void processReleasePage();
     }, 1000);
 });
 
@@ -168,7 +166,6 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
         format: mbrelease.format,
     });
 
-    LOGGER.info('Parsed release: ', mbrelease);
     return mbrelease;
 }
 

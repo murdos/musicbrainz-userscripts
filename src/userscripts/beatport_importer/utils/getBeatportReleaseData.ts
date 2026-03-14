@@ -11,10 +11,11 @@ const interceptedReleaseCache = new Map<string, BeatportPageData>();
 /**
  * Install a fetch interceptor to capture Beatport's release data responses.
  * Call once at script load, before any navigation can occur.
+ * Skips installation if fetch is read-only (e.g. Firefox/Greasemonkey sandbox).
  */
 export function installFetchInterceptor(logger: Logger): void {
     const originalFetch = window.fetch.bind(window);
-    window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    const interceptor = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
         const response = await originalFetch(input, init);
         const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
         const releaseMatch = url.match(/beatport\.com\/_next\/data\/[^/]+\/[a-z]{2}(?:-[a-z]{2})?\/release\/[^/]+\/(\d+)\.json/);
@@ -36,6 +37,11 @@ export function installFetchInterceptor(logger: Logger): void {
         }
         return response;
     };
+    try {
+        window.fetch = interceptor;
+    } catch {
+        // fetch is read-only in Firefox/Greasemonkey sandbox; script works without interceptor
+    }
 }
 
 function getLocaleFromPath(): string {
@@ -63,7 +69,6 @@ export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPa
         return null;
     }
 
-    // Use intercepted response from Beatport's own fetch (SPA navigation) to avoid duplicate request
     const cached = interceptedReleaseCache.get(releaseIdFromURL);
     if (cached) {
         interceptedReleaseCache.delete(releaseIdFromURL);
@@ -74,14 +79,12 @@ export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPa
     if (initialNextDataElement) {
         const data = JSON.parse(initialNextDataElement.innerHTML) as unknown as BeatportSSRState;
         const initialReleaseId = data.props.pageProps.release?.id.toString();
+        const buildId = data.buildId;
 
-        // __NEXT_DATA__ has matching release (direct load or refresh)
         if (initialReleaseId === releaseIdFromURL) {
             return data.props;
         }
 
-        // __NEXT_DATA__ is from a different page (e.g. Home) or different release - fetch from API
-        const buildId = data.buildId;
         if (buildId) {
             return fetchReleaseFromNextDataApi(buildId, releaseIdFromURL, logger);
         }
