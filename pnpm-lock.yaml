@@ -40,7 +40,7 @@ importers:
         version: 2.0.68
       '@types/node':
         specifier: ^24.8.1
-        version: 24.11.2
+        version: 24.12.0
       eslint:
         specifier: ^9.38.0
         version: 9.38.0
@@ -1070,8 +1070,8 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/node@24.11.2':
-    resolution: {integrity: sha512-HTsxyfkxTNxOXBsEdgIOzbMgBjDGPvkTfw0B1m09j1LFPk8u3tSL8SNBRTSc381wXXX/Wp93qPi1kQXwnWuHgA==}
+  '@types/node@24.12.0':
+    resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -3315,7 +3315,7 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/node@24.11.2':
+  '@types/node@24.12.0':
     dependencies:
       undici-types: 7.16.0
 
