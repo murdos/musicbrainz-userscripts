@@ -1096,7 +1096,7 @@ function batch_recording_rels(gm_info) {
 
         let $button = $(this).attr('disabled', true).css('color', '#EAEAEA');
 
-        $.each($rows, function (i, row) {
+        $rows.forEach(row => {
             let $row = $(row);
             let $title_cell = rowTitleCell($row);
             let title = $title_cell.find(TITLE_SELECTOR).text();
@@ -1163,7 +1163,7 @@ function batch_recording_rels(gm_info) {
             $button.attr('disabled', false).css('color', '#565656');
         }
 
-        $.each($rows, function (i, row) {
+        $rows.forEach(row => {
             let $row = $(row);
             let mbid = $row.data('suggested_work_mbid');
             let title = $row.data('suggested_work_title');

@@ -120,7 +120,7 @@ const BandcampImport = {
         }
 
         let tracks_streamable = 0;
-        $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
+        bandcampAlbumData.trackinfo.forEach(bctrack => {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {

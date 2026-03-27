@@ -122,7 +122,7 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
 
     const seen_tracks: { [key: number]: boolean } = {}; // to shoot duplicates ...
     const release_artists: string[] = [];
-    $.each(tracks_data, (index: number, track) => {
+    tracks_data.forEach(track => {
         if (track.release.id != release_data.id) {
             return;
         }
@@ -132,7 +132,7 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
         seen_tracks[track.id] = true;
 
         const artists: string[] = [];
-        $.each(track.artists, (index2: number, artist: { name: string }) => {
+        track.artists.forEach((artist: { name: string }) => {
             artists.push(artist.name);
             release_artists.push(artist.name);
         });
@@ -149,7 +149,7 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
     });
 
     const unique_artists: string[] = [];
-    $.each(release_artists, (index: number, el: string) => {
+    release_artists.forEach((el: string) => {
         if (!unique_artists.includes(el)) {
             unique_artists.push(el);
         }

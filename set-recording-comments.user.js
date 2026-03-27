@@ -172,7 +172,7 @@ function setRecordingComments() {
         let editData = [],
             deferred = $.Deferred();
 
-        $.each($tracks, function (i, track) {
+        $tracks.forEach((track, i) => {
             if ($(track).filter(':visible').length > 0) {
                 let $input = $inputs.eq(i),
                     comment = $input.val();

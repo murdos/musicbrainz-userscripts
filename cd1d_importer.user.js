@@ -225,13 +225,13 @@ const CD1DImporter = {
             .get();
 
         // Tracks
-        $.each(this.getTracks(format.id), function () {
+        this.getTracks(format.id).forEach(tracks => {
             let thisdisc = {
                 tracks: [],
                 format: release.format,
             };
             release.discs.push(thisdisc);
-            $.each(this, function (ntrack, track) {
+            tracks.forEach(track => {
                 thisdisc.tracks.push({
                     title: track.title,
                     duration: track.duration,

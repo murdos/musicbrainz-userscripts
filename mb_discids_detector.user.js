@@ -201,7 +201,7 @@ function computeAttachURL(mb_toc_numbers, artistName, releaseName) {
 
 function analyze_log_files(log_files) {
     let discs = [];
-    $.each(log_files, function (i, log_file) {
+    log_files.forEach(log_file => {
         const discsInLog = MBDiscid.log_input_to_entries($(log_file).text());
         for (const disc of discsInLog) {
             discs.push(disc);
@@ -278,7 +278,7 @@ const MBDiscid = (function () {
     this.log_input_to_entries = function (text) {
         let discs = [];
         var entries = [];
-        $.each(text.split('\n'), function (index, value) {
+        text.split('\n').forEach(value => {
             let m = toc_entry_matcher.exec(value);
             if (m) {
                 // New disc
@@ -360,7 +360,7 @@ const MBDiscid = (function () {
             (parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1) / this.SECTORS_PER_SECOND,
         );
         let checksum = 0;
-        $.each(entries, function (index, entry) {
+        entries.forEach(entry => {
             checksum += sum_of_digits(Math.floor((parseInt(entry[4], 10) + PREGAP) / SECTORS_PER_SECOND));
         });
 

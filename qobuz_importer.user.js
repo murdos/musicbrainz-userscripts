@@ -110,7 +110,7 @@ function parseRelease(data) {
     release.day = releaseDate.getUTCDate();
 
     release.labels = [];
-    $.each(data.label.name.split(' - '), function (index, label) {
+    data.label.name.split(' - ').forEach(label => {
         release.labels.push({
             name: label,
             catno: '[none]', // no catno on qobuz ?
@@ -123,7 +123,7 @@ function parseRelease(data) {
     let tracks = [],
         classical_tracks = [],
         old_media_num = 1;
-    $.each(data.tracks.items, function (index, trackobj) {
+    data.tracks.items.forEach(trackobj => {
         release.isrcs.push(trackobj.isrc);
         if (trackobj.media_number != old_media_num) {
             release.discs.push({
@@ -149,7 +149,7 @@ function parseRelease(data) {
             if (typeof trackobj.composer !== 'undefined') {
                 classical_artists.push(trackobj.composer.name);
             } else {
-                $.each(performers, function (index, performer) {
+                performers.forEach(performer => {
                     if (performer[1].includes('Composer')) {
                         classical_artists.push(performer[0]);
                     }
@@ -162,7 +162,7 @@ function parseRelease(data) {
 
         let artists = [];
         let featured_artists = [];
-        $.each(performers, function (index, performer) {
+        performers.forEach(performer => {
             if (performer[1].includes('Featured Artist')) {
                 featured_artists.push(performer[0]);
             } else if (
@@ -482,7 +482,7 @@ function processDiscographyPage({ mblinks, locale }) {
     }
 
     // Build urls_data array for batch processing
-    artist_urls_map.forEach((artist_link_elements, artist_url) => {
+    Object.entries(artist_urls_map).forEach(([artist_link_elements, artist_url]) => {
         artist_urls_data.push({
             url: artist_url,
             mb_type: 'artist',
