@@ -203,12 +203,12 @@ function insertMBLinks(current_page_key) {
         // ['discogs_type 1', 'discogs_type 2']
         // [['discogs_type 1', 'mb type 1'], 'discogs_type 2']
         // etc.
-        if (!$.isArray(types)) {
+        if (!Array.isArray(types)) {
             // just one string
             types = [types];
         }
         types.forEach((val, idx) => {
-            if (!$.isArray(val)) {
+            if (!Array.isArray(val)) {
                 types[idx] = [val, undefined];
             }
         });
