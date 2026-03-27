@@ -91,7 +91,7 @@ $(document).ready(function () {
     re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})', 'i');
     if (window.location.href.match(re)) {
         if ($('table.medium thead').length == 1) {
-            let text = $.trim($('table.medium thead').text());
+            let text = $('table.medium thead').text().trim();
             if (text.match(/ 1$/)) {
                 $('table.medium thead a').text(text.replace(/ 1$/, ''));
             }

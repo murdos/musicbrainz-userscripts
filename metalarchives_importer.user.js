@@ -45,13 +45,13 @@ function setreleasedate(release, datestring) {
 function getGenericalData() {
     const keydata = $('dl.float_left dt, dl.float_right dt')
         .map(function () {
-            let s = $.trim($(this).text());
+            let s = $(this).text().trim();
             return s.substring(0, s.length - 1);
         })
         .get();
     const valuedata = $('dl.float_left dd,dl.float_right dd')
         .map(function () {
-            return $.trim($(this).text());
+            return $(this).text().trim();
         })
         .get();
     const rdata = [];
@@ -62,7 +62,10 @@ function getGenericalData() {
 }
 
 function getArtistsList() {
-    return $.map($('h2.band_name').text().split('/'), $.trim);
+    return $('h2.band_name')
+        .text()
+        .split('/')
+        .map(name => name.trim());
 }
 
 function retrieveReleaseInfo(release_url) {

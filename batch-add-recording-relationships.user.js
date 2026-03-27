@@ -524,8 +524,8 @@ function batch_recording_rels(gm_info) {
         TOTAL_PAGES = Math.ceil((re_match ? parseInt(re_match[1], 10) : 1) / 2);
     }
 
-    let NAME_FILTER = $.trim($('#id-filter\\.name').val());
-    let ARTIST_FILTER = $.trim($('#id-filter\\.artist_credit_id').find('option:selected').text());
+    let NAME_FILTER = $('#id-filter\\.name').val().trim();
+    let ARTIST_FILTER = $('#id-filter\\.artist_credit_id').find('option:selected').text().trim();
 
     if (NAME_FILTER || ARTIST_FILTER) {
         get_filtered_page(0);

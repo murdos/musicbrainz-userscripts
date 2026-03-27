@@ -309,7 +309,7 @@ function magnifyLinks(rootNode) {
         let elem = elems[i];
 
         // Ignore empty links
-        if (!elem.href || $.trim(elem.textContent) === '' || elem.textContent.substring(4, 0) === 'http') continue;
+        if (!elem.href || elem.textContent.trim() === '' || elem.textContent.substring(4, 0) === 'http') continue;
         if (!elem.hasAttribute('mlink')) {
             elem.setAttribute('mlink', getDiscogsLinkKey(elem.href));
         }
