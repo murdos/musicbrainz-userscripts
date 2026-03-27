@@ -150,7 +150,7 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
 
     const unique_artists: string[] = [];
     $.each(release_artists, (index: number, el: string) => {
-        if ($.inArray(el, unique_artists) === -1) {
+        if (!unique_artists.includes(el)) {
             unique_artists.push(el);
         }
     });
