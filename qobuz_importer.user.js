@@ -557,7 +557,7 @@ function processReleasePage({ mblinks }) {
     }
 }
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Initialize MBLinks for checking already imported releases
     const mblinks = new MBLinks('QOBUZ_MBLINKS_CACHE');
     const pageTypeRegex = new RegExp(`^\\/([a-z]{2}-[a-z]{2})?(?:\\/)?(interpreter|album|label)\\/`);

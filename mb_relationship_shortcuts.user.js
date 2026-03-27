@@ -134,7 +134,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};

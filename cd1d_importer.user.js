@@ -260,7 +260,7 @@ const CD1DImporter = {
     },
 };
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
     /* CD1D uses same page with hidden tabs for all formats */
     let formats = CD1DImporter.getFormats();

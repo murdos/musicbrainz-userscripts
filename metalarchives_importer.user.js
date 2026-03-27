@@ -16,7 +16,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
 
     let release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');

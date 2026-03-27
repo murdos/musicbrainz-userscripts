@@ -74,7 +74,7 @@ subscribeToSPANavigation({
     onNavigate: () => processReleasePage(),
 });
 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
 
     // Process initial page load

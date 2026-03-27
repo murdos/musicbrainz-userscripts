@@ -17,7 +17,7 @@
 
 const mbLinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
 
     if (window.location.href.match(/encyclopedisque\.fr\/disque\/(\d+)/)) {

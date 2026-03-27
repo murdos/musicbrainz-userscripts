@@ -35,7 +35,7 @@ if (DEBUG) {
 
 const mbLinks = new MBLinks('DISCOGS_MBLINKS_CACHE', '1');
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
     MBSearchItStyle();
 

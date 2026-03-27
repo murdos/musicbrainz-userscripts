@@ -53,7 +53,7 @@ function setGoogleSearchMenu() {
 }
 setGoogleSearchMenu();
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Follow the instructions found at https://www.last.fm/api/authentication
     // then paste your API Key between the single quotes in the variable below.
     const LASTFM_APIKEY = '';

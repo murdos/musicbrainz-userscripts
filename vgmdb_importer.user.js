@@ -19,7 +19,7 @@
 
 const VGMDB_BLUESKY_UPDATE_LINK = 'https://bsky.app/profile/vgmdb.net/post/3lcvclcpny22d';
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
     MBSearchItStyle();
 
