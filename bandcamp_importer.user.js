@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.03.14.1
+// @version      2026.03.17.0
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include      /^https:\/\/[^/]+\/(?:(?:(?:album|track))\/[^/]+|music)$/
 // @include      /^https:\/\/([^.]+)\.bandcamp\.com((?:\/(?:(?:album|track))\/[^/]+|\/|\/music)?)$/
 // @include      /^https?:\/\/web\.archive\.org\/web\/\d+\/https?:\/\/[^/]+(?:\/(?:album|track)\/[^/]+\/?|\/music\/?|\/?)$/
+// @include      /^https?:\/\/bandcamp\.com\/private\/[A-Z0-9]+$/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
@@ -32,6 +33,13 @@ String.prototype.fix_bandcamp_url = function () {
         url = match[1];
     }
     return url.replace('http://', 'https://');
+};
+
+const getPrivateUrl = url => {
+    if (url.startsWith('/')) {
+        return document.querySelector('meta[property="og:url"]').getAttribute('content');
+    }
+    return url;
 };
 
 const BandcampImport = {
@@ -61,7 +69,7 @@ const BandcampImport = {
             language: 'eng',
             script: 'Latn',
             urls: [],
-            url: bandcampAlbumData.url.fix_bandcamp_url(),
+            url: bandcampAlbumData.is_private_stream ? getPrivateUrl(bandcampAlbumData.url) : bandcampAlbumData.url.fix_bandcamp_url(),
         };
 
         // Grab release title
