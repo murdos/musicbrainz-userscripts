@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.2.1
+// @version      2026.5.2.2
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -40,6 +40,7 @@ const urlRelationsIconClasses = {
 };
 
 const otherDatabasesIconClasses = {
+    'genius.com': 'genius',
     'd-nb.info': 'dnb',
     'www.musik-sammler.de': 'musiksammler',
     'rateyourmusic.com': 'rateyourmusic',
@@ -238,13 +239,14 @@ $(document).ready(function () {
                         alreadyInjectedUrls.push(targetUrl);
 
                         let iconClass;
-                        if (relType in urlRelationsIconClasses) {
-                            iconClass = urlRelationsIconClasses[relType];
-                        } else if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+                        if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
                             iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
-                        } else {
-                            // Other database?
+                        }
+                        if (!iconClass) {
                             iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+                        }
+                        if (!iconClass && relType in urlRelationsIconClasses) {
+                            iconClass = urlRelationsIconClasses[relType];
                         }
 
                         if (iconClass) {
