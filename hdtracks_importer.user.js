@@ -18,7 +18,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
     window.addEventListener('hashchange', parsePage); // HDtracks is a single page app (SPA)
 });

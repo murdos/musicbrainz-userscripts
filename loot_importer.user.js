@@ -34,7 +34,7 @@ if (DEBUG) {
  * - http://www.loot.co.za/product/bette-midler-a-gift-of-love/mhgm-3483-g060  *** NOT WORKING *** extra tab
  */
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     LOGGER.info('Document Ready & Loot Userscript executing');
     let LootRelease = ParseLootPage();
     insertMBSection(LootRelease);

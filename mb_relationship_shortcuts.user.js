@@ -136,7 +136,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};
@@ -281,12 +281,12 @@ $(document).ready(function () {
                                 }
                             });
 
-                        $.each(relations, function (reltype, urls) {
+                        Object.entries(relations).forEach(([reltype, urls]) => {
                             let html = '';
                             if (urls.length < -1) {
                                 html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
                             } else {
-                                $.each(urls, function (index, url) {
+                                urls.forEach(url => {
                                     html += `<a href='${url}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
                                 });
                             }

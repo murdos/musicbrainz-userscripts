@@ -53,7 +53,7 @@ function setGoogleSearchMenu() {
 }
 setGoogleSearchMenu();
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Follow the instructions found at https://www.last.fm/api/authentication
     // then paste your API Key between the single quotes in the variable below.
     const LASTFM_APIKEY = '';
@@ -78,7 +78,7 @@ $(document).ready(function () {
         $.getJSON(
             `https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&mbid=${mbid}&api_key=${LASTFM_APIKEY}&format=json`,
             function (data) {
-                $.each(data.toptracks.track, function (index, track) {
+                data.toptracks.track.forEach(track => {
                     if (index >= 5) return true;
                     let url = track.mbid ? `/recording/${track.mbid}` : track.url;
                     $('ul.toptracks').append(`<li><a href="${url}">${track.name}</a></li>`);
@@ -91,7 +91,7 @@ $(document).ready(function () {
     re = new RegExp('musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})', 'i');
     if (window.location.href.match(re)) {
         if ($('table.medium thead').length == 1) {
-            let text = $.trim($('table.medium thead').text());
+            let text = $('table.medium thead').text().trim();
             if (text.match(/ 1$/)) {
                 $('table.medium thead a').text(text.replace(/ 1$/, ''));
             }
@@ -326,8 +326,8 @@ $(document).ready(function () {
             $.getJSON(wsurl, function (data) {
                 // Store tracks data from webservice in a hash table
                 let tracks = {};
-                $.each(data.media, function (index, medium) {
-                    $.each(medium.tracks, function (i, track) {
+                data.media.forEach(medium => {
+                    medium.tracks.forEach(track => {
                         tracks[track.id] = track;
                     });
                 });

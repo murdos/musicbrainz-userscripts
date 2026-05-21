@@ -18,7 +18,7 @@
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     let gmXHR;
 
     if (typeof GM_xmlhttpRequest != 'undefined') {
@@ -76,7 +76,7 @@ function parseDeezerRelease(releaseUrl, data) {
         discs: [],
     };
 
-    $.each(data.contributors, function (index, artist) {
+    data.contributors.forEach(artist => {
         if (artist.role != 'Main') return true;
 
         let ac = {
@@ -97,7 +97,7 @@ function parseDeezerRelease(releaseUrl, data) {
         tracks: [],
     };
 
-    $.each(data.tracks.data, function (index, track) {
+    data.tracks.data.forEach(track => {
         let t = {
             number: index + 1,
             title: track.title_short,

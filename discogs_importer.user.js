@@ -35,7 +35,7 @@ if (DEBUG) {
 
 const mbLinks = new MBLinks('DISCOGS_MBLINKS_CACHE', '1');
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     MBImportStyle();
     MBSearchItStyle();
 
@@ -203,12 +203,12 @@ function insertMBLinks(current_page_key) {
         // ['discogs_type 1', 'discogs_type 2']
         // [['discogs_type 1', 'mb type 1'], 'discogs_type 2']
         // etc.
-        if (!$.isArray(types)) {
+        if (!Array.isArray(types)) {
             // just one string
             types = [types];
         }
-        $.each(types, function (idx, val) {
-            if (!$.isArray(val)) {
+        types.forEach((val, idx) => {
+            if (!Array.isArray(val)) {
                 types[idx] = [val, undefined];
             }
         });
@@ -220,7 +220,7 @@ function insertMBLinks(current_page_key) {
             magnifyLinks(node);
             debug_color(this, ++add_mblinks_counter, selector);
             const that = this;
-            $.each(types, function (idx, val) {
+            types.forEach(val => {
                 const discogs_type = val[0];
                 const mb_type = val[1];
                 searchAndDisplayMbLinkInSection($(that), discogs_type, mb_type, nosearch);
@@ -309,7 +309,7 @@ function magnifyLinks(rootNode) {
         let elem = elems[i];
 
         // Ignore empty links
-        if (!elem.href || $.trim(elem.textContent) === '' || elem.textContent.substring(4, 0) === 'http') continue;
+        if (!elem.href || elem.textContent.trim() === '' || elem.textContent.substring(4, 0) === 'http') continue;
         if (!elem.hasAttribute('mlink')) {
             elem.setAttribute('mlink', getDiscogsLinkKey(elem.href));
         }
@@ -528,7 +528,7 @@ function parseDiscogsRelease(discogsRelease) {
 
     // Release artist credit
     release.artist_credit = [];
-    $.each(discogsRelease.artists, function (index, artist) {
+    discogsRelease.artists.forEach(artist => {
         let ac = {
             artist_name: artistNoNum(artist.name),
             credited_name: artist.anv != '' ? artist.anv : artistNoNum(artist.name),
@@ -564,7 +564,7 @@ function parseDiscogsRelease(discogsRelease) {
     // Release labels
     release.labels = [];
     if (discogsRelease.labels) {
-        $.each(discogsRelease.labels, function (index, label) {
+        discogsRelease.labels.forEach(label => {
             const labelInfo = {
                 name: label.name,
                 catno: label.catno === 'none' ? '[none]' : label.catno,
@@ -591,7 +591,7 @@ function parseDiscogsRelease(discogsRelease) {
             }
 
             if (discogsRelease.formats[i].descriptions) {
-                $.each(discogsRelease.formats[i].descriptions, function (index, desc) {
+                discogsRelease.formats[i].descriptions.forEach(desc => {
                     if (!(discogs_format in ['Box Set'])) {
                         // Release format: special handling of Vinyl and Shellac 7", 10" and 12"
                         if (desc.match(/7"|10"|12"/) && discogs_format.concat(desc) in MediaTypes)
@@ -656,7 +656,7 @@ function parseDiscogsRelease(discogsRelease) {
 
     // Barcode
     if (discogsRelease.identifiers) {
-        $.each(discogsRelease.identifiers, function (index, identifier) {
+        discogsRelease.identifiers.forEach(identifier => {
             if (identifier.type === 'Barcode' && identifier.value !== null) {
                 release.barcode = identifier.value.replace(/ /g, '');
                 return false;
@@ -668,7 +668,7 @@ function parseDiscogsRelease(discogsRelease) {
     let heading = '';
     let releaseNumber = 1;
     let lastPosition = 0;
-    $.each(discogsRelease.tracklist, function (index, discogsTrack) {
+    discogsRelease.tracklist.forEach(discogsTrack => {
         if (discogsTrack.type_ === 'heading') {
             heading = discogsTrack.title;
             return;
@@ -685,7 +685,7 @@ function parseDiscogsRelease(discogsRelease) {
         // Track artist credit
         track.artist_credit = [];
         if (discogsTrack.artists) {
-            $.each(discogsTrack.artists, function (index, artist) {
+            discogsTrack.artists.forEach(artist => {
                 const ac = {
                     artist_name: artistNoNum(artist.name),
                     credited_name: artist.anv !== '' ? artist.anv : artistNoNum(artist.name),
@@ -706,7 +706,7 @@ function parseDiscogsRelease(discogsRelease) {
             // Append titles of sub-tracks to main track title
             const subtrack_titles = [];
             let subtrack_total_duration = 0;
-            $.each(discogsTrack.sub_tracks, function (subtrack_index, subtrack) {
+            discogsTrack.sub_tracks.forEach(subtrack => {
                 if (subtrack.type_ !== 'track') {
                     return;
                 }
