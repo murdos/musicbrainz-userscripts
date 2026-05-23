@@ -1,50 +1,52 @@
 // ==UserScript==
-// @name          MusicBrainz: Expand/collapse release groups
-// @description	  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
-// @namespace     http://userscripts.org/users/266906
-// @author        Michael Wiencek <mwtuea@gmail.com>
-// @version       2018.2.18.1
-// @license       GPL
-// @downloadURL   https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
-// @updateURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
-// @grant         none
-// @include       *://musicbrainz.org/artist/*
-// @include       *://musicbrainz.org/label/*
-// @include       *://musicbrainz.org/release-group/*
-// @include       *://musicbrainz.org/series/*
-// @include       *://beta.musicbrainz.org/artist/*
-// @include       *://beta.musicbrainz.org/label/*
-// @include       *://beta.musicbrainz.org/release-group/*
-// @include       *://beta.musicbrainz.org/series/*
-// @include       *://test.musicbrainz.org/artist/*
-// @include       *://test.musicbrainz.org/label/*
-// @include       *://test.musicbrainz.org/release-group/*
-// @include       *://test.musicbrainz.org/series/*
-// @match         *://musicbrainz.org/artist/*
-// @match         *://musicbrainz.org/label/*
-// @match         *://musicbrainz.org/release-group/*
-// @match         *://musicbrainz.org/series/*
-// @match         *://beta.musicbrainz.org/artist/*
-// @match         *://beta.musicbrainz.org/label/*
-// @match         *://beta.musicbrainz.org/release-group/*
-// @match         *://beta.musicbrainz.org/series/*
-// @match         *://test.musicbrainz.org/artist/*
-// @match         *://test.musicbrainz.org/label/*
-// @match         *://test.musicbrainz.org/release-group/*
-// @match         *://test.musicbrainz.org/series/*
-// @exclude       *musicbrainz.org/label/*/*
-// @exclude       *musicbrainz.org/release-group/*/*
-// @exclude       *musicbrainz.org/series/*/*
+// @name         MusicBrainz: Expand/collapse release groups
+// @description  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
+// @namespace    http://userscripts.org/users/266906
+// @author       Michael Wiencek <mwtuea@gmail.com>
+// @version      2022.1.6.1
+// @license      GPL
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
+// @grant        none
+// @include      *://musicbrainz.org/artist/*
+// @include      *://musicbrainz.org/label/*
+// @include      *://musicbrainz.org/release-group/*
+// @include      *://musicbrainz.org/series/*
+// @include      *://beta.musicbrainz.org/artist/*
+// @include      *://beta.musicbrainz.org/label/*
+// @include      *://beta.musicbrainz.org/release-group/*
+// @include      *://beta.musicbrainz.org/series/*
+// @include      *://test.musicbrainz.org/artist/*
+// @include      *://test.musicbrainz.org/label/*
+// @include      *://test.musicbrainz.org/release-group/*
+// @include      *://test.musicbrainz.org/series/*
+// @match        *://musicbrainz.org/artist/*
+// @match        *://musicbrainz.org/label/*
+// @match        *://musicbrainz.org/release-group/*
+// @match        *://musicbrainz.org/series/*
+// @match        *://beta.musicbrainz.org/artist/*
+// @match        *://beta.musicbrainz.org/label/*
+// @match        *://beta.musicbrainz.org/release-group/*
+// @match        *://beta.musicbrainz.org/series/*
+// @match        *://test.musicbrainz.org/artist/*
+// @match        *://test.musicbrainz.org/label/*
+// @match        *://test.musicbrainz.org/release-group/*
+// @match        *://test.musicbrainz.org/series/*
+// @exclude      *musicbrainz.org/label/*/*
+// @exclude      *musicbrainz.org/release-group/*/*
+// @exclude      *musicbrainz.org/series/*/*
 // ==/UserScript==
 
-var MBID_REGEX = /[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}/;
+const MBID_REGEX = /[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/;
 
-var releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
-for (var r = 0; r < releasesOrReleaseGroups.length; r++) {
-    if (releasesOrReleaseGroups[r].getAttribute('href').match(/\/release-group\//)) {
-        inject_release_group_button(releasesOrReleaseGroups[r].parentNode);
-    } else {
-        inject_release_button(releasesOrReleaseGroups[r].parentNode);
+const releasesOrReleaseGroups = document.querySelectorAll("#content table.tbl > tbody > tr > td a[href^='/release']");
+for (const entity of releasesOrReleaseGroups) {
+    const entityLink = entity.getAttribute('href');
+    if (entityLink.match(/\/release-group\//)) {
+        inject_release_group_button(entity.parentNode);
+    } else if (!entityLink.match(/\/cover-art/)) {
+        // avoid injecting a second button for a release's cover art link
+        inject_release_button(entity.parentNode);
     }
 }
 
@@ -63,11 +65,11 @@ function inject_release_group_button(parent) {
             else parent.removeChild(table);
         },
         function (json) {
-            parse_release_group(json, mbid, parent, table);
+            parse_release_group(json, mbid, table);
         },
         function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release group (HTTP status ${status})</td></tr>`;
-        }
+        },
     );
 
     parent.insertBefore(button, parent.firstChild);
@@ -76,23 +78,22 @@ function inject_release_group_button(parent) {
 function inject_release_button(parent, _table_parent, _table, _mbid) {
     let mbid = _mbid || parent.querySelector('a').href.match(MBID_REGEX),
         table = _table || document.createElement('table');
+    let table_parent = _table_parent || parent; // fallback for pages where we do not inject the release groups
 
-    table.style.marginTop = '1em';
-    table.style.marginLeft = '1em';
     table.style.paddingLeft = '1em';
 
     let button = create_button(
         `/ws/2/release/${mbid}?inc=media+recordings+artist-credits&fmt=json`,
         function (toggled) {
-            if (toggled) parent.appendChild(table);
-            else parent.removeChild(table);
+            if (toggled) table_parent.appendChild(table);
+            else table_parent.removeChild(table);
         },
         function (json) {
             parse_release(json, table);
         },
         function (status) {
             table.innerHTML = `<tr><td style="color: #f00;">Error loading release (HTTP status ${status})</td></tr>`;
-        }
+        },
     );
 
     parent.insertBefore(button, parent.childNodes[0]);
@@ -115,7 +116,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
             else button.innerHTML = '&#9654;';
             dom_callback(toggled);
         },
-        false
+        false,
     );
 
     button.addEventListener(
@@ -137,7 +138,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
                             button.removeEventListener('mousedown', arguments.callee, false);
                             button.addEventListener('mousedown', this_event, false);
                         },
-                        false
+                        false,
                     );
                     error_callback(req.status);
                 }
@@ -146,7 +147,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
             req.open('GET', url, true);
             req.send(null);
         },
-        false
+        false,
     );
 
     return button;
@@ -158,27 +159,26 @@ function format_time(ms) {
     return `${Math.floor(ts / 60)}:${s >= 10 ? s : `0${s}`}`;
 }
 
-function parse_release_group(json, mbid, parent, table) {
+function parse_release_group(json, mbid, table) {
     let releases = json.releases;
     table.innerHTML = '';
 
-    for (var i = 0; i < releases.length; i++) {
-        let release = releases[i],
-            media = {},
+    for (const release of releases) {
+        let media = {},
             tracks = [],
             formats = [];
 
-        for (let j = 0; j < release.media.length; j++) {
-            var medium = release.media[j],
-                format = medium.format,
+        for (const medium of release.media) {
+            let format = medium.format,
                 count = medium['track-count'];
-            if (format) format in media ? (media[format] += 1) : (media[format] = 1);
+            if (format) {
+                format in media ? (media[format] += 1) : (media[format] = 1);
+            }
             tracks.push(count);
         }
 
-        for (format in media) {
-            var count = media[format],
-                txt;
+        for (let format in media) {
+            let count = media[format];
             if (count > 1) formats.push(`${count.toString()}&#215;${format}`);
             else formats.push(format);
         }
@@ -193,36 +193,35 @@ function parse_release_group(json, mbid, parent, table) {
         return 0;
     });
 
-    for (var i = 0; i < releases.length; i++) {
-        (function (release) {
-            let track_tr = document.createElement('tr'),
-                track_td = document.createElement('td'),
-                track_table = document.createElement('table'),
-                format_td = document.createElement('td'),
-                tr = document.createElement('tr'),
-                td = document.createElement('td'),
-                a = createLink(`/release/${release.id}`, release.title);
+    for (const release of releases) {
+        let track_tr = document.createElement('tr'),
+            track_td = document.createElement('td'),
+            track_table = document.createElement('table'),
+            format_td = document.createElement('td'),
+            tr = document.createElement('tr'),
+            td = document.createElement('td'),
+            a = createLink(`/release/${release.id}`, release.title);
 
-            track_td.colSpan = 6;
-            track_table.style.width = '100%';
-            track_table.style.marginLeft = '1em';
-            track_tr.appendChild(track_td);
-            inject_release_button(td, track_td, track_table, release.id);
-            td.appendChild(a);
-            if (release.disambiguation) {
-                td.appendChild(document.createTextNode(` (${release.disambiguation})`));
-            }
-            tr.appendChild(td);
-            format_td.innerHTML = release.formats;
-            tr.appendChild(format_td);
+        track_td.colSpan = 6;
+        track_table.style.width = '100%';
+        track_table.style.marginLeft = '1em';
+        track_tr.appendChild(track_td);
+        inject_release_button(td, track_td, track_table, release.id);
+        td.appendChild(a);
+        if (release.disambiguation) {
+            td.appendChild(document.createTextNode(` (${release.disambiguation})`));
+        }
+        tr.appendChild(td);
+        format_td.innerHTML = release.formats;
+        tr.appendChild(format_td);
 
-            let columns = [release.tracks, release.date || '', release.country || '', release.status || ''];
+        let columns = [release.tracks, release.date || '', release.country || '', release.status || ''];
+        for (const column of columns) {
+            tr.appendChild(createElement('td', column));
+        }
 
-            for (let i = 0; i < columns.length; i++) tr.appendChild(createElement('td', columns[i]));
-
-            table.appendChild(tr);
-            table.appendChild(track_tr);
-        })(releases[i]);
+        table.appendChild(tr);
+        table.appendChild(track_tr);
     }
 
     let bottom_tr = document.createElement('tr'),
@@ -231,11 +230,11 @@ function parse_release_group(json, mbid, parent, table) {
     bottom_td.colSpan = 6;
     bottom_td.style.padding = '1em';
 
-    bottom_td.appendChild(createLink(`/release-group/${mbid}/edit`, 'edit'));
+    bottom_td.appendChild(createNewTabLink(`/release-group/${mbid}/edit`, 'edit'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/add?release-group=${mbid}`, 'add release'));
+    bottom_td.appendChild(createNewTabLink(`/release/add?release-group=${mbid}`, 'add release'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release-group/${mbid}/edits`, 'editing history'));
+    bottom_td.appendChild(createNewTabLink(`/release-group/${mbid}/edits`, 'editing history'));
 
     bottom_tr.appendChild(bottom_td);
     table.appendChild(bottom_tr);
@@ -255,8 +254,9 @@ function parse_release(json, table) {
             let track = medium.tracks[j],
                 recording = track.recording,
                 disambiguation = recording.disambiguation ? ` (${recording.disambiguation})` : '',
-                length = track.length ? format_time(track.length) : '?:??';
-            (artist_credit = track['artist-credit'] || track.recording['artist-credit']), (tr = document.createElement('tr'));
+                length = track.length ? format_time(track.length) : '?:??',
+                artist_credit = track['artist-credit'] || track.recording['artist-credit'],
+                tr = document.createElement('tr');
 
             tr.appendChild(createElement('td', j + 1));
             let title_td = createElement('td', disambiguation);
@@ -277,22 +277,23 @@ function parse_release(json, table) {
     bottom_td.colSpan = 4;
     bottom_td.style.padding = '1em';
 
-    bottom_td.appendChild(createLink(`/release/${json.id}/edit`, 'edit'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edit`, 'edit'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/${json.id}/edit-relationships`, 'edit relationships'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edit-relationships`, 'edit relationships'));
     bottom_td.appendChild(document.createTextNode(' | '));
-    bottom_td.appendChild(createLink(`/release/${json.id}/edits`, 'editing history'));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/edits`, 'editing history'));
+    bottom_td.appendChild(document.createTextNode(' | '));
+    bottom_td.appendChild(createNewTabLink(`/release/${json.id}/add-cover-art`, 'add cover art'));
 
     bottom_tr.appendChild(bottom_td);
     table.appendChild(bottom_tr);
 }
 
-function createAC(obj) {
+function createAC(artist_credit_array) {
     let span = document.createElement('span');
 
-    for (let i = 0; i < obj.length; i++) {
-        let credit = obj[i],
-            artist = credit.artist,
+    for (const credit of artist_credit_array) {
+        let artist = credit.artist,
             link = createLink(`/artist/${artist.id}`, credit.name || artist.name);
 
         link.setAttribute('title', artist['sort-name']);
@@ -313,4 +314,10 @@ function createLink(href, text) {
     let element = createElement('a', text);
     element.href = href;
     return element;
+}
+
+function createNewTabLink(href, text) {
+    let link = createLink(href, text);
+    link.target = '_blank';
+    return link;
 }

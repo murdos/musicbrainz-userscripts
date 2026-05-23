@@ -1,23 +1,23 @@
 // ==UserScript==
-// @name           Import Loot releases to MusicBrainz
-// @description    Add a button to import Loot.co.za releases to MusicBrainz
-// @version        2019.1.5.1
-// @namespace      https://github.com/murdos/musicbrainz-userscripts
-// @downloadURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
-// @updateURL      https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
-// @include        http*://www.loot.co.za/product/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mblinks.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @name         Import Loot releases to MusicBrainz
+// @description  Add a button to import Loot.co.za releases to MusicBrainz
+// @version      2019.1.5.1
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
+// @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
+// @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
+// @include      http*://www.loot.co.za/product/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mblinks.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
 
-var DEBUG = false;
+const DEBUG = false;
 //DEBUG = true;
 if (DEBUG) {
     LOGGER.setLevel('debug');
@@ -79,7 +79,7 @@ function insertMBSection(release) {
 
     if (release.maybe_buggy) {
         let warning_buggy = $(
-            '<p><small><b>Warning</b>: this release has perhaps a buggy title, please check twice the data you import.</small><p'
+            '<p><small><b>Warning</b>: this release has perhaps a buggy title, please check twice the data you import.</small><p',
         ).css({
             color: 'red',
             'margin-top': '4px',
@@ -165,14 +165,14 @@ function ParseLootPage() {
     releaseartist = AlbumName[1].innerText;
     if (releaseartist == 'Various Artists') {
         // Everything is: title(format)
-        releaseartisttitle_regex = /(.*?)\((.*)\)/; //match external parenthesis
+        const releaseartisttitle_regex = /(.*?)\((.*)\)/; //match external parenthesis
         if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
-            releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+            const releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
             releasetitle = releaseartisttitle[1].trim();
             release_format = releaseartisttitle[2];
         } else {
             LOGGER.debug(
-                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for Compilations'
+                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for Compilations',
             );
             release_maybe_buggy = true;
             releasetitle = '';
@@ -180,17 +180,17 @@ function ParseLootPage() {
         }
     } else {
         // artist - title(format)
-        releaseartisttitle_regex = /(.*) (-|–) (.*?)\((.*)\)/;
+        const releaseartisttitle_regex = /(.*) (-|–) (.*?)\((.*)\)/;
 
         if (AlbumName[0].innerText.match(releaseartisttitle_regex)) {
-            releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
+            const releaseartisttitle = AlbumName[0].innerText.match(releaseartisttitle_regex);
 
             releasetitle = releaseartisttitle[3].trim();
             releaseartist = releaseartisttitle[1];
             release_format = releaseartisttitle[4];
         } else {
             LOGGER.debug(
-                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for non Compilations'
+                'Release Title for Various Artist album does not match the name convention. Hint: Change releaseartisttitle regex for non Compilations',
             );
             release_maybe_buggy = true;
             releasetitle = '';
@@ -262,22 +262,22 @@ function ParseLootPage() {
         let tracklisting = allinfolist[disciterate].getElementsByTagName('tr');
         LOGGER.debug(' The Table: (tracklisting)', tracklisting);
 
-        for (let trackiterate = 0; trackiterate < tracklisting.length; trackiterate++) {
-            descriptiontrack = new Object();
+        for (const element of tracklisting) {
+            const descriptiontrack = new Object();
 
-            let currenttrack = tracklisting[trackiterate].querySelectorAll('td');
+            let currenttrack = element.querySelectorAll('td');
             //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title
             var artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
 
             // need to check if this can be replaced with single regex for now check artist-title if
             // not matching check just title
             if (currenttrack[1].innerText.match(artisttitle_regex)) {
-                var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
                 descriptiontrack.title = artisttitle[3];
                 descriptiontrack.artist = artisttitle[1];
             } else {
                 var artisttitle_regex = /(.*)/; // regex: title
-                var artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
                 descriptiontrack.title = artisttitle[1];
                 descriptiontrack.artist = releaseartist;
             }
@@ -315,17 +315,17 @@ function ParseLootPage() {
     }
 
     //LOGGER.debug(disclistarray);
-    release = new Object();
+    const release = {};
 
     // Check if anything is untoward and highlight to importer
     release.maybe_buggy = release_maybe_buggy;
 
     // Release artist credit
-    release.artist_credit = new Array();
+    release.artist_credit = [];
 
     let artist_name = releaseartist;
 
-    let various_artists = releaseartist == 'Various Artists';
+    let various_artists = releaseartist === 'Various Artists';
     if (various_artists) {
         release.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
@@ -346,7 +346,7 @@ function ParseLootPage() {
     release.country = Countries[releasecountry];
     release.language = Languages[releaselanguage];
 
-    release.discs = new Array();
+    release.discs = [];
     for (let l = 0; l < disccount.length; l++) {
         let disc = {
             position: l + 1,
@@ -359,7 +359,7 @@ function ParseLootPage() {
     release.labels = prodlabels;
 
     // Release URL
-    release.urls = new Array();
+    release.urls = [];
     release.urls.push({
         url: window.location.href,
         link_type: MBImport.URL_TYPES.purchase_for_mail_order,

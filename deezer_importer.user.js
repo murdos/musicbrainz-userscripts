@@ -1,18 +1,18 @@
 // ==UserScript==
-// @name           Import Deezer releases into MusicBrainz
-// @namespace      https://github.com/murdos/musicbrainz-userscripts/
-// @description    One-click importing of releases from deezer.com into MusicBrainz
-// @version        2019.1.30.1
-// @downloadURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
-// @updateURL      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
-// @include        http*://www.deezer.com/*/album/*
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require        lib/mbimport.js
-// @require        lib/logger.js
-// @require        lib/mbimportstyle.js
-// @icon           https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
-// @grant          GM_xmlhttpRequest
-// @grant          GM.xmlHttpRequest
+// @name         Import Deezer releases into MusicBrainz
+// @namespace    https://github.com/murdos/musicbrainz-userscripts/
+// @description  One-click importing of releases from deezer.com into MusicBrainz
+// @version      2025.9.28
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
+// @match        https://www.deezer.com/*/album/*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      lib/mbimport.js
+// @require      lib/logger.js
+// @require      lib/mbimportstyle.js
+// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // ==/UserScript==
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
@@ -128,6 +128,16 @@ function parseDeezerRelease(releaseUrl, data) {
     return release;
 }
 
+function waitForEl(selector, callback) {
+    if (jQuery(selector).length) {
+        callback();
+    } else {
+        setTimeout(function () {
+            waitForEl(selector, callback);
+        }, 100);
+    }
+}
+
 function insertLink(release, release_url) {
     let editNote = MBImport.makeEditNote(release_url, 'Deezer');
     let parameters = MBImport.buildFormParameters(release, editNote);
@@ -137,9 +147,13 @@ function insertLink(release, release_url) {
             ${MBImport.buildFormHTML(parameters)}
             </div><div class="toolbar-item">
             ${MBImport.buildSearchButton(release)}
-            </div>`
+            </div>`,
     ).hide();
-
-    $('div.toolbar-wrapper-full').append(mbUI);
-    mbUI.show();
+    waitForEl('[data-testid="toolbar"]', function () {
+        $('[data-testid="toolbar"]').css({
+            'align-items': 'center',
+        });
+        $('[data-testid="toolbar"]').append(mbUI);
+        mbUI.show();
+    });
 }
