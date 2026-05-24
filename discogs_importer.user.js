@@ -713,7 +713,7 @@ function parseDiscogsRelease(discogsRelease) {
                 }
                 let track_new = new Object();
                 if (subtrack.duration) {
-                    track_new.duraction = MBImport.hmsToMilliSeconds(subtrack.duration);
+                    track_new.duration = MBImport.hmsToMilliSeconds(subtrack.duration);
                     subtrack_total_duration += MBImport.hmsToMilliSeconds(subtrack.duration);
                 }
                 if (subtrack.title) {
