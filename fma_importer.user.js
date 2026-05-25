@@ -48,7 +48,7 @@ const release_attributes = {}; // albumid, total_pages, artist_name, label
 const album_api_array = []; // album information [0]
 const tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // if we have something on local storage place that
     if (localStorage.getItem('FMA_API_KEY')) {
         FMA_API = localStorage.getItem('FMA_API_KEY'); // -> YOURAPIKEY

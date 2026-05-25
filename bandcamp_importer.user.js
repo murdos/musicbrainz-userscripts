@@ -120,7 +120,7 @@ const BandcampImport = {
         }
 
         let tracks_streamable = 0;
-        $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
+        bandcampAlbumData.trackinfo.forEach(bctrack => {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {
@@ -355,7 +355,7 @@ const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocat
     return urls_data;
 };
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
      * bandcamp pages under third-party domains.

@@ -33,9 +33,9 @@ let is_classical = false, // release detected as classical
 
 function isVariousArtists(artist) {
     // Check hard-coded various artist ids
-    if ($.inArray(artist.id, various_artists_ids) != -1 || $.inArray(artist.id, various_composers_ids) != -1) {
+    if (various_artists_ids.includes(artist.id) || various_composers_ids.includes(artist.id)) {
         return true;
-    } else if ($.inArray(artist.slug, ['various-artist', 'various-composers']) != -1) {
+    } else if (['various-artist', 'various-composers'].includes(artist.slug)) {
         // Let's assume various based on the slug
         return true;
     }
@@ -64,7 +64,7 @@ function parseRelease(data) {
     release.url = `https://www.qobuz.com${data.relative_url}`; // no lang
 
     release.title = data.title;
-    if ($.inArray('Classique', data.genres_list) != -1) {
+    if (data.genres_list.includes('Classique')) {
         is_classical = true;
         release.classical = {};
         release.classical.discs = [];
@@ -110,7 +110,7 @@ function parseRelease(data) {
     release.day = releaseDate.getUTCDate();
 
     release.labels = [];
-    $.each(data.label.name.split(' - '), function (index, label) {
+    data.label.name.split(' - ').forEach(label => {
         release.labels.push({
             name: label,
             catno: '[none]', // no catno on qobuz ?
@@ -123,7 +123,7 @@ function parseRelease(data) {
     let tracks = [],
         classical_tracks = [],
         old_media_num = 1;
-    $.each(data.tracks.items, function (index, trackobj) {
+    data.tracks.items.forEach(trackobj => {
         release.isrcs.push(trackobj.isrc);
         if (trackobj.media_number != old_media_num) {
             release.discs.push({
@@ -149,8 +149,8 @@ function parseRelease(data) {
             if (typeof trackobj.composer !== 'undefined') {
                 classical_artists.push(trackobj.composer.name);
             } else {
-                $.each(performers, function (index, performer) {
-                    if ($.inArray('Composer', performer[1]) != -1) {
+                performers.forEach(performer => {
+                    if (performer[1].includes('Composer')) {
                         classical_artists.push(performer[0]);
                     }
                 });
@@ -162,17 +162,17 @@ function parseRelease(data) {
 
         let artists = [];
         let featured_artists = [];
-        $.each(performers, function (index, performer) {
-            if ($.inArray('Featured Artist', performer[1]) != -1) {
+        performers.forEach(performer => {
+            if (performer[1].includes('Featured Artist')) {
                 featured_artists.push(performer[0]);
             } else if (
-                // (is_classical && $.inArray('Composer', performer[1]) != -1) ||
-                $.inArray('MainArtist', performer[1]) != -1 ||
-                $.inArray('Main Performer', performer[1]) != -1 ||
-                $.inArray('Primary', performer[1]) != -1 ||
-                $.inArray('interprète', performer[1]) != -1 ||
-                $.inArray('Performer', performer[1]) != -1 ||
-                $.inArray('Main Artist', performer[1]) != -1
+                // (is_classical && performer[1].includes('Composer')) ||
+                performer[1].includes('MainArtist') ||
+                performer[1].includes('Main Performer') ||
+                performer[1].includes('Primary') ||
+                performer[1].includes('interprète') ||
+                performer[1].includes('Performer') ||
+                performer[1].includes('Main Artist')
             ) {
                 artists.push(performer[0]);
             }
@@ -482,7 +482,7 @@ function processDiscographyPage({ mblinks, locale }) {
     }
 
     // Build urls_data array for batch processing
-    artist_urls_map.forEach((artist_link_elements, artist_url) => {
+    Object.entries(artist_urls_map).forEach(([artist_link_elements, artist_url]) => {
         artist_urls_data.push({
             url: artist_url,
             mb_type: 'artist',
@@ -557,7 +557,7 @@ function processReleasePage({ mblinks }) {
     }
 }
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
     // Initialize MBLinks for checking already imported releases
     const mblinks = new MBLinks('QOBUZ_MBLINKS_CACHE');
     const pageTypeRegex = new RegExp(`^\\/([a-z]{2}-[a-z]{2})?(?:\\/)?(interpreter|album|label)\\/`);
