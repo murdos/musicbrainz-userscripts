@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.2.2
+// @version      2026.5.28.1
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -50,6 +50,8 @@ const otherDatabasesIconClasses = {
 };
 
 const streamingIconClasses = {
+    '7digital.com': 'sevendigital',
+    'audiomack.com': 'audiomack',
     'music.amazon.': 'amazonmusic',
     'music.apple.com': 'applemusic',
     'bandcamp.com': 'bandcamp',
