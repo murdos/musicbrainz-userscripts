@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.28.1
+// @version      2026.5.28.2
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -12,7 +12,6 @@
 // @match        *://*.musicbrainz.org/label/*
 // @exclude      */artist/*/recordings*
 // @exclude      */edit
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
@@ -70,6 +69,10 @@ const streamingIconClasses = {
     'store.steampowered.com': 'steam',
 };
 
+function relationshipsCell(mbid) {
+    return document.getElementById(mbid)?.querySelector('td.relationships');
+}
+
 /**
  * @param {string} mbid
  * @param {string} targetUrl
@@ -77,7 +80,10 @@ const streamingIconClasses = {
  */
 function injectShortcutIcon(mbid, targetUrl, iconClass) {
     if (!iconClass) return;
-    $(`#${mbid} td.relationships`).append(
+    const cell = relationshipsCell(mbid);
+    if (!cell) return;
+    cell.insertAdjacentHTML(
+        'beforeend',
         `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`,
     );
 }
@@ -133,12 +139,9 @@ background-image: url(https://store.steampowered.com/favicon.ico);
 background-size: 16px;
 }`;
 
-// prevent JQuery conflicts, see https://wiki.greasespot.net/@grant
-this.$ = this.jQuery = jQuery.noConflict(true);
-
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
+function init() {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};
@@ -166,49 +169,41 @@ $(document).ready(function () {
 
     // Determine target column
     let columnindex = 0;
-    $("table.tbl tbody tr[class!='subh']").each(function () {
-        $(this)
-            .children('td')
-            .each(function () {
-                const href = $(this).find('a').attr('href');
-                if (href !== undefined && href.match(mbidRE)) {
-                    return false;
-                }
-                columnindex++;
-            });
-        return false;
-    });
+    for (const row of document.querySelectorAll('table.tbl tbody tr:not(.subh)')) {
+        for (const cell of row.querySelectorAll(':scope > td')) {
+            const href = cell.querySelector('a')?.getAttribute('href');
+            if (href !== undefined && href.match(mbidRE)) {
+                break;
+            }
+            columnindex++;
+        }
+        break;
+    }
 
     // Set MBID to row in tables to get easiest fastest access
-    $("table.tbl tr[class!='subh']").each(function () {
-        let $tr = $(this);
+    for (const tr of document.querySelectorAll('table.tbl tr:not(.subh)')) {
+        const thAtColumn = tr.querySelectorAll(':scope > th')[columnindex];
+        const tdAtColumn = tr.querySelectorAll(':scope > td')[columnindex];
 
-        $tr.children(`th:eq(${columnindex})`).after('<th>Relationships</th>');
-        $tr.children(`td:eq(${columnindex})`).after("<td class='relationships'></td>");
+        thAtColumn?.insertAdjacentHTML('afterend', '<th>Relationships</th>');
+        tdAtColumn?.insertAdjacentHTML('afterend', "<td class='relationships'></td>");
 
-        $(this)
-            .find('a')
-            .each(function () {
-                let href = $(this).attr('href');
-                if ((m = href.match(mbidRE))) {
-                    $tr.attr('id', m[2]);
-                    return false;
-                }
-            });
-    });
+        for (const link of tr.querySelectorAll('a')) {
+            const href = link.getAttribute('href');
+            if ((m = href?.match(mbidRE))) {
+                tr.id = m[2];
+                break;
+            }
+        }
+    }
 
     // Adapt width of subheader rows by incrementing the colspan of a cell
-    $('table.tbl tr.subh').each(function () {
-        $(this)
-            .children('th[colspan]')
-            .attr('colspan', function (index, oldValue) {
-                if (index === 0) {
-                    return Number(oldValue) + 1;
-                } else {
-                    return oldValue;
-                }
-            });
-    });
+    for (const tr of document.querySelectorAll('table.tbl tr.subh')) {
+        const thWithColspan = tr.querySelector(':scope > th[colspan]');
+        if (thWithColspan) {
+            thWithColspan.colSpan += 1;
+        }
+    }
 
     // Calculate offset for multi-page lists
     let page = 1;
@@ -220,81 +215,93 @@ $(document).ready(function () {
     // Call the MB webservice
     const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    $.get(url, function (data) {
-        // Parse each child
-        $(data)
-            .find(child.type)
-            .each(function () {
-                let mbid = $(this).attr('id');
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            const doc = new DOMParser().parseFromString(data, 'application/xml');
+            if (doc.querySelector('parsererror')) {
+                console.error('Failed to parse MusicBrainz API response');
+                return;
+            }
+
+            for (const entity of doc.querySelectorAll(child.type)) {
+                const mbid = entity.getAttribute('id');
 
                 // URL relationships
-                let alreadyInjectedUrls = [];
-                $(this)
-                    .find("relation-list[target-type='url'] relation")
-                    .each(function () {
-                        let relType = $(this).attr('type');
-                        let targetUrl = $(this).children('target').text();
-                        let ended = $(this).children('ended').text() === 'true';
+                const alreadyInjectedUrls = [];
+                for (const relation of entity.querySelectorAll("relation-list[target-type='url'] relation")) {
+                    const relType = relation.getAttribute('type');
+                    const targetUrl = relation.querySelector(':scope > target')?.textContent ?? '';
+                    const ended = relation.querySelector(':scope > ended')?.textContent === 'true';
 
-                        // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
-                        if (alreadyInjectedUrls.includes(targetUrl)) return;
-                        alreadyInjectedUrls.push(targetUrl);
+                    // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
+                    if (alreadyInjectedUrls.includes(targetUrl)) continue;
+                    alreadyInjectedUrls.push(targetUrl);
 
-                        let iconClass;
-                        if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
-                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
-                        }
-                        if (!iconClass) {
-                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
-                        }
-                        if (!iconClass && relType in urlRelationsIconClasses) {
-                            iconClass = urlRelationsIconClasses[relType];
-                        }
+                    let iconClass;
+                    if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+                        iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
+                    }
+                    if (!iconClass) {
+                        iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+                    }
+                    if (!iconClass && relType in urlRelationsIconClasses) {
+                        iconClass = urlRelationsIconClasses[relType];
+                    }
 
-                        if (iconClass) {
-                            if (ended) {
-                                iconClass = ['ended', iconClass].join(' ');
-                            }
-                            injectShortcutIcon(mbid, targetUrl, iconClass);
+                    if (iconClass) {
+                        if (ended) {
+                            iconClass = ['ended', iconClass].join(' ');
                         }
-                    });
+                        injectShortcutIcon(mbid, targetUrl, iconClass);
+                    }
+                }
 
                 // Other relationships
-                $(this)
-                    .find("relation-list[target-type!='url']")
-                    .each(function () {
-                        let targettype = $(this).attr('target-type').replace('release_group', 'release-group');
-                        let relations = {};
+                for (const relationList of entity.querySelectorAll('relation-list')) {
+                    const targetTypeAttr = relationList.getAttribute('target-type');
+                    if (!targetTypeAttr || targetTypeAttr === 'url') continue;
 
-                        if (relationsIconsURLs[targettype] === undefined) {
-                            return;
+                    const targettype = targetTypeAttr.replace('release_group', 'release-group');
+                    const relations = {};
+
+                    if (relationsIconsURLs[targettype] === undefined) {
+                        continue;
+                    }
+
+                    for (const relation of relationList.querySelectorAll(':scope > relation')) {
+                        const reltype = relation.getAttribute('type');
+                        const target = relation.querySelector(':scope > target')?.textContent ?? '';
+                        const relUrl = targettype == 'url' ? target : `/${targettype}/${target}`;
+
+                        if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
+                            if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [relUrl];
+                            else relations[reltype].push(relUrl);
                         }
+                    }
 
-                        $(this)
-                            .children('relation')
-                            .each(function () {
-                                const reltype = $(this).attr('type');
-                                const target = $(this).children('target').text();
-                                const url = targettype == 'url' ? target : `/${targettype}/${target}`;
+                    const cell = relationshipsCell(mbid);
+                    if (!cell) continue;
 
-                                if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
-                                    if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [url];
-                                    else relations[reltype].push(url);
-                                }
-                            });
-
-                        $.each(relations, function (reltype, urls) {
-                            let html = '';
-                            if (urls.length < -1) {
-                                html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
-                            } else {
-                                $.each(urls, function (index, url) {
-                                    html += `<a href='${url}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
-                                });
+                    for (const [reltype, urls] of Object.entries(relations)) {
+                        let html = '';
+                        if (urls.length < -1) {
+                            html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
+                        } else {
+                            for (const relUrl of urls) {
+                                html += `<a href='${relUrl}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
                             }
-                            $(`#${mbid} td.relationships`).append(html);
-                        });
-                    });
-            });
-    });
-});
+                        }
+                        cell.insertAdjacentHTML('beforeend', html);
+                    }
+                }
+            }
+        })
+        .catch(err => console.error('MusicBrainz API request failed', err));
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
