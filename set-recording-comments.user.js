@@ -201,7 +201,7 @@ function setRecordingComments() {
             $submitButton.prop('disabled', false).text('Submit changes (marked red)');
         } else {
             let editNote = $('#recording-comments-edit-note').val().trim();
-            editNote += `\n\n—\nSet recording comments for a release\nEntered from: ${location.href}`;
+            editNote += `\n\n—\nSet recording comments for a release\nEntered from: ${location.href} '''''${document.querySelector('h1')?.textContent}'''''`;
             let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
             activeRequest = $.ajax({
