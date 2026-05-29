@@ -27,7 +27,8 @@
         "verbatimModuleSyntax": true,
         "paths": {
             "~/*": ["./src/*"]
-        }
+        },
+        "types": ["node"]
     },
     "include": ["src/**/*"],
     "typeRoots": ["node_modules/@types", "src/types"],
