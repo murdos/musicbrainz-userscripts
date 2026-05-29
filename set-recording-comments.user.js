@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz: Set recording comments for a release
 // @description  Batch set recording comments from a Release page.
-// @version      2026.5.28
+// @version      2026.5.29
 // @author       Michael Wiencek
 // @license      X11
 // @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
@@ -201,7 +201,8 @@ function setRecordingComments() {
             $submitButton.prop('disabled', false).text('Submit changes (marked red)');
         } else {
             let editNote = $('#recording-comments-edit-note').val().trim();
-            editNote += `\n\n—\nSet recording comments for a release\nEntered from: ${location.href} '''''${document.querySelector('h1')?.textContent}'''''`;
+            editNote += `${editNote ? '\n\n—\n' : ''}Entered from '''''${document.querySelector('h1')?.textContent}''''' at ${location.href}`;
+            editNote += `\nUsing '''Set recording comments for a release''' from https://github.com/murdos/musicbrainz-userscripts`;
             let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
             activeRequest = $.ajax({
