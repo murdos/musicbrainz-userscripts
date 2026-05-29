@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.05.29.1
+// @version      2026.05.29.2
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -345,6 +345,14 @@
       }
     }]);
   }();
+
+  var styleBlock = "\n    <style>\n        .harmony-button {\n            display: flex;\n            align-items: center;\n            gap: 4px;\n            margin: 0 !important;\n            border-radius: 5px;\n            justify-content: center;\n            cursor: pointer;\n            font-family: Arial;\n            font-size: 12px !important;\n            padding: 3px 6px;\n            border: 1px solid rgba(180,180,180,0.8) !important;\n            background-color: rgba(240,240,240,0.8) !important;\n            color: #334 !important;\n            height: 26px;\n            user-select: none;\n            text-decoration: none !important;\n        }\n\n        .harmony-button:hover {\n            background-color: rgba(250,250,250,0.9) !important;\n        }\n\n        .harmony-button:active {\n            background-color: rgba(170,170,170,0.8) !important;\n        }\n    </style>\n";
+  function buildHarmonyButton(_ref) {
+    var barcode = _ref.barcode,
+      release_url = _ref.release_url;
+    var harmonyWithBarcodeURL = barcode ? "https://harmony.pulsewidth.org.uk/release?gtin=".concat(barcode, "&category=all") : "https://harmony.pulsewidth.org.uk/release?url=".concat(encodeURIComponent(release_url), "&category=musicbrainz");
+    return "\n        ".concat(styleBlock, "\n        <a\n            class=\"harmony-button\"\n            title=\"Import this release into MusicBrainz using Harmony (open a new tab)\" \n            target=\"_blank\" \n            href=\"").concat(harmonyWithBarcodeURL, "\"\n        >\n            <img src=\"https://harmony.pulsewidth.org.uk/favicon.svg\" alt=\"Harmony icon\" width=\"16\" height=\"16\" />\n            Import with Harmony\n        </a>");
+  }
 
   function luceneEscape(text) {
     var newText = text.replace(/[-[\]{}()*+?~:\\^!"/]/g, '\\$&');
@@ -724,6 +732,7 @@
   }
 
   var MBImport = {
+    buildHarmonyButton: buildHarmonyButton,
     buildSearchLink: buildSearchLink,
     buildSearchButton: buildSearchButton,
     buildFormHTML: buildFormHTML,
@@ -1316,11 +1325,16 @@
       LOGGER.error('Could not find release info container');
       return;
     }
-    var spanHTML = mbrelease.barcode ? "<a href=\"https://atisket.pulsewidth.org.uk/?upc=".concat(encodeURIComponent(mbrelease.barcode), "\">\n            ").concat(mbrelease.barcode, "\n        </a>") : '[none]';
+    var barcodeText = mbrelease.barcode || '[none]';
+    var importLinkHTML = MBImport.buildHarmonyButton({
+      barcode: mbrelease.barcode,
+      release_url: release_url
+    });
     var releaseInfoBarcode = document.createElement('div');
     releaseInfoBarcode.className = lastReleaseInfo.className;
     releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
-    releaseInfoBarcode.innerHTML = "<p>Barcode</p><span>".concat(spanHTML, "</span>");
+    releaseInfoBarcode.style = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+    releaseInfoBarcode.innerHTML = "\n        <p>Barcode</p>\n        <span>".concat(barcodeText, "</span>\n        ").concat(importLinkHTML, "\n    ");
     lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
   }
   function init() {
