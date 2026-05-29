@@ -12,18 +12,17 @@ const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 // Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
 installFetchInterceptor(LOGGER);
 
-// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
-window.$ = window.jQuery = jQuery.noConflict(true);
-
-const MB_IMPORT_ELEMENT = 'div.musicbrainz-import';
+const MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
 const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
 
 /**
  * Remove existing MusicBrainz import UI to avoid duplicates
  */
 const cleanup = () => {
-    $(MB_IMPORT_ELEMENT).remove();
-    $(`#${MB_IMPORT_BARCODE_ELEMENT}`).remove();
+    document.querySelectorAll(MB_IMPORT_SELECTOR).forEach(el => {
+        el.remove();
+    });
+    document.getElementById(MB_IMPORT_BARCODE_ELEMENT)?.remove();
 };
 
 async function processReleasePage() {
@@ -35,7 +34,7 @@ async function processReleasePage() {
     }
 
     const releaseData = await getBeatportReleaseData(LOGGER);
-    if (!releaseData || !releaseData.pageProps.release) {
+    if (!releaseData?.pageProps.release) {
         LOGGER.error('Could not find release data on the release page');
         return;
     }
@@ -48,17 +47,15 @@ async function processReleasePage() {
         // Reversing is less reliable, but the API does not provide track numbers.
         const tracks_table = release.tracks.reverse();
 
-        const tracks_release = $.grep(releaseData.pageProps.dehydratedState.queries, element =>
-            element ? /tracks/g.test(element.queryKey) : false,
-        )[0];
+        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => /tracks/g.test(element.queryKey));
         const tracks_data_array = tracks_release?.state?.data.results;
         if (!tracks_data_array) {
             LOGGER.error('Could not find tracks data');
             return;
         }
-        const tracks_data = $.map(tracks_table, (url: string) =>
-            $.grep(tracks_data_array, element => (element ? element.url === url : false)),
-        ) as BeatportTrackData[];
+        const tracks_data = tracks_table
+            .map((url: string) => tracks_data_array.find(element => element.url === url))
+            .filter((track): track is BeatportTrackData => track !== undefined);
         const isrcs = tracks_data.map(track => track.isrc || null);
 
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
@@ -68,20 +65,6 @@ async function processReleasePage() {
         LOGGER.error('Error processing release page:', error);
     }
 }
-
-// Subscribe to SPA navigation events
-subscribeToSPANavigation({
-    onNavigate: () => processReleasePage(),
-});
-
-$(document).ready(() => {
-    MBImportStyle();
-
-    // Process initial page load
-    setTimeout(() => {
-        void processReleasePage();
-    }, 1000);
-});
 
 function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseData, tracks_data: BeatportTrackData[]): Release {
     const release_date = release_data.new_release_date.split('-');
@@ -122,20 +105,20 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
 
     const seen_tracks: { [key: number]: boolean } = {}; // to shoot duplicates ...
     const release_artists: string[] = [];
-    $.each(tracks_data, (index: number, track) => {
+    for (const track of tracks_data) {
         if (track.release.id != release_data.id) {
-            return;
+            continue;
         }
         if (seen_tracks[track.id]) {
-            return;
+            continue;
         }
         seen_tracks[track.id] = true;
 
         const artists: string[] = [];
-        $.each(track.artists, (index2: number, artist: { name: string }) => {
+        for (const artist of track.artists) {
             artists.push(artist.name);
             release_artists.push(artist.name);
-        });
+        }
 
         let title = track.name;
         if (track.mix_name && track.mix_name !== 'Original Mix') {
@@ -146,14 +129,9 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
             title: title,
             duration: track.length_ms,
         });
-    });
+    }
 
-    const unique_artists: string[] = [];
-    $.each(release_artists, (index: number, el: string) => {
-        if ($.inArray(el, unique_artists) === -1) {
-            unique_artists.push(el);
-        }
-    });
+    const unique_artists = [...new Set(release_artists)];
 
     if (unique_artists.length > 4) {
         mbrelease.artist_credit = [MBImport.specialArtist('various_artists')];
@@ -174,37 +152,69 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
     const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
 
-    const mbUI = $(
-        `<div class="interior-release-chart-content-item musicbrainz-import">${MBImport.buildFormHTML(
-            parameters,
-        )}${MBImport.buildSearchButton(mbrelease)}</div>`,
-    );
+    const collectionControls = document.querySelector('div[title="Collection controls"]');
+    if (!collectionControls) {
+        LOGGER.error('Could not find collection controls container');
+        return;
+    }
 
-    $(
-        '<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>',
-    )
-        .on('click', (event: Event) => {
-            const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
-            event.preventDefault();
-            window.open(`https://magicisrc.kepstin.ca?${query}`);
-        })
-        .appendTo(mbUI);
+    const mbUI = document.createElement('div');
+    mbUI.className = 'interior-release-chart-content-item musicbrainz-import';
+    mbUI.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
 
-    $('div[title="Collection controls"]').append(mbUI);
-    $(MB_IMPORT_ELEMENT).css({ display: 'flex', gap: '5px', flexWrap: 'wrap' });
-    $('form.musicbrainz_import button').css({ width: '120px' });
+    const isrcForm = document.createElement('form');
+    isrcForm.className = 'musicbrainz_import';
+    isrcForm.innerHTML =
+        '<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button>';
+    isrcForm.addEventListener('click', (event: Event) => {
+        const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+        event.preventDefault();
+        window.open(`https://magicisrc.kepstin.ca?${query}`);
+    });
+    mbUI.appendChild(isrcForm);
 
-    const lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
+    collectionControls.appendChild(mbUI);
+
+    Object.assign(mbUI.style, { display: 'flex', gap: '5px', flexWrap: 'wrap' });
+    mbUI.querySelectorAll<HTMLButtonElement>('form.musicbrainz_import button').forEach(button => {
+        button.style.width = '120px';
+    });
+
+    const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+    const lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
+    if (!lastReleaseInfo) {
+        LOGGER.error('Could not find release info container');
+        return;
+    }
+
     const spanHTML = mbrelease.barcode
         ? `<a href="https://atisket.pulsewidth.org.uk/?upc=${encodeURIComponent(mbrelease.barcode)}">
             ${mbrelease.barcode}
         </a>`
         : '[none]';
-    const releaseInfoBarcode = $(
-        `<div class="${lastReleaseInfo.attr('class')}" id="${MB_IMPORT_BARCODE_ELEMENT}">
-            <p>Barcode</p>
-            <span>${spanHTML}</span>
-        </div>`,
-    );
-    lastReleaseInfo.after(releaseInfoBarcode);
+    const releaseInfoBarcode = document.createElement('div');
+    releaseInfoBarcode.className = lastReleaseInfo.className;
+    releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
+    releaseInfoBarcode.innerHTML = `<p>Barcode</p><span>${spanHTML}</span>`;
+    lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+}
+
+function init() {
+    MBImportStyle();
+
+    // Process initial page load
+    setTimeout(() => {
+        void processReleasePage();
+    }, 1000);
+}
+
+// Subscribe to SPA navigation events
+subscribeToSPANavigation({
+    onNavigate: () => processReleasePage(),
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
 }
