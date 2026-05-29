@@ -1,3 +1,4 @@
+import { buildHarmonyButton } from './buildHarmonyButton';
 import { buildSearchLink } from './buildSearchLink';
 import { buildSearchButton } from './buildSearchButton';
 import { buildFormHTML } from './buildFormHTML';
@@ -11,6 +12,7 @@ import { URL_TYPES } from './urlTypes';
 import { special_artists, specialArtist } from './specialArtist';
 
 export const MBImport = {
+    buildHarmonyButton,
     buildSearchLink,
     buildSearchButton,
     buildFormHTML,

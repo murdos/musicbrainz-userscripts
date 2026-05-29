@@ -187,15 +187,19 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
         return;
     }
 
-    const spanHTML = mbrelease.barcode
-        ? `<a href="https://atisket.pulsewidth.org.uk/?upc=${encodeURIComponent(mbrelease.barcode)}">
-            ${mbrelease.barcode}
-        </a>`
-        : '[none]';
+    const barcodeText = mbrelease.barcode || '[none]';
+
+    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url });
+
     const releaseInfoBarcode = document.createElement('div');
     releaseInfoBarcode.className = lastReleaseInfo.className;
     releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
-    releaseInfoBarcode.innerHTML = `<p>Barcode</p><span>${spanHTML}</span>`;
+    releaseInfoBarcode.style = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+    releaseInfoBarcode.innerHTML = `
+        <p>Barcode</p>
+        <span>${barcodeText}</span>
+        ${importLinkHTML}
+    `;
     lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
 }
 
