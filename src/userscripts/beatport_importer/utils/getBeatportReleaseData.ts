@@ -151,15 +151,21 @@ function getBuildId(): string | undefined {
     }
 }
 
+/**
+ * Release ID always comes from the URL. On SPA navigation, use interceptor cache;
+ * on initial load, read __NEXT_DATA__ (its release id only verifies URL match — Next does not refresh it on client nav).
+ */
 export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPageData | null> => {
     const releaseIdFromURL = window.location.pathname.match(/release\/[^/]+\/(\d+)/)?.[1];
     if (!releaseIdFromURL) {
+        /** Early return to avoid running the script on non-release pages */
         return null;
     }
 
     let pageData: BeatportPageData | null = null;
     let buildId: string | undefined;
 
+    // SPA navigation: fresh JSON from Beatport's own fetch (see installFetchInterceptor).
     const cached = interceptedReleaseCache.get(releaseIdFromURL);
     if (cached) {
         interceptedReleaseCache.delete(releaseIdFromURL);
@@ -169,6 +175,7 @@ export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPa
     const initialNextDataElement = document.getElementById('__NEXT_DATA__');
     if (initialNextDataElement && !pageData) {
         const data = JSON.parse(initialNextDataElement.innerHTML) as unknown as BeatportSSRState;
+        // Initial load only: confirm embedded payload matches the URL before trusting it.
         const initialReleaseId = data.props.pageProps.release?.id.toString();
         buildId = data.buildId;
 
