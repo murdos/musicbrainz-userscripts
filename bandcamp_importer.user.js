@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.04.27.1
+// @version      2026.05.29.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -355,7 +355,7 @@ const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocat
     return urls_data;
 };
 
-$(document).ready(function () {
+function init() {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
      * bandcamp pages under third-party domains.
@@ -465,26 +465,34 @@ $(document).ready(function () {
         BandcampImport.insertLink(release, isMobile);
         LOGGER.info('Parsed release: ', release);
 
+        const nameSectionSpans = document.querySelectorAll('div#name-section h3 span');
+        const firstNameSectionSpan = nameSectionSpans[0];
+        const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
+
         if (release.type == 'track') {
             mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                $('div#name-section h3 span:last').before(link);
+                lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
             // add MB links to parent album
             mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
-                $('div#name-section h3 span:first').before(link);
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
         } else {
             mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                $('div#name-section h3 span:first').before(link);
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
             // add MB release links to album or single
             mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
-                $('div#name-section h3 span:first').after(link);
+                firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
             });
         }
 
         // append a comma after each tag to ease cut'n'paste to MB
-        $('div.tralbum-tags a:not(:last-child).tag').after(', ');
+        document.querySelectorAll('div.tralbum-tags a.tag').forEach(tag => {
+            if (tag !== tag.parentElement?.lastElementChild) {
+                tag.insertAdjacentText('afterend', ', ');
+            }
+        });
 
         // append a link to the full size image
         let coverArtElement;
@@ -531,15 +539,27 @@ $(document).ready(function () {
             marginLeft: '3px',
         };
 
+        const applyLinkStyle = element => {
+            element.querySelectorAll('a').forEach(anchor => {
+                Object.assign(anchor.style, linkStyle);
+            });
+        };
+
         const insertLinkCb = function (link) {
             if (!isLinkInserted) {
                 // Append the artist/label link on Stub discography pages
-                $('div.stub-page-content h1').append(link);
-                $('div.stub-page-content h1 a').css(linkStyle);
+                const stubPageHeading = document.querySelector('div.stub-page-content h1');
+                if (stubPageHeading) {
+                    stubPageHeading.insertAdjacentHTML('beforeend', link);
+                    applyLinkStyle(stubPageHeading);
+                }
 
                 // Append the artist/label link on actual discography pages
-                $('p#band-name-location span.title').append(link);
-                $('p#band-name-location span.title a').css(linkStyle);
+                const bandNameTitle = document.querySelector('p#band-name-location span.title');
+                if (bandNameTitle) {
+                    bandNameTitle.insertAdjacentHTML('beforeend', link);
+                    applyLinkStyle(bandNameTitle);
+                }
                 isLinkInserted = true;
             }
         };
@@ -551,8 +571,9 @@ $(document).ready(function () {
                 const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
                 const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
 
-                $('div.stub-page-content h1').append(`
-                    <span class="mb_wrapper">
+                document.querySelector('div.stub-page-content h1')?.insertAdjacentHTML(
+                    'beforeend',
+                    `<span class="mb_wrapper">
                         <span class="mb_valign mb_searchit">
                             <a class="mb_search_link"
                                 class="musicbrainz_import"
@@ -569,8 +590,8 @@ $(document).ready(function () {
                                 href="${labelSearchUrl}"
                             ><small>L</small>?</a>
                         </span>
-                    </span>
-                `);
+                    </span>`,
+                );
             }
         }
 
@@ -587,4 +608,10 @@ $(document).ready(function () {
         mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
         mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, undefined, onSearchComplete);
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
