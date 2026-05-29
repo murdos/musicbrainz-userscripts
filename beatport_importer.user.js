@@ -1025,6 +1025,11 @@
       return undefined;
     }
   }
+
+  /**
+   * Release ID always comes from the URL. On SPA navigation, use interceptor cache;
+   * on initial load, read __NEXT_DATA__ (its release id only verifies URL match — Next does not refresh it on client nav).
+   */
   var getBeatportReleaseData = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(logger) {
       var _window$location$path;
@@ -1040,6 +1045,7 @@
             return _context2.a(2, null);
           case 1:
             pageData = null;
+            // SPA navigation: fresh JSON from Beatport's own fetch (see installFetchInterceptor).
             cached = interceptedReleaseCache.get(releaseIdFromURL);
             if (cached) {
               interceptedReleaseCache.delete(releaseIdFromURL);
@@ -1050,7 +1056,7 @@
               _context2.n = 4;
               break;
             }
-            data = JSON.parse(initialNextDataElement.innerHTML);
+            data = JSON.parse(initialNextDataElement.innerHTML); // Initial load only: confirm embedded payload matches the URL before trusting it.
             initialReleaseId = (_data$props$pageProps = data.props.pageProps.release) === null || _data$props$pageProps === void 0 ? void 0 : _data$props$pageProps.id.toString();
             buildId = data.buildId;
             if (!(initialReleaseId === releaseIdFromURL)) {
