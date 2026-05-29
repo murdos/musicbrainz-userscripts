@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.03.14.5
+// @version      2026.05.29.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
 // @match        https://www.beatport.com/*
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
 
@@ -1101,22 +1100,22 @@
 
   // Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
   installFetchInterceptor(LOGGER);
-
-  // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
-  window.$ = window.jQuery = jQuery.noConflict(true);
-  var MB_IMPORT_ELEMENT = 'div.musicbrainz-import';
+  var MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
   var MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
 
   /**
    * Remove existing MusicBrainz import UI to avoid duplicates
    */
   var cleanup = function cleanup() {
-    $(MB_IMPORT_ELEMENT).remove();
-    $("#".concat(MB_IMPORT_BARCODE_ELEMENT)).remove();
+    var _document$getElementB;
+    document.querySelectorAll(MB_IMPORT_SELECTOR).forEach(function (el) {
+      el.remove();
+    });
+    (_document$getElementB = document.getElementById(MB_IMPORT_BARCODE_ELEMENT)) === null || _document$getElementB === void 0 || _document$getElementB.remove();
   };
   function processReleasePage() {
     return _processReleasePage.apply(this, arguments);
-  } // Subscribe to SPA navigation events
+  }
   function _processReleasePage() {
     _processReleasePage = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var isReleasePage, releaseData, release_url, _tracks_release$state, release, tracks_table, tracks_release, tracks_data_array, tracks_data, isrcs, mbrelease, _t;
@@ -1135,7 +1134,7 @@
             return getBeatportReleaseData(LOGGER);
           case 2:
             releaseData = _context.v;
-            if (!(!releaseData || !releaseData.pageProps.release)) {
+            if (releaseData !== null && releaseData !== void 0 && releaseData.pageProps.release) {
               _context.n = 3;
               break;
             }
@@ -1146,9 +1145,9 @@
             _context.p = 4;
             release = releaseData.pageProps.release; // Reversing is less reliable, but the API does not provide track numbers.
             tracks_table = release.tracks.reverse();
-            tracks_release = $.grep(releaseData.pageProps.dehydratedState.queries, function (element) {
-              return element ? /tracks/g.test(element.queryKey) : false;
-            })[0];
+            tracks_release = releaseData.pageProps.dehydratedState.queries.find(function (element) {
+              return /tracks/g.test(element.queryKey);
+            });
             tracks_data_array = tracks_release === null || tracks_release === void 0 || (_tracks_release$state = tracks_release.state) === null || _tracks_release$state === void 0 ? void 0 : _tracks_release$state.data.results;
             if (tracks_data_array) {
               _context.n = 5;
@@ -1157,10 +1156,12 @@
             LOGGER.error('Could not find tracks data');
             return _context.a(2);
           case 5:
-            tracks_data = $.map(tracks_table, function (url) {
-              return $.grep(tracks_data_array, function (element) {
-                return element ? element.url === url : false;
+            tracks_data = tracks_table.map(function (url) {
+              return tracks_data_array.find(function (element) {
+                return element.url === url;
               });
+            }).filter(function (track) {
+              return track !== undefined;
             });
             isrcs = tracks_data.map(function (track) {
               return track.isrc || null;
@@ -1180,19 +1181,6 @@
     }));
     return _processReleasePage.apply(this, arguments);
   }
-  subscribeToSPANavigation({
-    onNavigate: function onNavigate() {
-      return processReleasePage();
-    }
-  });
-  $(document).ready(function () {
-    MBImportStyle();
-
-    // Process initial page load
-    setTimeout(function () {
-      void processReleasePage();
-    }, 1000);
-  });
   function retrieveReleaseInfo(release_url, release_data, tracks_data) {
     var release_date = release_data.new_release_date.split('-');
 
@@ -1230,35 +1218,48 @@
     var mbtracks = [];
     var seen_tracks = {}; // to shoot duplicates ...
     var release_artists = [];
-    $.each(tracks_data, function (index, track) {
-      if (track.release.id != release_data.id) {
-        return;
+    var _iterator = _createForOfIteratorHelper(tracks_data),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var track = _step.value;
+        if (track.release.id != release_data.id) {
+          continue;
+        }
+        if (seen_tracks[track.id]) {
+          continue;
+        }
+        seen_tracks[track.id] = true;
+        var artists = [];
+        var _iterator2 = _createForOfIteratorHelper(track.artists),
+          _step2;
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var artist = _step2.value;
+            artists.push(artist.name);
+            release_artists.push(artist.name);
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+        var title = track.name;
+        if (track.mix_name && track.mix_name !== 'Original Mix') {
+          title += " (".concat(track.mix_name, ")");
+        }
+        mbtracks.push({
+          artist_credit: MBImport.makeArtistCredits(artists),
+          title: title,
+          duration: track.length_ms
+        });
       }
-      if (seen_tracks[track.id]) {
-        return;
-      }
-      seen_tracks[track.id] = true;
-      var artists = [];
-      $.each(track.artists, function (index2, artist) {
-        artists.push(artist.name);
-        release_artists.push(artist.name);
-      });
-      var title = track.name;
-      if (track.mix_name && track.mix_name !== 'Original Mix') {
-        title += " (".concat(track.mix_name, ")");
-      }
-      mbtracks.push({
-        artist_credit: MBImport.makeArtistCredits(artists),
-        title: title,
-        duration: track.length_ms
-      });
-    });
-    var unique_artists = [];
-    $.each(release_artists, function (index, el) {
-      if ($.inArray(el, unique_artists) === -1) {
-        unique_artists.push(el);
-      }
-    });
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+    var unique_artists = _toConsumableArray(new Set(release_artists));
     if (unique_artists.length > 4) {
       mbrelease.artist_credit = [MBImport.specialArtist('various_artists')];
     } else {
@@ -1275,27 +1276,66 @@
   function insertMBButtons(mbrelease, release_url, isrcs) {
     var edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     var parameters = MBImport.buildFormParameters(mbrelease, edit_note);
-    var mbUI = $("<div class=\"interior-release-chart-content-item musicbrainz-import\">".concat(MBImport.buildFormHTML(parameters)).concat(MBImport.buildSearchButton(mbrelease), "</div>"));
-    $('<form class="musicbrainz_import"><button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button></form>').on('click', function (event) {
+    var collectionControls = document.querySelector('div[title="Collection controls"]');
+    if (!collectionControls) {
+      LOGGER.error('Could not find collection controls container');
+      return;
+    }
+    var mbUI = document.createElement('div');
+    mbUI.className = 'interior-release-chart-content-item musicbrainz-import';
+    mbUI.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
+    var isrcForm = document.createElement('form');
+    isrcForm.className = 'musicbrainz_import';
+    isrcForm.innerHTML = '<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button>';
+    isrcForm.addEventListener('click', function (event) {
       var query = isrcs.map(function (isrc, index) {
         return isrc == null ? "isrc".concat(index + 1, "=") : "isrc".concat(index + 1, "=").concat(isrc);
       }).join('&');
       event.preventDefault();
       window.open("https://magicisrc.kepstin.ca?".concat(query));
-    }).appendTo(mbUI);
-    $('div[title="Collection controls"]').append(mbUI);
-    $(MB_IMPORT_ELEMENT).css({
+    });
+    mbUI.appendChild(isrcForm);
+    collectionControls.appendChild(mbUI);
+    Object.assign(mbUI.style, {
       display: 'flex',
       gap: '5px',
       flexWrap: 'wrap'
     });
-    $('form.musicbrainz_import button').css({
-      width: '120px'
+    mbUI.querySelectorAll('form.musicbrainz_import button').forEach(function (button) {
+      button.style.width = '120px';
     });
-    var lastReleaseInfo = $('div[class^="ReleaseDetailCard-style__Info"]').last();
+    var releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+    var lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
+    if (!lastReleaseInfo) {
+      LOGGER.error('Could not find release info container');
+      return;
+    }
     var spanHTML = mbrelease.barcode ? "<a href=\"https://atisket.pulsewidth.org.uk/?upc=".concat(encodeURIComponent(mbrelease.barcode), "\">\n            ").concat(mbrelease.barcode, "\n        </a>") : '[none]';
-    var releaseInfoBarcode = $("<div class=\"".concat(lastReleaseInfo.attr('class'), "\" id=\"").concat(MB_IMPORT_BARCODE_ELEMENT, "\">\n            <p>Barcode</p>\n            <span>").concat(spanHTML, "</span>\n        </div>"));
-    lastReleaseInfo.after(releaseInfoBarcode);
+    var releaseInfoBarcode = document.createElement('div');
+    releaseInfoBarcode.className = lastReleaseInfo.className;
+    releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
+    releaseInfoBarcode.innerHTML = "<p>Barcode</p><span>".concat(spanHTML, "</span>");
+    lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+  }
+  function init() {
+    MBImportStyle();
+
+    // Process initial page load
+    setTimeout(function () {
+      void processReleasePage();
+    }, 1000);
+  }
+
+  // Subscribe to SPA navigation events
+  subscribeToSPANavigation({
+    onNavigate: function onNavigate() {
+      return processReleasePage();
+    }
+  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 
 })();
