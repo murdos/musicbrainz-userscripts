@@ -35,9 +35,6 @@ importers:
       '@types/greasemonkey':
         specifier: ^4.0.7
         version: 4.0.7
-      '@types/jquery':
-        specifier: ^2.0.54
-        version: 2.0.68
       '@types/node':
         specifier: ^24.8.1
         version: 24.12.4
@@ -1055,9 +1052,6 @@ packages:
 
   '@types/greasemonkey@4.0.7':
     resolution: {integrity: sha512-DuYBRf/T4zixO/xhQ3eicZCBjjOgbSSXuHP5XkLNf/UBayrJpBniP9il/AQaPy0lffl4Bco48zgHL+pZmQ6Q0A==}
-
-  '@types/jquery@2.0.68':
-    resolution: {integrity: sha512-9E8HinL4D/VgWf6tci0/NWlkw8i8e5pL00yVmBpFaVmveSwMq3lEQcrRJVbu62Fprm3nBTHXkqkEByjGoQCpTA==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -3275,8 +3269,6 @@ snapshots:
   '@types/estree@1.0.9': {}
 
   '@types/greasemonkey@4.0.7': {}
-
-  '@types/jquery@2.0.68': {}
 
   '@types/json-schema@7.0.15': {}
 
