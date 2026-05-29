@@ -143,11 +143,9 @@ const BandcampImport = {
         let showntracks = bandcampAlbumData.trackinfo.length;
         let numtracks = -1;
         let nostream = false;
-        // album description indicates number of tracks in the download
-        let match = /^\d+ track album$/.exec(document.querySelector('meta[property="og:description"]').getAttribute('content'));
-        if (match) {
-            numtracks = parseInt(match, 10);
-        }
+        // ld+json metadata contains number of tracks in the download
+        const linkeddata = JSON.parse(document.querySelector('script[type="application/ld+json"]').innerText)
+        numtracks = linkeddata.numTracks
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
             $('h2.trackTitle').append(
@@ -578,12 +576,12 @@ function init() {
                             <a class="mb_search_link"
                                 class="musicbrainz_import"
                                 target="_blank"
-                                title="Search this artist on MusicBrainz (open in a new tab)" 
+                                title="Search this artist on MusicBrainz (open in a new tab)"
                                 href="${artistSearchUrl}"
                             ><small>A</small>?</a>
                         </span>
                         <span class="mb_valign mb_searchit">
-                            <a 
+                            <a
                                 class="mb_search_link musicbrainz_import"
                                 target="_blank"
                                 title="Search this label on MusicBrainz (open in a new tab)"
