@@ -40,6 +40,7 @@ const styleBlockFullButton = `
             height: 26px;
             user-select: none;
             text-decoration: none !important;
+            box-sizing: border-box;
         }
 
         .harmony-button:hover {
