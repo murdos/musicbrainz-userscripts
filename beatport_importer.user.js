@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.05.29.2
+// @version      2026.05.30.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -350,8 +350,18 @@
   function buildHarmonyButton(_ref) {
     var barcode = _ref.barcode,
       release_url = _ref.release_url;
-    var harmonyWithBarcodeURL = barcode ? "https://harmony.pulsewidth.org.uk/release?gtin=".concat(barcode, "&category=all") : "https://harmony.pulsewidth.org.uk/release?url=".concat(encodeURIComponent(release_url), "&category=musicbrainz");
-    return "\n        ".concat(styleBlock, "\n        <a\n            class=\"harmony-button\"\n            title=\"Import this release into MusicBrainz using Harmony (open a new tab)\" \n            target=\"_blank\" \n            href=\"").concat(harmonyWithBarcodeURL, "\"\n        >\n            <img src=\"https://harmony.pulsewidth.org.uk/favicon.svg\" alt=\"Harmony icon\" width=\"16\" height=\"16\" />\n            Import with Harmony\n        </a>");
+    var searchParams = new URLSearchParams();
+    if (barcode) {
+      searchParams.set('gtin', barcode);
+    }
+    if (release_url) {
+      searchParams.set('url', encodeURI(release_url));
+    }
+    searchParams.set('category', 'preferred'); // take Harmony user preferences into account
+    searchParams.set('musicbrainz', ''); // enforce lookup by barcode in MusicBrainz
+
+    var harmonyURL = "https://harmony.pulsewidth.org.uk/release?".concat(searchParams.toString());
+    return "\n        ".concat(styleBlock, "\n        <a\n            class=\"harmony-button\"\n            title=\"Import this release into MusicBrainz using Harmony (open a new tab)\" \n            target=\"_blank\"\n            href=\"").concat(harmonyURL, "\"\n        >\n            <img src=\"https://harmony.pulsewidth.org.uk/favicon.svg\" alt=\"Harmony icon\" width=\"16\" height=\"16\" />\n            Import with Harmony\n        </a>");
   }
 
   function luceneEscape(text) {
