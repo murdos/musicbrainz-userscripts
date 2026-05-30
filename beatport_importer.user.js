@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.05.30.2
+// @version      2026.05.30.3
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -1137,6 +1137,7 @@
   installFetchInterceptor(LOGGER);
   var MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
   var MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
+  var RELEASE_INFO_STYLE = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
 
   /**
    * Remove existing MusicBrainz import UI to avoid duplicates
@@ -1307,21 +1308,37 @@
     return mbrelease;
   }
 
-  // Insert button into page under label information
+  // Insert MusicBrainz import UI into the release details under the controls section
   function insertMBButtons(mbrelease, release_url, isrcs) {
     var edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     var parameters = MBImport.buildFormParameters(mbrelease, edit_note);
-    var collectionControls = document.querySelector('div[title="Collection controls"]');
-    if (!collectionControls) {
-      LOGGER.error('Could not find collection controls container');
+    var releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+    var lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
+    if (!lastReleaseInfo) {
+      LOGGER.error('Could not find release info container');
       return;
     }
-    var mbUI = document.createElement('div');
-    mbUI.className = 'interior-release-chart-content-item musicbrainz-import';
-    mbUI.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
+    var controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Controls"]');
+    var controls = controlsElements[0];
+    if (!controls) {
+      LOGGER.error('Could not find controls container');
+      return;
+    }
+
+    // Insert barcode information
+    var barcodeText = mbrelease.barcode || '[none]';
+    var releaseInfoBarcode = document.createElement('div');
+    releaseInfoBarcode.className = lastReleaseInfo.className;
+    releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
+    releaseInfoBarcode.style.cssText = RELEASE_INFO_STYLE;
+    releaseInfoBarcode.innerHTML = "\n        <p>Barcode</p>\n        <span>".concat(barcodeText, "</span>\n    ");
+    lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+
+    // Insert MusicBrainz import UI
+
     var isrcForm = document.createElement('form');
     isrcForm.className = 'musicbrainz_import';
-    isrcForm.innerHTML = '<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button>';
+    isrcForm.innerHTML = "<button type=\"submit\" title=\"Submit ISRCs to MusicBrainz with kepstin\u2019s MagicISRC\">\n            <img src=\"https://magicisrc.kepstin.ca/favicon.svg\" alt=\"MagicISRC icon\" width=\"14\" height=\"14\" style=\"margin-right: 4px;\" />\n            Submit ISRCs\n        </button>";
     isrcForm.addEventListener('click', function (event) {
       var query = isrcs.map(function (isrc, index) {
         return isrc == null ? "isrc".concat(index + 1, "=") : "isrc".concat(index + 1, "=").concat(isrc);
@@ -1329,34 +1346,18 @@
       event.preventDefault();
       window.open("https://magicisrc.kepstin.ca?".concat(query));
     });
-    mbUI.appendChild(isrcForm);
-    collectionControls.appendChild(mbUI);
-    Object.assign(mbUI.style, {
-      display: 'flex',
-      gap: '5px',
-      flexWrap: 'wrap'
-    });
-    mbUI.querySelectorAll('form.musicbrainz_import button').forEach(function (button) {
-      button.style.width = '120px';
-    });
-    var releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
-    var lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
-    if (!lastReleaseInfo) {
-      LOGGER.error('Could not find release info container');
-      return;
-    }
-    var barcodeText = mbrelease.barcode || '[none]';
     var importLinkHTML = MBImport.buildHarmonyButton({
       barcode: mbrelease.barcode,
       release_url: release_url,
       variant: 'full'
     });
-    var releaseInfoBarcode = document.createElement('div');
-    releaseInfoBarcode.className = lastReleaseInfo.className;
-    releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
-    releaseInfoBarcode.style = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
-    releaseInfoBarcode.innerHTML = "\n        <p>Barcode</p>\n        <span>".concat(barcodeText, "</span>\n        ").concat(importLinkHTML, "\n    ");
-    lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+    var releaseInfoButtons = document.createElement('div');
+    releaseInfoButtons.className = "".concat(lastReleaseInfo.className, " musicbrainz-import");
+    releaseInfoButtons.style.cssText = RELEASE_INFO_STYLE;
+    releaseInfoButtons.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
+    releaseInfoButtons.appendChild(isrcForm);
+    releaseInfoButtons.insertAdjacentHTML('beforeend', importLinkHTML);
+    controls.insertAdjacentElement('afterend', releaseInfoButtons);
   }
   function init() {
     MBImportStyle();
