@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.05.30.3
+// @version      2026.05.30.4
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -347,7 +347,7 @@
   }();
 
   var styleBlockIconButton = "\n    <style>\n        .harmony-button {\n            display: inline-block;\n            position: relative;\n        }\n\n        .harmony-button:hover {\n            transform: scale(1.1);\n        }\n\n        .harmony-button:active {\n            transform: scale(0.9);\n        }\n    </style>\n";
-  var styleBlockFullButton = "\n    <style>\n        .harmony-button {\n            display: flex;\n            align-items: center;\n            gap: 4px;\n            margin: 0 !important;\n            border-radius: 5px;\n            justify-content: center;\n            cursor: pointer;\n            font-family: Arial;\n            font-size: 12px !important;\n            padding: 3px 6px;\n            border: 1px solid rgba(180,180,180,0.8) !important;\n            background-color: rgba(240,240,240,0.8) !important;\n            color: #334 !important;\n            height: 26px;\n            user-select: none;\n            text-decoration: none !important;\n        }\n\n        .harmony-button:hover {\n            background-color: rgba(250,250,250,0.9) !important;\n        }\n\n        .harmony-button:active {\n            background-color: rgba(170,170,170,0.8) !important;\n        }\n    </style>\n";
+  var styleBlockFullButton = "\n    <style>\n        .harmony-button {\n            display: flex;\n            align-items: center;\n            gap: 4px;\n            margin: 0 !important;\n            border-radius: 5px;\n            justify-content: center;\n            cursor: pointer;\n            font-family: Arial;\n            font-size: 12px !important;\n            padding: 3px 6px;\n            border: 1px solid rgba(180,180,180,0.8) !important;\n            background-color: rgba(240,240,240,0.8) !important;\n            color: #334 !important;\n            height: 26px;\n            user-select: none;\n            text-decoration: none !important;\n            box-sizing: border-box;\n        }\n\n        .harmony-button:hover {\n            background-color: rgba(250,250,250,0.9) !important;\n        }\n\n        .harmony-button:active {\n            background-color: rgba(170,170,170,0.8) !important;\n        }\n    </style>\n";
   function buildHarmonyButton(_ref) {
     var barcode = _ref.barcode,
       release_url = _ref.release_url,
