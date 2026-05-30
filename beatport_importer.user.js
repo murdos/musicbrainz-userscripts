@@ -693,6 +693,13 @@
     var params = ["query=".concat(luceneEscape(what)), "type=".concat(type), 'indexed=1'];
     return "https://musicbrainz.org/search?".concat(params.join('&'));
   }
+  function exactSearchUrlFor(type, what) {
+    var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 25;
+    type = type.replace('-', '_');
+    var query = "\"".concat(luceneEscape(what), "\"");
+    var params = ["query=".concat(encodeURIComponent(query)), "type=".concat(type), "limit=".concat(limit), 'method=advanced'];
+    return "https://musicbrainz.org/search?".concat(params.join('&'));
+  }
 
   var URL_TYPES = {
     purchase_for_download: 74,
@@ -743,6 +750,7 @@
     ISO8601toMilliSeconds: ISO8601toMilliSeconds,
     makeEditNote: makeEditNote,
     searchUrlFor: searchUrlFor,
+    exactSearchUrlFor: exactSearchUrlFor,
     URL_TYPES: URL_TYPES,
     SPECIAL_ARTISTS: special_artists,
     specialArtist: specialArtist
