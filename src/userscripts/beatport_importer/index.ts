@@ -14,6 +14,7 @@ installFetchInterceptor(LOGGER);
 
 const MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
 const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
+const RELEASE_INFO_STYLE = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
 
 /**
  * Remove existing MusicBrainz import UI to avoid duplicates
@@ -147,38 +148,10 @@ function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseD
     return mbrelease;
 }
 
-// Insert button into page under label information
+// Insert MusicBrainz import UI into the release details under the controls section
 function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string | null)[]): void {
     const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
-
-    const collectionControls = document.querySelector('div[title="Collection controls"]');
-    if (!collectionControls) {
-        LOGGER.error('Could not find collection controls container');
-        return;
-    }
-
-    const mbUI = document.createElement('div');
-    mbUI.className = 'interior-release-chart-content-item musicbrainz-import';
-    mbUI.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
-
-    const isrcForm = document.createElement('form');
-    isrcForm.className = 'musicbrainz_import';
-    isrcForm.innerHTML =
-        '<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button>';
-    isrcForm.addEventListener('click', (event: Event) => {
-        const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
-        event.preventDefault();
-        window.open(`https://magicisrc.kepstin.ca?${query}`);
-    });
-    mbUI.appendChild(isrcForm);
-
-    collectionControls.appendChild(mbUI);
-
-    Object.assign(mbUI.style, { display: 'flex', gap: '5px', flexWrap: 'wrap' });
-    mbUI.querySelectorAll<HTMLButtonElement>('form.musicbrainz_import button').forEach(button => {
-        button.style.width = '120px';
-    });
 
     const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
     const lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
@@ -187,20 +160,50 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
         return;
     }
 
-    const barcodeText = mbrelease.barcode || '[none]';
+    const controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Controls"]');
+    const controls = controlsElements[0];
+    if (!controls) {
+        LOGGER.error('Could not find controls container');
+        return;
+    }
 
-    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url, variant: 'full' });
+    // Insert barcode information
+    const barcodeText = mbrelease.barcode || '[none]';
 
     const releaseInfoBarcode = document.createElement('div');
     releaseInfoBarcode.className = lastReleaseInfo.className;
     releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
-    releaseInfoBarcode.style = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+    releaseInfoBarcode.style.cssText = RELEASE_INFO_STYLE;
     releaseInfoBarcode.innerHTML = `
         <p>Barcode</p>
         <span>${barcodeText}</span>
-        ${importLinkHTML}
     `;
     lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+
+    // Insert MusicBrainz import UI
+
+    const isrcForm = document.createElement('form');
+    isrcForm.className = 'musicbrainz_import';
+    isrcForm.innerHTML = `<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC">
+            <img src="https://magicisrc.kepstin.ca/favicon.svg" alt="MagicISRC icon" width="14" height="14" style="margin-right: 4px;" />
+            Submit ISRCs
+        </button>`;
+    isrcForm.addEventListener('click', (event: Event) => {
+        const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+        event.preventDefault();
+        window.open(`https://magicisrc.kepstin.ca?${query}`);
+    });
+
+    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url, variant: 'full' });
+
+    const releaseInfoButtons = document.createElement('div');
+    releaseInfoButtons.className = `${lastReleaseInfo.className} musicbrainz-import`;
+    releaseInfoButtons.style.cssText = RELEASE_INFO_STYLE;
+    releaseInfoButtons.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
+    releaseInfoButtons.appendChild(isrcForm);
+    releaseInfoButtons.insertAdjacentHTML('beforeend', importLinkHTML);
+
+    controls.insertAdjacentElement('afterend', releaseInfoButtons);
 }
 
 function init() {
