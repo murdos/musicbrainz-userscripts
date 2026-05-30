@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.30.1
+// @version      2026.5.30.2
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -102,6 +102,32 @@ function findIconClassOfUrl(url, iconClassMap) {
             return iconClassMap[partialUrl];
         }
     }
+}
+
+/**
+ * @param {Object} relation
+ * @returns {{ targetUrl: string, iconClass: string } | null}
+ */
+function getIconClassForRelationship(relation) {
+    if (relation['target-type'] !== 'url') return null;
+    const targetUrl = relation.url?.resource;
+    if (!targetUrl) return null;
+
+    const relType = relation.type;
+    let iconClass;
+    if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+        iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
+    }
+    if (relType === 'purchase for mail-order') {
+        iconClass = findIconClassOfUrl(targetUrl, purchaseForMailOrderIconClasses) || iconClass;
+    }
+    if (!iconClass) {
+        iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+    }
+    if (!iconClass && relType in urlRelationsIconClasses) {
+        iconClass = urlRelationsIconClasses[relType];
+    }
+    return iconClass ? { targetUrl, iconClass } : null;
 }
 
 const incOptions = {
@@ -225,34 +251,21 @@ function init() {
             const pluralisedChildType = `${child.type}s`;
             for (const entity of data[pluralisedChildType] ?? []) {
                 const mbid = entity.id;
-                const alreadyInjectedUrls = [];
+                const alreadyInjectedIcons = new Set();
+                const activeUrlsByIconClass = {};
                 const groupedByTargetType = {};
+                const urlRelations = [];
 
                 for (const relation of entity.relations ?? []) {
-                    if (relation['target-type'] === 'url') {
-                        const targetUrl = relation.url?.resource;
-                        if (!targetUrl || alreadyInjectedUrls.includes(targetUrl)) continue;
-                        alreadyInjectedUrls.push(targetUrl);
-
-                        const relType = relation.type;
-                        let iconClass;
-                        if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
-                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
+                    const iconInfo = getIconClassForRelationship(relation);
+                    if (iconInfo) {
+                        if (!relation.ended) {
+                            if (!activeUrlsByIconClass[iconInfo.iconClass]) {
+                                activeUrlsByIconClass[iconInfo.iconClass] = new Set();
+                            }
+                            activeUrlsByIconClass[iconInfo.iconClass].add(iconInfo.targetUrl);
                         }
-                        if (relType === 'purchase for mail-order') {
-                            iconClass = findIconClassOfUrl(targetUrl, purchaseForMailOrderIconClasses) || iconClass;
-                        }
-                        if (!iconClass) {
-                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
-                        }
-                        if (!iconClass && relType in urlRelationsIconClasses) {
-                            iconClass = urlRelationsIconClasses[relType];
-                        }
-
-                        if (iconClass) {
-                            if (relation.ended) iconClass = `ended ${iconClass}`;
-                            injectShortcutIcon(mbid, targetUrl, iconClass);
-                        }
+                        urlRelations.push({ relation, iconInfo });
                         continue;
                     }
 
@@ -266,9 +279,22 @@ function init() {
                     groupedByTargetType[targettype][reltype].push(`/${targettype}/${targetId}`);
                 }
 
+                for (const { relation, iconInfo } of urlRelations) {
+                    const { targetUrl, iconClass } = iconInfo;
+                    if (relation.ended && activeUrlsByIconClass[iconClass]?.has(targetUrl)) continue;
+
+                    const dedupeKey = `${relation.ended ? 'ended' : 'active'}:${iconClass}`;
+                    if (alreadyInjectedIcons.has(dedupeKey)) continue;
+                    alreadyInjectedIcons.add(dedupeKey);
+
+                    const displayClass = relation.ended ? `ended ${iconClass}` : iconClass;
+                    injectShortcutIcon(mbid, targetUrl, displayClass);
+                }
+
                 const cell = relationshipsCell(mbid);
                 if (!cell) continue;
 
+                // `groupedByTargetType` handles non-URL relationships — links to other MusicBrainz entities, not external sites.
                 for (const [targettype, relationsByType] of Object.entries(groupedByTargetType)) {
                     for (const [reltype, urls] of Object.entries(relationsByType)) {
                         let html = '';
