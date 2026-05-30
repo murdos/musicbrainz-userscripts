@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.05.29.1
+// @version      2026.05.30.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -9,9 +9,9 @@
 // @include      /^https:\/\/([^.]+)\.bandcamp\.com((?:\/(?:(?:album|track))\/[^/]+|\/|\/music)?)$/
 // @include      /^https?:\/\/web\.archive\.org\/web\/\d+\/https?:\/\/[^/]+(?:\/(?:album|track)\/[^/]+\/?|\/music\/?|\/?)$/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
-// @require      lib/mbimport.js
+// @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.03.05.4
+// @require      lib/mblinks.js?version=v2026.05.30.1
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant        unsafeWindow
@@ -231,17 +231,32 @@ const BandcampImport = {
             return false;
         }
         // Form parameters
-        let edit_note = MBImport.makeEditNote(release.url, 'Bandcamp');
-        let parameters = MBImport.buildFormParameters(release, edit_note);
+        const edit_note = MBImport.makeEditNote(release.url, 'Bandcamp');
+        const parameters = MBImport.buildFormParameters(release, edit_note);
+
+        const importButton = MBImport.buildFormHTML(parameters);
+        const searchButton = MBImport.buildSearchButton(release);
+        const harmonyButton = MBImport.buildHarmonyButton({
+            barcode: unsafeWindow.TralbumData?.current?.upc || undefined,
+            release_url: release.url,
+            variant: 'full',
+        });
+
         // Build form
-        let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`);
+        const mbUI = document.createElement('div');
+        mbUI.id = 'mb_buttons';
+        mbUI.innerHTML = `${importButton}${searchButton}${harmonyButton}`;
 
         // Append MB import link
         if (isMobile) {
-            $('#band-navbar > ul').append($('<li>').css({ display: 'flex', alignItems: 'center', alignSelf: 'center' }).append(mbUI));
+            const bandNavbar = document.querySelector('#band-navbar');
+            if (bandNavbar) {
+                mbUI.style = 'margin: 8px; flex-wrap: wrap;';
+                bandNavbar.insertAdjacentElement('afterend', mbUI);
+            }
         } else {
             $('#name-section').append(mbUI);
-            document.querySelector('#mb_buttons').style.marginTop = '6px';
+            mbUI.style.marginTop = '6px';
         }
 
         document.querySelectorAll('form.musicbrainz_import').forEach(form => (form.style.display = 'inline-block'));
@@ -521,12 +536,12 @@ function init() {
         }
         const upc = unsafeWindow.TralbumData.current.upc;
         if (typeof upc != 'undefined' && upc !== null) {
-            document.querySelector('div #trackInfoInner').insertAdjacentHTML(
-                'beforeend',
-                `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}<br/>
-            Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}&category=default">Harmony</a>
-            | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`,
-            );
+            document
+                .querySelector('div #trackInfoInner')
+                .insertAdjacentHTML(
+                    'beforeend',
+                    `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}</div>`,
+                );
         }
     }
 
