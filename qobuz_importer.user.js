@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.05.29.2
+// @version      2026.05.30.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @include      /^https?://www\.qobuz\.com/[^/]+/(album|interpreter|label)(/[^/?]+)+(\?.*)?$/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require      lib/mbimport.js
+// @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.03.05.3
+// @require      lib/mblinks.js?version=v2026.05.30.1
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @run-at       document-start
@@ -490,7 +490,47 @@ function getEntityUrls(url, locale) {
     return [...urls];
 }
 
+const MB_SEARCH_MARKS = {
+    artist: 'A',
+    label: 'L',
+    release: 'R',
+};
+
+function createMbSearchLink(mb_type, entityName) {
+    const mark = MB_SEARCH_MARKS[mb_type] || '?';
+    const entity_name = mb_type.replace(/[_-]/g, ' ');
+    const href = mb_type !== 'release' ? MBImport.searchUrlFor(mb_type, entityName) : MBImport.exactSearchUrlFor(mb_type, entityName);
+    return `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${href}"><small>${mark}</small>?</a></span>`;
+}
+
+function removeMbSearchLinksBefore(element) {
+    while (element.previousElementSibling?.classList.contains('mb_searchit')) {
+        element.previousElementSibling.remove();
+    }
+}
+
+function insertMbSearchLinkBeforeElement(element, mb_type, entityName) {
+    removeMbSearchLinksBefore(element);
+    element.insertAdjacentHTML('beforebegin', createMbSearchLink(mb_type, entityName));
+}
+
+function insertMbLinkBeforeElements(elements, link) {
+    const styledLink = link.replace('<a ', '<a style="vertical-align:top" ');
+    const insertedElements = new Set();
+
+    for (const element of elements) {
+        if (insertedElements.has(element)) {
+            continue;
+        }
+        insertedElements.add(element);
+        removeMbSearchLinksBefore(element);
+        element.insertAdjacentHTML('beforebegin', styledLink);
+    }
+}
+
 function processDiscographyPage({ mblinks, locale }) {
+    MBSearchItStyle();
+
     const items = document.querySelectorAll('.product__item');
     const artist_urls_data = [];
     const label_urls_data = [];
@@ -543,41 +583,55 @@ function processDiscographyPage({ mblinks, locale }) {
     }
 
     // Build urls_data array for batch processing
+    const elementsWithSearchLink = new Set();
+
     artist_urls_map.forEach((artist_link_elements, artist_url) => {
+        for (const element of artist_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                insertMbSearchLinkBeforeElement(element, 'artist', element.textContent.trim());
+            }
+        }
         artist_urls_data.push({
             url: artist_url,
             mb_type: 'artist',
             insert_func: function (link) {
-                // Insert the MusicBrainz link before each artist link
-                artist_link_elements.forEach(artist_link_element => {
-                    artist_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(artist_link_elements, link);
             },
             key: `artist:${artist_url}`,
         });
     });
 
     label_urls_map.forEach((label_link_elements, label_url) => {
+        for (const element of label_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                insertMbSearchLinkBeforeElement(element, 'label', element.textContent.trim());
+            }
+        }
         label_urls_data.push({
             url: label_url,
             mb_type: 'label',
             insert_func: function (link) {
-                label_link_elements.forEach(label_link_element => {
-                    label_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(label_link_elements, link);
             },
             key: `label:${label_url}`,
         });
     });
 
     album_urls_map.forEach((album_link_elements, album_url) => {
+        for (const element of album_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                const albumName = element.querySelector('.product__name')?.textContent.trim() || element.textContent.trim();
+                insertMbSearchLinkBeforeElement(element, 'release', albumName);
+            }
+        }
         album_urls_data.push({
             url: album_url,
             mb_type: 'release',
             insert_func: function (link) {
-                album_link_elements.forEach(album_link_element => {
-                    album_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(album_link_elements, link);
             },
             key: `release:${album_url}`,
         });
@@ -619,6 +673,15 @@ function processReleasePage({ mblinks }) {
 }
 
 $(document).ready(function () {
+    document.head.insertAdjacentHTML(
+        'beforeend',
+        `<style>
+            a:has(.product__name) {
+                width: calc(100% - 22px);
+            }
+        </style>`,
+    );
+
     // Initialize MBLinks for checking already imported releases
     const mblinks = new MBLinks('QOBUZ_MBLINKS_CACHE');
     const pageTypeRegex = new RegExp(`^\\/([a-z]{2}-[a-z]{2})?(?:\\/)?(interpreter|album|label)\\/`);
