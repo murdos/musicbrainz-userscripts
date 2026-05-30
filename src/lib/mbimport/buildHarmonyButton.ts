@@ -35,17 +35,26 @@ const styleBlock = `
 `;
 
 export function buildHarmonyButton({ barcode, release_url }: Props): string {
-    const harmonyWithBarcodeURL = barcode
-        ? `https://harmony.pulsewidth.org.uk/release?gtin=${barcode}&category=all`
-        : `https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release_url)}&category=musicbrainz`;
+    const searchParams = new URLSearchParams();
+    if (barcode) {
+        searchParams.set('gtin', barcode);
+    }
+    if (release_url) {
+        searchParams.set('url', encodeURI(release_url));
+    }
+
+    searchParams.set('category', 'preferred'); // take Harmony user preferences into account
+    searchParams.set('musicbrainz', ''); // enforce lookup by barcode in MusicBrainz
+
+    const harmonyURL = `https://harmony.pulsewidth.org.uk/release?${searchParams.toString()}`;
 
     return `
         ${styleBlock}
         <a
             class="harmony-button"
             title="Import this release into MusicBrainz using Harmony (open a new tab)" 
-            target="_blank" 
-            href="${harmonyWithBarcodeURL}"
+            target="_blank"
+            href="${harmonyURL}"
         >
             <img src="https://harmony.pulsewidth.org.uk/favicon.svg" alt="Harmony icon" width="16" height="16" />
             Import with Harmony
