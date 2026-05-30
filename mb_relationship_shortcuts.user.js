@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.29.1
+// @version      2026.5.30.1
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -219,85 +219,61 @@ function init() {
     // Call the MB webservice
     const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    fetch(url)
-        .then(response => response.text())
+    fetch(url, { headers: { Accept: 'application/json' } })
+        .then(response => response.json())
         .then(data => {
-            const doc = new DOMParser().parseFromString(data, 'application/xml');
-            if (doc.querySelector('parsererror')) {
-                console.error('Failed to parse MusicBrainz API response');
-                return;
-            }
-
-            for (const entity of doc.querySelectorAll(child.type)) {
-                const mbid = entity.getAttribute('id');
-
-                // URL relationships
+            const pluralisedChildType = `${child.type}s`;
+            for (const entity of data[pluralisedChildType] ?? []) {
+                const mbid = entity.id;
                 const alreadyInjectedUrls = [];
-                for (const relation of entity.querySelectorAll("relation-list[target-type='url'] relation")) {
-                    const relType = relation.getAttribute('type');
-                    const targetUrl = relation.querySelector(':scope > target')?.textContent ?? '';
-                    const ended = relation.querySelector(':scope > ended')?.textContent === 'true';
+                const groupedByTargetType = {};
 
-                    // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
-                    if (alreadyInjectedUrls.includes(targetUrl)) continue;
-                    alreadyInjectedUrls.push(targetUrl);
+                for (const relation of entity.relations ?? []) {
+                    if (relation['target-type'] === 'url') {
+                        const targetUrl = relation.url?.resource;
+                        if (!targetUrl || alreadyInjectedUrls.includes(targetUrl)) continue;
+                        alreadyInjectedUrls.push(targetUrl);
 
-                    let iconClass;
-                    if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
-                        iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
-                    }
-                    if (['purchase for mail-order'].includes(relType)) {
-                        iconClass = findIconClassOfUrl(targetUrl, purchaseForMailOrderIconClasses);
-                    }
-                    if (!iconClass) {
-                        iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
-                    }
-                    if (!iconClass && relType in urlRelationsIconClasses) {
-                        iconClass = urlRelationsIconClasses[relType];
-                    }
-
-                    if (iconClass) {
-                        if (ended) {
-                            iconClass = ['ended', iconClass].join(' ');
+                        const relType = relation.type;
+                        let iconClass;
+                        if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
                         }
-                        injectShortcutIcon(mbid, targetUrl, iconClass);
-                    }
-                }
+                        if (relType === 'purchase for mail-order') {
+                            iconClass = findIconClassOfUrl(targetUrl, purchaseForMailOrderIconClasses) || iconClass;
+                        }
+                        if (!iconClass) {
+                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+                        }
+                        if (!iconClass && relType in urlRelationsIconClasses) {
+                            iconClass = urlRelationsIconClasses[relType];
+                        }
 
-                // Other relationships
-                for (const relationList of entity.querySelectorAll('relation-list')) {
-                    const targetTypeAttr = relationList.getAttribute('target-type');
-                    if (!targetTypeAttr || targetTypeAttr === 'url') continue;
-
-                    const targettype = targetTypeAttr.replace('release_group', 'release-group');
-                    const relations = {};
-
-                    if (relationsIconsURLs[targettype] === undefined) {
+                        if (iconClass) {
+                            if (relation.ended) iconClass = `ended ${iconClass}`;
+                            injectShortcutIcon(mbid, targetUrl, iconClass);
+                        }
                         continue;
                     }
 
-                    for (const relation of relationList.querySelectorAll(':scope > relation')) {
-                        const reltype = relation.getAttribute('type');
-                        const target = relation.querySelector(':scope > target')?.textContent ?? '';
-                        const relUrl = targettype == 'url' ? target : `/${targettype}/${target}`;
+                    const targettype = relation['target-type'].replace('release_group', 'release-group');
+                    const reltype = relation.type;
+                    const targetId = relation[relation['target-type']]?.id;
+                    if (!targetId || !relationsIconsURLs[targettype]?.[reltype]) continue;
 
-                        if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
-                            if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [relUrl];
-                            else relations[reltype].push(relUrl);
-                        }
-                    }
+                    if (!groupedByTargetType[targettype]) groupedByTargetType[targettype] = {};
+                    if (!groupedByTargetType[targettype][reltype]) groupedByTargetType[targettype][reltype] = [];
+                    groupedByTargetType[targettype][reltype].push(`/${targettype}/${targetId}`);
+                }
 
-                    const cell = relationshipsCell(mbid);
-                    if (!cell) continue;
+                const cell = relationshipsCell(mbid);
+                if (!cell) continue;
 
-                    for (const [reltype, urls] of Object.entries(relations)) {
+                for (const [targettype, relationsByType] of Object.entries(groupedByTargetType)) {
+                    for (const [reltype, urls] of Object.entries(relationsByType)) {
                         let html = '';
-                        if (urls.length < -1) {
-                            html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
-                        } else {
-                            for (const relUrl of urls) {
-                                html += `<a href='${relUrl}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
-                            }
+                        for (const relUrl of urls) {
+                            html += `<a href='${relUrl}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
                         }
                         cell.insertAdjacentHTML('beforeend', html);
                     }
