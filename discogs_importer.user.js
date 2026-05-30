@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2024.03.28.1
+// @version      2026.03.14.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -405,17 +405,18 @@ function MBIDfromUrl(url, discogs_type, mb_type) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function insertMbUI(mbUI) {
-    let e;
-    if ((e = $('#release-marketplace')) && e.length) {
-        e.before(mbUI);
-    }
-    // FIXME: the following selectors are broken since the 2021-08-09 release page update, not sure why there are three alternative selectors
-    else if ((e = $('div.section.collections')) && e.length) {
-        e.after(mbUI);
-    } else if ((e = $('#statistics')) && e.length) {
-        e.before(mbUI);
-    } else if ((e = $('div.section.social')) && e.length) {
-        e.before(mbUI);
+    for (const sel of [
+        // As of 2026-01-27, only appears in discogs UI when not logged in
+        // see: https://github.com/murdos/musicbrainz-userscripts/issues/777
+        '#release-marketplace',
+        '#shopping-box-host', // <- equivalent to #marketplace when logged in
+        '#release-stats', // <- formerly #statistics (until ~2021-08-09)
+    ]) {
+        const section = $(sel);
+        if (section.length > 0) {
+            section.before(mbUI);
+            break;
+        }
     }
 }
 
@@ -468,6 +469,14 @@ function insertMBSection(release, current_page_key) {
     $('form.musicbrainz_import').css({ width: '49%', display: 'inline-block' });
     $('form.musicbrainz_import_search').css({ float: 'right' });
     $('form.musicbrainz_import > button').css({ width: '100%', 'box-sizing': 'border-box' });
+
+    // Fix tracklist with long credits text overlap issue by setting track height to auto
+    const tracklistCss = `
+        [class*="trackCredits"][class*="expanded"] {
+            height: auto !important;
+        }
+    `;
+    document.head.insertAdjacentHTML('beforeend', `<style>${tracklistCss}</style>`);
 
     mbUI.slideDown();
 }
@@ -648,7 +657,7 @@ function parseDiscogsRelease(discogsRelease) {
     // Barcode
     if (discogsRelease.identifiers) {
         $.each(discogsRelease.identifiers, function (index, identifier) {
-            if (identifier.type === 'Barcode') {
+            if (identifier.type === 'Barcode' && identifier.value !== null) {
                 release.barcode = identifier.value.replace(/ /g, '');
                 return false;
             }
@@ -775,7 +784,7 @@ function parseDiscogsRelease(discogsRelease) {
 
         // Create release if needed
         let discindex = releaseNumber - 1;
-        if (!release.discs[discindex]) {
+        while (!release.discs[discindex]) {
             let newdisc = {
                 tracks: [],
                 format: release_formats[discindex],

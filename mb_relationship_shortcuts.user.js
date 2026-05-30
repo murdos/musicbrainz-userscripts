@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2022.4.21.1
+// @version      2026.5.30.2
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @include      http*://*musicbrainz.org/artist/*
-// @include      http*://*musicbrainz.org/release-group/*
-// @include      http*://*musicbrainz.org/label/*
+// @match        *://*.musicbrainz.org/artist/*
+// @match        *://*.musicbrainz.org/release-group/*
+// @match        *://*.musicbrainz.org/label/*
 // @exclude      */artist/*/recordings*
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @exclude      */edit
 // ==/UserScript==
 
 // Definitions: relations-type and corresponding icons we are going to treat
@@ -39,13 +39,18 @@ const urlRelationsIconClasses = {
 };
 
 const otherDatabasesIconClasses = {
+    'genius.com': 'genius',
     'd-nb.info': 'dnb',
     'www.musik-sammler.de': 'musiksammler',
     'rateyourmusic.com': 'rateyourmusic',
     'www.worldcat.org': 'worldcat',
+    'nocs.acum.org.il': 'acum',
+    'stereo-ve-mono.com': 'stereo-ve-mono',
 };
 
 const streamingIconClasses = {
+    '7digital.com': 'sevendigital',
+    'audiomack.com': 'audiomack',
     'music.amazon.': 'amazonmusic',
     'music.apple.com': 'applemusic',
     'bandcamp.com': 'bandcamp',
@@ -57,11 +62,20 @@ const streamingIconClasses = {
     'open.spotify.com': 'spotify',
     'tidal.com': 'tidal',
     'beatport.com': 'beatport',
+    'music.youtube.com': 'youtubemusic',
     'youtube.com': 'youtube',
     'archive.org': 'archive',
     'mediafire.com': 'mediafire',
     'store.steampowered.com': 'steam',
 };
+
+const purchaseForMailOrderIconClasses = {
+    'bandcamp.com': 'bandcamp',
+};
+
+function relationshipsCell(mbid) {
+    return document.getElementById(mbid)?.querySelector('td.relationships');
+}
 
 /**
  * @param {string} mbid
@@ -70,7 +84,10 @@ const streamingIconClasses = {
  */
 function injectShortcutIcon(mbid, targetUrl, iconClass) {
     if (!iconClass) return;
-    $(`#${mbid} td.relationships`).append(
+    const cell = relationshipsCell(mbid);
+    if (!cell) return;
+    cell.insertAdjacentHTML(
+        'beforeend',
         `<a href='${targetUrl.replace(/'/g, '&apos;')}'><span class='favicon ${iconClass}-favicon' /></a>`,
     );
 }
@@ -85,6 +102,32 @@ function findIconClassOfUrl(url, iconClassMap) {
             return iconClassMap[partialUrl];
         }
     }
+}
+
+/**
+ * @param {Object} relation
+ * @returns {{ targetUrl: string, iconClass: string } | null}
+ */
+function getIconClassForRelationship(relation) {
+    if (relation['target-type'] !== 'url') return null;
+    const targetUrl = relation.url?.resource;
+    if (!targetUrl) return null;
+
+    const relType = relation.type;
+    let iconClass;
+    if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
+        iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
+    }
+    if (relType === 'purchase for mail-order') {
+        iconClass = findIconClassOfUrl(targetUrl, purchaseForMailOrderIconClasses) || iconClass;
+    }
+    if (!iconClass) {
+        iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
+    }
+    if (!iconClass && relType in urlRelationsIconClasses) {
+        iconClass = urlRelationsIconClasses[relType];
+    }
+    return iconClass ? { targetUrl, iconClass } : null;
 }
 
 const incOptions = {
@@ -126,12 +169,9 @@ background-image: url(https://store.steampowered.com/favicon.ico);
 background-size: 16px;
 }`;
 
-// prevent JQuery conflicts, see https://wiki.greasespot.net/@grant
-this.$ = this.jQuery = jQuery.noConflict(true);
-
 if (!unsafeWindow) unsafeWindow = window;
 
-$(document).ready(function () {
+function init() {
     // Get pageType (label or artist)
     let parent = {};
     let child = {};
@@ -159,49 +199,41 @@ $(document).ready(function () {
 
     // Determine target column
     let columnindex = 0;
-    $("table.tbl tbody tr[class!='subh']").each(function () {
-        $(this)
-            .children('td')
-            .each(function () {
-                const href = $(this).find('a').attr('href');
-                if (href !== undefined && href.match(mbidRE)) {
-                    return false;
-                }
-                columnindex++;
-            });
-        return false;
-    });
+    for (const row of document.querySelectorAll('table.tbl tbody tr:not(.subh)')) {
+        for (const cell of row.querySelectorAll(':scope > td')) {
+            const href = cell.querySelector('a')?.getAttribute('href');
+            if (href !== undefined && href.match(mbidRE)) {
+                break;
+            }
+            columnindex++;
+        }
+        break;
+    }
 
     // Set MBID to row in tables to get easiest fastest access
-    $("table.tbl tr[class!='subh']").each(function () {
-        let $tr = $(this);
+    for (const tr of document.querySelectorAll('table.tbl tr:not(.subh)')) {
+        const thAtColumn = tr.querySelectorAll(':scope > th')[columnindex];
+        const tdAtColumn = tr.querySelectorAll(':scope > td')[columnindex];
 
-        $tr.children(`th:eq(${columnindex})`).after('<th>Relationships</th>');
-        $tr.children(`td:eq(${columnindex})`).after("<td class='relationships'></td>");
+        thAtColumn?.insertAdjacentHTML('afterend', '<th>Relationships</th>');
+        tdAtColumn?.insertAdjacentHTML('afterend', "<td class='relationships'></td>");
 
-        $(this)
-            .find('a')
-            .each(function () {
-                let href = $(this).attr('href');
-                if ((m = href.match(mbidRE))) {
-                    $tr.attr('id', m[2]);
-                    return false;
-                }
-            });
-    });
+        for (const link of tr.querySelectorAll('a')) {
+            const href = link.getAttribute('href');
+            if ((m = href?.match(mbidRE))) {
+                tr.id = m[2];
+                break;
+            }
+        }
+    }
 
     // Adapt width of subheader rows by incrementing the colspan of a cell
-    $('table.tbl tr.subh').each(function () {
-        $(this)
-            .children('th[colspan]')
-            .attr('colspan', function (index, oldValue) {
-                if (index === 0) {
-                    return Number(oldValue) + 1;
-                } else {
-                    return oldValue;
-                }
-            });
-    });
+    for (const tr of document.querySelectorAll('table.tbl tr.subh')) {
+        const thWithColspan = tr.querySelector(':scope > th[colspan]');
+        if (thWithColspan) {
+            thWithColspan.colSpan += 1;
+        }
+    }
 
     // Calculate offset for multi-page lists
     let page = 1;
@@ -213,80 +245,72 @@ $(document).ready(function () {
     // Call the MB webservice
     const url = `/ws/2/${child.type}?${parent.type}=${parent.mbid}&inc=${incOptions[child.type].join('+')}&limit=100&offset=${offset}`;
 
-    $.get(url, function (data) {
-        // Parse each child
-        $(data)
-            .find(child.type)
-            .each(function () {
-                let mbid = $(this).attr('id');
+    fetch(url, { headers: { Accept: 'application/json' } })
+        .then(response => response.json())
+        .then(data => {
+            const pluralisedChildType = `${child.type}s`;
+            for (const entity of data[pluralisedChildType] ?? []) {
+                const mbid = entity.id;
+                const alreadyInjectedIcons = new Set();
+                const activeUrlsByIconClass = {};
+                const groupedByTargetType = {};
+                const urlRelations = [];
 
-                // URL relationships
-                let alreadyInjectedUrls = [];
-                $(this)
-                    .find("relation-list[target-type='url'] relation")
-                    .each(function () {
-                        let relType = $(this).attr('type');
-                        let targetUrl = $(this).children('target').text();
-                        let ended = $(this).children('ended').text() === 'true';
-
-                        // Dedupe rels by URL (e.g. for Bandcamp, which has purchase and stream rels)
-                        if (alreadyInjectedUrls.includes(targetUrl)) return;
-                        alreadyInjectedUrls.push(targetUrl);
-
-                        let iconClass;
-                        if (relType in urlRelationsIconClasses) {
-                            iconClass = urlRelationsIconClasses[relType];
-                        } else if (['free streaming', 'streaming', 'download for free', 'purchase for download'].includes(relType)) {
-                            iconClass = findIconClassOfUrl(targetUrl, streamingIconClasses);
-                        } else {
-                            // Other database?
-                            iconClass = findIconClassOfUrl(targetUrl, otherDatabasesIconClasses);
-                        }
-
-                        if (iconClass) {
-                            if (ended) {
-                                iconClass = ['ended', iconClass].join(' ');
+                for (const relation of entity.relations ?? []) {
+                    const iconInfo = getIconClassForRelationship(relation);
+                    if (iconInfo) {
+                        if (!relation.ended) {
+                            if (!activeUrlsByIconClass[iconInfo.iconClass]) {
+                                activeUrlsByIconClass[iconInfo.iconClass] = new Set();
                             }
-                            injectShortcutIcon(mbid, targetUrl, iconClass);
+                            activeUrlsByIconClass[iconInfo.iconClass].add(iconInfo.targetUrl);
                         }
-                    });
+                        urlRelations.push({ relation, iconInfo });
+                        continue;
+                    }
 
-                // Other relationships
-                $(this)
-                    .find("relation-list[target-type!='url']")
-                    .each(function () {
-                        let targettype = $(this).attr('target-type').replace('release_group', 'release-group');
-                        let relations = {};
+                    const targettype = relation['target-type'].replace('release_group', 'release-group');
+                    const reltype = relation.type;
+                    const targetId = relation[relation['target-type']]?.id;
+                    if (!targetId || !relationsIconsURLs[targettype]?.[reltype]) continue;
 
-                        if (relationsIconsURLs[targettype] === undefined) {
-                            return;
+                    if (!groupedByTargetType[targettype]) groupedByTargetType[targettype] = {};
+                    if (!groupedByTargetType[targettype][reltype]) groupedByTargetType[targettype][reltype] = [];
+                    groupedByTargetType[targettype][reltype].push(`/${targettype}/${targetId}`);
+                }
+
+                for (const { relation, iconInfo } of urlRelations) {
+                    const { targetUrl, iconClass } = iconInfo;
+                    if (relation.ended && activeUrlsByIconClass[iconClass]?.has(targetUrl)) continue;
+
+                    const dedupeKey = `${relation.ended ? 'ended' : 'active'}:${iconClass}`;
+                    if (alreadyInjectedIcons.has(dedupeKey)) continue;
+                    alreadyInjectedIcons.add(dedupeKey);
+
+                    const displayClass = relation.ended ? `ended ${iconClass}` : iconClass;
+                    injectShortcutIcon(mbid, targetUrl, displayClass);
+                }
+
+                const cell = relationshipsCell(mbid);
+                if (!cell) continue;
+
+                // `groupedByTargetType` handles non-URL relationships — links to other MusicBrainz entities, not external sites.
+                for (const [targettype, relationsByType] of Object.entries(groupedByTargetType)) {
+                    for (const [reltype, urls] of Object.entries(relationsByType)) {
+                        let html = '';
+                        for (const relUrl of urls) {
+                            html += `<a href='${relUrl}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
                         }
+                        cell.insertAdjacentHTML('beforeend', html);
+                    }
+                }
+            }
+        })
+        .catch(err => console.error('MusicBrainz API request failed', err));
+}
 
-                        $(this)
-                            .children('relation')
-                            .each(function () {
-                                const reltype = $(this).attr('type');
-                                const target = $(this).children('target').text();
-                                const url = targettype == 'url' ? target : `/${targettype}/${target}`;
-
-                                if (Object.prototype.hasOwnProperty.call(relationsIconsURLs[targettype], reltype)) {
-                                    if (!Object.prototype.hasOwnProperty.call(relations, reltype)) relations[reltype] = [url];
-                                    else relations[reltype].push(url);
-                                }
-                            });
-
-                        $.each(relations, function (reltype, urls) {
-                            let html = '';
-                            if (urls.length < -1) {
-                                html += `<img src='${relationsIconsURLs[targettype][reltype]}' />(${urls.length})&nbsp;`;
-                            } else {
-                                $.each(urls, function (index, url) {
-                                    html += `<a href='${url}'><img src='${relationsIconsURLs[targettype][reltype]}' /></a>&nbsp;`;
-                                });
-                            }
-                            $(`#${mbid} td.relationships`).append(html);
-                        });
-                    });
-            });
-    });
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

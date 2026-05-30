@@ -1,0 +1,224 @@
+import { Logger, LogLevel } from '~/lib/logger';
+import { MBImport } from '~/lib/mbimport';
+import { MBImportStyle } from '~/lib/mbimportstyle';
+import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
+import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
+import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
+
+import type { BeatportReleaseData, BeatportTrackData } from './types';
+
+const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
+
+// Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
+installFetchInterceptor(LOGGER);
+
+const MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
+const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
+
+/**
+ * Remove existing MusicBrainz import UI to avoid duplicates
+ */
+const cleanup = () => {
+    document.querySelectorAll(MB_IMPORT_SELECTOR).forEach(el => {
+        el.remove();
+    });
+    document.getElementById(MB_IMPORT_BARCODE_ELEMENT)?.remove();
+};
+
+async function processReleasePage() {
+    cleanup();
+
+    const isReleasePage = window.location.pathname.includes('/release/');
+    if (!isReleasePage) {
+        return;
+    }
+
+    const releaseData = await getBeatportReleaseData(LOGGER);
+    if (!releaseData?.pageProps.release) {
+        LOGGER.error('Could not find release data on the release page');
+        return;
+    }
+
+    const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+
+    try {
+        const release = releaseData.pageProps.release;
+
+        // Reversing is less reliable, but the API does not provide track numbers.
+        const tracks_table = release.tracks.reverse();
+
+        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => /tracks/g.test(element.queryKey));
+        const tracks_data_array = tracks_release?.state?.data.results;
+        if (!tracks_data_array) {
+            LOGGER.error('Could not find tracks data');
+            return;
+        }
+        const tracks_data = tracks_table
+            .map((url: string) => tracks_data_array.find(element => element.url === url))
+            .filter((track): track is BeatportTrackData => track !== undefined);
+        const isrcs = tracks_data.map(track => track.isrc || null);
+
+        const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
+
+        insertMBButtons(mbrelease, release_url, isrcs);
+    } catch (error) {
+        LOGGER.error('Error processing release page:', error);
+    }
+}
+
+function retrieveReleaseInfo(release_url: string, release_data: BeatportReleaseData, tracks_data: BeatportTrackData[]): Release {
+    const release_date = release_data.new_release_date.split('-');
+
+    // Release information global to all Beatport releases
+    const mbrelease = {
+        artist_credit: [] as ArtistCredit[],
+        title: release_data.name,
+        year: parseInt(release_date[0] || '0'),
+        month: parseInt(release_date[1] || '0'),
+        day: parseInt(release_date[2] || '0'),
+        format: 'Digital Media',
+        packaging: 'None',
+        country: 'XW',
+        status: 'official',
+        language: 'eng',
+        script: 'Latn',
+        type: '',
+        urls: [] as URL[],
+        labels: [] as Label[],
+        barcode: release_data.upc,
+        discs: [] as Disc[],
+    } satisfies Release;
+
+    // URLs
+    mbrelease.urls.push({
+        url: release_url,
+        link_type: MBImport.URL_TYPES.purchase_for_download,
+    });
+
+    mbrelease.labels.push({
+        name: release_data.label.name,
+        catno: release_data.catalog_number,
+    });
+
+    // Tracks
+    const mbtracks: Track[] = [];
+
+    const seen_tracks: { [key: number]: boolean } = {}; // to shoot duplicates ...
+    const release_artists: string[] = [];
+    for (const track of tracks_data) {
+        if (track.release.id != release_data.id) {
+            continue;
+        }
+        if (seen_tracks[track.id]) {
+            continue;
+        }
+        seen_tracks[track.id] = true;
+
+        const artists: string[] = [];
+        for (const artist of track.artists) {
+            artists.push(artist.name);
+            release_artists.push(artist.name);
+        }
+
+        let title = track.name;
+        if (track.mix_name && track.mix_name !== 'Original Mix') {
+            title += ` (${track.mix_name})`;
+        }
+        mbtracks.push({
+            artist_credit: MBImport.makeArtistCredits(artists),
+            title: title,
+            duration: track.length_ms,
+        });
+    }
+
+    const unique_artists = [...new Set(release_artists)];
+
+    if (unique_artists.length > 4) {
+        mbrelease.artist_credit = [MBImport.specialArtist('various_artists')];
+    } else {
+        mbrelease.artist_credit = MBImport.makeArtistCredits(unique_artists);
+    }
+
+    mbrelease.discs.push({
+        tracks: mbtracks,
+        format: mbrelease.format,
+    });
+
+    return mbrelease;
+}
+
+// Insert button into page under label information
+function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string | null)[]): void {
+    const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
+    const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
+
+    const collectionControls = document.querySelector('div[title="Collection controls"]');
+    if (!collectionControls) {
+        LOGGER.error('Could not find collection controls container');
+        return;
+    }
+
+    const mbUI = document.createElement('div');
+    mbUI.className = 'interior-release-chart-content-item musicbrainz-import';
+    mbUI.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(mbrelease);
+
+    const isrcForm = document.createElement('form');
+    isrcForm.className = 'musicbrainz_import';
+    isrcForm.innerHTML =
+        '<button type="submit" title="Submit ISRCs to MusicBrainz with kepstin’s MagicISRC"><span>Submit ISRCs</span></button>';
+    isrcForm.addEventListener('click', (event: Event) => {
+        const query = isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)).join('&');
+        event.preventDefault();
+        window.open(`https://magicisrc.kepstin.ca?${query}`);
+    });
+    mbUI.appendChild(isrcForm);
+
+    collectionControls.appendChild(mbUI);
+
+    Object.assign(mbUI.style, { display: 'flex', gap: '5px', flexWrap: 'wrap' });
+    mbUI.querySelectorAll<HTMLButtonElement>('form.musicbrainz_import button').forEach(button => {
+        button.style.width = '120px';
+    });
+
+    const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+    const lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
+    if (!lastReleaseInfo) {
+        LOGGER.error('Could not find release info container');
+        return;
+    }
+
+    const barcodeText = mbrelease.barcode || '[none]';
+
+    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url });
+
+    const releaseInfoBarcode = document.createElement('div');
+    releaseInfoBarcode.className = lastReleaseInfo.className;
+    releaseInfoBarcode.id = MB_IMPORT_BARCODE_ELEMENT;
+    releaseInfoBarcode.style = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+    releaseInfoBarcode.innerHTML = `
+        <p>Barcode</p>
+        <span>${barcodeText}</span>
+        ${importLinkHTML}
+    `;
+    lastReleaseInfo.insertAdjacentElement('afterend', releaseInfoBarcode);
+}
+
+function init() {
+    MBImportStyle();
+
+    // Process initial page load
+    setTimeout(() => {
+        void processReleasePage();
+    }, 1000);
+}
+
+// Subscribe to SPA navigation events
+subscribeToSPANavigation({
+    onNavigate: () => processReleasePage(),
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
