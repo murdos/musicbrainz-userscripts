@@ -189,7 +189,7 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
 
     const barcodeText = mbrelease.barcode || '[none]';
 
-    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url });
+    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url, variant: 'full' });
 
     const releaseInfoBarcode = document.createElement('div');
     releaseInfoBarcode.className = lastReleaseInfo.className;
