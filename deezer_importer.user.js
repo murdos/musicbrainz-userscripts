@@ -2,7 +2,7 @@
 // @name         Import Deezer releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version      2026.05.30.1
+// @version      2026.05.31.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js
 // @match        https://www.deezer.com/*/album/*
@@ -193,6 +193,15 @@ function insertLink(release, release_url, isrcs) {
             'align-items': 'center',
         });
         $('[data-testid="toolbar"]').append(mbUI);
+        mbUI.show();
+    });
+
+    // Deezer Mobile is a completely different App, so we need to mount differently
+    waitForEl('[data-tracking-label="main-CTA"]', () => {
+        const mbUIContainer = $(
+            '<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; gap: 4px;">',
+        ).append(mbUI);
+        $('[data-tracking-label="main-CTA"]').after(mbUIContainer);
         mbUI.show();
     });
 }
