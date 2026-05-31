@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Loot releases to MusicBrainz
 // @description  Add a button to import Loot.co.za releases to MusicBrainz
-// @version      2019.1.5.1
+// @version      2026.05.31.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
