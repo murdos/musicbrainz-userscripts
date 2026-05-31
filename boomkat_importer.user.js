@@ -9,6 +9,7 @@
 // @match        https://boomkat.com/products/*
 // @require      lib/mbimport.js
 // @require      lib/logger.js
+// @require      src/lib/logger.ts
 // @require      lib/mbimportstyle.js
 // ==/UserScript==
 
@@ -127,7 +128,7 @@ async function retrieveReleaseInfo(release_url, formatElement) {
         tracks: tracks,
         format: release.format,
     });
-    LOGGER.info('Parsed release: ', release);
+    LOGGER.info('Parsed release: ', JSON.parse(JSON.stringify(release)));
     return release;
 }
 

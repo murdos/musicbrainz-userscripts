@@ -8,7 +8,7 @@ export class Logger {
     private LOG_LEVEL: LogLevel = LogLevel.INFO;
     private scriptName: string;
 
-    constructor(scriptName: string, level: LogLevel = LogLevel.ERROR) {
+    constructor(scriptName: string = 'MusicBrainz-UserScripts', level: LogLevel = LogLevel.INFO) {
         this.scriptName = scriptName;
         this.LOG_LEVEL = level;
     }
