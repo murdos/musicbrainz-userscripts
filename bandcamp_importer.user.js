@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.05.31.2
+// @version      2026.05.31.3
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -142,7 +142,7 @@ const BandcampImport = {
         // album description indicates number of tracks in the download
         let match = /^\d+ track album$/.exec(document.querySelector('meta[property="og:description"]').getAttribute('content'));
         if (match) {
-            numtracks = parseInt(match, 10);
+            numtracks = parseInt(match[0], 10);
         }
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
@@ -537,7 +537,7 @@ function init() {
         if (typeof upc != 'undefined' && upc !== null) {
             document
                 .querySelector('div #trackInfoInner')
-                .insertAdjacentHTML(
+                ?.insertAdjacentHTML(
                     'beforeend',
                     `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}</div>`,
                 );
