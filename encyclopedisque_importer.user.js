@@ -9,7 +9,7 @@
 // @include      http://www.encyclopedisque.fr/artiste/*.html
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 // @require      lib/mbimport.js
-// @require      lib/mblinks.js
+// @require      lib/mblinks.js?version=v2026.05.31.1
 // @require      lib/logger.js
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
