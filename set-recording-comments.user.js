@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz: Set recording comments for a release
 // @description  Batch set recording comments from a Release page.
-// @version      2026.5.29
+// @version      2026.5.31
 // @author       Michael Wiencek
 // @license      X11
 // @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
@@ -39,12 +39,9 @@
 // authorization.
 // ==/License==
 
-setTimeout(function () {
-    const scr = document.createElement('script');
-    scr.textContent = `$(${setRecordingComments});`;
-    document.body.appendChild(scr);
-}, 1000);
+setTimeout(setRecordingComments, 1000);
 
+// Keep this intermediate function in case we need to recall it on mb-hydration events, one day
 function setRecordingComments() {
     let $tracks;
     let $inputs = $();
@@ -202,7 +199,7 @@ function setRecordingComments() {
         } else {
             let editNote = $('#recording-comments-edit-note').val().trim();
             editNote += `${editNote ? '\n\n—\n' : ''}Entered from '''''${document.querySelector('h1')?.textContent}''''' at ${location.href}`;
-            editNote += `\nUsing '''Set recording comments for a release''' from https://github.com/murdos/musicbrainz-userscripts`;
+            editNote += `\nUsing '''${GM_info.script.name.replace(/^.+:/, '')}''' ${GM_info.script.version} from https://github.com/murdos/musicbrainz-userscripts`;
             let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
             activeRequest = $.ajax({
