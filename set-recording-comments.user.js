@@ -198,7 +198,7 @@ function setRecordingComments() {
             $submitButton.prop('disabled', false).text('Submit changes (marked red)');
         } else {
             let editNote = $('#recording-comments-edit-note').val().trim();
-            editNote += `${editNote ? '\n\n—\n' : ''}Entered from '''''${document.querySelector('h1')?.textContent}''''' at ${location.href}`;
+            editNote += `${editNote ? '\n\n—\n' : ''}Entered from '''''${document.querySelector('.releaseheader h1')?.textContent}''''' at ${location.href}`;
             editNote += `\nUsing '''${GM_info.script.name.replace(/^.+:/, '')}''' ${GM_info.script.version} from https://github.com/murdos/musicbrainz-userscripts`;
             let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
