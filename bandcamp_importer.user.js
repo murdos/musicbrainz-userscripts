@@ -1,25 +1,23 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.04.27.1
+// @version      2026.05.31.4
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include      /^https:\/\/[^/]+\/(?:(?:(?:album|track))\/[^/]+|music)$/
 // @include      /^https:\/\/([^.]+)\.bandcamp\.com((?:\/(?:(?:album|track))\/[^/]+|\/|\/music)?)$/
+// @include      /^https:\/\/bandcamp\.com\/private\//
+// @include      /^https:\/\/([^.]+)\.bandcamp\.com\/private\//
 // @include      /^https?:\/\/web\.archive\.org\/web\/\d+\/https?:\/\/[^/]+(?:\/(?:album|track)\/[^/]+\/?|\/music\/?|\/?)$/
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
-// @require      lib/mbimport.js
+// @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.03.05.4
+// @require      lib/mblinks.js?version=v2026.05.31.1
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
-
-// prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
-this.$ = this.jQuery = jQuery.noConflict(true);
 
 // eslint-disable-next-line no-global-assign
 if (!unsafeWindow) unsafeWindow = window;
@@ -34,14 +32,42 @@ String.prototype.fix_bandcamp_url = function () {
     return url.replace('http://', 'https://');
 };
 
+const isPrivateStreamPage = () => !!unsafeWindow.TralbumData?.is_private_stream || /^\/private\//.test(window.location.pathname);
+
+const getBandRootUrl = () => {
+    const ogUrl = document.querySelector('meta[property="og:url"]')?.getAttribute('content');
+    if (ogUrl) {
+        const match = ogUrl.match(/^(https?:\/\/[^/]+\.bandcamp\.com)/);
+        if (match) return match[1];
+    }
+    const host = window.location.hostname;
+    if (host.endsWith('.bandcamp.com') && host !== 'bandcamp.com') {
+        return `${window.location.protocol}//${host}`;
+    }
+    const bandLink = document.querySelector('a[href*=".bandcamp.com"]:not([href*="bandcamp.com/discover"])');
+    if (bandLink) {
+        const match = bandLink.href.match(/^(https?:\/\/[^/]+\.bandcamp\.com)/);
+        if (match) return match[1];
+    }
+    return null;
+};
+
+const absoluteBandcampUrl = url => {
+    url = url.fix_bandcamp_url();
+    if (url.startsWith('http')) return url.split('?')[0];
+    const root = getBandRootUrl();
+    if (root && url.startsWith('/')) return root + url.split('?')[0];
+    return url;
+};
+
 const BandcampImport = {
     // Analyze Bandcamp data and return a release object
-    retrieveReleaseInfo: function () {
+    retrieveReleaseInfo: function (isPrivateStream) {
         let bandcampAlbumData = unsafeWindow.TralbumData;
         let bandcampEmbedData = unsafeWindow.EmbedData;
         const bandcampMobileData = unsafeWindow.TralbumJSONLD;
 
-        const artist = bandcampAlbumData.artist || bandcampMobileData.byArtist.name;
+        const artist = bandcampAlbumData.artist || bandcampMobileData?.byArtist?.name;
 
         let release = {
             discs: [],
@@ -56,12 +82,12 @@ const BandcampImport = {
             format: 'Digital Media',
             country: 'XW',
             type: '',
-            status: 'official',
+            status: isPrivateStream ? 'promotion' : 'official',
             packaging: 'None',
             language: 'eng',
             script: 'Latn',
             urls: [],
-            url: bandcampAlbumData.url.fix_bandcamp_url(),
+            url: absoluteBandcampUrl(bandcampAlbumData.url),
         };
 
         // Grab release title
@@ -120,7 +146,7 @@ const BandcampImport = {
         }
 
         let tracks_streamable = 0;
-        $.each(bandcampAlbumData.trackinfo, function (index, bctrack) {
+        bandcampAlbumData.trackinfo.forEach(bctrack => {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {
@@ -146,13 +172,16 @@ const BandcampImport = {
         // album description indicates number of tracks in the download
         let match = /^\d+ track album$/.exec(document.querySelector('meta[property="og:description"]').getAttribute('content'));
         if (match) {
-            numtracks = parseInt(match, 10);
+            numtracks = parseInt(match[0], 10);
         }
         if (numtracks > 0 && numtracks > showntracks) {
             // display a warning if tracks in download differs from tracks shown
-            $('h2.trackTitle').append(
-                `<p style="font-size: 70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`,
-            );
+            document.querySelectorAll('h2.trackTitle').forEach(trackTitle => {
+                trackTitle.insertAdjacentHTML(
+                    'beforeend',
+                    `<p style="font-size: 70%; font-style: italic; margin: 0.1em 0;">Warning: ${numtracks} vs ${showntracks} tracks</p>`,
+                );
+            });
 
             // append unknown tracks to the release
             for (let i = 0; i < numtracks - showntracks; i++) {
@@ -167,41 +196,43 @@ const BandcampImport = {
             nostream = true;
         }
 
-        // URLs
-        let link_type = MBImport.URL_TYPES;
-        // Download for free vs. for purchase
-        if (bandcampAlbumData.current.download_pref !== null) {
-            if (
-                bandcampAlbumData.freeDownloadPage !== null ||
-                bandcampAlbumData.current.download_pref === 1 ||
-                (bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)
-            ) {
+        // URLs (private streams are intentionally omitted to avoid advertising them)
+        if (!isPrivateStream) {
+            let link_type = MBImport.URL_TYPES;
+            // Download for free vs. for purchase
+            if (bandcampAlbumData.current.download_pref !== null) {
+                if (
+                    bandcampAlbumData.freeDownloadPage !== null ||
+                    bandcampAlbumData.current.download_pref === 1 ||
+                    (bandcampAlbumData.current.download_pref === 2 && bandcampAlbumData.current.minimum_price === 0)
+                ) {
+                    release.urls.push({
+                        url: release.url,
+                        link_type: link_type.download_for_free,
+                    });
+                }
+                if (bandcampAlbumData.current.download_pref === 2) {
+                    release.urls.push({
+                        url: release.url,
+                        link_type: link_type.purchase_for_download,
+                    });
+                }
+            }
+            // Check if the release is streamable
+            if (bandcampAlbumData.hasAudio && !nostream && disc.tracks.length > 0 && disc.tracks.length == tracks_streamable) {
                 release.urls.push({
                     url: release.url,
-                    link_type: link_type.download_for_free,
+                    link_type: link_type.stream_for_free,
                 });
             }
-            if (bandcampAlbumData.current.download_pref === 2) {
+            // Check if release is Creative Commons licensed
+            const ccIcons = document.querySelector('div#license a.cc-icons');
+            if (ccIcons) {
                 release.urls.push({
-                    url: release.url,
-                    link_type: link_type.purchase_for_download,
+                    url: ccIcons.getAttribute('href').fix_bandcamp_url(),
+                    link_type: link_type.license,
                 });
             }
-        }
-        // Check if the release is streamable
-        if (bandcampAlbumData.hasAudio && !nostream && disc.tracks.length > 0 && disc.tracks.length == tracks_streamable) {
-            release.urls.push({
-                url: release.url,
-                link_type: link_type.stream_for_free,
-            });
-        }
-        // Check if release is Creative Commons licensed
-        const ccIcons = document.querySelector('div#license a.cc-icons');
-        if (ccIcons) {
-            release.urls.push({
-                url: ccIcons.getAttribute('href').fix_bandcamp_url(),
-                link_type: link_type.license,
-            });
         }
         // Check if album has a back link to a label
         let label = this.getlabelname();
@@ -225,23 +256,45 @@ const BandcampImport = {
     },
 
     // Insert links in page
-    insertLink: function (release, isMobile) {
+    insertLink: function (release, isMobile, isPrivateStream) {
         if (release.type == 'track') {
             // only import album or single, tracks belong to an album
             return false;
         }
         // Form parameters
-        let edit_note = MBImport.makeEditNote(release.url, 'Bandcamp');
-        let parameters = MBImport.buildFormParameters(release, edit_note);
+        const sourceUrl = isPrivateStream ? `${window.location.origin}${window.location.pathname}` : release.url;
+        const edit_note = isPrivateStream
+            ? MBImport.makeEditNote(sourceUrl, 'Bandcamp', 'private stream')
+            : MBImport.makeEditNote(release.url, 'Bandcamp');
+        const parameters = MBImport.buildFormParameters(release, edit_note);
+
+        const importButton = MBImport.buildFormHTML(parameters);
+        const searchButton = MBImport.buildSearchButton(release);
+        const barcode = unsafeWindow.TralbumData?.current?.upc || undefined;
+        const harmonyButton =
+            isPrivateStream && !barcode
+                ? ''
+                : MBImport.buildHarmonyButton({
+                      barcode,
+                      release_url: isPrivateStream ? undefined : release.url,
+                      variant: 'full',
+                  });
+
         // Build form
-        let mbUI = $(`<div id="mb_buttons">${MBImport.buildFormHTML(parameters)}${MBImport.buildSearchButton(release)}</div>`);
+        const mbUI = document.createElement('div');
+        mbUI.id = 'mb_buttons';
+        mbUI.innerHTML = `${importButton}${searchButton}${harmonyButton}`;
 
         // Append MB import link
         if (isMobile) {
-            $('#band-navbar > ul').append($('<li>').css({ display: 'flex', alignItems: 'center', alignSelf: 'center' }).append(mbUI));
+            const bandNavbar = document.querySelector('#band-navbar');
+            if (bandNavbar) {
+                mbUI.style = 'margin: 8px; flex-wrap: wrap;';
+                bandNavbar.insertAdjacentElement('afterend', mbUI);
+            }
         } else {
-            $('#name-section').append(mbUI);
-            document.querySelector('#mb_buttons').style.marginTop = '6px';
+            document.querySelector('#name-section')?.appendChild(mbUI);
+            mbUI.style.marginTop = '6px';
         }
 
         document.querySelectorAll('form.musicbrainz_import').forEach(form => (form.style.display = 'inline-block'));
@@ -262,8 +315,9 @@ const BandcampImport = {
 
     // get label name from back link if possible
     getlabelname: function () {
-        let label = $('a.back-to-label-link span.back-link-text').contents().get(2);
-        if (typeof label == 'undefined') {
+        const backLinkText = document.querySelector('a.back-to-label-link span.back-link-text');
+        const label = backLinkText?.childNodes[2];
+        if (!label) {
             return '';
         }
         return label.textContent;
@@ -320,16 +374,15 @@ const getHostname = url => {
 /**
  * Collects discography release link data from elements matching the given selector.
  * @param {Object} options
- * @param {string} options.linksMatcher - jQuery selector for release/track links
+ * @param {string} options.linksMatcher - CSS selector for release/track links
  * @param {string} options.hostname - Base hostname for constructing full URLs
  * @param {string} [options.insertionLocationMatcher] - Optional selector for insertion point (e.g. 'p.title' for music format)
  * @returns {Array} Array of url_data objects for mblinks.searchAndDisplayMbLinks
  */
 const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocationMatcher }) => {
     const urls_data = [];
-    $(linksMatcher).each(function () {
-        const $link = $(this);
-        const bandcampReleaseUrl = $link.attr('href');
+    document.querySelectorAll(linksMatcher).forEach(linkEl => {
+        const bandcampReleaseUrl = linkEl.getAttribute('href');
         const pathName = getPathName(bandcampReleaseUrl);
 
         if (pathName && pathName.match(/^(\/album|\/track)/)) {
@@ -341,11 +394,11 @@ const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocat
                 url: full_url,
                 mb_type: 'release',
                 insert_func: function (link) {
-                    const $target = insertionLocationMatcher ? $(insertionLocationMatcher, $link) : $link;
-                    if ($target.length) {
-                        $target.prepend(link);
+                    const target = insertionLocationMatcher ? linkEl.querySelector(insertionLocationMatcher) : linkEl;
+                    if (target) {
+                        target.insertAdjacentHTML('afterbegin', link);
                     } else {
-                        $link.prepend(link);
+                        linkEl.insertAdjacentHTML('afterbegin', link);
                     }
                 },
                 key: `release:${full_url}`,
@@ -355,7 +408,7 @@ const collectDiscographyReleaseLinks = ({ linksMatcher, hostname, insertionLocat
     return urls_data;
 };
 
-$(document).ready(function () {
+function init() {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
      * bandcamp pages under third-party domains.
@@ -364,6 +417,7 @@ $(document).ready(function () {
     if (!unsafeWindow.TralbumData) return;
     /***/
     const isMobile = typeof unsafeWindow.TralbumJSONLD !== 'undefined';
+    const isPrivateStream = isPrivateStreamPage();
     let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
     const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
     const hasAlbumData = unsafeWindow.TralbumData && 'current' in unsafeWindow.TralbumData; // Sometimes TralbumData is an empty object, see issue #676
@@ -401,17 +455,20 @@ $(document).ready(function () {
     } else if (hasAlbumData) {
         MBImportStyle();
 
-        let release = BandcampImport.retrieveReleaseInfo();
+        let release = BandcampImport.retrieveReleaseInfo(isPrivateStream);
 
         // add MB artist link
-        let root_url = release.url.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
+        let root_url = getBandRootUrl();
+        if (!root_url && /^https?:\/\//.test(release.url)) {
+            root_url = release.url.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
+        }
         let label_url = '';
 
         mblinks.searchAndDisplayMbLink(
             root_url,
             'label',
             function (link) {
-                $('p#band-name-location span.title').append(link);
+                document.querySelector('p#band-name-location span.title')?.insertAdjacentHTML('beforeend', link);
             },
             `label:${root_url}`,
         );
@@ -425,7 +482,7 @@ $(document).ready(function () {
                     label_url,
                     'label',
                     function (link) {
-                        $('a.back-to-label-link span.back-link-text').append(link);
+                        document.querySelector('a.back-to-label-link span.back-link-text')?.insertAdjacentHTML('beforeend', link);
                     },
                     `label:${label_url}`,
                 );
@@ -448,7 +505,7 @@ $(document).ready(function () {
             label_name = BandcampImport.getlabelname();
         } else {
             label_mbid = mblinks.resolveMBID(`label:${root_url}`);
-            if (label_mbid) label_name = $('p#band-name-location span.title').text().trim();
+            if (label_mbid) label_name = document.querySelector('p#band-name-location span.title')?.textContent.trim() ?? '';
         }
         if (label_mbid || label_name) {
             if (release.labels.length == 0) {
@@ -462,29 +519,39 @@ $(document).ready(function () {
             release.labels[0].mbid = label_mbid;
         }
 
-        BandcampImport.insertLink(release, isMobile);
+        BandcampImport.insertLink(release, isMobile, isPrivateStream);
         LOGGER.info('Parsed release: ', release);
+
+        const nameSectionSpans = document.querySelectorAll('div#name-section h3 span');
+        const firstNameSectionSpan = nameSectionSpans[0];
+        const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
 
         if (release.type == 'track') {
             mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                $('div#name-section h3 span:last').before(link);
+                lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
             // add MB links to parent album
             mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
-                $('div#name-section h3 span:first').before(link);
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
         } else {
             mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                $('div#name-section h3 span:first').before(link);
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
-            // add MB release links to album or single
-            mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
-                $('div#name-section h3 span:first').after(link);
-            });
+            // add MB release links to album or single (skip for private streams)
+            if (!isPrivateStream) {
+                mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
+                    firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
+                });
+            }
         }
 
         // append a comma after each tag to ease cut'n'paste to MB
-        $('div.tralbum-tags a:not(:last-child).tag').after(', ');
+        document.querySelectorAll('div.tralbum-tags a.tag').forEach(tag => {
+            if (tag !== tag.parentElement?.lastElementChild) {
+                tag.insertAdjacentText('afterend', ', ');
+            }
+        });
 
         // append a link to the full size image
         let coverArtElement;
@@ -513,12 +580,12 @@ $(document).ready(function () {
         }
         const upc = unsafeWindow.TralbumData.current.upc;
         if (typeof upc != 'undefined' && upc !== null) {
-            document.querySelector('div #trackInfoInner').insertAdjacentHTML(
-                'beforeend',
-                `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}<br/>
-            Import: <a href="https://harmony.pulsewidth.org.uk/release?url=${encodeURIComponent(release.url)}&category=default">Harmony</a>
-            | <a href="https://atisket.pulsewidth.org.uk/?upc=${upc}">a-tisket</a></div>`,
-            );
+            document
+                .querySelector('div #trackInfoInner')
+                ?.insertAdjacentHTML(
+                    'beforeend',
+                    `<div id="mbimport_upc" style="margin-bottom: 2em; font-size: smaller;">UPC: ${upc}</div>`,
+                );
         }
     }
 
@@ -531,15 +598,27 @@ $(document).ready(function () {
             marginLeft: '3px',
         };
 
+        const applyLinkStyle = element => {
+            element.querySelectorAll('a').forEach(anchor => {
+                Object.assign(anchor.style, linkStyle);
+            });
+        };
+
         const insertLinkCb = function (link) {
             if (!isLinkInserted) {
                 // Append the artist/label link on Stub discography pages
-                $('div.stub-page-content h1').append(link);
-                $('div.stub-page-content h1 a').css(linkStyle);
+                const stubPageHeading = document.querySelector('div.stub-page-content h1');
+                if (stubPageHeading) {
+                    stubPageHeading.insertAdjacentHTML('beforeend', link);
+                    applyLinkStyle(stubPageHeading);
+                }
 
                 // Append the artist/label link on actual discography pages
-                $('p#band-name-location span.title').append(link);
-                $('p#band-name-location span.title a').css(linkStyle);
+                const bandNameTitle = document.querySelector('p#band-name-location span.title');
+                if (bandNameTitle) {
+                    bandNameTitle.insertAdjacentHTML('beforeend', link);
+                    applyLinkStyle(bandNameTitle);
+                }
                 isLinkInserted = true;
             }
         };
@@ -551,8 +630,9 @@ $(document).ready(function () {
                 const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
                 const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
 
-                $('div.stub-page-content h1').append(`
-                    <span class="mb_wrapper">
+                document.querySelector('div.stub-page-content h1')?.insertAdjacentHTML(
+                    'beforeend',
+                    `<span class="mb_wrapper">
                         <span class="mb_valign mb_searchit">
                             <a class="mb_search_link"
                                 class="musicbrainz_import"
@@ -569,8 +649,8 @@ $(document).ready(function () {
                                 href="${labelSearchUrl}"
                             ><small>L</small>?</a>
                         </span>
-                    </span>
-                `);
+                    </span>`,
+                );
             }
         }
 
@@ -587,4 +667,10 @@ $(document).ready(function () {
         mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
         mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, undefined, onSearchComplete);
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

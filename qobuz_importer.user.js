@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.04.27.1
+// @version      2026.05.31.2
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @include      /^https?://www\.qobuz\.com/[^/]+/(album|interpreter|label)(/[^/?]+)+(\?.*)?$/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require      lib/mbimport.js
+// @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.03.05.3
+// @require      lib/mblinks.js?version=v2026.05.31.1
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // @run-at       document-start
@@ -25,11 +25,37 @@ if (DEBUG) {
 }
 
 // list of qobuz artist id which should be mapped to Various Artists
-const various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160],
-    various_composers_ids = [573076];
-let is_classical = false, // release detected as classical
-    album_artist_data = {}, // for switching album artists on classical
-    raw_release_data;
+const various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160];
+const various_composers_ids = [573076];
+const OPEN_QOBUZ_BASE = 'https://open.qobuz.com';
+
+let is_classical = false; // release detected as classical
+let album_artist_data = {}; // for switching album artists on classical
+let raw_release_data;
+
+function getOpenQobuzArtistUrl(artistId) {
+    return `${OPEN_QOBUZ_BASE}/artist/${artistId}`;
+}
+
+function getOpenQobuzAlbumUrl(albumId) {
+    return `${OPEN_QOBUZ_BASE}/album/${albumId}`;
+}
+
+/**
+ * Derive an open.qobuz.com lookup URL from a www.qobuz.com entity URL.
+ * Label URLs are not supported on open.qobuz.com.
+ */
+function getOpenQobuzUrlFromWwwUrl(url) {
+    let match = url.match(/\/interpreter\/[^/]+\/(\d+)\/?(?:\?|#|$)/);
+    if (match) {
+        return getOpenQobuzArtistUrl(match[1]);
+    }
+    match = url.match(/\/album\/[^/]+\/([^/?#]+)\/?(?:\?|#|$)/);
+    if (match) {
+        return getOpenQobuzAlbumUrl(match[1]);
+    }
+    return null;
+}
 
 function isVariousArtists(artist) {
     // Check hard-coded various artist ids
@@ -62,6 +88,7 @@ function parseRelease(data) {
 
     release.script = 'Latn';
     release.url = `https://www.qobuz.com${data.relative_url}`; // no lang
+    release.openQobuzUrl = getOpenQobuzAlbumUrl(data.id);
 
     release.title = data.title;
     if ($.inArray('Classique', data.genres_list) != -1) {
@@ -90,6 +117,7 @@ function parseRelease(data) {
     } else {
         release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
         release.artist_credit[0].qobuzUrl = `https://www.qobuz.com/${locale}/interpreter/${data.artist.slug}/${data.artist.id}`;
+        release.artist_credit[0].openQobuzUrl = getOpenQobuzArtistUrl(data.artist.id);
     }
 
     release.packaging = 'None';
@@ -364,11 +392,17 @@ function lookupReleaseAndDisplayLinks({ release, mblinks }) {
         }
     };
 
-    mblinks.searchAndDisplayMbLink(release.url, 'release', insertReleaseLinkCb);
+    const releaseLookupUrls = [];
+    if (release.openQobuzUrl) {
+        releaseLookupUrls.push(release.openQobuzUrl);
+    }
+    releaseLookupUrls.push(release.url); // locale-independent URL
+    if (window.location.href) {
+        releaseLookupUrls.push(window.location.href.split('?')[0].split('#')[0]); // URL with locale
+    }
 
-    if (!isReleaseLinkInserted && window.location.href) {
-        /* lookup using locale-dependent URL */
-        mblinks.searchAndDisplayMbLink(window.location.href, 'release', insertReleaseLinkCb);
+    for (const url of [...new Set(releaseLookupUrls)]) {
+        mblinks.searchAndDisplayMbLink(url, 'release', insertReleaseLinkCb);
     }
 }
 
@@ -376,19 +410,37 @@ function lookupReleaseAndDisplayLinks({ release, mblinks }) {
  * Lookup the artists in MB and add the links to the page.
  */
 function lookupArtistAndDisplayLinks({ release, mblinks }) {
-    const insertArtistLinkCb = function (link) {
-        $('.artist-name').append(link);
-        $('.artist-name a').css({
-            position: 'relative',
-            top: '-11px',
-        });
-    };
-
     for (const artist of release.artist_credit) {
-        mblinks.searchAndDisplayMbLink(artist.qobuzUrl, 'artist', insertArtistLinkCb);
+        let isArtistLinkInserted = false;
+
+        const insertArtistLinkCb = function (link) {
+            if (!isArtistLinkInserted) {
+                $('.artist-name').append(link);
+                $('.artist-name a').css({
+                    display: 'inline-block',
+                    marginTop: '6px',
+                    position: 'relative',
+                    top: '-11px',
+                });
+                isArtistLinkInserted = true;
+            }
+        };
+
+        const artistLookupUrls = [];
+        if (artist.openQobuzUrl) {
+            artistLookupUrls.push(artist.openQobuzUrl);
+        }
+        if (artist.qobuzUrl) {
+            artistLookupUrls.push(artist.qobuzUrl);
+        }
+
+        for (const url of [...new Set(artistLookupUrls)]) {
+            mblinks.searchAndDisplayMbLink(url, 'artist', insertArtistLinkCb);
+        }
 
         // Try to get artist MBID from cache and add it to release data
-        let artist_mbid = mblinks.resolveMBID(artist.qobuzUrl);
+        let artist_mbid =
+            (artist.openQobuzUrl && mblinks.resolveMBID(artist.openQobuzUrl)) || (artist.qobuzUrl && mblinks.resolveMBID(artist.qobuzUrl));
         if (artist_mbid) {
             artist.mbid = artist_mbid;
         }
@@ -419,17 +471,66 @@ function lookupLabelAndDisplayLinks({ release, mblinks }) {
 }
 
 /**
- * Check if the URL has a locale and return both the URL with and without the locale.
+ * Return all Qobuz URL variants to use for MB lookups: open.qobuz.com, locale-dependent
+ * www.qobuz.com/{locale}, and locale-independent www.qobuz.com where applicable.
+ * Label URLs only support the www.qobuz.com variants.
  */
 function getEntityUrls(url, locale) {
-    if (url.includes(`/${locale}/`)) {
-        return [url, url.replace(`/${locale}/`, '/')];
-    } else {
-        return [url];
+    const urls = new Set([url]);
+
+    if (locale && url.includes(`/${locale}/`)) {
+        urls.add(url.replace(`/${locale}/`, '/'));
+    }
+
+    const openQobuzUrl = getOpenQobuzUrlFromWwwUrl(url);
+    if (openQobuzUrl) {
+        urls.add(openQobuzUrl);
+    }
+
+    return [...urls];
+}
+
+const MB_SEARCH_MARKS = {
+    artist: 'A',
+    label: 'L',
+    release: 'R',
+};
+
+function createMbSearchLink(mb_type, entityName) {
+    const mark = MB_SEARCH_MARKS[mb_type] || '?';
+    const entity_name = mb_type.replace(/[_-]/g, ' ');
+    const href = mb_type === 'release' ? MBImport.searchUrlFor(mb_type, entityName) : MBImport.exactSearchUrlFor(mb_type, entityName);
+    return `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${href}"><small>${mark}</small>?</a></span>`;
+}
+
+function removeMbSearchLinksBefore(element) {
+    while (element.previousElementSibling?.classList.contains('mb_searchit')) {
+        element.previousElementSibling.remove();
+    }
+}
+
+function insertMbSearchLinkBeforeElement(element, mb_type, entityName) {
+    removeMbSearchLinksBefore(element);
+    element.insertAdjacentHTML('beforebegin', createMbSearchLink(mb_type, entityName));
+}
+
+function insertMbLinkBeforeElements(elements, link) {
+    const styledLink = link.replace('<a ', '<a style="vertical-align:top" ');
+    const insertedElements = new Set();
+
+    for (const element of elements) {
+        if (insertedElements.has(element)) {
+            continue;
+        }
+        insertedElements.add(element);
+        removeMbSearchLinksBefore(element);
+        element.insertAdjacentHTML('beforebegin', styledLink);
     }
 }
 
 function processDiscographyPage({ mblinks, locale }) {
+    MBSearchItStyle();
+
     const items = document.querySelectorAll('.product__item');
     const artist_urls_data = [];
     const label_urls_data = [];
@@ -482,41 +583,55 @@ function processDiscographyPage({ mblinks, locale }) {
     }
 
     // Build urls_data array for batch processing
+    const elementsWithSearchLink = new Set();
+
     artist_urls_map.forEach((artist_link_elements, artist_url) => {
+        for (const element of artist_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                insertMbSearchLinkBeforeElement(element, 'artist', element.textContent.trim());
+            }
+        }
         artist_urls_data.push({
             url: artist_url,
             mb_type: 'artist',
             insert_func: function (link) {
-                // Insert the MusicBrainz link before each artist link
-                artist_link_elements.forEach(artist_link_element => {
-                    artist_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(artist_link_elements, link);
             },
             key: `artist:${artist_url}`,
         });
     });
 
     label_urls_map.forEach((label_link_elements, label_url) => {
+        for (const element of label_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                insertMbSearchLinkBeforeElement(element, 'label', element.textContent.trim());
+            }
+        }
         label_urls_data.push({
             url: label_url,
             mb_type: 'label',
             insert_func: function (link) {
-                label_link_elements.forEach(label_link_element => {
-                    label_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(label_link_elements, link);
             },
             key: `label:${label_url}`,
         });
     });
 
     album_urls_map.forEach((album_link_elements, album_url) => {
+        for (const element of album_link_elements) {
+            if (!elementsWithSearchLink.has(element)) {
+                elementsWithSearchLink.add(element);
+                const albumName = element.querySelector('.product__name')?.textContent.trim() || element.textContent.trim();
+                insertMbSearchLinkBeforeElement(element, 'release', albumName);
+            }
+        }
         album_urls_data.push({
             url: album_url,
             mb_type: 'release',
             insert_func: function (link) {
-                album_link_elements.forEach(album_link_element => {
-                    album_link_element.insertAdjacentHTML('beforebegin', link);
-                });
+                insertMbLinkBeforeElements(album_link_elements, link);
             },
             key: `release:${album_url}`,
         });
@@ -558,6 +673,15 @@ function processReleasePage({ mblinks }) {
 }
 
 $(document).ready(function () {
+    document.head.insertAdjacentHTML(
+        'beforeend',
+        `<style>
+            a:has(.product__name) {
+                width: calc(100% - 22px);
+            }
+        </style>`,
+    );
+
     // Initialize MBLinks for checking already imported releases
     const mblinks = new MBLinks('QOBUZ_MBLINKS_CACHE');
     const pageTypeRegex = new RegExp(`^\\/([a-z]{2}-[a-z]{2})?(?:\\/)?(interpreter|album|label)\\/`);

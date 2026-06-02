@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         MusicBrainz: Set recording comments for a release
 // @description  Batch set recording comments from a Release page.
-// @version      2024.6.18.1
+// @version      2026.5.31
 // @author       Michael Wiencek
 // @license      X11
 // @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @include      /^https?:\/\/(\w+\.)?musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
+// @include      /^https?:\/\/(\w+\.)?musicbrainz\.(org|eu)\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -39,12 +39,9 @@
 // authorization.
 // ==/License==
 
-setTimeout(function () {
-    const scr = document.createElement('script');
-    scr.textContent = `$(${setRecordingComments});`;
-    document.body.appendChild(scr);
-}, 1000);
+setTimeout(setRecordingComments, 1000);
 
+// Keep this intermediate function in case we need to recall it on mb-hydration events, one day
 function setRecordingComments() {
     let $tracks;
     let $inputs = $();
@@ -200,7 +197,9 @@ function setRecordingComments() {
             $inputs.prop('disabled', false);
             $submitButton.prop('disabled', false).text('Submit changes (marked red)');
         } else {
-            let editNote = $('#recording-comments-edit-note').val();
+            let editNote = $('#recording-comments-edit-note').val().trim();
+            editNote += `${editNote ? '\n\n—\n' : ''}Entered from '''''${document.querySelector('.releaseheader h1')?.textContent}''''' at ${location.href}`;
+            editNote += `\nUsing '''${GM_info.script.name.replace(/^.+:/, '')}''' ${GM_info.script.version} from https://github.com/murdos/musicbrainz-userscripts`;
             let makeVotable = document.getElementById('make-recording-comments-votable').checked;
 
             activeRequest = $.ajax({
