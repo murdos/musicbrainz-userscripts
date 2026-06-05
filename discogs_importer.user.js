@@ -1167,3 +1167,9 @@ const Countries = {
     'Saint Helena': 'SH',
     'Svalbard and Jan Mayen': 'SJ',
 };
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    parseDiscogsRelease,
+  };
+}
