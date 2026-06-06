@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.05.31.4
+// @version      2026.06.06.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -52,12 +52,44 @@ const getBandRootUrl = () => {
     return null;
 };
 
-const absoluteBandcampUrl = url => {
+const normalizeBandcampUrl = url => {
+    if (!url) return '';
     url = url.fix_bandcamp_url();
-    if (url.startsWith('http')) return url.split('?')[0];
+    if (url.startsWith('http')) return url.split('?')[0].split('#')[0];
     const root = getBandRootUrl();
-    if (root && url.startsWith('/')) return root + url.split('?')[0];
+    if (root && url.startsWith('/')) return root + url.split('?')[0].split('#')[0];
     return url;
+};
+
+const normalizeUrlForComparison = url => {
+    const normalized = normalizeBandcampUrl(url);
+    if (!normalized) return '';
+    try {
+        const parsed = new URL(normalized);
+        const path = parsed.pathname.replace(/\/$/, '') || '/';
+        return `${parsed.protocol}//${parsed.hostname}${path}`;
+    } catch {
+        return normalized.replace(/\/$/, '');
+    }
+};
+
+/**
+ * Resolve the canonical release URL from the page location, cross-checking TralbumData.url.
+ * When TralbumData points elsewhere (e.g. a custom shop domain), the page URL wins and the
+ * TralbumData URL is returned as an alternate for release.urls.
+ */
+const resolveBandcampReleaseUrl = tralbumUrl => {
+    const pageUrl = normalizeBandcampUrl(`${window.location.origin}${window.location.pathname}`);
+    const tralbumDataUrl = tralbumUrl ? normalizeBandcampUrl(tralbumUrl) : '';
+
+    const result = { url: pageUrl, alternateUrls: [] };
+
+    if (tralbumDataUrl && normalizeUrlForComparison(tralbumDataUrl) !== normalizeUrlForComparison(pageUrl)) {
+        LOGGER.info('TralbumData URL differs from page URL; using page URL', { pageUrl, tralbumDataUrl });
+        result.alternateUrls.push(tralbumDataUrl);
+    }
+
+    return result;
 };
 
 const BandcampImport = {
@@ -66,6 +98,7 @@ const BandcampImport = {
         let bandcampAlbumData = unsafeWindow.TralbumData;
         let bandcampEmbedData = unsafeWindow.EmbedData;
         const bandcampMobileData = unsafeWindow.TralbumJSONLD;
+        const { url: releaseUrl, alternateUrls } = resolveBandcampReleaseUrl(bandcampAlbumData.url);
 
         const artist = bandcampAlbumData.artist || bandcampMobileData?.byArtist?.name;
 
@@ -87,7 +120,7 @@ const BandcampImport = {
             language: 'eng',
             script: 'Latn',
             urls: [],
-            url: absoluteBandcampUrl(bandcampAlbumData.url),
+            url: releaseUrl,
         };
 
         // Grab release title
@@ -210,11 +243,23 @@ const BandcampImport = {
                         url: release.url,
                         link_type: link_type.download_for_free,
                     });
+                    alternateUrls.forEach(alternateUrl => {
+                        release.urls.push({
+                            url: alternateUrl,
+                            link_type: link_type.download_for_free,
+                        });
+                    });
                 }
                 if (bandcampAlbumData.current.download_pref === 2) {
                     release.urls.push({
                         url: release.url,
                         link_type: link_type.purchase_for_download,
+                    });
+                    alternateUrls.forEach(alternateUrl => {
+                        release.urls.push({
+                            url: alternateUrl,
+                            link_type: link_type.purchase_for_download,
+                        });
                     });
                 }
             }
@@ -223,6 +268,12 @@ const BandcampImport = {
                 release.urls.push({
                     url: release.url,
                     link_type: link_type.stream_for_free,
+                });
+                alternateUrls.forEach(alternateUrl => {
+                    release.urls.push({
+                        url: alternateUrl,
+                        link_type: link_type.stream_for_free,
+                    });
                 });
             }
             // Check if release is Creative Commons licensed
