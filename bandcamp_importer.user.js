@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.06.2
+// @version      2026.06.06.3
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -121,6 +121,7 @@ const BandcampImport = {
             script: 'Latn',
             urls: [],
             url: releaseUrl,
+            alternateUrls,
         };
 
         // Grab release title
@@ -243,7 +244,7 @@ const BandcampImport = {
                         url: release.url,
                         link_type: link_type.download_for_free,
                     });
-                    alternateUrls.forEach(alternateUrl => {
+                    release.alternateUrls.forEach(alternateUrl => {
                         release.urls.push({
                             url: alternateUrl,
                             link_type: link_type.download_for_free,
@@ -255,7 +256,7 @@ const BandcampImport = {
                         url: release.url,
                         link_type: link_type.purchase_for_download,
                     });
-                    alternateUrls.forEach(alternateUrl => {
+                    release.alternateUrls.forEach(alternateUrl => {
                         release.urls.push({
                             url: alternateUrl,
                             link_type: link_type.purchase_for_download,
@@ -269,7 +270,7 @@ const BandcampImport = {
                     url: release.url,
                     link_type: link_type.stream_for_free,
                 });
-                alternateUrls.forEach(alternateUrl => {
+                release.alternateUrls.forEach(alternateUrl => {
                     release.urls.push({
                         url: alternateUrl,
                         link_type: link_type.stream_for_free,
@@ -532,8 +533,33 @@ function init() {
             });
             // add MB release links to album or single (skip for private streams)
             if (!isPrivateStream) {
-                mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
-                    firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
+                const releaseLookupUrls = [release.url, ...release.alternateUrls];
+                const seenReleaseMbids = new Set();
+                const releaseLinksToInsert = [];
+                let pendingReleaseLookups = releaseLookupUrls.length;
+                releaseLookupUrls.forEach(lookupUrl => {
+                    mblinks.searchAndDisplayMbLink(
+                        lookupUrl,
+                        'release',
+                        link => {
+                            const mb_url = link.match(/href="([^"]+)"/)?.[1];
+                            if (!mb_url) return;
+                            const mbid = mb_url.slice(-36);
+                            if (!seenReleaseMbids.has(mbid)) {
+                                seenReleaseMbids.add(mbid);
+                                releaseLinksToInsert.push(link);
+                            }
+                        },
+                        lookupUrl,
+                        () => {
+                            pendingReleaseLookups--;
+                            if (pendingReleaseLookups === 0) {
+                                releaseLinksToInsert.forEach(link => {
+                                    firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
+                                });
+                            }
+                        },
+                    );
                 });
             }
         }
