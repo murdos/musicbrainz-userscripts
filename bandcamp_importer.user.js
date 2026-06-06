@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.06.1
+// @version      2026.06.06.2
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -513,6 +513,31 @@ function init() {
         if (!root_url && /^https?:\/\//.test(release.url)) {
             root_url = release.url.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
         }
+
+        const nameSectionSpans = document.querySelectorAll('div#name-section h3 span');
+        const firstNameSectionSpan = nameSectionSpans[0];
+        const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
+
+        if (release.type == 'track') {
+            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
+                lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+            });
+            // add MB links to parent album
+            mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+            });
+        } else {
+            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
+                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+            });
+            // add MB release links to album or single (skip for private streams)
+            if (!isPrivateStream) {
+                mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
+                    firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
+                });
+            }
+        }
+
         let label_url = '';
 
         mblinks.searchAndDisplayMbLink(
@@ -572,30 +597,6 @@ function init() {
 
         BandcampImport.insertLink(release, isMobile, isPrivateStream);
         LOGGER.info('Parsed release: ', release);
-
-        const nameSectionSpans = document.querySelectorAll('div#name-section h3 span');
-        const firstNameSectionSpan = nameSectionSpans[0];
-        const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
-
-        if (release.type == 'track') {
-            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
-            });
-            // add MB links to parent album
-            mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
-                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
-            });
-        } else {
-            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
-            });
-            // add MB release links to album or single (skip for private streams)
-            if (!isPrivateStream) {
-                mblinks.searchAndDisplayMbLink(release.url, 'release', function (link) {
-                    firstNameSectionSpan?.insertAdjacentHTML('afterend', link);
-                });
-            }
-        }
 
         // append a comma after each tag to ease cut'n'paste to MB
         document.querySelectorAll('div.tralbum-tags a.tag').forEach(tag => {
