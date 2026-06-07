@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.06.4
+// @version      2026.06.07.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -32,7 +32,7 @@ String.prototype.fix_bandcamp_url = function () {
     return url.replace('http://', 'https://');
 };
 
-const isPrivateStreamPage = () => !!unsafeWindow.TralbumData?.is_private_stream || /^\/private\//.test(window.location.pathname);
+const isPrivateStreamPage = () => !!unsafeWindow.TralbumData?.is_private_stream || /^\/private\//.test(unsafeWindow.location.pathname);
 
 const getBandRootUrl = () => {
     const ogUrl = document.querySelector('meta[property="og:url"]')?.getAttribute('content');
@@ -40,9 +40,9 @@ const getBandRootUrl = () => {
         const match = ogUrl.match(/^(https?:\/\/[^/]+\.bandcamp\.com)/);
         if (match) return match[1];
     }
-    const host = window.location.hostname;
+    const host = unsafeWindow.location.hostname;
     if (host.endsWith('.bandcamp.com') && host !== 'bandcamp.com') {
-        return `${window.location.protocol}//${host}`;
+        return `${unsafeWindow.location.protocol}//${host}`;
     }
     const bandLink = document.querySelector('a[href*=".bandcamp.com"]:not([href*="bandcamp.com/discover"])');
     if (bandLink) {
@@ -197,7 +197,7 @@ const BandcampImport = {
         }
 
         let tracks_streamable = 0;
-        bandcampAlbumData.trackinfo.forEach(bctrack => {
+        for (const bctrack of bandcampAlbumData.trackinfo) {
             let title = bctrack.title;
             let artist = [];
             if (various_artists) {
@@ -214,7 +214,7 @@ const BandcampImport = {
                 artist_credit: MBImport.makeArtistCredits(artist),
             };
             disc.tracks.push(track);
-        });
+        }
 
         // Check for hidden tracks (more tracks in the download than shown for streaming ie.)
         let showntracks = bandcampAlbumData.trackinfo.length;
@@ -331,7 +331,7 @@ const BandcampImport = {
             return false;
         }
         // Form parameters
-        const sourceUrl = isPrivateStream ? `${window.location.origin}${window.location.pathname}` : release.url;
+        const sourceUrl = isPrivateStream ? `${unsafeWindow.location.origin}${unsafeWindow.location.pathname}` : release.url;
         const edit_note = isPrivateStream
             ? MBImport.makeEditNote(sourceUrl, 'Bandcamp', 'private stream')
             : MBImport.makeEditNote(release.url, 'Bandcamp');
