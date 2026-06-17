@@ -778,7 +778,7 @@ function init() {
         };
 
         mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
-        mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, undefined, onSearchComplete);
+        mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, `label:${cleanURL}`, onSearchComplete);
     }
 }
 
