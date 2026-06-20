@@ -628,7 +628,7 @@ function init() {
 
         if (release.artist_credit.length == 1) {
             // try to get artist's mbid from cache
-            let artist_mbid = mblinks.resolveMBID(root_url);
+            let artist_mbid = mblinks.resolveMBID(`artist:${root_url}`);
             if (artist_mbid) {
                 release.artist_credit[0].mbid = artist_mbid;
             }
@@ -777,7 +777,7 @@ function init() {
             }
         };
 
-        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, undefined, onSearchComplete);
+        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, `artist:${cleanURL}`, onSearchComplete);
         mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, `label:${cleanURL}`, onSearchComplete);
     }
 }
