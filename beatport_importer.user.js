@@ -287,6 +287,7 @@
       var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : LogLevel.ERROR;
       _classCallCheck(this, Logger);
       _defineProperty(this, "LOG_LEVEL", LogLevel.INFO);
+      _defineProperty(this, "scriptName", void 0);
       this.scriptName = scriptName;
       this.LOG_LEVEL = level;
     }
@@ -864,7 +865,7 @@
   function installFetchInterceptor(logger) {
     var originalFetch = window.fetch.bind(window);
     var interceptor = /*#__PURE__*/function () {
-      var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(input, init) {
+      var _interceptor = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(input, init) {
         var response, url, releaseMatch, releaseId;
         return _regenerator().w(function (_context) {
           while (1) switch (_context.n) {
@@ -892,9 +893,10 @@
           }
         }, _callee);
       }));
-      return function interceptor(_x, _x2) {
-        return _ref.apply(this, arguments);
-      };
+      function interceptor(_x, _x2) {
+        return _interceptor.apply(this, arguments);
+      }
+      return interceptor;
     }();
     try {
       window.fetch = interceptor;
@@ -1060,7 +1062,7 @@
    * on initial load, read __NEXT_DATA__ (its release id only verifies URL match — Next does not refresh it on client nav).
    */
   var getBeatportReleaseData = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(logger) {
+    var _getBeatportReleaseData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(logger) {
       var _window$location$path;
       var releaseIdFromURL, pageData, buildId, cached, initialNextDataElement, _data$props$pageProps, data, initialReleaseId;
       return _regenerator().w(function (_context2) {
@@ -1126,9 +1128,10 @@
         }
       }, _callee2);
     }));
-    return function getBeatportReleaseData(_x1) {
-      return _ref2.apply(this, arguments);
-    };
+    function getBeatportReleaseData(_x1) {
+      return _getBeatportReleaseData.apply(this, arguments);
+    }
+    return getBeatportReleaseData;
   }();
 
   var LOGGER = new Logger('beatport_importer', LogLevel.INFO);
