@@ -30,9 +30,10 @@
         "lint-fix": "pnpm run eslint -- --fix",
         "oxlint": "oxlint --type-aware",
         "eslint": "eslint .",
-        "test": "node --strip-types tests/discogs/run.ts",
-        "test:discogs": "node --strip-types tests/discogs/run.ts",
-        "test:discogs:update": "node --strip-types tests/discogs/run.ts --update",
+        "test": "vitest run",
+        "test:discogs": "vitest run tests/discogs",
+        "test:discogs:update-fixtures": "node --strip-types tests/discogs/fetch-fixtures.ts && pnpm run format",
+        "test:watch": "vitest",
         "generate-readme": "node --strip-types ./tools/generate-readme.ts > README.md",
         "prepare": "husky"
     },
@@ -59,6 +60,7 @@
         "oxlint-tsgolint": "^0.23.0",
         "rollup": "^4.62.0",
         "typescript-eslint": "^8.46.1",
+        "vitest": "^4.1.9",
         "zod": "^4.4.3"
     },
     "lint-staged": {
