@@ -477,8 +477,6 @@ function parse_YYYY_MM_DD(date, obj) {
 function Parsefmarelease(albumobject, trackobject) {
     if (albumobject === undefined) {
         albumobject = [];
-    } else {
-        albumobject = albumobject;
     }
 
     let fmarelease = {};
