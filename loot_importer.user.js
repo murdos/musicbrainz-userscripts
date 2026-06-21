@@ -276,8 +276,8 @@ function ParseLootPage() {
                 descriptiontrack.title = artisttitle[3];
                 descriptiontrack.artist = artisttitle[1];
             } else {
-                var artisttitle_regex = /(.*)/; // regex: title
-                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                var title_regex = /(.*)/; // regex: title
+                const artisttitle = currenttrack[1].innerText.match(title_regex);
                 descriptiontrack.title = artisttitle[1];
                 descriptiontrack.artist = releaseartist;
             }

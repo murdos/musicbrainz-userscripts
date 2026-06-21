@@ -296,13 +296,13 @@ const MBDiscid = (function () {
         }
 
         for (let i = 0; i < discs.length; i++) {
-            var entries = discs[i];
-            let layout_type = get_layout_type(entries);
+            var discEntries = discs[i];
+            let layout_type = get_layout_type(discEntries);
             let entries_audio;
             if (layout_type === 'with_data') {
-                entries_audio = entries.slice(0, entries.length - 1);
+                entries_audio = discEntries.slice(0, discEntries.length - 1);
             } else {
-                entries_audio = entries;
+                entries_audio = discEntries;
             }
             discs[i] = entries_audio;
         }
