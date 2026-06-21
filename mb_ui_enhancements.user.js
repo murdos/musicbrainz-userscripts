@@ -413,7 +413,7 @@ $(document).ready(function () {
                         .find(`td:nth-last-child(${ISRC_COLUMN_POSITION})`)
                         .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
                 });
-            }
+            };
         }
     }
 
