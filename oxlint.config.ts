@@ -21,9 +21,6 @@ export default defineConfig({
         es6: true,
         node: true,
     },
-    globals: {
-        unsafeWindow: 'writable',
-    },
     overrides: [
         {
             files: ['**/*.user.js'],

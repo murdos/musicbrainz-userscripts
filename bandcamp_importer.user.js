@@ -19,8 +19,10 @@
 // @run-at       document-start
 // ==/UserScript==
 
-// eslint-disable-next-line no-global-assign
-if (!unsafeWindow) unsafeWindow = window;
+/* oxlint-disable-next-line no-global-assign */
+if (!unsafeWindow) {
+    unsafeWindow = window;
+}
 
 String.prototype.fix_bandcamp_url = function () {
     let url = this;
@@ -772,7 +774,7 @@ function init() {
                     </span>`,
                 );
             }
-        }
+        };
 
         // The URL could either be a band or a label page, we don't know which, so we search for both.
         // Show lookup buttons only after both searches have completed and neither found a link.
