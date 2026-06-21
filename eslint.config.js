@@ -1,7 +1,6 @@
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import js from '@eslint/js';
-import prettier from 'eslint-plugin-prettier/recommended';
 import userscripts from 'eslint-plugin-userscripts';
 import tseslint from 'typescript-eslint';
 
@@ -29,7 +28,6 @@ export default defineConfig([
             '@typescript-eslint/no-non-null-assertion': 'off', // TODO: add correct guardrails and remove this in the future
         },
     },
-    prettier,
     {
         files: ['*.user.js'],
         plugins: {
@@ -64,7 +62,6 @@ export default defineConfig([
         },
 
         rules: {
-            'prettier/prettier': 'error',
             'prefer-template': 'error',
             'no-inner-declarations': 'warn',
             'no-global-assign': 'warn',
