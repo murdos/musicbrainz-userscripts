@@ -2,8 +2,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { RELEASE_URLS } from './config';
-import { loadParseDiscogsRelease } from './load-parser';
+import { RELEASE_URLS } from './config.ts';
+import { loadParseDiscogsRelease } from './load-parser.ts';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(DIR, 'fixtures');
