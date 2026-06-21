@@ -246,7 +246,12 @@ $(document).ready(function () {
                         title: 'Search release title on Google',
                     })
                     .addClass('release-title-action-btn')
-                    .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
+                    .css({
+                        ...iconCSS,
+                        display: 'inline-block',
+                        cursor: 'pointer',
+                        marginLeft: '2px',
+                    })
                     .append($searchImg.clone());
                 $iconsContainer.append($googleTitleLink);
 
@@ -263,7 +268,11 @@ $(document).ready(function () {
                     .join(' ');
                 const googleExactUrl = `https://www.google.com/search?q=${encodeURIComponent(exactQuery)}`;
                 const $searchArtistImg = $('<img />')
-                    .attr({ src: GM_getResourceURL('searchArtistIcon'), alt: 'Search artist and title', role: 'img' })
+                    .attr({
+                        src: GM_getResourceURL('searchArtistIcon'),
+                        alt: 'Search artist and title',
+                        role: 'img',
+                    })
                     .css(iconCSS);
                 const $googleExactLink = $('<a />')
                     .attr({
@@ -273,14 +282,23 @@ $(document).ready(function () {
                         title: 'Search Google for exact match (artist(s) + release title)',
                     })
                     .addClass('release-title-action-btn')
-                    .css({ ...iconCSS, display: 'inline-block', cursor: 'pointer', marginLeft: '2px' })
+                    .css({
+                        ...iconCSS,
+                        display: 'inline-block',
+                        cursor: 'pointer',
+                        marginLeft: '2px',
+                    })
                     .append($searchArtistImg);
                 $iconsContainer.append($googleExactLink);
             }
 
             if (shouldShowCopyButton) {
                 const $img = $('<img />')
-                    .attr({ src: GM_getResourceURL('copyIcon'), alt: 'Copy', title: 'Copy release title' })
+                    .attr({
+                        src: GM_getResourceURL('copyIcon'),
+                        alt: 'Copy',
+                        title: 'Copy release title',
+                    })
                     .css({ ...iconCSS, cursor: 'pointer' });
                 const $checkImg = $('<img />')
                     .attr({ src: GM_getResourceURL('checkIcon'), alt: 'Copied' })

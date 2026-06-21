@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import { RELEASE_URLS } from './config';
 import { loadParseDiscogsRelease } from './load-parser';
 

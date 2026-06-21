@@ -1,5 +1,5 @@
-import type { Release } from '~/types/importers';
 import { searchParams } from '~/lib/shared/search-params';
+import type { Release } from '~/types/importers';
 
 export function buildSearchLink(release: Release): string {
     const parameters = searchParams(release);

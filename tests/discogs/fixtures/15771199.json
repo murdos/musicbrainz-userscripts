@@ -80,18 +80,12 @@
         {
             "name": "CD",
             "qty": "2",
-            "descriptions": [
-                "Album",
-                "Deluxe Edition",
-                "Stereo"
-            ]
+            "descriptions": ["Album", "Deluxe Edition", "Stereo"]
         },
         {
             "name": "DVD",
             "qty": "1",
-            "descriptions": [
-                "DVD-Video"
-            ]
+            "descriptions": ["DVD-Video"]
         }
     ],
     "data_quality": "Needs Vote",
@@ -217,12 +211,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Rock"
-    ],
-    "styles": [
-        "Folk Rock"
-    ],
+    "genres": ["Rock"],
+    "styles": ["Folk Rock"],
     "tracklist": [
         {
             "position": "",

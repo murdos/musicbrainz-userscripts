@@ -34,10 +34,7 @@
         {
             "name": "Vinyl",
             "qty": "2",
-            "descriptions": [
-                "LP",
-                "Album"
-            ],
+            "descriptions": ["LP", "Album"],
             "text": "Gatefold"
         }
     ],
@@ -191,14 +188,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Electronic",
-        "Pop"
-    ],
-    "styles": [
-        "Ballad",
-        "Disco"
-    ],
+    "genres": ["Electronic", "Pop"],
+    "styles": ["Ballad", "Disco"],
     "tracklist": [
         {
             "position": "",

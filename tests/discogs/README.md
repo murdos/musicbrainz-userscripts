@@ -35,14 +35,14 @@ CI runs `pnpm test:discogs` on every pull request. No Discogs API calls are made
 1. Find a Discogs release that exercises the behaviour you care about.
 2. Add its API URL to `RELEASE_URLS` in `config.ts`:
 
-   ```ts
-   export const RELEASE_URLS = [
-       // ...
-       'https://api.discogs.com/releases/1234567', // brief note on what this covers
-   ] as const;
-   ```
+    ```ts
+    export const RELEASE_URLS = [
+        // ...
+        'https://api.discogs.com/releases/1234567', // brief note on what this covers
+    ] as const;
+    ```
 
-   Use the API URL (`https://api.discogs.com/releases/<id>`), not the website URL.
+    Use the API URL (`https://api.discogs.com/releases/<id>`), not the website URL.
 
 3. Fetch fixtures and generate snapshots (see below).
 4. Commit the new fixture, snapshot, and config change.

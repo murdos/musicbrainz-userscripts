@@ -1,7 +1,7 @@
-import { defineConfig } from 'eslint/config';
-import globals from 'globals';
 import js from '@eslint/js';
 import userscripts from 'eslint-plugin-userscripts';
+import { defineConfig } from 'eslint/config';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([

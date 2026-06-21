@@ -82,10 +82,7 @@
         {
             "name": "File",
             "qty": "41",
-            "descriptions": [
-                "FLAC",
-                "Special Edition"
-            ],
+            "descriptions": ["FLAC", "Special Edition"],
             "text": "24 bit/96 kHz"
         }
     ],
@@ -138,13 +135,8 @@
         }
     ],
     "videos": [],
-    "genres": [
-        "Classical"
-    ],
-    "styles": [
-        "Romantic",
-        "Classical"
-    ],
+    "genres": ["Classical"],
+    "styles": ["Romantic", "Classical"],
     "tracklist": [
         {
             "position": "",

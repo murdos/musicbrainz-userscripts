@@ -85,7 +85,10 @@ const resolveBandcampReleaseUrl = tralbumUrl => {
     const result = { url: pageUrl, alternateUrls: [] };
 
     if (tralbumDataUrl && normalizeUrlForComparison(tralbumDataUrl) !== normalizeUrlForComparison(pageUrl)) {
-        LOGGER.info('TralbumData URL differs from page URL; using page URL', { pageUrl, tralbumDataUrl });
+        LOGGER.info('TralbumData URL differs from page URL; using page URL', {
+            pageUrl,
+            tralbumDataUrl,
+        });
         result.alternateUrls.push(tralbumDataUrl);
     }
 
@@ -533,7 +536,11 @@ function init() {
                 hostnames,
                 insertionLocationMatcher,
             }),
-            ...collectDiscographyReleaseLinks({ linksMatcher: releaseLinksMatcher, hostnames, insertionLocationMatcher }),
+            ...collectDiscographyReleaseLinks({
+                linksMatcher: releaseLinksMatcher,
+                hostnames,
+                insertionLocationMatcher,
+            }),
         ];
 
         if (urls_data.length > 0) {

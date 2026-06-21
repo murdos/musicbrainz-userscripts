@@ -89,10 +89,7 @@
         {
             "name": "CD",
             "qty": "2",
-            "descriptions": [
-                "Album",
-                "Stereo"
-            ]
+            "descriptions": ["Album", "Stereo"]
         }
     ],
     "data_quality": "Correct",
@@ -304,12 +301,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Rock"
-    ],
-    "styles": [
-        "Space Rock"
-    ],
+    "genres": ["Rock"],
+    "styles": ["Space Rock"],
     "tracklist": [
         {
             "position": "1-1",

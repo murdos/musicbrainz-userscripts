@@ -1,7 +1,8 @@
-import type { ArtistCredit, Release } from '~/types/importers';
 import type { FormParameter } from '~/lib/shared/search-params';
 import { appendParameter } from '~/lib/shared/search-params';
 import { hmsToMilliSeconds } from '~/lib/shared/time-functions';
+import type { ArtistCredit, Release } from '~/types/importers';
+
 import { guessReleaseType } from './guessReleaseType';
 
 function buildArtistCreditsFormParameters(parameters: FormParameter[], paramPrefix: string, artist_credit: ArtistCredit[]): void {

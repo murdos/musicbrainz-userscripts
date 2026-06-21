@@ -229,10 +229,7 @@
         {
             "name": "Vinyl",
             "qty": "2",
-            "descriptions": [
-                "LP",
-                "Album"
-            ]
+            "descriptions": ["LP", "Album"]
         }
     ],
     "data_quality": "Correct",
@@ -478,14 +475,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Electronic",
-        "Pop"
-    ],
-    "styles": [
-        "Ballad",
-        "Disco"
-    ],
+    "genres": ["Electronic", "Pop"],
+    "styles": ["Ballad", "Disco"],
     "tracklist": [
         {
             "position": "",

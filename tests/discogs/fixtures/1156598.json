@@ -106,11 +106,7 @@
         {
             "name": "Vinyl",
             "qty": "1",
-            "descriptions": [
-                "LP",
-                "Album",
-                "Stereo"
-            ]
+            "descriptions": ["LP", "Album", "Stereo"]
         }
     ],
     "data_quality": "Correct",
@@ -403,12 +399,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Rock"
-    ],
-    "styles": [
-        "Prog Rock"
-    ],
+    "genres": ["Rock"],
+    "styles": ["Prog Rock"],
     "tracklist": [
         {
             "position": "A1",
