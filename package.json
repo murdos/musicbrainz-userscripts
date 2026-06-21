@@ -11,6 +11,9 @@
         "lint": "pnpm run eslint",
         "lint-fix": "pnpm run eslint -- --fix",
         "eslint": "eslint .",
+        "test": "tsx tests/discogs/run.ts",
+        "test:discogs": "tsx tests/discogs/run.ts",
+        "test:discogs:update": "tsx tests/discogs/run.ts --update",
         "prepare": "husky"
     },
     "repository": {

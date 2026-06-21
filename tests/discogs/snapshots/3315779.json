@@ -1,0 +1,269 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Ik Breng Voor Jullie Zonneschijn !",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "De Heikrekels",
+                            "credited_name": "De Heikrekels",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A1"
+                },
+                {
+                    "title": "Leve, Leve De Liefde !",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Marjan Kampen",
+                            "credited_name": "Marjan Kampen",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A2"
+                },
+                {
+                    "title": "Margrietje",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Fred Limpens",
+                            "credited_name": "Fred Limpens",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A3"
+                },
+                {
+                    "title": "Al Ging Ons Pad Niet Altijd Over Rozen !",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Duo Onbekend",
+                            "credited_name": "Duo Onbekend",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A4"
+                },
+                {
+                    "title": "Werkeloos",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Rafael",
+                            "credited_name": "Rafael",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A5"
+                },
+                {
+                    "title": "Niemand Heeft Je Ooit Gezien",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Marjan Kampen",
+                            "credited_name": "Marjan Kampen",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A6"
+                },
+                {
+                    "title": "Zomerzon",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Trio De Rog",
+                            "credited_name": "Trio De Rog",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A7"
+                },
+                {
+                    "title": "Fleudemeu",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Duo Pils",
+                            "credited_name": "Duo Pils",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "A8"
+                },
+                {
+                    "title": "Mandolinen In Nicosia",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Zangeres Zonder Naam",
+                            "credited_name": "De Zangeres Zonder Naam",
+                            "joinphrase": " En ",
+                            "mbid": ""
+                        },
+                        {
+                            "artist_name": "The Walkers",
+                            "credited_name": "The Walkers",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B1"
+                },
+                {
+                    "title": "Met 'n Roos In Je Blonde Haren",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Theo Diepenbrock",
+                            "credited_name": "Theo Diepenbrock",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B2"
+                },
+                {
+                    "title": "Mario",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Beppie Kraft",
+                            "credited_name": "Beppie Kraft",
+                            "joinphrase": " En ",
+                            "mbid": ""
+                        },
+                        {
+                            "artist_name": "De Arona Stars",
+                            "credited_name": "De Arona Stars",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B3"
+                },
+                {
+                    "title": "Meisjes Met Rode Haren",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Theo Diepenbrock",
+                            "credited_name": "Theo Diepenbrock",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B4"
+                },
+                {
+                    "title": "Jij Hebt Me Bedrogen !",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Beppie Kraft",
+                            "credited_name": "Beppie Kraft",
+                            "joinphrase": " En ",
+                            "mbid": ""
+                        },
+                        {
+                            "artist_name": "De Arona Stars",
+                            "credited_name": "De Arona Stars",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B5"
+                },
+                {
+                    "title": "Ik Ben Alleen Vannacht",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Fred Limpens",
+                            "credited_name": "Fred Limpens",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B6"
+                },
+                {
+                    "title": "Je Kan Me Wel Vergeten !",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Riek En Jan",
+                            "credited_name": "Riek En Jan",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B7"
+                },
+                {
+                    "title": "De Laatste Tango",
+                    "duration": null,
+                    "artist_credit": [
+                        {
+                            "artist_name": "Karel Thiel",
+                            "credited_name": "Karel Thiel",
+                            "joinphrase": "",
+                            "mbid": ""
+                        }
+                    ],
+                    "number": "B8"
+                }
+            ],
+            "format": "12\" Vinyl"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Various Artists",
+            "credited_name": "",
+            "joinphrase": "",
+            "mbid": "89ad4ac3-39f7-470e-963a-56509c546377"
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "16 Hollandse Hits *5*",
+    "year": 1972,
+    "country": "NL",
+    "labels": [
+        {
+            "name": "Telstar (2)",
+            "catno": "TPA 89531 TL",
+            "mbid": ""
+        },
+        {
+            "name": "Telstar (2)",
+            "catno": "TPA 89.531",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/3315779",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [
+        "compilation"
+    ]
+}

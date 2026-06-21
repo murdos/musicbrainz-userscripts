@@ -30,7 +30,7 @@
         },
         "types": ["node"]
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "tests/**/*"],
     "typeRoots": ["node_modules/@types", "src/types"],
     "exclude": ["node_modules", "dist", "**/*.user.js"]
 }

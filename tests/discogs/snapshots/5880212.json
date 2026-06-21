@@ -1,0 +1,100 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Harpsichord Concerto In D Minor, BWV 1052: I. Allegro / II. Adagio / III. Allegro",
+                    "duration": 1255000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Harpsichord Concerto In F Major, BWV 1057: I. [Allegro] / II. Andante / III. Allegro Assai",
+                    "duration": 942000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Harpsichord Concerto In G Minor, BWV 1058: I. [Allegro] / II. Andante / III. Allegro Assai ",
+                    "duration": 763000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Harpsichord Concerto In D Major, BWV 1054: I. Allegro / II. Adagio E Piano Sempre / III. Allegro",
+                    "duration": 955000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Harpsichord Concerto In E Major, BWV 1053: I. [Allegro] / II. Siciliano / III. Allegro",
+                    "duration": 1216000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Harpsichord Concerto In F Minor, BWV 1056: I. [Allegro] / II. Largo / III. Presto",
+                    "duration": 554000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Harpsichord Concerto In A Major, BWV 1055: I. Allegro / II. Larghetto (Siciliano) / III. Allegro Ma Non Tanto",
+                    "duration": 769000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044: I. Allegro / II. Adagio Ma Non Tanto E Dolce / III. Tempo Di Allabreve",
+                    "duration": 1267000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Johann Sebastian Bach",
+            "credited_name": "J.S. Bach",
+            "joinphrase": " - ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "Christophe Rousset",
+            "credited_name": "Christophe Rousset",
+            "joinphrase": " • ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "The Academy Of Ancient Music",
+            "credited_name": "The Academy Of Ancient Music",
+            "joinphrase": " • ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "Christopher Hogwood",
+            "credited_name": "Christopher Hogwood",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "title": "The Complete Harpsichord Concertos",
+    "year": 1998,
+    "labels": [
+        {
+            "name": "Decca",
+            "catno": "460 031-2",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/5880212",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [
+        "compilation"
+    ],
+    "barcode": "028946003121"
+}

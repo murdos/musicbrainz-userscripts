@@ -1,0 +1,821 @@
+{
+    "id": 15771199,
+    "status": "Accepted",
+    "year": 2020,
+    "resource_url": "https://api.discogs.com/releases/15771199",
+    "uri": "https://www.discogs.com/release/15771199-Levellers-Peace",
+    "artists": [
+        {
+            "name": "The Levellers",
+            "anv": "Levellers",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 23672,
+            "resource_url": "https://api.discogs.com/artists/23672",
+            "thumbnail_url": "https://i.discogs.com/lsjue6CQsumyyfiqszluGkpkQRKv_lq0qr0vGaAKIQE/rs:fit/g:sm/q:90/h:420/w:556/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTIzNjcy/LTEzOTI3OTY1MTQt/OTI5OS5qcGVn.jpeg"
+        }
+    ],
+    "artists_sort": "Levellers, The",
+    "labels": [
+        {
+            "name": "On The Fiddle Recordings",
+            "catno": "OTFCD031X",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 94836,
+            "resource_url": "https://api.discogs.com/labels/94836",
+            "thumbnail_url": "https://i.discogs.com/sQXn_-PBH_k2qNJ2Pk_idMU1dIVP236fTsevwQSrdzA/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk0ODM2/LTE0MzgxNTI2OTct/NTUxNy5qcGVn.jpeg"
+        },
+        {
+            "name": "On The Fiddle Recordings",
+            "catno": "OTFCD031",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 94836,
+            "resource_url": "https://api.discogs.com/labels/94836",
+            "thumbnail_url": "https://i.discogs.com/sQXn_-PBH_k2qNJ2Pk_idMU1dIVP236fTsevwQSrdzA/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk0ODM2/LTE0MzgxNTI2OTct/NTUxNy5qcGVn.jpeg"
+        },
+        {
+            "name": "On The Fiddle Recordings",
+            "catno": "OTFDVD031",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 94836,
+            "resource_url": "https://api.discogs.com/labels/94836",
+            "thumbnail_url": "https://i.discogs.com/sQXn_-PBH_k2qNJ2Pk_idMU1dIVP236fTsevwQSrdzA/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk0ODM2/LTE0MzgxNTI2OTct/NTUxNy5qcGVn.jpeg"
+        }
+    ],
+    "series": [],
+    "companies": [
+        {
+            "name": "On The Fiddle Recordings",
+            "catno": "",
+            "entity_type": "13",
+            "entity_type_name": "Phonographic Copyright (p)",
+            "id": 94836,
+            "resource_url": "https://api.discogs.com/labels/94836",
+            "thumbnail_url": "https://i.discogs.com/sQXn_-PBH_k2qNJ2Pk_idMU1dIVP236fTsevwQSrdzA/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk0ODM2/LTE0MzgxNTI2OTct/NTUxNy5qcGVn.jpeg"
+        },
+        {
+            "name": "On The Fiddle Recordings",
+            "catno": "",
+            "entity_type": "14",
+            "entity_type_name": "Copyright (c)",
+            "id": 94836,
+            "resource_url": "https://api.discogs.com/labels/94836",
+            "thumbnail_url": "https://i.discogs.com/sQXn_-PBH_k2qNJ2Pk_idMU1dIVP236fTsevwQSrdzA/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk0ODM2/LTE0MzgxNTI2OTct/NTUxNy5qcGVn.jpeg"
+        },
+        {
+            "name": "Metway Studios",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 265505,
+            "resource_url": "https://api.discogs.com/labels/265505",
+            "thumbnail_url": "https://i.discogs.com/MVTqwhguvfWGjmQLKALrqMBrmTQqNQJuuwFniSQ6yxk/rs:fit/g:sm/q:90/h:98/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2NTUw/NS0xMzQ4NDAzNTAx/LTk1MzIucG5n.jpeg"
+        }
+    ],
+    "formats": [
+        {
+            "name": "CD",
+            "qty": "2",
+            "descriptions": [
+                "Album",
+                "Deluxe Edition",
+                "Stereo"
+            ]
+        },
+        {
+            "name": "DVD",
+            "qty": "1",
+            "descriptions": [
+                "DVD-Video"
+            ]
+        }
+    ],
+    "data_quality": "Needs Vote",
+    "community": {
+        "have": 145,
+        "want": 29,
+        "rating": {
+            "count": 6,
+            "average": 4.17
+        },
+        "submitter": {
+            "username": "IvanDobsky",
+            "resource_url": "https://api.discogs.com/users/IvanDobsky"
+        },
+        "contributors": [
+            {
+                "username": "IvanDobsky",
+                "resource_url": "https://api.discogs.com/users/IvanDobsky"
+            },
+            {
+                "username": "Disgone",
+                "resource_url": "https://api.discogs.com/users/Disgone"
+            },
+            {
+                "username": "Broedi",
+                "resource_url": "https://api.discogs.com/users/Broedi"
+            },
+            {
+                "username": "paquet",
+                "resource_url": "https://api.discogs.com/users/paquet"
+            }
+        ],
+        "data_quality": "Needs Vote",
+        "status": "Accepted"
+    },
+    "format_quantity": 3,
+    "date_added": "2020-08-15T06:18:06-07:00",
+    "date_changed": "2020-09-27T14:18:48-07:00",
+    "num_for_sale": 2,
+    "lowest_price": 39.62,
+    "master_id": 1788962,
+    "master_url": "https://api.discogs.com/masters/1788962",
+    "title": "Peace",
+    "country": "UK & Europe",
+    "released": "2020-08-14",
+    "notes": "Deluxe edition has a slipcase holding standard gatefold CD digisleeve with extra bonus CD inserted.  \nCardsleeve holding DVD (OTFDCD031).  \n20 page booklet of lyrics and local photographs.",
+    "released_formatted": "14 Aug 2020",
+    "identifiers": [
+        {
+            "type": "Barcode",
+            "value": "5053760056973",
+            "description": "Slipcase"
+        },
+        {
+            "type": "Barcode",
+            "value": "5053760056966",
+            "description": "Album"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "OTFCD031 11 A00",
+            "description": "CD1"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L551",
+            "description": "CD1"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 948T",
+            "description": "CD1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "OTFCD031X 18 A00",
+            "description": "CD2 Bonus Disc"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L558",
+            "description": "CD2 Bonus Disc"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 94Y7",
+            "description": "CD2 Bonus Disc"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "OTFDVD031L0 15 A00",
+            "description": "DVD Layer 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "OTFDVD031L1 12 A00 ",
+            "description": "DVD Layer 1"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L552",
+            "description": "DVD"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 946Z",
+            "description": "DVD"
+        }
+    ],
+    "videos": [
+        {
+            "uri": "https://www.youtube.com/watch?v=HZ7BUG1oSS4",
+            "title": "Four Boys Lost",
+            "description": "Provided to YouTube by Republic of Music\n\nFour Boys Lost · Levellers\n\nPeace\n\n℗ ON THE FIDDLE RECORDINGS\n\nReleased on: 2020-08-14\n\nArtist: Levellers\n\nAuto-generated by YouTube.",
+            "duration": 217,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=AQF1TCpIP5g",
+            "title": "Levellers - Peace (Full Album) 2020",
+            "description": "Levellers - Peace (Full Album) 2020\nIt's the 11th studio album of this unique band from  Brigthon.\nThanks for watching! Don't forget to SUBSCRIBE!",
+            "duration": 2204,
+            "embed": true
+        }
+    ],
+    "genres": [
+        "Rock"
+    ],
+    "styles": [
+        "Folk Rock"
+    ],
+    "tracklist": [
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Peace",
+            "duration": ""
+        },
+        {
+            "position": "CD1-1",
+            "type_": "track",
+            "title": "Food Roof Family",
+            "duration": "3:40"
+        },
+        {
+            "position": "CD1-2",
+            "type_": "track",
+            "title": "Generation Fear",
+            "duration": "2:36"
+        },
+        {
+            "position": "CD1-3",
+            "type_": "track",
+            "title": "Four Boys Lost",
+            "extraartists": [
+                {
+                    "name": "Ronan Le Bars",
+                    "anv": "",
+                    "join": "",
+                    "role": "Uilleann Pipes",
+                    "tracks": "",
+                    "id": 425981,
+                    "resource_url": "https://api.discogs.com/artists/425981"
+                }
+            ],
+            "duration": "3:36"
+        },
+        {
+            "position": "CD1-4",
+            "type_": "track",
+            "title": "Burning Hate Like Fire",
+            "extraartists": [
+                {
+                    "name": "Steve Boakes",
+                    "anv": "",
+                    "join": "",
+                    "role": "Didgeridoo",
+                    "tracks": "",
+                    "id": 260488,
+                    "resource_url": "https://api.discogs.com/artists/260488"
+                }
+            ],
+            "duration": "3:49"
+        },
+        {
+            "position": "CD1-5",
+            "type_": "track",
+            "title": "Born That Way",
+            "duration": "3:13"
+        },
+        {
+            "position": "CD1-6",
+            "type_": "track",
+            "title": "Our New Day",
+            "duration": "2:33"
+        },
+        {
+            "position": "CD1-7",
+            "type_": "track",
+            "title": "Calling Out",
+            "duration": "3:44"
+        },
+        {
+            "position": "CD1-8",
+            "type_": "track",
+            "title": "Ghosts In The Water",
+            "duration": "3:59"
+        },
+        {
+            "position": "CD1-9",
+            "type_": "track",
+            "title": "The Men Who Would Be King",
+            "duration": "2:20"
+        },
+        {
+            "position": "CD1-10",
+            "type_": "track",
+            "title": "Albion & Phoenix",
+            "duration": "3:09"
+        },
+        {
+            "position": "CD1-11",
+            "type_": "track",
+            "title": "Our Future",
+            "duration": "3:55"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Bonus CD",
+            "duration": ""
+        },
+        {
+            "position": "CD2-1",
+            "type_": "track",
+            "title": "All The Unknown",
+            "duration": "2:18"
+        },
+        {
+            "position": "CD2-2",
+            "type_": "track",
+            "title": "Sleep Well",
+            "duration": "2:16"
+        },
+        {
+            "position": "CD2-3",
+            "type_": "track",
+            "title": "Improperty",
+            "duration": "1:42"
+        },
+        {
+            "position": "CD2-4",
+            "type_": "track",
+            "title": "Revelation",
+            "duration": "3:30"
+        },
+        {
+            "position": "CD2-5",
+            "type_": "track",
+            "title": "The Men Who Would Be King (Max Pashm Remix)",
+            "extraartists": [
+                {
+                    "name": "Max Pashm",
+                    "anv": "",
+                    "join": "",
+                    "role": "Remix",
+                    "tracks": "",
+                    "id": 38901,
+                    "resource_url": "https://api.discogs.com/artists/38901"
+                }
+            ],
+            "duration": "4:23"
+        },
+        {
+            "position": "CD2-6",
+            "type_": "track",
+            "title": "That Way Born (Hannah Moule Remake)",
+            "extraartists": [
+                {
+                    "name": "Hannah Miller",
+                    "anv": "Hannah Moule",
+                    "join": "",
+                    "role": "Cello",
+                    "tracks": "",
+                    "id": 1482651,
+                    "resource_url": "https://api.discogs.com/artists/1482651"
+                },
+                {
+                    "name": "Oliver Austin",
+                    "anv": "Oli Moule",
+                    "join": "",
+                    "role": "Percussion",
+                    "tracks": "",
+                    "id": 3848120,
+                    "resource_url": "https://api.discogs.com/artists/3848120"
+                },
+                {
+                    "name": "Hannah Miller",
+                    "anv": "Hannah Moule",
+                    "join": "",
+                    "role": "Remix",
+                    "tracks": "",
+                    "id": 1482651,
+                    "resource_url": "https://api.discogs.com/artists/1482651"
+                },
+                {
+                    "name": "Oliver Austin",
+                    "anv": "Oli Moule",
+                    "join": "",
+                    "role": "Remix",
+                    "tracks": "",
+                    "id": 3848120,
+                    "resource_url": "https://api.discogs.com/artists/3848120"
+                },
+                {
+                    "name": "Hannah Miller",
+                    "anv": "Hannah Moule",
+                    "join": "",
+                    "role": "Synth",
+                    "tracks": "",
+                    "id": 1482651,
+                    "resource_url": "https://api.discogs.com/artists/1482651"
+                },
+                {
+                    "name": "Hannah Miller",
+                    "anv": "Hannah Moule",
+                    "join": "",
+                    "role": "Vocals",
+                    "tracks": "",
+                    "id": 1482651,
+                    "resource_url": "https://api.discogs.com/artists/1482651"
+                }
+            ],
+            "duration": "3:35"
+        },
+        {
+            "position": "CD2-7",
+            "type_": "track",
+            "title": "Burning Hate Like Fire (Lean Fiddler Remix)",
+            "duration": "4:03"
+        },
+        {
+            "position": "CD2-8",
+            "type_": "track",
+            "title": "Generation Fear (Alex Banks Remix)",
+            "extraartists": [
+                {
+                    "name": "Alex Banks (2)",
+                    "anv": "",
+                    "join": "",
+                    "role": "Remix",
+                    "tracks": "",
+                    "id": 3794562,
+                    "resource_url": "https://api.discogs.com/artists/3794562"
+                }
+            ],
+            "duration": "5:09"
+        },
+        {
+            "position": "CD2-9",
+            "type_": "track",
+            "title": "Our Future (Cut La Roc Remix)",
+            "extraartists": [
+                {
+                    "name": "Cut La Roc",
+                    "anv": "",
+                    "join": "",
+                    "role": "Remix",
+                    "tracks": "",
+                    "id": 1342,
+                    "resource_url": "https://api.discogs.com/artists/1342"
+                }
+            ],
+            "duration": "4:59"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "The Video Album",
+            "duration": ""
+        },
+        {
+            "position": "DVD-1",
+            "type_": "track",
+            "title": "Food Roof Family",
+            "duration": "7:03"
+        },
+        {
+            "position": "DVD-2",
+            "type_": "track",
+            "title": "Generation Fear",
+            "duration": "3:39"
+        },
+        {
+            "position": "DVD-3",
+            "type_": "track",
+            "title": "Four Boys Lost",
+            "extraartists": [
+                {
+                    "name": "Ronan Le Bars",
+                    "anv": "",
+                    "join": "",
+                    "role": "Uilleann Pipes",
+                    "tracks": "",
+                    "id": 425981,
+                    "resource_url": "https://api.discogs.com/artists/425981"
+                }
+            ],
+            "duration": "5:18"
+        },
+        {
+            "position": "DVD-4",
+            "type_": "track",
+            "title": "Burning Hate Like Fire",
+            "extraartists": [
+                {
+                    "name": "Steve Boakes",
+                    "anv": "",
+                    "join": "",
+                    "role": "Didgeridoo",
+                    "tracks": "",
+                    "id": 260488,
+                    "resource_url": "https://api.discogs.com/artists/260488"
+                }
+            ],
+            "duration": "3:53"
+        },
+        {
+            "position": "DVD-5",
+            "type_": "track",
+            "title": "Born That Way",
+            "duration": "6:46"
+        },
+        {
+            "position": "DVD-6",
+            "type_": "track",
+            "title": "Our New Day",
+            "duration": "2:35"
+        },
+        {
+            "position": "DVD-7",
+            "type_": "track",
+            "title": "Calling Out",
+            "duration": "6:30"
+        },
+        {
+            "position": "DVD-8",
+            "type_": "track",
+            "title": "Ghosts In The Water",
+            "duration": "5:36"
+        },
+        {
+            "position": "DVD-9",
+            "type_": "track",
+            "title": "The Men Who Would Be King",
+            "duration": "4:27"
+        },
+        {
+            "position": "DVD-10",
+            "type_": "track",
+            "title": "Albion & Phoenix",
+            "duration": "4:35"
+        },
+        {
+            "position": "DVD-11",
+            "type_": "track",
+            "title": "Our Future",
+            "duration": "5:06"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "The Singles",
+            "duration": ""
+        },
+        {
+            "position": "DVD-12",
+            "type_": "track",
+            "title": "Food Roof Family",
+            "duration": "4:04"
+        },
+        {
+            "position": "DVD-13",
+            "type_": "track",
+            "title": "Calling Out",
+            "duration": "4:42"
+        },
+        {
+            "position": "DVD-14",
+            "type_": "track",
+            "title": "Generation Fear",
+            "duration": "10:41"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Extras",
+            "duration": ""
+        },
+        {
+            "position": "DVD-15",
+            "type_": "track",
+            "title": "Acrylic On Canvas",
+            "duration": "4:23"
+        },
+        {
+            "position": "DVD-16",
+            "type_": "track",
+            "title": "Local Heroes",
+            "duration": "6:05"
+        },
+        {
+            "position": "DVD-17",
+            "type_": "track",
+            "title": "Metway Miniature Set Tour",
+            "duration": "8:03"
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Charlie Heather",
+            "anv": "Charlie",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 657697,
+            "resource_url": "https://api.discogs.com/artists/657697"
+        },
+        {
+            "name": "Jeremy Cunningham",
+            "anv": "Jeremy",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 605362,
+            "resource_url": "https://api.discogs.com/artists/605362"
+        },
+        {
+            "name": "Jon Sevink",
+            "anv": "Jon",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 657688,
+            "resource_url": "https://api.discogs.com/artists/657688"
+        },
+        {
+            "name": "Mark Chadwick",
+            "anv": "Mark",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 605363,
+            "resource_url": "https://api.discogs.com/artists/605363"
+        },
+        {
+            "name": "Matt Savage",
+            "anv": "Matt",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 597493,
+            "resource_url": "https://api.discogs.com/artists/597493"
+        },
+        {
+            "name": "Simon Friend",
+            "anv": "Simon",
+            "join": "",
+            "role": "Performer",
+            "tracks": "",
+            "id": 657715,
+            "resource_url": "https://api.discogs.com/artists/657715"
+        },
+        {
+            "name": "Sean Lakeman",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 924713,
+            "resource_url": "https://api.discogs.com/artists/924713"
+        },
+        {
+            "name": "The Levellers",
+            "anv": "Levellers",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "",
+            "id": 23672,
+            "resource_url": "https://api.discogs.com/artists/23672"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/eb32yEVCyr3yGjF0bAK6o0s8B42f-wpZAF8nwMSLFYw/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzItNDc3Ni5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/eb32yEVCyr3yGjF0bAK6o0s8B42f-wpZAF8nwMSLFYw/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzItNDc3Ni5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/Bn6im9iKzivlLWr_6pyQlNaNAEmZtpxd-Nqs7-PqKd0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzItNDc3Ni5qcGVn.jpeg",
+            "width": 600,
+            "height": 597
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/EVhGati-bVWMca3qWXypLim2r8h9b-qEb37USNVBn2s/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzEtODMxOS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/EVhGati-bVWMca3qWXypLim2r8h9b-qEb37USNVBn2s/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzEtODMxOS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/gyxyDQinezIosxegbHWN-Xx9zZmwDldGAkZT326maVM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzEtODMxOS5qcGVn.jpeg",
+            "width": 600,
+            "height": 594
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/i-D_wRAR4OPX9nB6Iec8MtCJTE1fwinZEwXug5qzx_w/rs:fit/g:sm/q:90/h:51/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NjctOTI0OS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/i-D_wRAR4OPX9nB6Iec8MtCJTE1fwinZEwXug5qzx_w/rs:fit/g:sm/q:90/h:51/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NjctOTI0OS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/3JJztJwdBTs7ZUG6CzpWIqw5spCWDAcVHqa6XHqlfOU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NjctOTI0OS5qcGVn.jpeg",
+            "width": 600,
+            "height": 51
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/nf36RvIYKS4kkp3L1i6YKRi_V9BYIkfE9czPJkmYg1g/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTUtNTU5MC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/nf36RvIYKS4kkp3L1i6YKRi_V9BYIkfE9czPJkmYg1g/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTUtNTU5MC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/IZ3LFCYmd5DyjKcNS_W7JneymhLp8UChtdM0uMMfPS0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTUtNTU5MC5qcGVn.jpeg",
+            "width": 600,
+            "height": 595
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/nCOrJFvWQMzSaa9xLzxCTPyAGfIa2EHv4Arx63kp9lI/rs:fit/g:sm/q:90/h:572/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTQtODQzMC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/nCOrJFvWQMzSaa9xLzxCTPyAGfIa2EHv4Arx63kp9lI/rs:fit/g:sm/q:90/h:572/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTQtODQzMC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/HdR8qKXdf7J1zORy0QGHJXNw8-ckQeaCgMpjV6FZMEs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/OTQtODQzMC5qcGVn.jpeg",
+            "width": 600,
+            "height": 572
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/rtMBxvfIR5PSbyI_a15icCeqDASLkXzZaOFyEJp0LPw/rs:fit/g:sm/q:90/h:31/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/ODktODE2NS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/rtMBxvfIR5PSbyI_a15icCeqDASLkXzZaOFyEJp0LPw/rs:fit/g:sm/q:90/h:31/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/ODktODE2NS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/1VYQSCUAj8lKigaTIOW1uLtdcTrn-gRtMcPCfvoAXng/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/ODktODE2NS5qcGVn.jpeg",
+            "width": 600,
+            "height": 31
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/xNl0uo_ImSIhT0Opnf2k9WXzYPgfwaheDJZLA9Pixys/rs:fit/g:sm/q:90/h:293/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTAtNTY4Ny5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/xNl0uo_ImSIhT0Opnf2k9WXzYPgfwaheDJZLA9Pixys/rs:fit/g:sm/q:90/h:293/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTAtNTY4Ny5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/7bDA_A0iX5b4dT8r1IpGk4sVv6GhC3lIFv-Wt0rEUMs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTAtNTY4Ny5qcGVn.jpeg",
+            "width": 600,
+            "height": 293
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/IUmjXNkWXowhONLWxeBL0wIspeQWM-vSh24hEIr5CaE/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtMjU1My5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/IUmjXNkWXowhONLWxeBL0wIspeQWM-vSh24hEIr5CaE/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtMjU1My5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/YVgA6Je4h-fyzEnoAh_yhmVN_M3V5ecOX8YSlTZ6e3k/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtMjU1My5qcGVn.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/K1rFcWIWSSnNBdt53zSk8IbfRJat9HlLl9_732qLuSA/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtNDQ2MC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/K1rFcWIWSSnNBdt53zSk8IbfRJat9HlLl9_732qLuSA/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtNDQ2MC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/mqBVYSAwRFNdUqOAdTbhMrSLYayVVUClI6U9m__NNEA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/MTYtNDQ2MC5qcGVn.jpeg",
+            "width": 600,
+            "height": 596
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/Y9OJJwBbNh1XF_nVYycc9gCwJyGgYB0L9_FCcc95LWc/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTExNy5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/Y9OJJwBbNh1XF_nVYycc9gCwJyGgYB0L9_FCcc95LWc/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTExNy5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/GJtW3l5q1Hntk0MKUaltQYq5oQQlcf_uW9rD-Xbnyyw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTExNy5qcGVn.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/PTG_J37hmR8w3qKEeg8G8Bs2tJSMxeX-m93UA0YNhqY/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTI4Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/PTG_J37hmR8w3qKEeg8G8Bs2tJSMxeX-m93UA0YNhqY/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTI4Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/Tk-Md--nkq59zzzL640NopkoE_QTeh9IZjkHO16N50M/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDAtNTI4Mi5qcGVn.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/zr5ARNPUZXYYJ98BGNDjpp2J7GkxtzLA1nEBJ-oqUf8/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDItMzE4NC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/zr5ARNPUZXYYJ98BGNDjpp2J7GkxtzLA1nEBJ-oqUf8/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDItMzE4NC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/rbjZ3AO9SgyO5YmT-8xmbWGYefTJomW8mm0vF4eU4qI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NDItMzE4NC5qcGVn.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/r3bEwgZdbIJd_1SJjDcLFhzRO7bEvsj4IJF3s7wDhCw/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjQ1MS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/r3bEwgZdbIJd_1SJjDcLFhzRO7bEvsj4IJF3s7wDhCw/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjQ1MS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/MQNi-T2r8sihxsgJpAvk64t6yf7fLmADFAIbSeMkmJI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjQ1MS5qcGVn.jpeg",
+            "width": 600,
+            "height": 597
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/aoa5c0X9zJoFqpndq382kwhMBw3aZxPqgVcaZhGn8ng/rs:fit/g:sm/q:90/h:588/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjMtNzA1OS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/aoa5c0X9zJoFqpndq382kwhMBw3aZxPqgVcaZhGn8ng/rs:fit/g:sm/q:90/h:588/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjMtNzA1OS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/Vcy614VU1SjizWW-Wf1kmmzlQHNuSp0pNiLO10H3Qhs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjMtNzA1OS5qcGVn.jpeg",
+            "width": 600,
+            "height": 588
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/tGbJBZL1KXDtLahQDoCewEn_L6g7VxZ6qp1aD94w_8g/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE2MDEyMzY2/NDEtMzQ4NC5wbmc.jpeg",
+            "resource_url": "https://i.discogs.com/tGbJBZL1KXDtLahQDoCewEn_L6g7VxZ6qp1aD94w_8g/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE2MDEyMzY2/NDEtMzQ4NC5wbmc.jpeg",
+            "uri150": "https://i.discogs.com/f9QAU8SKGRMPOPKnqmaPiveqQYhnfRTn9oYJ_XgsXS0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE2MDEyMzY2/NDEtMzQ4NC5wbmc.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/I0mZmo6tM5U7mb8GGxELpI7ox99J2Vsb6JhfYj2v06g/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjE2Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/I0mZmo6tM5U7mb8GGxELpI7ox99J2Vsb6JhfYj2v06g/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjE2Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/PG0H-4IkNtB_ZIw_oicBog2NL19W4Bu_jfnlm8AJRdY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTkz/NjQtMjE2Mi5qcGVn.jpeg",
+            "width": 600,
+            "height": 598
+        }
+    ],
+    "thumb": "https://i.discogs.com/Bn6im9iKzivlLWr_6pyQlNaNAEmZtpxd-Nqs7-PqKd0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1Nzcx/MTk5LTE1OTc0OTky/NzItNDc3Ni5qcGVn.jpeg",
+    "estimated_weight": 255,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

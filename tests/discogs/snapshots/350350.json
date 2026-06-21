@@ -1,0 +1,49 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Crashing Aeroplanes: Hindenburg At Lakehurst / Voice Recorder / Value Jet 592 At Miami / To The Sky / Value Jet 592 At Everglades / Case Of Emergency / EIAI 1862 At Amsterdam / Up There / JAL 123 At Mount Osutaka / Autopilot / PanAm 103 At Lockerbie / Last Words / Baggage Claim",
+                    "duration": 3037000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Andreas Ammer",
+            "credited_name": "Ammer",
+            "joinphrase": " / ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "F.M. Einheit",
+            "credited_name": "Einheit",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "title": "Crashing Aeroplanes",
+    "year": 2002,
+    "month": 2,
+    "day": 18,
+    "country": "DE",
+    "labels": [
+        {
+            "name": "FM 4.5.1",
+            "catno": "0538-2",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/350350",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "barcode": "4015698053821"
+}
