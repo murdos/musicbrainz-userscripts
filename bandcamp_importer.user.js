@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.20
+// @version      2026.06.21.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -505,7 +505,7 @@ function init() {
     /***/
     const isMobile = typeof unsafeWindow.TralbumJSONLD !== 'undefined';
     const isPrivateStream = isPrivateStreamPage();
-    let mblinks = new MBLinks('BCI_MBLINKS_CACHE');
+    let mblinks = new MBLinks('BCI_MBLINKS_CACHE', 2);
     const hasBandData = unsafeWindow.BandData && !!unsafeWindow.BandData.id;
     const hasAlbumData = unsafeWindow.TralbumData && 'current' in unsafeWindow.TralbumData; // Sometimes TralbumData is an empty object, see issue #676
     const isDiscographyPage =
