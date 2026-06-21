@@ -10,17 +10,21 @@ import { z } from 'zod';
 
 const EXTENSIONS = ['.js', '.ts'];
 const BABEL_OPTIONS = {
+    babelrc: false,
+    configFile: false,
     babelHelpers: 'bundled',
     exclude: 'node_modules/**',
     include: ['**/*'],
     extensions: EXTENSIONS,
+    targets: {
+        browsers: ['> 1%', 'last 2 versions', 'not ie <= 8'],
+    },
     presets: [
         [
             '@babel/preset-env',
             {
-                targets: {
-                    browsers: ['> 1%', 'last 2 versions', 'not ie <= 8'],
-                },
+                // Rollup bundles modules; Babel only transpiles syntax for target browsers.
+                modules: false,
             },
         ],
         '@babel/preset-typescript',
