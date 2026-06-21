@@ -375,7 +375,7 @@ $(document).ready(function () {
                 }
             });
 
-            function handleMedium($medium, ws_tracks) {
+            const handleMedium = function ($medium, ws_tracks) {
                 // Extend colspan for medium table header
                 $medium.find('thead tr').each(function () {
                     $(this)

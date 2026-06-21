@@ -743,7 +743,7 @@ function init() {
             }
         };
 
-        function showLookupButtonsIfNoLink() {
+        const showLookupButtonsIfNoLink = function () {
             if (!isLinkInserted) {
                 MBSearchItStyle();
                 const entityName = unsafeWindow.BandData.name;
