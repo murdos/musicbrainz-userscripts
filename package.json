@@ -23,7 +23,7 @@
     "scripts": {
         "build": "node --strip-types src/build/build.ts",
         "build:watch": "node --strip-types src/build/build.ts --watch",
-        "type-check": "tsc --noEmit",
+        "type-check": "tsgo",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
         "lint": "pnpm run eslint",
@@ -45,6 +45,7 @@
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/greasemonkey": "^4.0.7",
         "@types/node": "^24.8.1",
+        "@typescript/native-preview": "7.0.0-dev.20260617.2",
         "eslint": "^9.38.0",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-userscripts": "^0.5.6",
@@ -53,7 +54,6 @@
         "lint-staged": "^16.2.4",
         "oxfmt": "^0.55.0",
         "rollup": "^4.62.0",
-        "typescript": "^6.0.3",
         "typescript-eslint": "^8.46.1",
         "zod": "^4.4.3"
     },
