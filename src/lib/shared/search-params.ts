@@ -1,5 +1,5 @@
-import type { Release } from '~/types/importers';
 import { luceneEscape } from '~/lib/shared/lucene-escape';
+import type { Release } from '~/types/importers';
 
 export interface FormParameter {
     name: string;

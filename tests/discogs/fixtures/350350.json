@@ -136,16 +136,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Electronic",
-        "Non-Music"
-    ],
-    "styles": [
-        "Radioplay",
-        "Industrial",
-        "Spoken Word",
-        "Experimental"
-    ],
+    "genres": ["Electronic", "Non-Music"],
+    "styles": ["Radioplay", "Industrial", "Spoken Word", "Experimental"],
     "tracklist": [
         {
             "position": "",

@@ -70,10 +70,7 @@
         {
             "name": "CD",
             "qty": "1",
-            "descriptions": [
-                "Album",
-                "Stereo"
-            ]
+            "descriptions": ["Album", "Stereo"]
         }
     ],
     "data_quality": "Needs Vote",
@@ -164,12 +161,8 @@
         }
     ],
     "videos": [],
-    "genres": [
-        "Classical"
-    ],
-    "styles": [
-        "Classical"
-    ],
+    "genres": ["Classical"],
+    "styles": ["Classical"],
     "tracklist": [
         {
             "position": "1",

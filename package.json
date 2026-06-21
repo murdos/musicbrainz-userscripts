@@ -2,6 +2,23 @@
     "name": "musicbrainz-userscripts",
     "version": "1.0.0",
     "description": "Collection of userscripts for MusicBrainz",
+    "keywords": [
+        "import",
+        "improvements",
+        "musicbrainz",
+        "ui",
+        "userscripts"
+    ],
+    "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
+    "bugs": {
+        "url": "https://github.com/murdos/musicbrainz-userscripts/issues"
+    },
+    "license": "SEE LICENSE IN individual userscripts",
+    "author": "Aurélien Mino <aurelien.mino@gmail.com>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/murdos/musicbrainz-userscripts.git"
+    },
     "type": "module",
     "scripts": {
         "build": "tsx src/build/build.ts",
@@ -17,23 +34,6 @@
         "test:discogs:update": "tsx tests/discogs/run.ts --update",
         "prepare": "husky"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/murdos/musicbrainz-userscripts.git"
-    },
-    "keywords": [
-        "musicbrainz",
-        "userscripts",
-        "import",
-        "ui",
-        "improvements"
-    ],
-    "author": "Aurélien Mino <aurelien.mino@gmail.com>",
-    "license": "SEE LICENSE IN individual userscripts",
-    "bugs": {
-        "url": "https://github.com/murdos/musicbrainz-userscripts/issues"
-    },
-    "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
         "@babel/core": "^7.27.1",
         "@babel/preset-env": "^7.27.2",
@@ -58,12 +58,12 @@
         "typescript-eslint": "^8.46.1",
         "zod": "^4.1.12"
     },
-    "packageManager": "pnpm@10.33.4",
-    "engines": {
-        "node": "24.x"
-    },
     "lint-staged": {
         "*.{json,md,yml}": "oxfmt",
         "*.{js,ts,tsx}": "eslint --fix"
-    }
+    },
+    "engines": {
+        "node": "24.x"
+    },
+    "packageManager": "pnpm@10.33.4"
 }

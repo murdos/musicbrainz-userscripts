@@ -291,7 +291,13 @@ function insertLink(release) {
     }
 
     mbUI.append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
-    mbUI.append(MBImport.buildHarmonyButton({ barcode: release.barcode, release_url: release.url, variant: 'full' }));
+    mbUI.append(
+        MBImport.buildHarmonyButton({
+            barcode: release.barcode,
+            release_url: release.url,
+            variant: 'full',
+        }),
+    );
     mbUI.css({
         marginTop: '5px',
         display: 'flex',

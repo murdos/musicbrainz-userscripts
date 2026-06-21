@@ -861,9 +861,12 @@ function batch_recording_rels(gm_info) {
 
             let $progress = $('<span></span>');
             rowTitleCell($rec).append(
-                $('<div class="suggested-work"></div>')
-                    .append($('<span>Looking for matching work…</span>'), '&#160;', $progress)
-                    .css({ 'font-size': '0.9em', padding: '0.3em', 'padding-left': '1em', color: 'orange' }),
+                $('<div class="suggested-work"></div>').append($('<span>Looking for matching work…</span>'), '&#160;', $progress).css({
+                    'font-size': '0.9em',
+                    padding: '0.3em',
+                    'padding-left': '1em',
+                    color: 'orange',
+                }),
             );
 
             let current = 0;
@@ -919,7 +922,10 @@ function batch_recording_rels(gm_info) {
         $title_cell.append(
             $('<div class="suggested-work"></div>')
                 .append(
-                    $('<span>Suggested work:</span>').css({ color: 'green', 'font-weight': 'bold' }),
+                    $('<span>Suggested work:</span>').css({
+                        color: 'green',
+                        'font-weight': 'bold',
+                    }),
                     '&#160;',
                     $('<a></a>').attr('href', `/work/${mbid}`).text(title),
                     comment ? '&#160;' : null,

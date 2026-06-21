@@ -1,4 +1,5 @@
 import { Logger } from '~/lib/logger';
+
 import type { BeatportPageData, BeatportSSRState, BeatportTrackData } from '../types';
 
 /**

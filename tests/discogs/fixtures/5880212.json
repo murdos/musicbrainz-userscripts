@@ -120,9 +120,7 @@
         {
             "name": "CD",
             "qty": "2",
-            "descriptions": [
-                "Compilation"
-            ]
+            "descriptions": ["Compilation"]
         }
     ],
     "data_quality": "Needs Vote",
@@ -239,13 +237,8 @@
         }
     ],
     "videos": [],
-    "genres": [
-        "Classical"
-    ],
-    "styles": [
-        "Baroque",
-        "Concerto"
-    ],
+    "genres": ["Classical"],
+    "styles": ["Baroque", "Concerto"],
     "tracklist": [
         {
             "position": "",

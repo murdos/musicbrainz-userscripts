@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import * as vm from 'node:vm';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 

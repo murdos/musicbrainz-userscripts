@@ -60,10 +60,7 @@
         {
             "name": "Vinyl",
             "qty": "1",
-            "descriptions": [
-                "LP",
-                "Compilation"
-            ]
+            "descriptions": ["LP", "Compilation"]
         }
     ],
     "data_quality": "Needs Vote",
@@ -207,12 +204,8 @@
             "embed": true
         }
     ],
-    "genres": [
-        "Pop"
-    ],
-    "styles": [
-        "Schlager"
-    ],
+    "genres": ["Pop"],
+    "styles": ["Schlager"],
     "tracklist": [
         {
             "position": "A1",

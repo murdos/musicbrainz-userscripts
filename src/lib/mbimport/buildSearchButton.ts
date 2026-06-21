@@ -1,5 +1,5 @@
-import type { Release } from '~/types/importers';
 import { searchParams } from '~/lib/shared/search-params';
+import type { Release } from '~/types/importers';
 
 // compute HTML of search button
 export function buildSearchButton(release: Release): string {

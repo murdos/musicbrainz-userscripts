@@ -206,7 +206,11 @@ function setRecordingComments() {
                 type: 'POST',
                 url: '/ws/js/edit/create',
                 dataType: 'json',
-                data: JSON.stringify({ edits: editData, editNote: editNote, makeVotable: makeVotable }),
+                data: JSON.stringify({
+                    edits: editData,
+                    editNote: editNote,
+                    makeVotable: makeVotable,
+                }),
                 contentType: 'application/json; charset=utf-8',
             })
                 .always(function () {
