@@ -30,7 +30,7 @@
         },
         "types": ["node"]
     },
-    "include": ["src/**/*", "tests/**/*"],
+    "include": ["src/**/*", "tests/**/*", "oxfmt.config.ts"],
     "typeRoots": ["node_modules/@types", "src/types"],
     "exclude": ["node_modules", "dist", "**/*.user.js"]
 }

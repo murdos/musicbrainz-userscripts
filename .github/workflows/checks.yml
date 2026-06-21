@@ -16,6 +16,8 @@ jobs:
                   cache: 'pnpm'
             - name: 'Install dependencies'
               run: pnpm install --frozen-lockfile
+            # - name: 'Format check'
+            #   run: pnpm format:check
             - name: 'Run type checking'
               run: pnpm type-check
             - name: 'Run linter'

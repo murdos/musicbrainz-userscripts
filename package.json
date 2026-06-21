@@ -7,7 +7,8 @@
         "build": "tsx src/build/build.ts",
         "build:watch": "tsx src/build/build.ts --watch",
         "type-check": "tsc --noEmit",
-        "prettier:format": "prettier --write .",
+        "format": "oxfmt",
+        "format:check": "oxfmt --check",
         "lint": "pnpm run eslint",
         "lint-fix": "pnpm run eslint -- --fix",
         "eslint": "eslint .",
@@ -45,14 +46,12 @@
         "@types/greasemonkey": "^4.0.7",
         "@types/node": "^24.8.1",
         "eslint": "^9.38.0",
-        "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-import": "^2.32.0",
-        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-userscripts": "^0.5.6",
         "globals": "^16.4.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.4",
-        "prettier": "^3.6.2",
+        "oxfmt": "^0.55.0",
         "rollup": "^4.52.5",
         "tsx": "^4.19.4",
         "typescript": "^5.8.3",
@@ -64,7 +63,7 @@
         "node": "24.x"
     },
     "lint-staged": {
-        "*.{json,md,yml}": "prettier --write",
+        "*.{json,md,yml}": "oxfmt",
         "*.{js,ts,tsx}": "eslint --fix"
     }
 }
