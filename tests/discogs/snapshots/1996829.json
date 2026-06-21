@@ -1,0 +1,113 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Overture To The Impresario, K.486",
+                    "duration": 261000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Chor Der Janischaren (Allegro From The Abduction From The Seraglio, K.384)",
+                    "duration": 192000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Chor Der Janischaren (Allegro Vivace From The Abduction From The Seraglio, K.384)",
+                    "duration": 84000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Rondo Alla Turka (From Piano Sonata No.11, K331)",
+                    "duration": 184000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Contradanse, K.101",
+                    "duration": 100000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Die Schlittenfahrt (The Sleighride) From The German Dances, K.605",
+                    "duration": 184000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Adagio In B-Flat Major, K.411",
+                    "duration": 299000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Sonata In C Major, K.545",
+                    "duration": 249000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Overture To The Marriage Of Figaro, K.492",
+                    "duration": 252000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Kyrie From Requiem, K.626",
+                    "duration": 154000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Rondo: Allegro From Quintet In E-Flat Major For Horn & Strings, K.407",
+                    "duration": 221000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "March In C Major, K.408",
+                    "duration": 281000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Overture To The Abduction From The Seraglio, K.384",
+                    "duration": 105000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Alleluia From Exsultate, Jubilate, K.165",
+                    "duration": 154000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Eine Kleine Nachtmusik, K.525: I. Allegro / II. Romance: Andante / III. Menuetto: Allegretto / IV. Rondo: Allegro",
+                    "duration": 1056000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "The Empire Brass Quintet",
+            "credited_name": "Empire Brass",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Mozart For Brass",
+    "year": 1993,
+    "country": "US",
+    "labels": [
+        {
+            "name": "Telarc Digital",
+            "catno": "CD-80332",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/1996829",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "type": "album",
+    "barcode": "089408033223"
+}

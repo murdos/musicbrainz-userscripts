@@ -1,0 +1,603 @@
+{
+    "id": 1996829,
+    "status": "Accepted",
+    "year": 1993,
+    "resource_url": "https://api.discogs.com/releases/1996829",
+    "uri": "https://www.discogs.com/release/1996829-Empire-Brass-Mozart-For-Brass",
+    "artists": [
+        {
+            "name": "The Empire Brass Quintet",
+            "anv": "Empire Brass",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 776863,
+            "resource_url": "https://api.discogs.com/artists/776863",
+            "thumbnail_url": "https://i.discogs.com/6ODy5AnWfVmlCW08c5QbeYHTsu3M6ZkiqjKMtgdAvm0/rs:fit/g:sm/q:90/h:268/w:370/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTc3Njg2/My0xMjYxNTkxNjEy/LmpwZWc.jpeg"
+        }
+    ],
+    "artists_sort": "Empire Brass Quintet, The",
+    "labels": [
+        {
+            "name": "Telarc Digital",
+            "catno": "CD-80332",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 262947,
+            "resource_url": "https://api.discogs.com/labels/262947",
+            "thumbnail_url": "https://i.discogs.com/6XwHh6DyL8bJ8c7Klbz3ALH3znR2M4UVlSZxIgp-a8w/rs:fit/g:sm/q:90/h:394/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2Mjk0/Ny0xNTE5OTM4NjA1/LTUzMjAuanBlZw.jpeg"
+        }
+    ],
+    "series": [],
+    "companies": [
+        {
+            "name": "DADC Austria",
+            "catno": "",
+            "entity_type": "31",
+            "entity_type_name": "Glass Mastered At",
+            "id": 267848,
+            "resource_url": "https://api.discogs.com/labels/267848",
+            "thumbnail_url": "https://i.discogs.com/UQ9JCJalpJJv6HV_c-2lZSEjbAUXi94mo6DAGDaPZg0/rs:fit/g:sm/q:90/h:67/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2Nzg0/OC0xMzE3NzM0MDQy/LmpwZWc.jpeg"
+        },
+        {
+            "name": "Berkshire Performing Arts Center",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 917181,
+            "resource_url": "https://api.discogs.com/labels/917181"
+        },
+        {
+            "name": "Telarc",
+            "catno": "",
+            "entity_type": "13",
+            "entity_type_name": "Phonographic Copyright (p)",
+            "id": 28165,
+            "resource_url": "https://api.discogs.com/labels/28165",
+            "thumbnail_url": "https://i.discogs.com/2dgcMvf28VJ9ZhW38qNV5ZnP7tat7Q_I56xf__Jf3Ik/rs:fit/g:sm/q:90/h:211/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI4MTY1/LTE1Mjk3NzEyOTUt/OTM5OS5qcGVn.jpeg"
+        },
+        {
+            "name": "Telarc",
+            "catno": "",
+            "entity_type": "14",
+            "entity_type_name": "Copyright (c)",
+            "id": 28165,
+            "resource_url": "https://api.discogs.com/labels/28165",
+            "thumbnail_url": "https://i.discogs.com/2dgcMvf28VJ9ZhW38qNV5ZnP7tat7Q_I56xf__Jf3Ik/rs:fit/g:sm/q:90/h:211/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI4MTY1/LTE1Mjk3NzEyOTUt/OTM5OS5qcGVn.jpeg"
+        }
+    ],
+    "formats": [
+        {
+            "name": "CD",
+            "qty": "1",
+            "descriptions": [
+                "Album",
+                "Stereo"
+            ]
+        }
+    ],
+    "data_quality": "Needs Vote",
+    "community": {
+        "have": 51,
+        "want": 6,
+        "rating": {
+            "count": 3,
+            "average": 3.33
+        },
+        "submitter": {
+            "username": "Markus",
+            "resource_url": "https://api.discogs.com/users/Markus"
+        },
+        "contributors": [
+            {
+                "username": "Markus",
+                "resource_url": "https://api.discogs.com/users/Markus"
+            },
+            {
+                "username": "MidMusic",
+                "resource_url": "https://api.discogs.com/users/MidMusic"
+            },
+            {
+                "username": "ThisGuyFrritz",
+                "resource_url": "https://api.discogs.com/users/ThisGuyFrritz"
+            },
+            {
+                "username": "Internaut",
+                "resource_url": "https://api.discogs.com/users/Internaut"
+            },
+            {
+                "username": "DiscogsUpdateBot",
+                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
+            },
+            {
+                "username": "vivaldi55",
+                "resource_url": "https://api.discogs.com/users/vivaldi55"
+            },
+            {
+                "username": "stramineushomo",
+                "resource_url": "https://api.discogs.com/users/stramineushomo"
+            },
+            {
+                "username": "oceanographer",
+                "resource_url": "https://api.discogs.com/users/oceanographer"
+            },
+            {
+                "username": "ericvisser",
+                "resource_url": "https://api.discogs.com/users/ericvisser"
+            },
+            {
+                "username": "officialandbootz",
+                "resource_url": "https://api.discogs.com/users/officialandbootz"
+            },
+            {
+                "username": "gemini80s",
+                "resource_url": "https://api.discogs.com/users/gemini80s"
+            }
+        ],
+        "data_quality": "Needs Vote",
+        "status": "Accepted"
+    },
+    "format_quantity": 1,
+    "date_added": "2009-11-06T16:38:33-08:00",
+    "date_changed": "2022-12-01T03:50:46-08:00",
+    "num_for_sale": 14,
+    "lowest_price": 1.32,
+    "master_id": 1537752,
+    "master_url": "https://api.discogs.com/masters/1537752",
+    "title": "Mozart For Brass",
+    "country": "US",
+    "released": "1993",
+    "notes": "TECHNICAL INFORMATION\r\n\r\nRecorded in Berkshire Performing Arts Center, Studio A, Lenox Massachusetts, April 13, 15, 1993\r\nMicrophones: Neumann M-50b (vacuun tube)\r\nOn-Stage Microphone Preamps: FM Acoustics M1 ClassAmp\r\nDigital Recording Processor: Telarc / Ultra-Analog 20-Bit 128 times oversampling A/D converter, custom engineered by Kenneth Hamann\r\nMicrophone, Interconnecting & Speaker Cables: This recording utilized the latest in cable technology including Monster Cable M1500, M1.5, Series I & III Prolink\r\nMonitor Speakers: Waveform Mach 7 (Bi-amplified) by Ötvös Industries\r\nPower Amplifiers: Bryston 4BPNB\r\nExclusive Control Room and Recording Hall Acoustic Treatment: RPG Abffusors & Diffusors\r\nDigital Editing: Sony DAE 3000\r\n\r\nDuring the recording of the digital masters and the subsequent transfer to disc, the signal was not passed through any processing device (i.e., compression, limiting, or equalization) at any step during production.\r\n\r\nSpecial thanks to James Sacksteder, Liz Thomson, Ken Amis, Doug Wright, The New Wordl Brass, John Hauser, David Cutler, Julie Pierfrit, Todd Murphy, Marily Najaime, Matt Carson, Egil Smedvig, The Cats, MTT for encouragement, Bob for letting me do this project, the whole crew at Telarc, but especially Kelly for a wonderful arrangement and helping me through this one. - Rolf Smedvig\r\n\r\n©℗1993 Telarc\r\nMade in Austria\r\nPrinted in U.S.A.\r\n",
+    "released_formatted": "1993",
+    "identifiers": [
+        {
+            "type": "Barcode",
+            "value": "0 89408 03322 3"
+        },
+        {
+            "type": "SPARS Code",
+            "value": "DDD"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "CD-80332 21 [DADC Austria logo]"
+        }
+    ],
+    "videos": [],
+    "genres": [
+        "Classical"
+    ],
+    "styles": [
+        "Classical"
+    ],
+    "tracklist": [
+        {
+            "position": "1",
+            "type_": "track",
+            "title": "Overture To The Impresario, K.486",
+            "extraartists": [
+                {
+                    "name": "Egil Smedvig",
+                    "anv": "",
+                    "join": "",
+                    "role": "Arranged By",
+                    "tracks": "",
+                    "id": 1620562,
+                    "resource_url": "https://api.discogs.com/artists/1620562"
+                }
+            ],
+            "duration": "4:21"
+        },
+        {
+            "position": "2",
+            "type_": "track",
+            "title": "Chor Der Janischaren (Allegro From The Abduction From The Seraglio, K.384)",
+            "duration": "3:12"
+        },
+        {
+            "position": "3",
+            "type_": "track",
+            "title": "Chor Der Janischaren (Allegro Vivace From The Abduction From The Seraglio, K.384)",
+            "duration": "1:24"
+        },
+        {
+            "position": "4",
+            "type_": "track",
+            "title": "Rondo Alla Turka (From Piano Sonata No.11, K331)",
+            "duration": "3:04"
+        },
+        {
+            "position": "5",
+            "type_": "track",
+            "title": "Contradanse, K.101",
+            "duration": "1:40"
+        },
+        {
+            "position": "6",
+            "type_": "track",
+            "title": "Die Schlittenfahrt (The Sleighride) From The German Dances, K.605",
+            "duration": "3:04"
+        },
+        {
+            "position": "7",
+            "type_": "track",
+            "title": "Adagio In B-Flat Major, K.411",
+            "duration": "4:59"
+        },
+        {
+            "position": "8",
+            "type_": "track",
+            "title": "Sonata In C Major, K.545",
+            "duration": "4:09"
+        },
+        {
+            "position": "9",
+            "type_": "track",
+            "title": "Overture To The Marriage Of Figaro, K.492",
+            "duration": "4:12"
+        },
+        {
+            "position": "10",
+            "type_": "track",
+            "title": "Kyrie From Requiem, K.626",
+            "extraartists": [
+                {
+                    "name": "Kelly Smedvig",
+                    "anv": "",
+                    "join": "",
+                    "role": "Arranged By",
+                    "tracks": "",
+                    "id": 1620558,
+                    "resource_url": "https://api.discogs.com/artists/1620558"
+                }
+            ],
+            "duration": "2:34"
+        },
+        {
+            "position": "11",
+            "type_": "track",
+            "title": "Rondo: Allegro From Quintet In E-Flat Major For Horn & Strings, K.407",
+            "duration": "3:41"
+        },
+        {
+            "position": "12",
+            "type_": "track",
+            "title": "March In C Major, K.408",
+            "duration": "4:41"
+        },
+        {
+            "position": "13",
+            "type_": "track",
+            "title": "Overture To The Abduction From The Seraglio, K.384",
+            "duration": "1:45"
+        },
+        {
+            "position": "14",
+            "type_": "track",
+            "title": "Alleluia From Exsultate, Jubilate, K.165",
+            "duration": "2:34"
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Eine Kleine Nachtmusik, K.525",
+            "duration": "",
+            "sub_tracks": [
+                {
+                    "position": "15",
+                    "type_": "track",
+                    "title": "I. Allegro",
+                    "duration": "5:38"
+                },
+                {
+                    "position": "16",
+                    "type_": "track",
+                    "title": "II. Romance: Andante",
+                    "duration": "6:02"
+                },
+                {
+                    "position": "17",
+                    "type_": "track",
+                    "title": "III. Menuetto: Allegretto",
+                    "duration": "2:04"
+                },
+                {
+                    "position": "18",
+                    "type_": "track",
+                    "title": "IV. Rondo: Allegro",
+                    "duration": "3:52"
+                }
+            ]
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Rolf Smedvig",
+            "anv": "",
+            "join": "",
+            "role": "Arranged By",
+            "tracks": "2 to 9, 11 to 18",
+            "id": 776852,
+            "resource_url": "https://api.discogs.com/artists/776852"
+        },
+        {
+            "name": "Anilda Carrasquillo",
+            "anv": "",
+            "join": "",
+            "role": "Art Direction",
+            "tracks": "",
+            "id": 1893666,
+            "resource_url": "https://api.discogs.com/artists/1893666"
+        },
+        {
+            "name": "Wolfgang Amadeus Mozart",
+            "anv": "",
+            "join": "",
+            "role": "Composed By",
+            "tracks": "",
+            "id": 95546,
+            "resource_url": "https://api.discogs.com/artists/95546"
+        },
+        {
+            "name": "Susan Cybulski",
+            "anv": "",
+            "join": "",
+            "role": "Design",
+            "tracks": "",
+            "id": 2044675,
+            "resource_url": "https://api.discogs.com/artists/2044675"
+        },
+        {
+            "name": "Rosalind Ilett",
+            "anv": "",
+            "join": "",
+            "role": "Edited By",
+            "tracks": "",
+            "id": 853023,
+            "resource_url": "https://api.discogs.com/artists/853023"
+        },
+        {
+            "name": "Thomas Knab",
+            "anv": "",
+            "join": "",
+            "role": "Edited By",
+            "tracks": "",
+            "id": 692366,
+            "resource_url": "https://api.discogs.com/artists/692366"
+        },
+        {
+            "name": "Jack Renner",
+            "anv": "",
+            "join": "",
+            "role": "Engineer",
+            "tracks": "",
+            "id": 662015,
+            "resource_url": "https://api.discogs.com/artists/662015"
+        },
+        {
+            "name": "Robert Woods (2)",
+            "anv": "",
+            "join": "",
+            "role": "Executive-Producer",
+            "tracks": "",
+            "id": 748966,
+            "resource_url": "https://api.discogs.com/artists/748966"
+        },
+        {
+            "name": "Eric Ruske",
+            "anv": "",
+            "join": "",
+            "role": "Horn",
+            "tracks": "",
+            "id": 1620556,
+            "resource_url": "https://api.discogs.com/artists/1620556"
+        },
+        {
+            "name": "Richard E. Rodda",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes",
+            "tracks": "",
+            "id": 1698148,
+            "resource_url": "https://api.discogs.com/artists/1698148"
+        },
+        {
+            "name": "Everett Beale",
+            "anv": "",
+            "join": "",
+            "role": "Percussion",
+            "tracks": "",
+            "id": 1620564,
+            "resource_url": "https://api.discogs.com/artists/1620564"
+        },
+        {
+            "name": "Richard Jensen",
+            "anv": "",
+            "join": "",
+            "role": "Percussion",
+            "tracks": "",
+            "id": 1620557,
+            "resource_url": "https://api.discogs.com/artists/1620557"
+        },
+        {
+            "name": "Catanzaro & Mahdessian",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Cover]",
+            "tracks": "",
+            "id": 2464663,
+            "resource_url": "https://api.discogs.com/artists/2464663"
+        },
+        {
+            "name": "Tom Macko",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Retouch]",
+            "tracks": "",
+            "id": 2546372,
+            "resource_url": "https://api.discogs.com/artists/2546372"
+        },
+        {
+            "name": "Elaine Martone",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 595770,
+            "resource_url": "https://api.discogs.com/artists/595770"
+        },
+        {
+            "name": "Kajo Paukert",
+            "anv": "",
+            "join": "",
+            "role": "Technician [Assistance]",
+            "tracks": "",
+            "id": 1724232,
+            "resource_url": "https://api.discogs.com/artists/1724232"
+        },
+        {
+            "name": "Scott Burgess",
+            "anv": "",
+            "join": "",
+            "role": "Technician [Assistance]",
+            "tracks": "",
+            "id": 849409,
+            "resource_url": "https://api.discogs.com/artists/849409"
+        },
+        {
+            "name": "Scott A. Hartman",
+            "anv": "",
+            "join": "",
+            "role": "Trombone",
+            "tracks": "",
+            "id": 1620561,
+            "resource_url": "https://api.discogs.com/artists/1620561"
+        },
+        {
+            "name": "R. Douglas Wright",
+            "anv": "Douglas Wright",
+            "join": "",
+            "role": "Trombone [Assistant]",
+            "tracks": "2, 3, 10, 12, 13",
+            "id": 1726199,
+            "resource_url": "https://api.discogs.com/artists/1726199"
+        },
+        {
+            "name": "Jeffrey Curnow",
+            "anv": "",
+            "join": "",
+            "role": "Trumpet",
+            "tracks": "",
+            "id": 1620495,
+            "resource_url": "https://api.discogs.com/artists/1620495"
+        },
+        {
+            "name": "Andrew Roe",
+            "anv": "",
+            "join": "",
+            "role": "Trumpet [Assistant]",
+            "tracks": "2, 3, 12, 13",
+            "id": 1620563,
+            "resource_url": "https://api.discogs.com/artists/1620563"
+        },
+        {
+            "name": "Gary Peterson",
+            "anv": "",
+            "join": "",
+            "role": "Trumpet [Assistant]",
+            "tracks": "2, 3, 12, 13",
+            "id": 462315,
+            "resource_url": "https://api.discogs.com/artists/462315"
+        },
+        {
+            "name": "Matthew Carlson",
+            "anv": "Matt Carlson",
+            "join": "",
+            "role": "Trumpet [Assistant]",
+            "tracks": "13",
+            "id": 607370,
+            "resource_url": "https://api.discogs.com/artists/607370"
+        },
+        {
+            "name": "Rolf Smedvig",
+            "anv": "",
+            "join": "",
+            "role": "Trumpet [Solo]",
+            "tracks": "",
+            "id": 776852,
+            "resource_url": "https://api.discogs.com/artists/776852"
+        },
+        {
+            "name": "Samuel Pilafian",
+            "anv": "J. Samuel Pilafian",
+            "join": "",
+            "role": "Tuba",
+            "tracks": "",
+            "id": 776854,
+            "resource_url": "https://api.discogs.com/artists/776854"
+        },
+        {
+            "name": "Kenneth Amis",
+            "anv": "Ken Amis",
+            "join": "",
+            "role": "Tuba [Assistant]",
+            "tracks": "10, 12",
+            "id": 1620498,
+            "resource_url": "https://api.discogs.com/artists/1620498"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/jG34m0tmw9kMjdNfHK_6-JBL0RStA9xTc9z8RW4hzvo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC03MDk3LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/jG34m0tmw9kMjdNfHK_6-JBL0RStA9xTc9z8RW4hzvo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC03MDk3LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/3MKFZURIFtUYrPLUCOYUeQ9LhHSdVv4LVeqdxfa4aus/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC03MDk3LmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/r929DRiE52rQzLdl8IsDIQQpPJwJ_hKfwvNOGrAd7zc/rs:fit/g:sm/q:90/h:468/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS01NTI4LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/r929DRiE52rQzLdl8IsDIQQpPJwJ_hKfwvNOGrAd7zc/rs:fit/g:sm/q:90/h:468/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS01NTI4LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/Es2Xr9-9Ug0F3q7SP84dmbM_2Uq4hOGN3eaDL3yEWEA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS01NTI4LmpwZWc.jpeg",
+            "width": 600,
+            "height": 468
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/8jnBBAHaLcQXQofJ4xCSgnJlA1_h21vi0almpMmSw_Y/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC02OTE5LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/8jnBBAHaLcQXQofJ4xCSgnJlA1_h21vi0almpMmSw_Y/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC02OTE5LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/rQSSCpwD5wC27xMT7mxMqOz-X-RK0bNODS3Cb0DQqc4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC02OTE5LmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/9XAzGkeaKPk4iExgOJhDD1tj6QeLpJsOVGVcyU0BBmc/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS02NzUxLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/9XAzGkeaKPk4iExgOJhDD1tj6QeLpJsOVGVcyU0BBmc/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS02NzUxLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/BBjLyBQRulQHhC4vYJlYQxw6ZZbGxEIfEekeF_1UcHo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS02NzUxLmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/A2kk-BXanu_fjqNbjhMIJu78Nv8cXf7wTkYRhJ7Zfxk/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0yMDM3LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/A2kk-BXanu_fjqNbjhMIJu78Nv8cXf7wTkYRhJ7Zfxk/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0yMDM3LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/FjdVOZKXKkeJhzURv7nBnLXIz_HKzKgCGdiRg_K68Ak/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0yMDM3LmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/-sqY64bCVfxaKgKzHZakGke5Zg7CjVatkxkjkHByzm4/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0xNjYwLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/-sqY64bCVfxaKgKzHZakGke5Zg7CjVatkxkjkHByzm4/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0xNjYwLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/uDJlQHa3OnVyhbU3bfIWomfX0TnP8g_LaX9PxZuFf-s/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MS0xNjYwLmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        }
+    ],
+    "thumb": "https://i.discogs.com/3MKFZURIFtUYrPLUCOYUeQ9LhHSdVv4LVeqdxfa4aus/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5OTY4/MjktMTYwMDQ2MzQz/MC03MDk3LmpwZWc.jpeg",
+    "estimated_weight": 85,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

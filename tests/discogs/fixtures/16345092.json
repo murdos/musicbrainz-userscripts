@@ -1,0 +1,753 @@
+{
+    "id": 16345092,
+    "status": "Accepted",
+    "year": 2020,
+    "resource_url": "https://api.discogs.com/releases/16345092",
+    "uri": "https://www.discogs.com/release/16345092-Hawkwind-Hawkwind-50-Live",
+    "artists": [
+        {
+            "name": "Hawkwind",
+            "anv": "",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 69719,
+            "resource_url": "https://api.discogs.com/artists/69719",
+            "thumbnail_url": "https://i.discogs.com/MChs0GUtOksEmW3uOZDtt2C54yXbSBYVPEblw7KRXyk/rs:fit/g:sm/q:90/h:395/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTY5NzE5/LTEyMDcwNjY5NjAu/anBlZw.jpeg"
+        }
+    ],
+    "artists_sort": "Hawkwind",
+    "labels": [
+        {
+            "name": "Cherry Red",
+            "catno": "CDBRED830",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 5174,
+            "resource_url": "https://api.discogs.com/labels/5174",
+            "thumbnail_url": "https://i.discogs.com/hx7BWg1AKElWjY92ve4hZ0U6xNlC6ne6nNnJ_1UaK7w/rs:fit/g:sm/q:90/h:331/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTUxNzQt/MTQ5ODM0MTExNS00/MTEzLmpwZWc.jpeg"
+        }
+    ],
+    "series": [],
+    "companies": [
+        {
+            "name": "Cherry Red Records Ltd.",
+            "catno": "",
+            "entity_type": "5",
+            "entity_type_name": "Licensed To",
+            "id": 269699,
+            "resource_url": "https://api.discogs.com/labels/269699",
+            "thumbnail_url": "https://i.discogs.com/ycJc5HGunFtJPBoV-kdEFs21JjWrU_c55CD6ZO0VNV4/rs:fit/g:sm/q:90/h:63/w:409/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2OTY5/OS0xNDkzNzYzNjQ2/LTU2ODcuanBlZw.jpeg"
+        },
+        {
+            "name": "Cherry Red Records (2)",
+            "catno": "",
+            "entity_type": "8",
+            "entity_type_name": "Marketed By",
+            "id": 239866,
+            "resource_url": "https://api.discogs.com/labels/239866",
+            "thumbnail_url": "https://i.discogs.com/eCdGbeQ5-mC-1CW2SUqzhKJGMIqmGsUxnz5c6M6kKho/rs:fit/g:sm/q:90/h:89/w:242/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTIzOTg2/Ni0xNjQ5OTU4ODYw/LTU0MzQuanBlZw.jpeg"
+        },
+        {
+            "name": "Cherry Red Records (2)",
+            "catno": "",
+            "entity_type": "9",
+            "entity_type_name": "Distributed By",
+            "id": 239866,
+            "resource_url": "https://api.discogs.com/labels/239866",
+            "thumbnail_url": "https://i.discogs.com/eCdGbeQ5-mC-1CW2SUqzhKJGMIqmGsUxnz5c6M6kKho/rs:fit/g:sm/q:90/h:89/w:242/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTIzOTg2/Ni0xNjQ5OTU4ODYw/LTU0MzQuanBlZw.jpeg"
+        },
+        {
+            "name": "Hawkwind",
+            "catno": "",
+            "entity_type": "13",
+            "entity_type_name": "Phonographic Copyright (p)",
+            "id": 432983,
+            "resource_url": "https://api.discogs.com/labels/432983",
+            "thumbnail_url": "https://i.discogs.com/unTelkEJodhOlwav6xiD7091kCNXnyFnOT27a31sll4/rs:fit/g:sm/q:90/h:454/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTQzMjk4/My0xNjQ3OTE1OTg3/LTkyNjAuanBlZw.jpeg"
+        },
+        {
+            "name": "Cherry Red Records Ltd.",
+            "catno": "",
+            "entity_type": "14",
+            "entity_type_name": "Copyright (c)",
+            "id": 269699,
+            "resource_url": "https://api.discogs.com/labels/269699",
+            "thumbnail_url": "https://i.discogs.com/ycJc5HGunFtJPBoV-kdEFs21JjWrU_c55CD6ZO0VNV4/rs:fit/g:sm/q:90/h:63/w:409/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2OTY5/OS0xNDkzNzYzNjQ2/LTU2ODcuanBlZw.jpeg"
+        },
+        {
+            "name": "Sony DADC",
+            "catno": "",
+            "entity_type": "31",
+            "entity_type_name": "Glass Mastered At",
+            "id": 34825,
+            "resource_url": "https://api.discogs.com/labels/34825",
+            "thumbnail_url": "https://i.discogs.com/7DjrRpIWCovna7blofbuu7GhWdoIMOw6tDiOFn3keXk/rs:fit/g:sm/q:90/h:200/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTM0ODI1/LTE2ODM0NzA2MzYt/MzcyMi5qcGVn.jpeg"
+        }
+    ],
+    "formats": [
+        {
+            "name": "CD",
+            "qty": "2",
+            "descriptions": [
+                "Album",
+                "Stereo"
+            ]
+        }
+    ],
+    "data_quality": "Correct",
+    "community": {
+        "have": 243,
+        "want": 21,
+        "rating": {
+            "count": 16,
+            "average": 4.44
+        },
+        "submitter": {
+            "username": "DaveTheVan",
+            "resource_url": "https://api.discogs.com/users/DaveTheVan"
+        },
+        "contributors": [
+            {
+                "username": "DaveTheVan",
+                "resource_url": "https://api.discogs.com/users/DaveTheVan"
+            },
+            {
+                "username": "_Hawkhead_",
+                "resource_url": "https://api.discogs.com/users/_Hawkhead_"
+            },
+            {
+                "username": "TBlikeng",
+                "resource_url": "https://api.discogs.com/users/TBlikeng"
+            },
+            {
+                "username": "IvanDobsky",
+                "resource_url": "https://api.discogs.com/users/IvanDobsky"
+            },
+            {
+                "username": "Nooway",
+                "resource_url": "https://api.discogs.com/users/Nooway"
+            },
+            {
+                "username": "zombiekev",
+                "resource_url": "https://api.discogs.com/users/zombiekev"
+            }
+        ],
+        "data_quality": "Correct",
+        "status": "Accepted"
+    },
+    "format_quantity": 2,
+    "date_added": "2020-12-05T08:39:54-08:00",
+    "date_changed": "2021-10-14T07:20:54-07:00",
+    "num_for_sale": 23,
+    "lowest_price": 13.2,
+    "master_id": 1862472,
+    "master_url": "https://api.discogs.com/masters/1862472",
+    "title": "Hawkwind 50 Live",
+    "country": "UK",
+    "released": "2020-12-04",
+    "notes": "Issued in a 6-panel clear tray digipak with an 8-page booklet. \n\nAll tracks ℗ 2020 Hawkwind, under exclusive license to Cherry Red Records Ltd. © 2020 Cherry Red Records Ltd.\n\nTitle given as:\n\"Hawkwind 50 Live\" on front cover.\n\"Hawkwind Live\" on spines.\n\"Hawkwind 50\" on discs.\n\nTrack 1-7 misspelled \"In The Begining\" on back cover.",
+    "released_formatted": "04 Dec 2020",
+    "identifiers": [
+        {
+            "type": "Barcode",
+            "value": "5 013929 183087",
+            "description": "Text"
+        },
+        {
+            "type": "Barcode",
+            "value": "5013929183087",
+            "description": "Scanned"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "CDBRED830CD1 15 A00",
+            "description": "Disc 1"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L555",
+            "description": "Disc 1"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 943P",
+            "description": "Disc 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "CDBRED830CD2 17 A00",
+            "description": "Disc 2"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L557",
+            "description": "Disc 2"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 94K8",
+            "description": "Disc 2"
+        }
+    ],
+    "videos": [
+        {
+            "uri": "https://www.youtube.com/watch?v=Wqn-osL48Q0",
+            "title": "Spirit Of The Age (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nSpirit Of The Age (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: David Brock\nComposer: Robert Calvert\n\nAuto-generated by YouTube.",
+            "duration": 458,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=yzShB4ZqCCk",
+            "title": "Hurry on Sundown (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nHurry on Sundown (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: David Brock\n\nAuto-generated by YouTube.",
+            "duration": 435,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=n6fTuiZC7rU",
+            "title": "Master Of The Universe / Welcome to the Future (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nMaster Of The Universe / Welcome to the Future (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: Nik Turner\nComposer: Robert Calvert\n\nAuto-generated by YouTube.",
+            "duration": 632,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aD7MYp_ACcE",
+            "title": "The Fantasy of Faldum (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Fantasy of Faldum (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: Magnus Martin\n\nAuto-generated by YouTube.",
+            "duration": 564,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aVl2ynp7fqc",
+            "title": "The Watcher (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Watcher (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Ian Kilmister\nComposer: Lemmy Kilmister\n\nAuto-generated by YouTube.",
+            "duration": 360,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=cVu2wix4PCM",
+            "title": "Golden Void (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nGolden Void (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 367,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aPgXWr9opi8",
+            "title": "The Right to Decide (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Right to Decide (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 594,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=gzasJ85rQIc",
+            "title": "Space Is Dark (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nSpace Is Dark (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 199,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=Wqn-osL48Q0",
+            "title": "Spirit Of The Age (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nSpirit Of The Age (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: David Brock\nComposer: Robert Calvert\n\nAuto-generated by YouTube.",
+            "duration": 458,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=yzShB4ZqCCk",
+            "title": "Hurry on Sundown (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nHurry on Sundown (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: David Brock\n\nAuto-generated by YouTube.",
+            "duration": 435,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=n6fTuiZC7rU",
+            "title": "Master Of The Universe / Welcome to the Future (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nMaster Of The Universe / Welcome to the Future (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: Nik Turner\nComposer: Robert Calvert\n\nAuto-generated by YouTube.",
+            "duration": 632,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aD7MYp_ACcE",
+            "title": "The Fantasy of Faldum (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Fantasy of Faldum (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\nComposer: Magnus Martin\n\nAuto-generated by YouTube.",
+            "duration": 564,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aVl2ynp7fqc",
+            "title": "The Watcher (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Watcher (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Ian Kilmister\nComposer: Lemmy Kilmister\n\nAuto-generated by YouTube.",
+            "duration": 360,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=cVu2wix4PCM",
+            "title": "Golden Void (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nGolden Void (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 367,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=aPgXWr9opi8",
+            "title": "The Right to Decide (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nThe Right to Decide (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 594,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=gzasJ85rQIc",
+            "title": "Space Is Dark (Live)",
+            "description": "Provided to YouTube by Cherry Red Records\n\nSpace Is Dark (Live) · Hawkwind\n\n50 Live\n\n℗ 2020 Cherry Red Records Ltd Cherry Red Records Ltd\n\nComposer: Dave Brock\n\nAuto-generated by YouTube.",
+            "duration": 199,
+            "embed": true
+        }
+    ],
+    "genres": [
+        "Rock"
+    ],
+    "styles": [
+        "Space Rock"
+    ],
+    "tracklist": [
+        {
+            "position": "1-1",
+            "type_": "track",
+            "title": "Motorway City",
+            "duration": "6:29"
+        },
+        {
+            "position": "1-2",
+            "type_": "track",
+            "title": "Flesh Fondue",
+            "duration": "8:58"
+        },
+        {
+            "position": "1-3",
+            "type_": "track",
+            "title": "Last Man On Earth",
+            "duration": "4:51"
+        },
+        {
+            "position": "1-4",
+            "type_": "track",
+            "title": "Space Is Dark",
+            "duration": "3:18"
+        },
+        {
+            "position": "1-5",
+            "type_": "track",
+            "title": "Born To Go",
+            "duration": "10:45"
+        },
+        {
+            "position": "1-6",
+            "type_": "track",
+            "title": "65 Million Years Ago",
+            "duration": "4:56"
+        },
+        {
+            "position": "1-7",
+            "type_": "track",
+            "title": "In The Beginning",
+            "duration": "2:22"
+        },
+        {
+            "position": "1-8",
+            "type_": "track",
+            "title": "Spirit Of The Age",
+            "duration": "7:37"
+        },
+        {
+            "position": "1-9",
+            "type_": "track",
+            "title": "The Fantasy Of Faldum",
+            "duration": "9:23"
+        },
+        {
+            "position": "2-1",
+            "type_": "track",
+            "title": "The Watcher",
+            "duration": "6:00"
+        },
+        {
+            "position": "2-2",
+            "type_": "track",
+            "title": "Silver Machine",
+            "duration": "4:47"
+        },
+        {
+            "position": "2-3",
+            "type_": "track",
+            "title": "Assault And Battery",
+            "duration": "2:37"
+        },
+        {
+            "position": "2-4",
+            "type_": "track",
+            "title": "Golden Void",
+            "duration": "6:06"
+        },
+        {
+            "position": "2-5",
+            "type_": "track",
+            "title": "The Right To Decide",
+            "duration": "9:54"
+        },
+        {
+            "position": "2-6",
+            "type_": "track",
+            "title": "Accolade",
+            "duration": "1:45"
+        },
+        {
+            "position": "2-7",
+            "type_": "track",
+            "title": "Hurry On Sundown",
+            "duration": "7:15"
+        },
+        {
+            "position": "2-8.1",
+            "type_": "track",
+            "title": "Master Of The Universe",
+            "duration": "8:34"
+        },
+        {
+            "position": "2-8.2",
+            "type_": "track",
+            "title": "Welcome To The Future",
+            "duration": "1:57"
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Niall Hone",
+            "anv": "",
+            "join": "",
+            "role": "Bass, Synth",
+            "tracks": "",
+            "id": 898145,
+            "resource_url": "https://api.discogs.com/artists/898145"
+        },
+        {
+            "name": "Kris Tait",
+            "anv": "",
+            "join": "",
+            "role": "Coordinator",
+            "tracks": "",
+            "id": 686350,
+            "resource_url": "https://api.discogs.com/artists/686350"
+        },
+        {
+            "name": "Richard Chadwick",
+            "anv": "",
+            "join": "",
+            "role": "Drums, Vocals",
+            "tracks": "",
+            "id": 329544,
+            "resource_url": "https://api.discogs.com/artists/329544"
+        },
+        {
+            "name": "Phil Campbell",
+            "anv": "",
+            "join": "",
+            "role": "Guest [Special Guest]",
+            "tracks": "2-1",
+            "id": 459085,
+            "resource_url": "https://api.discogs.com/artists/459085"
+        },
+        {
+            "name": "John Chase (5)",
+            "anv": "",
+            "join": "",
+            "role": "Layout",
+            "tracks": "",
+            "id": 2728146,
+            "resource_url": "https://api.discogs.com/artists/2728146"
+        },
+        {
+            "name": "Meriel Waissman",
+            "anv": "",
+            "join": "",
+            "role": "Layout",
+            "tracks": "",
+            "id": 4170142,
+            "resource_url": "https://api.discogs.com/artists/4170142"
+        },
+        {
+            "name": "Brockworld",
+            "anv": "",
+            "join": "",
+            "role": "Mixed By",
+            "tracks": "",
+            "id": 4825382,
+            "resource_url": "https://api.discogs.com/artists/4825382"
+        },
+        {
+            "name": "John Chase (5)",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Concert Photographs]",
+            "tracks": "",
+            "id": 2728146,
+            "resource_url": "https://api.discogs.com/artists/2728146"
+        },
+        {
+            "name": "Hawkwind",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 69719,
+            "resource_url": "https://api.discogs.com/artists/69719"
+        },
+        {
+            "name": "Tim Blake",
+            "anv": "",
+            "join": "",
+            "role": "Theremin, Other [Axe]",
+            "tracks": "",
+            "id": 191152,
+            "resource_url": "https://api.discogs.com/artists/191152"
+        },
+        {
+            "name": "Magnus Martin",
+            "anv": "",
+            "join": "",
+            "role": "Vocals, Guitar, Keyboards [Keys]",
+            "tracks": "",
+            "id": 6004332,
+            "resource_url": "https://api.discogs.com/artists/6004332"
+        },
+        {
+            "name": "Dave Brock",
+            "anv": "",
+            "join": "",
+            "role": "Vocals, Lead Guitar, Keyboards [Keys], Synth",
+            "tracks": "",
+            "id": 324669,
+            "resource_url": "https://api.discogs.com/artists/324669"
+        },
+        {
+            "name": "Dave Brock",
+            "anv": "Brock",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "1-1, 1-2, 1-4 to 1-8, 2-2 to 2-8.1",
+            "id": 324669,
+            "resource_url": "https://api.discogs.com/artists/324669"
+        },
+        {
+            "name": "Hawkwind",
+            "anv": "",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "2-8.2",
+            "id": 69719,
+            "resource_url": "https://api.discogs.com/artists/69719"
+        },
+        {
+            "name": "Ian Fraser Kilmister",
+            "anv": "Kilmister",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "2-1",
+            "id": 1226750,
+            "resource_url": "https://api.discogs.com/artists/1226750"
+        },
+        {
+            "name": "Magnus Martin",
+            "anv": "Martin",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "1-3, 1-9",
+            "id": 6004332,
+            "resource_url": "https://api.discogs.com/artists/6004332"
+        },
+        {
+            "name": "Nik Turner",
+            "anv": "Turner",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "2-8.1",
+            "id": 152246,
+            "resource_url": "https://api.discogs.com/artists/152246"
+        },
+        {
+            "name": "Robert Calvert",
+            "anv": "Calvert",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "1-5, 1-8, 2-2, 2-8.2",
+            "id": 214188,
+            "resource_url": "https://api.discogs.com/artists/214188"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/An-QZWLnvPehwbmU8nmmKQ8Yh4I4y2LzNHjvznZrhFw/rs:fit/g:sm/q:90/h:535/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NDctMjUyOS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/An-QZWLnvPehwbmU8nmmKQ8Yh4I4y2LzNHjvznZrhFw/rs:fit/g:sm/q:90/h:535/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NDctMjUyOS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/Tc9eR31gC3YnGhhb3dALTmW08vh6n7NbpRBaCekTgNg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NDctMjUyOS5qcGVn.jpeg",
+            "width": 600,
+            "height": 535
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/YVDmaMokdGQ3Bqzs0ASZTPgLzAXMUUoNlbVM34i1RWY/rs:fit/g:sm/q:90/h:539/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjItNTI3Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/YVDmaMokdGQ3Bqzs0ASZTPgLzAXMUUoNlbVM34i1RWY/rs:fit/g:sm/q:90/h:539/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjItNTI3Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/NfwsqHCL9AlBVRI2qBLM8GBOIEdme0E9JuglBUr8WwA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjItNTI3Mi5qcGVn.jpeg",
+            "width": 600,
+            "height": 539
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/KtvUYAuPKv6racS8dq0cg0tqMRM5GCzGqltv0c_OPL4/rs:fit/g:sm/q:90/h:60/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjktMzkwNC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/KtvUYAuPKv6racS8dq0cg0tqMRM5GCzGqltv0c_OPL4/rs:fit/g:sm/q:90/h:60/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjktMzkwNC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/TPF0yIIWePitwPdZyN3CrI9qgyxEcB1Oc25sRk9yZg4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NjktMzkwNC5qcGVn.jpeg",
+            "width": 600,
+            "height": 60
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/EkHJ59kK_j2Xuyi6Dl3ZAqSdtyBGdMNRram6ChCJSfA/rs:fit/g:sm/q:90/h:537/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/ODQtNjYzMy5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/EkHJ59kK_j2Xuyi6Dl3ZAqSdtyBGdMNRram6ChCJSfA/rs:fit/g:sm/q:90/h:537/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/ODQtNjYzMy5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/qJE9DPEIFKLFxBG-uYiSujTxqH29XpCqBqVCSeJbm94/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/ODQtNjYzMy5qcGVn.jpeg",
+            "width": 600,
+            "height": 537
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/W6xCpxP5e5gf8LUWfaTzzU0Zfz9s0TIL--sKoaN0SYg/rs:fit/g:sm/q:90/h:531/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDctNzE5NS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/W6xCpxP5e5gf8LUWfaTzzU0Zfz9s0TIL--sKoaN0SYg/rs:fit/g:sm/q:90/h:531/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDctNzE5NS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/5eQw9KahcuZSjqTVosQAJghh0L8c-jK1Bh6KJaUG9h0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDctNzE5NS5qcGVn.jpeg",
+            "width": 600,
+            "height": 531
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/aeCM745MrsCjp9zLCXurwB45ZoNKpGE9cihtQkdwGYg/rs:fit/g:sm/q:90/h:531/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDktNjAyMi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/aeCM745MrsCjp9zLCXurwB45ZoNKpGE9cihtQkdwGYg/rs:fit/g:sm/q:90/h:531/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDktNjAyMi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/pQyqHd3jjLhP5GLhYG44ZC1Bmm0DbEXJ-QcM4_sHEBA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MDktNjAyMi5qcGVn.jpeg",
+            "width": 600,
+            "height": 531
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/DgiFGTCOljZJ5Ga6WLNTFIk0rZhxolf_p_4x-Ko0z5A/rs:fit/g:sm/q:90/h:544/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTMtMzM5MC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/DgiFGTCOljZJ5Ga6WLNTFIk0rZhxolf_p_4x-Ko0z5A/rs:fit/g:sm/q:90/h:544/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTMtMzM5MC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/jVD8Ql8p7oumJzEVFA55LMMoBVfuSRs3hlpXLRD2X98/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTMtMzM5MC5qcGVn.jpeg",
+            "width": 600,
+            "height": 544
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/BxdOm9Ue9ajCIRG80WR6VLFVdjjWIGqZjTYDE-Y7_zI/rs:fit/g:sm/q:90/h:583/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTktMzAyNy5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/BxdOm9Ue9ajCIRG80WR6VLFVdjjWIGqZjTYDE-Y7_zI/rs:fit/g:sm/q:90/h:583/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTktMzAyNy5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/0VrYn4fVUkYYkdMWb1me0e6NKmToTGXcwrNmvtYhENs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MTktMzAyNy5qcGVn.jpeg",
+            "width": 600,
+            "height": 583
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/DaDVzRqz1RKvZ6Enaz-1dckJ8d3Fgiiy59IaK6RL25M/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjItODc0MC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/DaDVzRqz1RKvZ6Enaz-1dckJ8d3Fgiiy59IaK6RL25M/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjItODc0MC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/A_pus2FBXUFzFTr5-HQk-3URGO75jvdRkr6yUoXQI6Q/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjItODc0MC5qcGVn.jpeg",
+            "width": 597,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/Ok0e_l8y4J30hoeMOl4Ih6XoDDJp5It-RY-o_affvVs/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjgtMzIxNC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/Ok0e_l8y4J30hoeMOl4Ih6XoDDJp5It-RY-o_affvVs/rs:fit/g:sm/q:90/h:598/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjgtMzIxNC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/M-nn0FfWq0Ut8YAu50REVmH-f1Rp1cR1BhTkWLRx3ME/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MjgtMzIxNC5qcGVn.jpeg",
+            "width": 600,
+            "height": 598
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/Bm5HPXcMrnTO-_jBy-B6M8rWjdQ-X4-ttAl8KSfN6xA/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MzAtMjI0Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/Bm5HPXcMrnTO-_jBy-B6M8rWjdQ-X4-ttAl8KSfN6xA/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MzAtMjI0Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/2ZBI_wigxIwhK02Es3HJQoXx0GJbdzgv06Dt4J0wGUw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAx/MzAtMjI0Mi5qcGVn.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/FZXpcxdzw71sytWk1kjC4ehIxb4bspeWObS1qQfOJZc/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA2/NDQtODA0Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/FZXpcxdzw71sytWk1kjC4ehIxb4bspeWObS1qQfOJZc/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA2/NDQtODA0Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/QA29Q0vgP-Mwc8e7NU0Oi1dty_jfycKx7p0YQenk1tg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA2/NDQtODA0Mi5qcGVn.jpeg",
+            "width": 600,
+            "height": 595
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/B7c4lMCuoL-deoCUXCxz2wdix7je-6QODde2t5AzhZc/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA3/MzEtODk5OS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/B7c4lMCuoL-deoCUXCxz2wdix7je-6QODde2t5AzhZc/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA3/MzEtODk5OS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/lcV8_NS4L4jrgWRcd6tPrfOROw3Co9ZKtZl-PIJtGdM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA3/MzEtODk5OS5qcGVn.jpeg",
+            "width": 600,
+            "height": 295
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/CYedpkAUB8BfLFqoHDCwWAHD0rah-Z8SYfvx-6O8v_w/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA4/NjctNjQ3Mi5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/CYedpkAUB8BfLFqoHDCwWAHD0rah-Z8SYfvx-6O8v_w/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA4/NjctNjQ3Mi5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/1_mCTWM4GQKEG9NpOaeCXdYRR_TPBqxBcVT0E4USjv0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA4/NjctNjQ3Mi5qcGVn.jpeg",
+            "width": 600,
+            "height": 295
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/R55hLmF_EnabizTLyVm9hRkNI9rmDxJNlyizoYinu_I/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA5/NzctNTc4OC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/R55hLmF_EnabizTLyVm9hRkNI9rmDxJNlyizoYinu_I/rs:fit/g:sm/q:90/h:295/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA5/NzctNTc4OC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/isSwpY2IyBfbFTVvojkyMHDxWsWF-gpt63-wX7kN1iI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDA5/NzctNTc4OC5qcGVn.jpeg",
+            "width": 600,
+            "height": 295
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/bWl4WA8K2vLrOg5hrYgrTh2jz4vGtVVP2JpDq4akx_U/rs:fit/g:sm/q:90/h:297/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEx/MzctOTA1My5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/bWl4WA8K2vLrOg5hrYgrTh2jz4vGtVVP2JpDq4akx_U/rs:fit/g:sm/q:90/h:297/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEx/MzctOTA1My5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/AMV-48KRTt1VgbWiLUen6rgPa_KcQI-2UoBP963rh-Q/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEx/MzctOTA1My5qcGVn.jpeg",
+            "width": 600,
+            "height": 297
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/osjoT7WbKNgerlrpegYtIk4ROYGc2SYxrAPPThLIE-U/rs:fit/g:sm/q:90/h:296/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEz/NTktNzk0OC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/osjoT7WbKNgerlrpegYtIk4ROYGc2SYxrAPPThLIE-U/rs:fit/g:sm/q:90/h:296/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEz/NTktNzk0OC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/8J7Pgw9CaRpNr6k2n8BKOveeWt_Q6CbbC-11ZsRgjUI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDEz/NTktNzk0OC5qcGVn.jpeg",
+            "width": 600,
+            "height": 296
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/qVRT9iu3oXEtZ-GiP19mOCH_bsZgfe6pudJYQdegAKM/rs:fit/g:sm/q:90/h:297/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE2/NzgtNzEzMy5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/qVRT9iu3oXEtZ-GiP19mOCH_bsZgfe6pudJYQdegAKM/rs:fit/g:sm/q:90/h:297/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE2/NzgtNzEzMy5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/mDsqv6TcH1IfZTFA4myqDZ2sSuCUFesLljvfzYfSwyg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE2/NzgtNzEzMy5qcGVn.jpeg",
+            "width": 600,
+            "height": 297
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/AFbF3r261l6JP1iy1BlaGyE0ln3yEqtZAYJFcpnR9Jk/rs:fit/g:sm/q:90/h:298/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE4/MjUtOTQ0Ny5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/AFbF3r261l6JP1iy1BlaGyE0ln3yEqtZAYJFcpnR9Jk/rs:fit/g:sm/q:90/h:298/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE4/MjUtOTQ0Ny5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/YnTh5Gxw97Jf4hLhI0WtzRhyGZFw_r0P0mYf6fPd-i8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE4/MjUtOTQ0Ny5qcGVn.jpeg",
+            "width": 600,
+            "height": 298
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/Bh1S1do4QOM0enXg3Bj_1fFpnoJd17ob-pIfHRSCetM/rs:fit/g:sm/q:90/h:590/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE5/NDktMzY5Ny5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/Bh1S1do4QOM0enXg3Bj_1fFpnoJd17ob-pIfHRSCetM/rs:fit/g:sm/q:90/h:590/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE5/NDktMzY5Ny5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/KW3bAWZkICUMmDhlMzhyQEKHfka0W19dimkTKA9ml1A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDc3MDE5/NDktMzY5Ny5qcGVn.jpeg",
+            "width": 600,
+            "height": 590
+        }
+    ],
+    "thumb": "https://i.discogs.com/Tc9eR31gC3YnGhhb3dALTmW08vh6n7NbpRBaCekTgNg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MzQ1/MDkyLTE2MDcyMDAw/NDctMjUyOS5qcGVn.jpeg",
+    "estimated_weight": 170,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

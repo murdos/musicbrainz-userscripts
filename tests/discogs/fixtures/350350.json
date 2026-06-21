@@ -1,0 +1,323 @@
+{
+    "id": 350350,
+    "status": "Accepted",
+    "year": 2002,
+    "resource_url": "https://api.discogs.com/releases/350350",
+    "uri": "https://www.discogs.com/release/350350-Ammer-Einheit-Crashing-Aeroplanes",
+    "artists": [
+        {
+            "name": "Andreas Ammer",
+            "anv": "Ammer",
+            "join": "/",
+            "role": "",
+            "tracks": "",
+            "id": 180356,
+            "resource_url": "https://api.discogs.com/artists/180356",
+            "thumbnail_url": "https://i.discogs.com/MAUOL4CkmKEmggpyr1g4qNOWb6KcjTB2T56PRwtNTfE/rs:fit/g:sm/q:90/h:300/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE4MDM1/Ni0xMTc4NzQxNzMw/LmpwZWc.jpeg"
+        },
+        {
+            "name": "F.M. Einheit",
+            "anv": "Einheit",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 48077,
+            "resource_url": "https://api.discogs.com/artists/48077",
+            "thumbnail_url": "https://i.discogs.com/nrarD2ag0U4V6S6js00bEkLQXntjRio55hN1HZk-V1g/rs:fit/g:sm/q:90/h:450/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4MDc3/LTE2OTkzOTA3MDAt/MTU4My5qcGVn.jpeg"
+        }
+    ],
+    "artists_sort": "Andreas Ammer / F.M. Einheit",
+    "labels": [
+        {
+            "name": "FM 4.5.1",
+            "catno": "0538-2",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 13511,
+            "resource_url": "https://api.discogs.com/labels/13511",
+            "thumbnail_url": "https://i.discogs.com/56Ea0G5HHNpcU1TbAqc_O8juKkArf2rILKByajQXQpU/rs:fit/g:sm/q:90/h:91/w:90/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTEzNTEx/LTAwMS5qcGc.jpeg"
+        }
+    ],
+    "series": [],
+    "companies": [
+        {
+            "name": "DOCdata Germany",
+            "catno": "",
+            "entity_type": "17",
+            "entity_type_name": "Pressed By",
+            "id": 317741,
+            "resource_url": "https://api.discogs.com/labels/317741",
+            "thumbnail_url": "https://i.discogs.com/W_J_Lt6XylB1K1mSMwGgFvmkYqvhwORIDFHrd2JA8v0/rs:fit/g:sm/q:90/h:562/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTMxNzc0/MS0xNjM1NjEwODkx/LTkyMzcuanBlZw.jpeg"
+        }
+    ],
+    "formats": [
+        {
+            "name": "CD",
+            "qty": "1",
+            "descriptions": []
+        }
+    ],
+    "data_quality": "Correct",
+    "community": {
+        "have": 102,
+        "want": 59,
+        "rating": {
+            "count": 22,
+            "average": 4.36
+        },
+        "submitter": {
+            "username": "krrratz",
+            "resource_url": "https://api.discogs.com/users/krrratz"
+        },
+        "contributors": [
+            {
+                "username": "krrratz",
+                "resource_url": "https://api.discogs.com/users/krrratz"
+            },
+            {
+                "username": "bzzp",
+                "resource_url": "https://api.discogs.com/users/bzzp"
+            },
+            {
+                "username": "stassen",
+                "resource_url": "https://api.discogs.com/users/stassen"
+            },
+            {
+                "username": "DiscogsUpdateBot",
+                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
+            },
+            {
+                "username": "betadron",
+                "resource_url": "https://api.discogs.com/users/betadron"
+            }
+        ],
+        "data_quality": "Correct",
+        "status": "Accepted"
+    },
+    "format_quantity": 1,
+    "date_added": "2005-01-08T21:20:57-08:00",
+    "date_changed": "2015-05-04T08:40:44-07:00",
+    "num_for_sale": 3,
+    "lowest_price": 14.99,
+    "title": "Crashing Aeroplanes",
+    "country": "Germany",
+    "released": "2002-02-18",
+    "notes": "Radioplay commissioned by the European Broadcasting Union. First broadcast: June 18 2001, WDR. The CD release was postponed for several months in the aftermath of 9/11. In June 2002, \"Crashing Aeroplanes\" was awarded the \"Hörspielpreis der Kriegsblinden\", Germany's highest award for radioplays (which had already been attributed to Ammer/Einheit's joint production [r=824088] in 1995).",
+    "released_formatted": "18 Feb 2002",
+    "identifiers": [
+        {
+            "type": "Barcode",
+            "value": "4 015698 053821"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI LL88"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 5231"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "INDIGO 0538-2"
+        },
+        {
+            "type": "Other",
+            "value": "3-934847-60-9",
+            "description": "ISBN"
+        }
+    ],
+    "videos": [
+        {
+            "uri": "https://www.youtube.com/watch?v=-ct7EjoNNJc",
+            "title": "Crashing Aeroplanes by Ammer / Einheit",
+            "description": "\"Crashing Aeroplanes\" by Andreas Ammer and F.M. Einheit. \n\n\"Radioplay commissioned by the European Broadcasting Union. First broadcast: June 18 2001, WDR. The CD release was postponed for several months in the aftermath of 9/11. In June 2002, \"Crashing Ae",
+            "duration": 3038,
+            "embed": true
+        }
+    ],
+    "genres": [
+        "Electronic",
+        "Non-Music"
+    ],
+    "styles": [
+        "Radioplay",
+        "Industrial",
+        "Spoken Word",
+        "Experimental"
+    ],
+    "tracklist": [
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Crashing Aeroplanes",
+            "duration": "50:37",
+            "sub_tracks": [
+                {
+                    "position": "1.1",
+                    "type_": "track",
+                    "title": "Hindenburg At Lakehurst",
+                    "duration": ""
+                },
+                {
+                    "position": "1.2",
+                    "type_": "track",
+                    "title": "Voice Recorder",
+                    "duration": ""
+                },
+                {
+                    "position": "1.3",
+                    "type_": "track",
+                    "title": "Value Jet 592 At Miami",
+                    "duration": ""
+                },
+                {
+                    "position": "1.4",
+                    "type_": "track",
+                    "title": "To The Sky",
+                    "duration": ""
+                },
+                {
+                    "position": "1.5",
+                    "type_": "track",
+                    "title": "Value Jet 592 At Everglades",
+                    "duration": ""
+                },
+                {
+                    "position": "1.6",
+                    "type_": "track",
+                    "title": "Case Of Emergency",
+                    "duration": ""
+                },
+                {
+                    "position": "1.7",
+                    "type_": "track",
+                    "title": "EIAI 1862 At Amsterdam",
+                    "duration": ""
+                },
+                {
+                    "position": "1.8",
+                    "type_": "track",
+                    "title": "Up There",
+                    "duration": ""
+                },
+                {
+                    "position": "1.9",
+                    "type_": "track",
+                    "title": "JAL 123 At Mount Osutaka",
+                    "duration": ""
+                },
+                {
+                    "position": "1.10",
+                    "type_": "track",
+                    "title": "Autopilot",
+                    "duration": ""
+                },
+                {
+                    "position": "1.11",
+                    "type_": "track",
+                    "title": "PanAm 103 At Lockerbie",
+                    "duration": ""
+                },
+                {
+                    "position": "1.12",
+                    "type_": "track",
+                    "title": "Last Words",
+                    "duration": ""
+                },
+                {
+                    "position": "1.13",
+                    "type_": "track",
+                    "title": "Baggage Claim",
+                    "duration": ""
+                }
+            ]
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Rica Blunck",
+            "anv": "Rika Blunk",
+            "join": "",
+            "role": "Voice Actor [Air Hostesses]",
+            "tracks": "",
+            "id": 68692,
+            "resource_url": "https://api.discogs.com/artists/68692"
+        },
+        {
+            "name": "Michael Tregor",
+            "anv": "",
+            "join": "",
+            "role": "Voice Actor [Co-pilots]",
+            "tracks": "",
+            "id": 638508,
+            "resource_url": "https://api.discogs.com/artists/638508"
+        },
+        {
+            "name": "Wilfried Stroh",
+            "anv": "",
+            "join": "",
+            "role": "Voice Actor [Ikarus]",
+            "tracks": "",
+            "id": 871833,
+            "resource_url": "https://api.discogs.com/artists/871833"
+        },
+        {
+            "name": "Martin Wuttke",
+            "anv": "",
+            "join": "",
+            "role": "Voice Actor [Pilots]",
+            "tracks": "",
+            "id": 871834,
+            "resource_url": "https://api.discogs.com/artists/871834"
+        },
+        {
+            "name": "Andreas Ammer",
+            "anv": "",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "",
+            "id": 180356,
+            "resource_url": "https://api.discogs.com/artists/180356"
+        },
+        {
+            "name": "F.M. Einheit",
+            "anv": "",
+            "join": "",
+            "role": "Written-By",
+            "tracks": "",
+            "id": 48077,
+            "resource_url": "https://api.discogs.com/artists/48077"
+        }
+    ],
+    "images": [
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/zgqK5NS5whOLgTHIvKsazbQdlKzdsCDoxW7ailihjhQ/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjAy/LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/zgqK5NS5whOLgTHIvKsazbQdlKzdsCDoxW7ailihjhQ/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjAy/LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/kdxKzldjE2xm7eCyG790yi2U29CoWnNOad7yJInLQ5A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjAy/LmpwZWc.jpeg",
+            "width": 600,
+            "height": 594
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/c8JAO9ZtBScHTYdznRHOZ30yC_mBxcoyCfGJtA9hG1M/rs:fit/g:sm/q:90/h:503/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjQz/LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/c8JAO9ZtBScHTYdznRHOZ30yC_mBxcoyCfGJtA9hG1M/rs:fit/g:sm/q:90/h:503/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjQz/LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/w4-7b8jGR4cLaSPX5ZqK-nRMbhVTZjWQBE4_aSVOVGY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjQz/LmpwZWc.jpeg",
+            "width": 600,
+            "height": 503
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/_mXSgeBNnt4wpft63KlarwNhsJJ9Iuru1nBCHpbGrvg/rs:fit/g:sm/q:90/h:591/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3Njcz/LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/_mXSgeBNnt4wpft63KlarwNhsJJ9Iuru1nBCHpbGrvg/rs:fit/g:sm/q:90/h:591/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3Njcz/LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/On3VMo4jzNvb1v4JMXyFUku5i5IwJS7fNeWYoBeQ_tw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3Njcz/LmpwZWc.jpeg",
+            "width": 600,
+            "height": 591
+        }
+    ],
+    "thumb": "https://i.discogs.com/kdxKzldjE2xm7eCyG790yi2U29CoWnNOad7yJInLQ5A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MDM1/MC0xMTcyNjE3NjAy/LmpwZWc.jpeg",
+    "estimated_weight": 85,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

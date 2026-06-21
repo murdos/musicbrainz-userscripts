@@ -1,0 +1,967 @@
+{
+    "id": 5880212,
+    "status": "Accepted",
+    "year": 1998,
+    "resource_url": "https://api.discogs.com/releases/5880212",
+    "uri": "https://www.discogs.com/release/5880212-JS-Bach-Christophe-Rousset-The-Academy-Of-Ancient-Music-Christopher-Hogwood-The-Complete-Harpsichord",
+    "artists": [
+        {
+            "name": "Johann Sebastian Bach",
+            "anv": "J.S. Bach",
+            "join": "-",
+            "role": "",
+            "tracks": "",
+            "id": 95537,
+            "resource_url": "https://api.discogs.com/artists/95537",
+            "thumbnail_url": "https://i.discogs.com/-_zVaRMNL6wRFRhZGMFdZkb4gllke5-RPdHjYZ1A8gk/rs:fit/g:sm/q:90/h:591/w:480/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk1NTM3/LTEzOTkzODM0ODQt/NjQyOS5qcGVn.jpeg"
+        },
+        {
+            "name": "Christophe Rousset",
+            "anv": "",
+            "join": "•",
+            "role": "",
+            "tracks": "",
+            "id": 841787,
+            "resource_url": "https://api.discogs.com/artists/841787",
+            "thumbnail_url": "https://i.discogs.com/2CjOX88cpaTbHmQ2V2lfgI8QMhi-WcDWVyhiAPLbxKI/rs:fit/g:sm/q:90/h:600/w:398/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg0MTc4/Ny0xMjI5MTc5NjE1/LmpwZWc.jpeg"
+        },
+        {
+            "name": "The Academy Of Ancient Music",
+            "anv": "",
+            "join": "•",
+            "role": "",
+            "tracks": "",
+            "id": 837442,
+            "resource_url": "https://api.discogs.com/artists/837442",
+            "thumbnail_url": "https://i.discogs.com/37RupLYydFiLJ6oB-UM3e8a0_NYmfSRfi3VUR-N4wCw/rs:fit/g:sm/q:90/h:168/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgzNzQ0/Mi0xNzUwMzI2MDcw/LTg5NjAucG5n.jpeg"
+        },
+        {
+            "name": "Christopher Hogwood",
+            "anv": "",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 779781,
+            "resource_url": "https://api.discogs.com/artists/779781",
+            "thumbnail_url": "https://i.discogs.com/MrhkhQYOvr9ZseXrfFKbXXrU0e42_0SJp6FtyH4zhGY/rs:fit/g:sm/q:90/h:600/w:353/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTc3OTc4/MS0xMzc4NTUzMzAw/LTc5OTkuanBlZw.jpeg"
+        }
+    ],
+    "artists_sort": "Johann Sebastian Bach - Christophe Rousset • Academy Of Ancient Music, The • Christopher Hogwood",
+    "labels": [
+        {
+            "name": "Decca",
+            "catno": "460 031-2",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 5320,
+            "resource_url": "https://api.discogs.com/labels/5320",
+            "thumbnail_url": "https://i.discogs.com/yQYJRdbwgXIOAvzG5r-M_1QqKOfNdeh0FMFxjzFpiVw/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTUzMjAt/MTU4OTE1MTU4Mi03/OTg4LmpwZWc.jpeg"
+        }
+    ],
+    "series": [
+        {
+            "name": "Éditions De L'Oiseau-Lyre",
+            "catno": "",
+            "entity_type": "2",
+            "entity_type_name": "Series",
+            "id": 693809,
+            "resource_url": "https://api.discogs.com/labels/693809",
+            "thumbnail_url": "https://i.discogs.com/3oEk-yAJWQ5el78TRYpqDXmw8D_mJATfKwTmBBXO3gs/rs:fit/g:sm/q:90/h:421/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTY5Mzgw/OS0xNTg1NjQ5NDEx/LTgxNjAuanBlZw.jpeg"
+        }
+    ],
+    "companies": [
+        {
+            "name": "The Decca Record Company Limited",
+            "catno": "",
+            "entity_type": "13",
+            "entity_type_name": "Phonographic Copyright (p)",
+            "id": 96171,
+            "resource_url": "https://api.discogs.com/labels/96171",
+            "thumbnail_url": "https://i.discogs.com/QB-EqXrDelE9FvwB8LEGW_nWUi4Sg8RX23xMK_Claxc/rs:fit/g:sm/q:90/h:27/w:287/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk2MTcx/LTEzMjEwMDczNzAu/anBlZw.jpeg"
+        },
+        {
+            "name": "The Decca Record Company Limited",
+            "catno": "",
+            "entity_type": "14",
+            "entity_type_name": "Copyright (c)",
+            "id": 96171,
+            "resource_url": "https://api.discogs.com/labels/96171",
+            "thumbnail_url": "https://i.discogs.com/QB-EqXrDelE9FvwB8LEGW_nWUi4Sg8RX23xMK_Claxc/rs:fit/g:sm/q:90/h:27/w:287/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTk2MTcx/LTEzMjEwMDczNzAu/anBlZw.jpeg"
+        },
+        {
+            "name": "Abbey Road Studios",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 217694,
+            "resource_url": "https://api.discogs.com/labels/217694",
+            "thumbnail_url": "https://i.discogs.com/XDYTZcjSSoTI3eUuMARX4Yjr7f6Ajl1tGgCYQr24Qms/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTIxNzY5/NC0xNTI0Njg3MDc3/LTM2NzEucG5n.jpeg"
+        },
+        {
+            "name": "Henry Wood Hall, London",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 267691,
+            "resource_url": "https://api.discogs.com/labels/267691",
+            "thumbnail_url": "https://i.discogs.com/GUzOfU_SacWNlY351lXMLBj-LIhGm5thYL0eDKEEXlc/rs:fit/g:sm/q:90/h:338/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2NzY5/MS0xMzE0ODg1NjYw/LmpwZWc.jpeg"
+        },
+        {
+            "name": "PMDC, Germany",
+            "catno": "",
+            "entity_type": "16",
+            "entity_type_name": "Made By",
+            "id": 342158,
+            "resource_url": "https://api.discogs.com/labels/342158",
+            "thumbnail_url": "https://i.discogs.com/hi8EBBXttQ98FIE_avlqbG5wx-mbFlVhiayCNLoTYrU/rs:fit/g:sm/q:90/h:503/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTM0MjE1/OC0xNjkwNjM1ODUx/LTYwMDAuanBlZw.jpeg"
+        }
+    ],
+    "formats": [
+        {
+            "name": "CD",
+            "qty": "2",
+            "descriptions": [
+                "Compilation"
+            ]
+        }
+    ],
+    "data_quality": "Needs Vote",
+    "community": {
+        "have": 41,
+        "want": 7,
+        "rating": {
+            "count": 2,
+            "average": 5
+        },
+        "submitter": {
+            "username": "Frysian",
+            "resource_url": "https://api.discogs.com/users/Frysian"
+        },
+        "contributors": [
+            {
+                "username": "Frysian",
+                "resource_url": "https://api.discogs.com/users/Frysian"
+            },
+            {
+                "username": "Rossmichael",
+                "resource_url": "https://api.discogs.com/users/Rossmichael"
+            },
+            {
+                "username": "DiscogsUpdateBot",
+                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
+            },
+            {
+                "username": "Zanyramorsky",
+                "resource_url": "https://api.discogs.com/users/Zanyramorsky"
+            },
+            {
+                "username": "officialandbootz",
+                "resource_url": "https://api.discogs.com/users/officialandbootz"
+            },
+            {
+                "username": "Stathisan",
+                "resource_url": "https://api.discogs.com/users/Stathisan"
+            }
+        ],
+        "data_quality": "Needs Vote",
+        "status": "Accepted"
+    },
+    "format_quantity": 2,
+    "date_added": "2014-07-13T07:03:36-07:00",
+    "date_changed": "2025-07-30T08:48:25-07:00",
+    "num_for_sale": 6,
+    "lowest_price": 3.95,
+    "title": "The Complete Harpsichord Concertos",
+    "country": "UK & Europe",
+    "released": "1998",
+    "notes": "Ⓟ 1995, 1997, 1998 The Decca Record Company Limited, London.\nⒸ 1998 The Decca Record Company Limited, London, a Polygram company.\nCD's are made in Germany. Printed in Germany. Total time: 128:38. CD1: 65:43 and CD2: 62:55\nCover jewel case: Kirckman harpsichord; photo courtesy of Steven Devine at Finchcocks.\nCover booklet: Portrait of J.S. Bach by Elias Gottlob Haussmann - Museum für Geschichte der Stadt, Leipzig.\nThe Academy of Ancient Music on authentic instruments. Pitch: a' = 415 Hz.\nThis recording was monitored on B&W loudspeakers.\n\nRecording locations:\n- EMI Abbey Road, Studio 1, 5-7 August 1993 (BWV 1055, 1058);\n- Henry Wood Hall, London, 12-14 August 1994 (BWV 1053, 1054, 1056);\n- Henry Wood Hall, London, 2-3 February 1995 (BWV 1044, 1052, 1057);\n\nThe 36-page glossy booklet contains a track and credits-list as well as notes in English, French and German.\nThe booklet and 2 CD's are sheltered by a (fat) chubby double jewel case with black trays.",
+    "released_formatted": "1998",
+    "identifiers": [
+        {
+            "type": "Barcode",
+            "value": "0 28946 00312 1"
+        },
+        {
+            "type": "Rights Society",
+            "value": "BIEM / MCPS"
+        },
+        {
+            "type": "Label Code",
+            "value": "LC 0254"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "460 032-2 01 #",
+            "description": "CD1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "460 033-2 01 #",
+            "description": "CD2"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "MADE IN GERMANY BY PMDC",
+            "description": "CD1 and CD2"
+        },
+        {
+            "type": "Mastering SID Code",
+            "value": "IFPI L008",
+            "description": "CD1 and CD2"
+        },
+        {
+            "type": "Mould SID Code",
+            "value": "IFPI 01Y4",
+            "description": "CD1 and CD2"
+        },
+        {
+            "type": "Price Code",
+            "value": "PY 842"
+        },
+        {
+            "type": "SPARS Code",
+            "value": "DDD"
+        },
+        {
+            "type": "Other",
+            "value": "O H 2",
+            "description": "Suffix catalog# - boxed in separately"
+        },
+        {
+            "type": "Other",
+            "value": "460 032-2",
+            "description": "CD1 - Catalog# - label"
+        },
+        {
+            "type": "Other",
+            "value": "460 033-2",
+            "description": "CD2 - Catalog# - label"
+        }
+    ],
+    "videos": [],
+    "genres": [
+        "Classical"
+    ],
+    "styles": [
+        "Baroque",
+        "Concerto"
+    ],
+    "tracklist": [
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In D Minor, BWV 1052",
+            "duration": "20:55",
+            "sub_tracks": [
+                {
+                    "position": "1-1",
+                    "type_": "track",
+                    "title": "I. Allegro",
+                    "duration": "7:27"
+                },
+                {
+                    "position": "1-2",
+                    "type_": "track",
+                    "title": "II. Adagio",
+                    "duration": "6:01"
+                },
+                {
+                    "position": "1-3",
+                    "type_": "track",
+                    "title": "III. Allegro",
+                    "duration": "7:21"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In F Major, BWV 1057",
+            "duration": "15:42",
+            "sub_tracks": [
+                {
+                    "position": "1-4",
+                    "type_": "track",
+                    "title": "I. [Allegro]",
+                    "duration": "6:50"
+                },
+                {
+                    "position": "1-5",
+                    "type_": "track",
+                    "title": "II. Andante",
+                    "duration": "3:48"
+                },
+                {
+                    "position": "1-6",
+                    "type_": "track",
+                    "title": "III. Allegro Assai",
+                    "duration": "5:00"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In G Minor, BWV 1058",
+            "duration": "12:43",
+            "sub_tracks": [
+                {
+                    "position": "1-7",
+                    "type_": "track",
+                    "title": "I. [Allegro]",
+                    "duration": "3:24"
+                },
+                {
+                    "position": "1-8",
+                    "type_": "track",
+                    "title": "II. Andante",
+                    "duration": "5:50"
+                },
+                {
+                    "position": "1-9",
+                    "type_": "track",
+                    "title": "III. Allegro Assai ",
+                    "duration": "3:25"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In D Major, BWV 1054",
+            "duration": "15:55",
+            "sub_tracks": [
+                {
+                    "position": "1-10",
+                    "type_": "track",
+                    "title": "I. Allegro",
+                    "duration": "7:33"
+                },
+                {
+                    "position": "1-11",
+                    "type_": "track",
+                    "title": "II. Adagio E Piano Sempre",
+                    "duration": "5:31"
+                },
+                {
+                    "position": "1-12",
+                    "type_": "track",
+                    "title": "III. Allegro",
+                    "duration": "2:46"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In E Major, BWV 1053",
+            "duration": "20:16",
+            "sub_tracks": [
+                {
+                    "position": "2-1",
+                    "type_": "track",
+                    "title": "I. [Allegro]",
+                    "duration": "7:47"
+                },
+                {
+                    "position": "2-2",
+                    "type_": "track",
+                    "title": "II. Siciliano",
+                    "duration": "5:23"
+                },
+                {
+                    "position": "2-3",
+                    "type_": "track",
+                    "title": "III. Allegro",
+                    "duration": "6:02"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In F Minor, BWV 1056",
+            "duration": "9:14",
+            "sub_tracks": [
+                {
+                    "position": "2-4",
+                    "type_": "track",
+                    "title": "I. [Allegro]",
+                    "duration": "3:09"
+                },
+                {
+                    "position": "2-5",
+                    "type_": "track",
+                    "title": "II. Largo",
+                    "duration": "2:48"
+                },
+                {
+                    "position": "2-6",
+                    "type_": "track",
+                    "title": "III. Presto",
+                    "duration": "3:14"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Harpsichord Concerto In A Major, BWV 1055",
+            "duration": "12:49",
+            "sub_tracks": [
+                {
+                    "position": "2-7",
+                    "type_": "track",
+                    "title": "I. Allegro",
+                    "duration": "4:12"
+                },
+                {
+                    "position": "2-8",
+                    "type_": "track",
+                    "title": "II. Larghetto (Siciliano)",
+                    "duration": "4:38"
+                },
+                {
+                    "position": "2-9",
+                    "type_": "track",
+                    "title": "III. Allegro Ma Non Tanto",
+                    "duration": "3:55"
+                }
+            ]
+        },
+        {
+            "position": "",
+            "type_": "index",
+            "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044",
+            "extraartists": [
+                {
+                    "name": "Rachel Brown (2)",
+                    "anv": "",
+                    "join": "",
+                    "role": "Flute, Soloist",
+                    "tracks": "",
+                    "id": 836756,
+                    "resource_url": "https://api.discogs.com/artists/836756"
+                },
+                {
+                    "name": "Simon Standage",
+                    "anv": "",
+                    "join": "",
+                    "role": "Violin, Soloist",
+                    "tracks": "",
+                    "id": 343905,
+                    "resource_url": "https://api.discogs.com/artists/343905"
+                }
+            ],
+            "duration": "21:07",
+            "sub_tracks": [
+                {
+                    "position": "2-10",
+                    "type_": "track",
+                    "title": "I. Allegro",
+                    "duration": "8:33"
+                },
+                {
+                    "position": "2-11",
+                    "type_": "track",
+                    "title": "II. Adagio Ma Non Tanto E Dolce",
+                    "duration": "5:33"
+                },
+                {
+                    "position": "2-12",
+                    "type_": "track",
+                    "title": "III. Tempo Di Allabreve",
+                    "duration": "7:00"
+                }
+            ]
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "David Smart",
+            "anv": "",
+            "join": "",
+            "role": "Art Direction",
+            "tracks": "",
+            "id": 832850,
+            "resource_url": "https://api.discogs.com/artists/832850"
+        },
+        {
+            "name": "Mark Caudle",
+            "anv": "",
+            "join": "",
+            "role": "Cello",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 837444,
+            "resource_url": "https://api.discogs.com/artists/837444"
+        },
+        {
+            "name": "Susan Sheppard",
+            "anv": "",
+            "join": "",
+            "role": "Cello",
+            "tracks": "1-1 to 1-6, 1-10 to 1-12, 2-1 to 2-6, 2-10 to 2-12",
+            "id": 838289,
+            "resource_url": "https://api.discogs.com/artists/838289"
+        },
+        {
+            "name": "Johann Sebastian Bach",
+            "anv": "",
+            "join": "",
+            "role": "Composed By",
+            "tracks": "",
+            "id": 95537,
+            "resource_url": "https://api.discogs.com/artists/95537"
+        },
+        {
+            "name": "Christopher Hogwood",
+            "anv": "",
+            "join": "",
+            "role": "Conductor",
+            "tracks": "",
+            "id": 779781,
+            "resource_url": "https://api.discogs.com/artists/779781"
+        },
+        {
+            "name": "Amanda McNamara",
+            "anv": "Amanda MacNamara",
+            "join": "",
+            "role": "Double Bass",
+            "tracks": "1-10 to 1-12, 2-1 to 2-6",
+            "id": 867830,
+            "resource_url": "https://api.discogs.com/artists/867830"
+        },
+        {
+            "name": "Judith Evans",
+            "anv": "",
+            "join": "",
+            "role": "Double Bass",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 838283,
+            "resource_url": "https://api.discogs.com/artists/838283"
+        },
+        {
+            "name": "Timothy Lyons",
+            "anv": "",
+            "join": "",
+            "role": "Double Bass",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 1589840,
+            "resource_url": "https://api.discogs.com/artists/1589840"
+        },
+        {
+            "name": "Caroline Haigh",
+            "anv": "",
+            "join": "",
+            "role": "Edited By [Recording]",
+            "tracks": "",
+            "id": 959419,
+            "resource_url": "https://api.discogs.com/artists/959419"
+        },
+        {
+            "name": "Ian Watson (3)",
+            "anv": "",
+            "join": "",
+            "role": "Edited By [Recording]",
+            "tracks": "",
+            "id": 838381,
+            "resource_url": "https://api.discogs.com/artists/838381"
+        },
+        {
+            "name": "Jenni Whiteside",
+            "anv": "",
+            "join": "",
+            "role": "Edited By [Recording]",
+            "tracks": "",
+            "id": 838383,
+            "resource_url": "https://api.discogs.com/artists/838383"
+        },
+        {
+            "name": "Jonathan Stokes",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Balance]",
+            "tracks": "1-7 to 1-12, 2-1 to 2-9",
+            "id": 848521,
+            "resource_url": "https://api.discogs.com/artists/848521"
+        },
+        {
+            "name": "Neil Hutchinson",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Balance]",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 647974,
+            "resource_url": "https://api.discogs.com/artists/647974"
+        },
+        {
+            "name": "Andrew Groves",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Location]",
+            "tracks": "",
+            "id": 840012,
+            "resource_url": "https://api.discogs.com/artists/840012"
+        },
+        {
+            "name": "Michael Mailes",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Location]",
+            "tracks": "",
+            "id": 434186,
+            "resource_url": "https://api.discogs.com/artists/434186"
+        },
+        {
+            "name": "Rachel Brown (2)",
+            "anv": "",
+            "join": "",
+            "role": "Flute",
+            "tracks": "1-1 to 1-6",
+            "id": 836756,
+            "resource_url": "https://api.discogs.com/artists/836756"
+        },
+        {
+            "name": "Christopher Hogwood",
+            "anv": "",
+            "join": "",
+            "role": "Harpsichord",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 779781,
+            "resource_url": "https://api.discogs.com/artists/779781"
+        },
+        {
+            "name": "Christophe Rousset",
+            "anv": "",
+            "join": "",
+            "role": "Harpsichord, Soloist",
+            "tracks": "",
+            "id": 841787,
+            "resource_url": "https://api.discogs.com/artists/841787"
+        },
+        {
+            "name": "Fabian Watkinson",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes [Booklet Editor]",
+            "tracks": "",
+            "id": 1702112,
+            "resource_url": "https://api.discogs.com/artists/1702112"
+        },
+        {
+            "name": "David Schulenberg",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes [English]",
+            "tracks": "",
+            "id": 3911411,
+            "resource_url": "https://api.discogs.com/artists/3911411"
+        },
+        {
+            "name": "Dennis Collins (2)",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes [French Translation - 1998]",
+            "tracks": "",
+            "id": 1644641,
+            "resource_url": "https://api.discogs.com/artists/1644641"
+        },
+        {
+            "name": "Theo Schmitt",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes [German Translation - 1998]",
+            "tracks": "",
+            "id": 3644818,
+            "resource_url": "https://api.discogs.com/artists/3644818"
+        },
+        {
+            "name": "The Academy Of Ancient Music",
+            "anv": "",
+            "join": "",
+            "role": "Orchestra",
+            "tracks": "",
+            "id": 837442,
+            "resource_url": "https://api.discogs.com/artists/837442"
+        },
+        {
+            "name": "Elias Gottlob Haussmann",
+            "anv": "",
+            "join": "",
+            "role": "Painting [Booklet]",
+            "tracks": "",
+            "id": 2263424,
+            "resource_url": "https://api.discogs.com/artists/2263424"
+        },
+        {
+            "name": "Jean-Pierre Masclet",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Booklet - Christophe Rousset]",
+            "tracks": "",
+            "id": 2246658,
+            "resource_url": "https://api.discogs.com/artists/2246658"
+        },
+        {
+            "name": "Lorenzo Agius",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Booklet - Christopher Hogwood]",
+            "tracks": "",
+            "id": 2246839,
+            "resource_url": "https://api.discogs.com/artists/2246839"
+        },
+        {
+            "name": "Steven Devine",
+            "anv": "",
+            "join": "",
+            "role": "Photography By, Cover [Jewel Case]",
+            "tracks": "",
+            "id": 2571011,
+            "resource_url": "https://api.discogs.com/artists/2571011"
+        },
+        {
+            "name": "Chris Sayers",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 708420,
+            "resource_url": "https://api.discogs.com/artists/708420"
+        },
+        {
+            "name": "Marion Scott",
+            "anv": "",
+            "join": "",
+            "role": "Recorder",
+            "tracks": "1-4 to 1-6",
+            "id": 960931,
+            "resource_url": "https://api.discogs.com/artists/960931"
+        },
+        {
+            "name": "Rachel Beckett",
+            "anv": "",
+            "join": "",
+            "role": "Recorder",
+            "tracks": "1-4 to 1-6",
+            "id": 836789,
+            "resource_url": "https://api.discogs.com/artists/836789"
+        },
+        {
+            "name": "Simon Neal (2)",
+            "anv": "",
+            "join": "",
+            "role": "Technician [Harpsichord Tuning]",
+            "tracks": "",
+            "id": 1698524,
+            "resource_url": "https://api.discogs.com/artists/1698524"
+        },
+        {
+            "name": "Katherine Hart",
+            "anv": "",
+            "join": "",
+            "role": "Viola",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 837440,
+            "resource_url": "https://api.discogs.com/artists/837440"
+        },
+        {
+            "name": "Martin Kelly (3)",
+            "anv": "",
+            "join": "",
+            "role": "Viola",
+            "tracks": "1-7 to 1-12, 2-1 to 2-9",
+            "id": 835864,
+            "resource_url": "https://api.discogs.com/artists/835864"
+        },
+        {
+            "name": "Nicola Akeroyd",
+            "anv": "",
+            "join": "",
+            "role": "Viola",
+            "tracks": "",
+            "id": 838285,
+            "resource_url": "https://api.discogs.com/artists/838285"
+        },
+        {
+            "name": "Desmond Heath",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 836785,
+            "resource_url": "https://api.discogs.com/artists/836785"
+        },
+        {
+            "name": "Jill Samuel",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 838281,
+            "resource_url": "https://api.discogs.com/artists/838281"
+        },
+        {
+            "name": "Johannes Gebauer",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "2-10 to 2-12",
+            "id": 1689501,
+            "resource_url": "https://api.discogs.com/artists/1689501"
+        },
+        {
+            "name": "Marshall Marcus",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "1-10 to 1-12, 2-1 to 2-6",
+            "id": 837101,
+            "resource_url": "https://api.discogs.com/artists/837101"
+        },
+        {
+            "name": "Pavlo Beznosiuk",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "1-7 to 1-12, 2-1 to 2-9",
+            "id": 849191,
+            "resource_url": "https://api.discogs.com/artists/849191"
+        },
+        {
+            "name": "Pierre Joubert",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "",
+            "id": 838287,
+            "resource_url": "https://api.discogs.com/artists/838287"
+        },
+        {
+            "name": "Simon Standage",
+            "anv": "",
+            "join": "",
+            "role": "Violin [1st]",
+            "tracks": "1-1 to 1-6",
+            "id": 343905,
+            "resource_url": "https://api.discogs.com/artists/343905"
+        },
+        {
+            "name": "Fiona Duncan",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-1 to 1-6, 1-10 to 1-12, 2-1 to 2-6, 2-10 to 2-12",
+            "id": 1183578,
+            "resource_url": "https://api.discogs.com/artists/1183578"
+        },
+        {
+            "name": "Iona Davies",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-7 to 1-12, 2-1 to 2-9",
+            "id": 867829,
+            "resource_url": "https://api.discogs.com/artists/867829"
+        },
+        {
+            "name": "Jill Samuel",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-10 to 1-12, 2-1 to 2-6",
+            "id": 838281,
+            "resource_url": "https://api.discogs.com/artists/838281"
+        },
+        {
+            "name": "Margaret Faultless",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 837111,
+            "resource_url": "https://api.discogs.com/artists/837111"
+        },
+        {
+            "name": "Marie Knight (2)",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 867833,
+            "resource_url": "https://api.discogs.com/artists/867833"
+        },
+        {
+            "name": "Simon Jones (10)",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-1 to 1-6, 2-10 to 2-12",
+            "id": 1286574,
+            "resource_url": "https://api.discogs.com/artists/1286574"
+        },
+        {
+            "name": "William Thorp",
+            "anv": "",
+            "join": "",
+            "role": "Violin [2nd]",
+            "tracks": "1-7 to 1-9, 2-7 to 2-9",
+            "id": 838284,
+            "resource_url": "https://api.discogs.com/artists/838284"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/H3CtXlfylClvDZzxMb2RAn3KQGFiUVKhjg97vzfjDVo/rs:fit/g:sm/q:90/h:512/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY0/Ni04NjM3LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/H3CtXlfylClvDZzxMb2RAn3KQGFiUVKhjg97vzfjDVo/rs:fit/g:sm/q:90/h:512/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY0/Ni04NjM3LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/voGUdwCGPodDuONGsYkMAsbnjhe5htyjR2L_7qy3h6M/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY0/Ni04NjM3LmpwZWc.jpeg",
+            "width": 600,
+            "height": 512
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/IWWPYw-lbN40XlBYx0U4LyGQ7SOTAQiV1VSRd-gyKQo/rs:fit/g:sm/q:90/h:465/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY1/My00NjQ5LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/IWWPYw-lbN40XlBYx0U4LyGQ7SOTAQiV1VSRd-gyKQo/rs:fit/g:sm/q:90/h:465/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY1/My00NjQ5LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/iEozJIbS33e4_YKStpi3TNaOBuqESi0iLwxsgT3HXc0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY1/My00NjQ5LmpwZWc.jpeg",
+            "width": 600,
+            "height": 465
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/bxKMEXFLa4URSZGE4MZa88HvILCMBk6IHpg_t4rnCYA/rs:fit/g:sm/q:90/h:464/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/MC0yMzE4LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/bxKMEXFLa4URSZGE4MZa88HvILCMBk6IHpg_t4rnCYA/rs:fit/g:sm/q:90/h:464/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/MC0yMzE4LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/gDTwkSeIcC4-8AqWdxtakL7zZG-6HctbHZTKuflLMP0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/MC0yMzE4LmpwZWc.jpeg",
+            "width": 600,
+            "height": 464
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/PNZIU6Qr0CvGvZ50tkm8_498QBkARj-TS0r9YCakgBo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/OC00MjEzLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/PNZIU6Qr0CvGvZ50tkm8_498QBkARj-TS0r9YCakgBo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/OC00MjEzLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/N3SQkyiwae0CNROS_xFnBdwhEypunyiNs9mC2aNNmTc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY2/OC00MjEzLmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/-U0u-f_Jr6kmjXxr2gciPQVWXKlxush28kNtwHl-UoI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY3/Ny05OTIyLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/-U0u-f_Jr6kmjXxr2gciPQVWXKlxush28kNtwHl-UoI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY3/Ny05OTIyLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/ec4tJNANpE-6nrnN8v39EJZUWtxzZO07kC4DZrO7mhM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY3/Ny05OTIyLmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/zXNQUJ58XTnA2r9ZUI36IF34T7YStRsZXUrEYJ0yaX8/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY4/Ny04OTY1LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/zXNQUJ58XTnA2r9ZUI36IF34T7YStRsZXUrEYJ0yaX8/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY4/Ny04OTY1LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/dZC6mxWCygqIR-T25cEo6vrPdY6BBZ9_7knjgORKa44/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY4/Ny04OTY1LmpwZWc.jpeg",
+            "width": 600,
+            "height": 597
+        }
+    ],
+    "thumb": "https://i.discogs.com/voGUdwCGPodDuONGsYkMAsbnjhe5htyjR2L_7qy3h6M/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTU4ODAy/MTItMTQwNTI3NTY0/Ni04NjM3LmpwZWc.jpeg",
+    "estimated_weight": 170,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

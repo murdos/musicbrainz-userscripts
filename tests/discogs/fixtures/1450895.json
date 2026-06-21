@@ -1,0 +1,1575 @@
+{
+    "id": 1450895,
+    "status": "Accepted",
+    "year": 1977,
+    "resource_url": "https://api.discogs.com/releases/1450895",
+    "uri": "https://www.discogs.com/release/1450895-Barry-Manilow-Live",
+    "artists": [
+        {
+            "name": "Barry Manilow",
+            "anv": "",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 79091,
+            "resource_url": "https://api.discogs.com/artists/79091",
+            "thumbnail_url": "https://i.discogs.com/uUmVlsXJr1ftmO7HzsQNC5kqJLRu9NbyahHOLO0Fj0U/rs:fit/g:sm/q:90/h:600/w:535/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTc5MDkx/LTE2NDE0MTI3NTgt/OTMyMC5qcGVn.jpeg"
+        }
+    ],
+    "artists_sort": "Barry Manilow",
+    "labels": [
+        {
+            "name": "Arista",
+            "catno": "DARTY 3",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 362,
+            "resource_url": "https://api.discogs.com/labels/362",
+            "thumbnail_url": "https://i.discogs.com/LtFQ5vk9L_iX2QuscmOFE0TAcLtsQB7olAcijyQUZdA/rs:fit/g:sm/q:90/h:400/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTM2Mi0x/NTUwNzg3ODg4LTc0/ODguanBlZw.jpeg"
+        }
+    ],
+    "series": [],
+    "companies": [
+        {
+            "name": "Phonodisc Ltd.",
+            "catno": "",
+            "entity_type": "17",
+            "entity_type_name": "Pressed By",
+            "id": 327018,
+            "resource_url": "https://api.discogs.com/labels/327018",
+            "thumbnail_url": "https://i.discogs.com/5W9HkVZZE06JawRP3uwkMgqOpkjkBJGxX3u_RsVK2Bk/rs:fit/g:sm/q:90/h:462/w:502/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTMyNzAx/OC0xMzI3MDU0NjAx/LnBuZw.jpeg"
+        },
+        {
+            "name": "Tape One",
+            "catno": "",
+            "entity_type": "30",
+            "entity_type_name": "Lacquer Cut At",
+            "id": 173687,
+            "resource_url": "https://api.discogs.com/labels/173687",
+            "thumbnail_url": "https://i.discogs.com/zL9RGCEJ00F05UReH3BYuWMlOX6K8ITyZAmjiAgQ1sY/rs:fit/g:sm/q:90/h:177/w:207/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTE3MzY4/Ny0xMzI5NzI3NzU4/LmpwZWc.jpeg"
+        },
+        {
+            "name": "Kamikazi Music Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 663045,
+            "resource_url": "https://api.discogs.com/labels/663045"
+        },
+        {
+            "name": "Chappell & Co. Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 273333,
+            "resource_url": "https://api.discogs.com/labels/273333",
+            "thumbnail_url": "https://i.discogs.com/OmLQ51jVQY8JJTx0CPW9CkLkUqaFkv7aMmhb08yY4Jk/rs:fit/g:sm/q:90/h:256/w:256/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI3MzMz/My0xNDU2ODU3ODE1/LTI2NTIuanBlZw.jpeg"
+        },
+        {
+            "name": "Rondor Music (London) Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 263841,
+            "resource_url": "https://api.discogs.com/labels/263841",
+            "thumbnail_url": "https://i.discogs.com/Cuq1UEKjWtPKVfQ4Ey2twvNx_AgMaW4-CR6SINoyRyw/rs:fit/g:sm/q:90/h:50/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2Mzg0/MS0xNDkwOTI3ODQ2/LTk0NTcuanBlZw.jpeg"
+        },
+        {
+            "name": "Grahple Music",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 657818,
+            "resource_url": "https://api.discogs.com/labels/657818"
+        },
+        {
+            "name": "Screen Gems-EMI Music Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 267836,
+            "resource_url": "https://api.discogs.com/labels/267836",
+            "thumbnail_url": "https://i.discogs.com/9-QBCzzLu4E-sFQE8JaXYqtxVS0-efMtnmNN4SP6Viw/rs:fit/g:sm/q:90/h:31/w:262/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2Nzgz/Ni0xNDkxNzA2MjUz/LTI4NTkuanBlZw.jpeg"
+        },
+        {
+            "name": "Sunbury Music Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 266904,
+            "resource_url": "https://api.discogs.com/labels/266904",
+            "thumbnail_url": "https://i.discogs.com/wspwAn0yozFaxo1aahuP9QzvLAMhe5UFiD10mu6Dta0/rs:fit/g:sm/q:90/h:297/w:297/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2Njkw/NC0xNTk0MjYyMTY1/LTgyMDQuanBlZw.jpeg"
+        },
+        {
+            "name": "Robert Mellin Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 281457,
+            "resource_url": "https://api.discogs.com/labels/281457",
+            "thumbnail_url": "https://i.discogs.com/wgFzkeutbNcrVJdjLsQaxz-X_sj4z7CkJ9aIWYQN84c/rs:fit/g:sm/q:90/h:63/w:264/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI4MTQ1/Ny0xNDgyMjc1MjE2/LTQyNjYuanBlZw.jpeg"
+        },
+        {
+            "name": "Anglo-Pic Music Co. Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 309500,
+            "resource_url": "https://api.discogs.com/labels/309500"
+        },
+        {
+            "name": "Ardmore & Beechwood Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 294416,
+            "resource_url": "https://api.discogs.com/labels/294416",
+            "thumbnail_url": "https://i.discogs.com/4RmEs_DmAz1Run260p8qnaEmIA8EEaOeNwXsYqJtniU/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI5NDQx/Ni0xNDk5NDI4NDQ3/LTc3ODMuanBlZw.jpeg"
+        },
+        {
+            "name": "KPM",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 111977,
+            "resource_url": "https://api.discogs.com/labels/111977",
+            "thumbnail_url": "https://i.discogs.com/ufrtuLflP092GL-xKzaQaQ_rgpFdhVqgPeTsELw_YoM/rs:fit/g:sm/q:90/h:106/w:158/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTExMTk3/Ny0xNjU5MTc0NTg5/LTQxNzAucG5n.jpeg"
+        },
+        {
+            "name": "United Artists Music Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 268737,
+            "resource_url": "https://api.discogs.com/labels/268737",
+            "thumbnail_url": "https://i.discogs.com/k-fX7voOQBePTSnxLduaMpaUh3uW0EC5mfs-sP7BAN8/rs:fit/g:sm/q:90/h:155/w:172/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI2ODcz/Ny0xNjQ5NDkyMDg1/LTU2MjIucG5n.jpeg"
+        },
+        {
+            "name": "Leeds Music Ltd.",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 277317,
+            "resource_url": "https://api.discogs.com/labels/277317",
+            "thumbnail_url": "https://i.discogs.com/tX089D06-sE_M4UJ8H-eu3OCrBLPOTQdX9S8bHme1-Q/rs:fit/g:sm/q:90/h:300/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI3NzMx/Ny0xNjMxOTAwNTg0/LTk0NjQuanBlZw.jpeg"
+        },
+        {
+            "name": "Carlin",
+            "catno": "",
+            "entity_type": "21",
+            "entity_type_name": "Published By",
+            "id": 291700,
+            "resource_url": "https://api.discogs.com/labels/291700",
+            "thumbnail_url": "https://i.discogs.com/KXMOa_seYbfzwY1sj5v_42jbV0UkUyx6Sqi6msVT31E/rs:fit/g:sm/q:90/h:74/w:170/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI5MTcw/MC0xNDkxMDA4MjIz/LTM3MDAuanBlZw.jpeg"
+        },
+        {
+            "name": "Arista Records",
+            "catno": "",
+            "entity_type": "13",
+            "entity_type_name": "Phonographic Copyright (p)",
+            "id": 22429,
+            "resource_url": "https://api.discogs.com/labels/22429",
+            "thumbnail_url": "https://i.discogs.com/Dz4mccDm45eptnID4GyweK9BwWl2TRDri8DUI6VYlxg/rs:fit/g:sm/q:90/h:600/w:447/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTIyNDI5/LTE2MDAzODk3MjAt/NTE4MS5qcGVn.jpeg"
+        },
+        {
+            "name": "Arista Records",
+            "catno": "",
+            "entity_type": "14",
+            "entity_type_name": "Copyright (c)",
+            "id": 22429,
+            "resource_url": "https://api.discogs.com/labels/22429",
+            "thumbnail_url": "https://i.discogs.com/Dz4mccDm45eptnID4GyweK9BwWl2TRDri8DUI6VYlxg/rs:fit/g:sm/q:90/h:600/w:447/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTIyNDI5/LTE2MDAzODk3MjAt/NTE4MS5qcGVn.jpeg"
+        },
+        {
+            "name": "Mediasound",
+            "catno": "",
+            "entity_type": "27",
+            "entity_type_name": "Mixed At",
+            "id": 138798,
+            "resource_url": "https://api.discogs.com/labels/138798",
+            "thumbnail_url": "https://i.discogs.com/WCpe_a0RgbrYTBLQSkS7CyMghLZlNk5EGi4WFNtjzzU/rs:fit/g:sm/q:90/h:544/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTEzODc5/OC0xNzgwMzE1ODQy/LTY0MzMuanBlZw.jpeg"
+        },
+        {
+            "name": "Uris Theatre",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 516982,
+            "resource_url": "https://api.discogs.com/labels/516982",
+            "thumbnail_url": "https://i.discogs.com/EOahUJCiQ-kS2ibGMvciRZ_b4YNDDacjIVZdl36aDlw/rs:fit/g:sm/q:90/h:600/w:381/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTUxNjk4/Mi0xNDY1ODU1MjMw/LTUxMDguanBlZw.jpeg"
+        },
+        {
+            "name": "Ravinia Festival",
+            "catno": "",
+            "entity_type": "23",
+            "entity_type_name": "Recorded At",
+            "id": 324588,
+            "resource_url": "https://api.discogs.com/labels/324588",
+            "thumbnail_url": "https://i.discogs.com/QVEArGB6OvoARrCxwcLAqdVzY8HyP2RkXjk4d-RF4-E/rs:fit/g:sm/q:90/h:262/w:504/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTMyNDU4/OC0xNjQxOTI5NDg0/LTExOTMuanBlZw.jpeg"
+        },
+        {
+            "name": "Shorewood Packaging",
+            "catno": "",
+            "entity_type": "16",
+            "entity_type_name": "Made By",
+            "id": 287560,
+            "resource_url": "https://api.discogs.com/labels/287560",
+            "thumbnail_url": "https://i.discogs.com/QDJZhA7YijUU1kfuqooGeBl3C11zSLQPfTck1Nc8wsQ/rs:fit/g:sm/q:90/h:300/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTI4NzU2/MC0xMzYxNDMxMzUx/LTU3MjcuanBlZw.jpeg"
+        },
+        {
+            "name": "Columbia Pictures Corporation Ltd.",
+            "catno": "",
+            "entity_type": "4",
+            "entity_type_name": "Record Company",
+            "id": 655003,
+            "resource_url": "https://api.discogs.com/labels/655003"
+        }
+    ],
+    "formats": [
+        {
+            "name": "Vinyl",
+            "qty": "2",
+            "descriptions": [
+                "LP",
+                "Album"
+            ]
+        }
+    ],
+    "data_quality": "Correct",
+    "community": {
+        "have": 323,
+        "want": 16,
+        "rating": {
+            "count": 16,
+            "average": 3.44
+        },
+        "submitter": {
+            "username": "aclbernie",
+            "resource_url": "https://api.discogs.com/users/aclbernie"
+        },
+        "contributors": [
+            {
+                "username": "aclbernie",
+                "resource_url": "https://api.discogs.com/users/aclbernie"
+            },
+            {
+                "username": "love-vinyl-records",
+                "resource_url": "https://api.discogs.com/users/love-vinyl-records"
+            },
+            {
+                "username": "Kergillian",
+                "resource_url": "https://api.discogs.com/users/Kergillian"
+            },
+            {
+                "username": "MaximusMCX",
+                "resource_url": "https://api.discogs.com/users/MaximusMCX"
+            },
+            {
+                "username": "harbour",
+                "resource_url": "https://api.discogs.com/users/harbour"
+            },
+            {
+                "username": "Bladerunner1858",
+                "resource_url": "https://api.discogs.com/users/Bladerunner1858"
+            },
+            {
+                "username": "gone4sure",
+                "resource_url": "https://api.discogs.com/users/gone4sure"
+            },
+            {
+                "username": "themusicgoesaround",
+                "resource_url": "https://api.discogs.com/users/themusicgoesaround"
+            },
+            {
+                "username": "vokuhila",
+                "resource_url": "https://api.discogs.com/users/vokuhila"
+            },
+            {
+                "username": "johntugby",
+                "resource_url": "https://api.discogs.com/users/johntugby"
+            },
+            {
+                "username": "uzumaki",
+                "resource_url": "https://api.discogs.com/users/uzumaki"
+            },
+            {
+                "username": "capitolfive",
+                "resource_url": "https://api.discogs.com/users/capitolfive"
+            },
+            {
+                "username": "andygrayrecords",
+                "resource_url": "https://api.discogs.com/users/andygrayrecords"
+            }
+        ],
+        "data_quality": "Correct",
+        "status": "Accepted"
+    },
+    "format_quantity": 2,
+    "date_added": "2008-09-07T01:35:40-07:00",
+    "date_changed": "2020-01-12T09:14:01-08:00",
+    "num_for_sale": 70,
+    "lowest_price": 0.17,
+    "master_id": 77692,
+    "master_url": "https://api.discogs.com/masters/77692",
+    "title": "Live",
+    "country": "UK",
+    "released": "1977",
+    "notes": "Autocoupled release:\nSides A & D on one LP, sides B & C on second LP.\n\nMADE IN GREAT BRITAIN\nRecorded at The Uris Theatre, New York City, except V.S.M. recorded at Ravinia Festival, Chicago.\nMixed at Media Sound Studios, New York City.\n",
+    "released_formatted": "1977",
+    "identifiers": [
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3A",
+            "description": "Side A label"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3B",
+            "description": "Side B label"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3C",
+            "description": "Side C label"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3D",
+            "description": "Side D label"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 A//1 TO   1  2  2",
+            "description": "Runout side A (stamped) variant 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 B//2 TO   13  13",
+            "description": "Runout side B (stamped) variant 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 C//2 TO  13  1 C 1  4 ",
+            "description": "Runout side C (stamped) variant 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 D//1 TO   13  5",
+            "description": "Runout side D (stamped) variant 1"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 A // 2 TO",
+            "description": "Runout side A (stamped) variant 2"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 B // 1 TO",
+            "description": "Runout side B (stamped) variant 2"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 C //2 TO",
+            "description": "Runout side C (stamped) variant 2"
+        },
+        {
+            "type": "Matrix / Runout",
+            "value": "DARTY 3 D // 2 TO ",
+            "description": "Runout side D (stamped) variant 2"
+        }
+    ],
+    "videos": [
+        {
+            "uri": "https://www.youtube.com/watch?v=7ywaVRAqBPA",
+            "title": "Riders To The Stars (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nRiders To The Stars (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexande",
+            "duration": 293,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=_bOqUCaXXhQ",
+            "title": "Why Don't We Live Together (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nWhy Don't We Live Together (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nOrchestrator: Norman Harris\nOrchestrator: Dick Behrke\nOrchestrator: Arif M",
+            "duration": 223,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=cumh85vz-1Y",
+            "title": "A Very Strange Medley (V.S.M.) (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nA Very Strange Medley (V.S.M.) (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricard",
+            "duration": 364,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=07JiFaJ4Zd8",
+            "title": "Weekend In New England (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nWeekend In New England (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexa",
+            "duration": 259,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=tH5UbiNdzHw",
+            "title": "Let Me Go (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nLet Me Go (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 2006 Arista Records LLC\n\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexander\nRecording  Engineer: Michael DeLugg\n",
+            "duration": 241,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=wH0qHI8chws",
+            "title": "Looks Like We Made It (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nLooks Like We Made It (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexan",
+            "duration": 239,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=dn50VtUYPaA",
+            "title": "Tryin' To Get The Feeling Again (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nTryin' To Get The Feeling Again (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 2006 Arista Records LLC\n\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexander\nRecording  Eng",
+            "duration": 300,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=_0oVYpejesk",
+            "title": "Jump Shout Boogie Medley (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nJump Shout Boogie Medley (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Ale",
+            "duration": 493,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=i7JbVUATPXM",
+            "title": "Daybreak (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nDaybreak (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexander\nRecording",
+            "duration": 240,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=y-M0E-HkW3M",
+            "title": "Lady Flash Medley (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nLady Flash Medley (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 2006 Arista Records LLC\n\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexander\nRecording  Engineer: Michael",
+            "duration": 338,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=hGrIC-Z1YYA",
+            "title": "Lay Me Down (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nLay Me Down (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nOrchestrator: Norman Harris\nOrchestrator: Dick Behrke\nOrchestrator: Arif Mardin\nOrchestra",
+            "duration": 283,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=vUVfDh-8hrg",
+            "title": "Could It Be Magic/Mandy (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nCould It Be Magic/Mandy (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alex",
+            "duration": 478,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=jBFn4uyvR4c",
+            "title": "New York City Rhythm (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nNew York City Rhythm (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nOrchestrator: Norman Harris\nOrchestrator: Dick Behrke\nOrchestrator: Arif Mardin\n",
+            "duration": 311,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=VkiKaY1UOIU",
+            "title": "This One's For You (Live)",
+            "description": "Provided to YouTube by Sony Music Entertainment\n\nThis One's For You (Live) · Barry Manilow\n\nLive (Legacy Edition)\n\n℗ 1977 Arista Records LLC\n\nOrchestrator: Gerald Alters\nConductor, Drums: Lee Gurst\nProducer: Ron Dante\nCongas: Harold \"Ricardo\" Alexander",
+            "duration": 249,
+            "embed": true
+        }
+    ],
+    "genres": [
+        "Electronic",
+        "Pop"
+    ],
+    "styles": [
+        "Ballad",
+        "Disco"
+    ],
+    "tracklist": [
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Live - Act I",
+            "duration": ""
+        },
+        {
+            "position": "A1",
+            "type_": "track",
+            "title": "Riders To The Stars",
+            "extraartists": [
+                {
+                    "name": "Adrienne Anderson",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 662339,
+                    "resource_url": "https://api.discogs.com/artists/662339"
+                },
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                }
+            ],
+            "duration": "4:48"
+        },
+        {
+            "position": "A2",
+            "type_": "track",
+            "title": "Why Don't We Live Together",
+            "extraartists": [
+                {
+                    "name": "Galdston & Thom",
+                    "anv": "Phil Galston / Peter Thom",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1887970,
+                    "resource_url": "https://api.discogs.com/artists/1887970"
+                }
+            ],
+            "duration": "3:45"
+        },
+        {
+            "position": "A3",
+            "type_": "track",
+            "title": "Looks Like We Made It",
+            "extraartists": [
+                {
+                    "name": "Richard Kerr",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 637270,
+                    "resource_url": "https://api.discogs.com/artists/637270"
+                },
+                {
+                    "name": "Will Jennings",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 60452,
+                    "resource_url": "https://api.discogs.com/artists/60452"
+                }
+            ],
+            "duration": "4:00"
+        },
+        {
+            "position": "A4",
+            "type_": "track",
+            "title": "New York City Rhythm",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "5:12"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Live - Act I",
+            "duration": ""
+        },
+        {
+            "position": "B1",
+            "type_": "track",
+            "title": "A Very Strange Medley (V.S.M.)",
+            "duration": "6:10"
+        },
+        {
+            "position": "B1a",
+            "type_": "track",
+            "title": "Kentucky Fried Chicken",
+            "extraartists": [
+                {
+                    "name": "Al Gorgoni",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 394509,
+                    "resource_url": "https://api.discogs.com/artists/394509"
+                },
+                {
+                    "name": "Bob Nolan",
+                    "anv": "Rob Nolan",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 657271,
+                    "resource_url": "https://api.discogs.com/artists/657271"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1b",
+            "type_": "track",
+            "title": "State Farm Insurance",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Jerry Gavin",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1575047,
+                    "resource_url": "https://api.discogs.com/artists/1575047"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1c",
+            "type_": "track",
+            "title": "Stridex",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1d",
+            "type_": "track",
+            "title": "Band Aids",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1e",
+            "type_": "track",
+            "title": "Bowlene",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Lois Wise",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1575049,
+                    "resource_url": "https://api.discogs.com/artists/1575049"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1f",
+            "type_": "track",
+            "title": "Dr. Pepper",
+            "extraartists": [
+                {
+                    "name": "Jake Holmes",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 541024,
+                    "resource_url": "https://api.discogs.com/artists/541024"
+                },
+                {
+                    "name": "Randy Newman",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 166320,
+                    "resource_url": "https://api.discogs.com/artists/166320"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1g",
+            "type_": "track",
+            "title": "Pepsi",
+            "extraartists": [
+                {
+                    "name": "Ellen Starr",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1575046,
+                    "resource_url": "https://api.discogs.com/artists/1575046"
+                },
+                {
+                    "name": "Jor McNeil",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1575043,
+                    "resource_url": "https://api.discogs.com/artists/1575043"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1h",
+            "type_": "track",
+            "title": "McDonalds",
+            "extraartists": [
+                {
+                    "name": "Kevin Gavin",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 282020,
+                    "resource_url": "https://api.discogs.com/artists/282020"
+                },
+                {
+                    "name": "Sid Woloshin",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1575044,
+                    "resource_url": "https://api.discogs.com/artists/1575044"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2",
+            "type_": "track",
+            "title": "Jump Shout Boogie Medley",
+            "duration": "8:16"
+        },
+        {
+            "position": "B2a",
+            "type_": "track",
+            "title": "Jump Shout Boogie",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Bruce Sussman",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 705276,
+                    "resource_url": "https://api.discogs.com/artists/705276"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2b",
+            "type_": "track",
+            "title": "Avenue C",
+            "extraartists": [
+                {
+                    "name": "Buck Clayton",
+                    "anv": "B. Clayton",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 265637,
+                    "resource_url": "https://api.discogs.com/artists/265637"
+                },
+                {
+                    "name": "Dave Lambert (3)",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 322330,
+                    "resource_url": "https://api.discogs.com/artists/322330"
+                },
+                {
+                    "name": "Jon Hendricks",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 253478,
+                    "resource_url": "https://api.discogs.com/artists/253478"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2c",
+            "type_": "track",
+            "title": "Jumpin' At The Woodside",
+            "extraartists": [
+                {
+                    "name": "Count Basie",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 145262,
+                    "resource_url": "https://api.discogs.com/artists/145262"
+                },
+                {
+                    "name": "Jon Hendricks",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 253478,
+                    "resource_url": "https://api.discogs.com/artists/253478"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2d",
+            "type_": "track",
+            "title": "Cloudburst",
+            "extraartists": [
+                {
+                    "name": "Jimmy Harris",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 51722,
+                    "resource_url": "https://api.discogs.com/artists/51722"
+                },
+                {
+                    "name": "Jon Hendricks",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 253478,
+                    "resource_url": "https://api.discogs.com/artists/253478"
+                },
+                {
+                    "name": "Leroy Kirkland",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 650078,
+                    "resource_url": "https://api.discogs.com/artists/650078"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2e",
+            "type_": "track",
+            "title": "Bandstand Boogie",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Bob Horn (2)",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1061912,
+                    "resource_url": "https://api.discogs.com/artists/1061912"
+                },
+                {
+                    "name": "Bruce Sussman",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 705276,
+                    "resource_url": "https://api.discogs.com/artists/705276"
+                },
+                {
+                    "name": "Charles Albertine",
+                    "anv": "C Albertine",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 347265,
+                    "resource_url": "https://api.discogs.com/artists/347265"
+                },
+                {
+                    "name": "Larry Elgart",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 873742,
+                    "resource_url": "https://api.discogs.com/artists/873742"
+                },
+                {
+                    "name": "Les Elgart",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1058636,
+                    "resource_url": "https://api.discogs.com/artists/1058636"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B3",
+            "type_": "track",
+            "title": "This One's For You",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "4:14"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Live - Act II",
+            "duration": ""
+        },
+        {
+            "position": "C1",
+            "type_": "track",
+            "title": "Beautiful Music (Part 1)",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "2:02"
+        },
+        {
+            "position": "C2",
+            "type_": "track",
+            "title": "Daybreak",
+            "extraartists": [
+                {
+                    "name": "Adrienne Anderson",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 662339,
+                    "resource_url": "https://api.discogs.com/artists/662339"
+                },
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                }
+            ],
+            "duration": "4:17"
+        },
+        {
+            "position": "C3",
+            "type_": "track",
+            "title": "Lay Me Down",
+            "extraartists": [
+                {
+                    "name": "Larry Weiss",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 662263,
+                    "resource_url": "https://api.discogs.com/artists/662263"
+                }
+            ],
+            "duration": "4:41"
+        },
+        {
+            "position": "C4",
+            "type_": "track",
+            "title": "Weekend In New England",
+            "extraartists": [
+                {
+                    "name": "Randy Edelman",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 364793,
+                    "resource_url": "https://api.discogs.com/artists/364793"
+                }
+            ],
+            "duration": "4:16"
+        },
+        {
+            "position": "C5",
+            "type_": "track",
+            "title": "Studio Musician",
+            "extraartists": [
+                {
+                    "name": "Rupert Holmes",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 219291,
+                    "resource_url": "https://api.discogs.com/artists/219291"
+                }
+            ],
+            "duration": "4:15"
+        },
+        {
+            "position": "",
+            "type_": "heading",
+            "title": "Live - Act II",
+            "duration": ""
+        },
+        {
+            "position": "D1",
+            "type_": "track",
+            "title": "Beautiful Music (Part 2)",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "1:15"
+        },
+        {
+            "position": "D2a",
+            "type_": "track",
+            "title": "Could It Be Magic",
+            "extraartists": [
+                {
+                    "name": "Adrienne Anderson",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 662339,
+                    "resource_url": "https://api.discogs.com/artists/662339"
+                },
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Frédéric Chopin",
+                    "anv": "F. Chopin",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 192325,
+                    "resource_url": "https://api.discogs.com/artists/192325"
+                }
+            ],
+            "duration": "8:00"
+        },
+        {
+            "position": "D2b",
+            "type_": "track",
+            "title": "Mandy",
+            "extraartists": [
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                },
+                {
+                    "name": "Scott English",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 518454,
+                    "resource_url": "https://api.discogs.com/artists/518454"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "D3",
+            "type_": "track",
+            "title": "It's A Miracle",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "5:14"
+        },
+        {
+            "position": "D4",
+            "type_": "track",
+            "title": "It's Just Another New Years Eve",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "4:21"
+        },
+        {
+            "position": "D5",
+            "type_": "track",
+            "title": "I Write The Songs",
+            "extraartists": [
+                {
+                    "name": "Bruce Johnston",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 100702,
+                    "resource_url": "https://api.discogs.com/artists/100702"
+                }
+            ],
+            "duration": "4:31"
+        },
+        {
+            "position": "D6",
+            "type_": "track",
+            "title": "Beautiful Music (Part 3)",
+            "extraartists": [
+                {
+                    "name": "Barry Manilow",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 79091,
+                    "resource_url": "https://api.discogs.com/artists/79091"
+                },
+                {
+                    "name": "Marty Panzer",
+                    "anv": "",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 759652,
+                    "resource_url": "https://api.discogs.com/artists/759652"
+                }
+            ],
+            "duration": "2:21"
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Gerald Alters",
+            "anv": "",
+            "join": "",
+            "role": "Arranged By [Orchestration]",
+            "tracks": "",
+            "id": 508303,
+            "resource_url": "https://api.discogs.com/artists/508303"
+        },
+        {
+            "name": "Arky & Barrett",
+            "anv": "",
+            "join": "",
+            "role": "Artwork [Cover Art]",
+            "tracks": "",
+            "id": 2398555,
+            "resource_url": "https://api.discogs.com/artists/2398555"
+        },
+        {
+            "name": "Steven Donaghey",
+            "anv": "",
+            "join": "",
+            "role": "Bass",
+            "tracks": "",
+            "id": 508307,
+            "resource_url": "https://api.discogs.com/artists/508307"
+        },
+        {
+            "name": "Harold \"Ricardo\" Alexander",
+            "anv": "",
+            "join": "",
+            "role": "Congas",
+            "tracks": "",
+            "id": 508308,
+            "resource_url": "https://api.discogs.com/artists/508308"
+        },
+        {
+            "name": "Michael-Newton Brown",
+            "anv": "",
+            "join": "",
+            "role": "Design [Lighting]",
+            "tracks": "",
+            "id": 2759342,
+            "resource_url": "https://api.discogs.com/artists/2759342"
+        },
+        {
+            "name": "Lee Gurst",
+            "anv": "",
+            "join": "",
+            "role": "Drums, Conductor [Orchestra], Photography By [Supervision], Photography By [Inside], Photography By [Back Cover]",
+            "tracks": "",
+            "id": 508309,
+            "resource_url": "https://api.discogs.com/artists/508309"
+        },
+        {
+            "name": "John Venable",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Live Recording]",
+            "tracks": "",
+            "id": 593298,
+            "resource_url": "https://api.discogs.com/artists/593298"
+        },
+        {
+            "name": "Michael Delugg",
+            "anv": "",
+            "join": "",
+            "role": "Engineer [Recording]",
+            "tracks": "",
+            "id": 281634,
+            "resource_url": "https://api.discogs.com/artists/281634"
+        },
+        {
+            "name": "Lady Flash (2)",
+            "anv": "",
+            "join": "",
+            "role": "Featuring",
+            "tracks": "",
+            "id": 384583,
+            "resource_url": "https://api.discogs.com/artists/384583"
+        },
+        {
+            "name": "Keith Loving",
+            "anv": "",
+            "join": "",
+            "role": "Guitar",
+            "tracks": "",
+            "id": 421870,
+            "resource_url": "https://api.discogs.com/artists/421870"
+        },
+        {
+            "name": "Alan Axelrod",
+            "anv": "",
+            "join": "",
+            "role": "Keyboards",
+            "tracks": "",
+            "id": 508305,
+            "resource_url": "https://api.discogs.com/artists/508305"
+        },
+        {
+            "name": "Barry Manilow",
+            "anv": "",
+            "join": "",
+            "role": "Liner Notes",
+            "tracks": "",
+            "id": 79091,
+            "resource_url": "https://api.discogs.com/artists/79091"
+        },
+        {
+            "name": "Marshall Rosenberg",
+            "anv": "",
+            "join": "",
+            "role": "Percussion",
+            "tracks": "B1",
+            "id": 1215102,
+            "resource_url": "https://api.discogs.com/artists/1215102"
+        },
+        {
+            "name": "Bob Banks (2)",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Back Cover]",
+            "tracks": "",
+            "id": 3831693,
+            "resource_url": "https://api.discogs.com/artists/3831693"
+        },
+        {
+            "name": "Mark David Imburgia",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Back Cover]",
+            "tracks": "",
+            "id": 3831695,
+            "resource_url": "https://api.discogs.com/artists/3831695"
+        },
+        {
+            "name": "William Redd",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Back Cover]",
+            "tracks": "",
+            "id": 3831694,
+            "resource_url": "https://api.discogs.com/artists/3831694"
+        },
+        {
+            "name": "Lara Donin",
+            "anv": "",
+            "join": "",
+            "role": "Photography By [Cover], Photography By [Back Cover]",
+            "tracks": "",
+            "id": 3831692,
+            "resource_url": "https://api.discogs.com/artists/3831692"
+        },
+        {
+            "name": "Barry Manilow",
+            "anv": "",
+            "join": "",
+            "role": "Piano",
+            "tracks": "",
+            "id": 79091,
+            "resource_url": "https://api.discogs.com/artists/79091"
+        },
+        {
+            "name": "Barry Manilow",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 79091,
+            "resource_url": "https://api.discogs.com/artists/79091"
+        },
+        {
+            "name": "Ron Dante",
+            "anv": "",
+            "join": "",
+            "role": "Producer",
+            "tracks": "",
+            "id": 234486,
+            "resource_url": "https://api.discogs.com/artists/234486"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/7Rff-aC5x48giBK5jGQAKUI-qdU5dN4GkZ2WrUOV2VI/rs:fit/g:sm/q:90/h:394/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTM1NzM5NzI5/OC00NzIyLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/7Rff-aC5x48giBK5jGQAKUI-qdU5dN4GkZ2WrUOV2VI/rs:fit/g:sm/q:90/h:394/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTM1NzM5NzI5/OC00NzIyLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/dlprCx9x7bwf9XhSdMWw84xPdEC8H87K8tR_oLc2_5A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTM1NzM5NzI5/OC00NzIyLmpwZWc.jpeg",
+            "width": 400,
+            "height": 394
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/JzvMchKovNAtpwjg9v8gD-6pooSnSYpFFUYb0AVPeIs/rs:fit/g:sm/q:90/h:593/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNTU1LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/JzvMchKovNAtpwjg9v8gD-6pooSnSYpFFUYb0AVPeIs/rs:fit/g:sm/q:90/h:593/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNTU1LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/yMUFJLTAiihrofjA9UyRd99WGLVgo0Ugbuitj6ZXsH4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNTU1LmpwZWc.jpeg",
+            "width": 600,
+            "height": 593
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/aPJZ5sWqN9uFqSMVlkvqlbclcIo6H6HrM37ANi-5nas/rs:fit/g:sm/q:90/h:582/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNzAzLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/aPJZ5sWqN9uFqSMVlkvqlbclcIo6H6HrM37ANi-5nas/rs:fit/g:sm/q:90/h:582/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNzAzLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/ey1yhqC_lVj62GkT3Rq727BTCnKKpi1KQWQO0XauIQY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0zNzAzLmpwZWc.jpeg",
+            "width": 600,
+            "height": 582
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/IeETcmUWuYJP4oGy8Oy6nYXLqvGX5iyyMLYtjzJQt3w/rs:fit/g:sm/q:90/h:568/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/Mi01MDMwLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/IeETcmUWuYJP4oGy8Oy6nYXLqvGX5iyyMLYtjzJQt3w/rs:fit/g:sm/q:90/h:568/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/Mi01MDMwLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/foJR4QR1d8XLYGd384_kGx9cRcRUmHBYJQiAdqEEdpM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/Mi01MDMwLmpwZWc.jpeg",
+            "width": 600,
+            "height": 568
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/weSUVwcg5RgJzA8-lkJ4g_wbov4xH2qp2ln8UKSxmBU/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0xNzE5LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/weSUVwcg5RgJzA8-lkJ4g_wbov4xH2qp2ln8UKSxmBU/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0xNzE5LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/Egfb-IzG00eyI-rkYpQTRPA_Mmt05isEJLe3xQ8SUUM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS0xNzE5LmpwZWc.jpeg",
+            "width": 600,
+            "height": 594
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/DDCcvj-01ZLyqGCNisBKo_VgIAvYfpYZ6hTxWt1TOpA/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS01NTI3LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/DDCcvj-01ZLyqGCNisBKo_VgIAvYfpYZ6hTxWt1TOpA/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS01NTI3LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/O9F1JVh9Ss_-jUAeeDccFOj0ORR8lTMBYpKIKuEXJl4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS01NTI3LmpwZWc.jpeg",
+            "width": 600,
+            "height": 595
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/9ksBxN8ChhjrmUi_b9gVoGRs1YSAoPeRaFiJOpX_nAk/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS02MTY2LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/9ksBxN8ChhjrmUi_b9gVoGRs1YSAoPeRaFiJOpX_nAk/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS02MTY2LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/A83MsgmJAmJ9TT_iIiqOwtQ07PMRrqAsYq8Hqs8ExY4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS02MTY2LmpwZWc.jpeg",
+            "width": 598,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/YmBULUdS9mt-hCV8nzbp3dWoxY3tRPH7wJ4gZwHp0dY/rs:fit/g:sm/q:90/h:599/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS00OTE2LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/YmBULUdS9mt-hCV8nzbp3dWoxY3tRPH7wJ4gZwHp0dY/rs:fit/g:sm/q:90/h:599/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS00OTE2LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/PttTi_QJLit8lzqgvZkCKWFI3bDTLzydEU5JG9kET4c/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS00OTE2LmpwZWc.jpeg",
+            "width": 600,
+            "height": 599
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/O2vk76NY_T8DJPmP3wQIiLQSwtO09SJiAPcBnOIFpQI/rs:fit/g:sm/q:90/h:554/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/OS0xOTkxLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/O2vk76NY_T8DJPmP3wQIiLQSwtO09SJiAPcBnOIFpQI/rs:fit/g:sm/q:90/h:554/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/OS0xOTkxLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/qbmkMrT1mvEKuYcYVm1wqCDKghnA1aocHXWx_Yh5I3Y/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTQ3MjEzNDQ3/OS0xOTkxLmpwZWc.jpeg",
+            "width": 600,
+            "height": 554
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/kmSOP7pou4BbFxnUNYUaQ1m9to4P1VngAYfCnf3dGec/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS05NDA2LmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/kmSOP7pou4BbFxnUNYUaQ1m9to4P1VngAYfCnf3dGec/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS05NDA2LmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/BcRwSm1jB8Iuwf4TZoLOkfuVF_qJOKJviTPDmDTpWnk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTU2NjY2NTA0/OS05NDA2LmpwZWc.jpeg",
+            "width": 600,
+            "height": 596
+        }
+    ],
+    "thumb": "https://i.discogs.com/dlprCx9x7bwf9XhSdMWw84xPdEC8H87K8tR_oLc2_5A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0NTA4/OTUtMTM1NzM5NzI5/OC00NzIyLmpwZWc.jpeg",
+    "estimated_weight": 460,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

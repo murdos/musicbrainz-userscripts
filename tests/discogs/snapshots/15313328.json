@@ -1,0 +1,129 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Allegro Con Brio / Marcia Funebre: Adagio Assi / Scherzo And Trio: Allegro Vivace / Finale: Allegro Molto",
+                    "duration": 2953000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Leonore Overture No 2 (1805)",
+                    "duration": 901000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Adagio - Allegro Vivace / Adagio / Allegro Vivace / Allegro Ma Non Troppo",
+                    "duration": 1970000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Symphony No 8 In F Major, Op 93 (1812): Allegro Vivace E Con Brio / Allegretto Scherzando / Tempo Di Menuetto / Allegro Vivace",
+                    "duration": 1491000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Allegro Con Brio / Andante Con Moto / Allegro / Allegro",
+                    "duration": 1883000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Adagio Molto - Allegro Con Brio / Andante Cantabile Con Moto / Menuetto & Trio: Allegro Molto E Vivace / Adagio - Allegro Molto E Vivace",
+                    "duration": 1537000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Erwachen Heiterer Gefühle Bei Der Ankunft Auf Dem Lande (Allegro Ma Non Troppo) / Szene Am Bach (Andante Molto Mosso) / Lustiges Zusammensein Der Landleute (Allegro) / Gewitter, Sturm (Allegro) / Hirtengesang - Frohe, Dankbare Gefühle Nach Dem Sturm (Allegretto)",
+                    "duration": 2495000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Adagio Molto - Allegro Con Brio / Larghetto / Scherzo & Trio: Allegro / Allegro Molto",
+                    "duration": 2068000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Poco Sostenuto - Vivace / Allegretto / Presto / Allegro Con Brio",
+                    "duration": 2321000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Triple Concerto In C Major For Piano, Violin And Cello Op 56 (1803-1804): Allegro / Largo / Rondo Alla Polacca",
+                    "duration": 2154000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Allegro Ma Non Troppo, Un Poco Maestoso / Scherzo: Molto Vivace / Adagio Molto E Cantabile / Presto - Allegro Ma Non Troppo - Vivace - Adagio Cantabile",
+                    "duration": 4091000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "Digital Media"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Ludwig van Beethoven",
+            "credited_name": "Beethoven",
+            "joinphrase": " - ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "Bernard Haitink",
+            "credited_name": "Bernard Haitink",
+            "joinphrase": ", ",
+            "mbid": ""
+        },
+        {
+            "artist_name": "London Symphony Orchestra",
+            "credited_name": "London Symphony Orchestra",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Symphonies Nos 1-9",
+    "year": 2006,
+    "month": 9,
+    "day": 12,
+    "labels": [
+        {
+            "name": "LSO Live",
+            "catno": "LSO0598",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/15313328",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": []
+}

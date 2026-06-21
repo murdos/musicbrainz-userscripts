@@ -1,0 +1,135 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Motorway City",
+                    "duration": 389000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Flesh Fondue",
+                    "duration": 538000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Last Man On Earth",
+                    "duration": 291000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Space Is Dark",
+                    "duration": 198000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Born To Go",
+                    "duration": 645000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "65 Million Years Ago",
+                    "duration": 296000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "In The Beginning",
+                    "duration": 142000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Spirit Of The Age",
+                    "duration": 457000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "The Fantasy Of Faldum",
+                    "duration": 563000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "The Watcher",
+                    "duration": 360000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Silver Machine",
+                    "duration": 287000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Assault And Battery",
+                    "duration": 157000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Golden Void",
+                    "duration": 366000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "The Right To Decide",
+                    "duration": 594000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Accolade",
+                    "duration": 105000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Hurry On Sundown",
+                    "duration": 435000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Master Of The Universe",
+                    "duration": 514000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Welcome To The Future",
+                    "duration": 117000,
+                    "artist_credit": []
+                }
+            ],
+            "format": "CD"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Hawkwind",
+            "credited_name": "Hawkwind",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Hawkwind 50 Live",
+    "year": 2020,
+    "month": 12,
+    "day": 4,
+    "country": "GB",
+    "labels": [
+        {
+            "name": "Cherry Red",
+            "catno": "CDBRED830",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/16345092",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "type": "album",
+    "barcode": "5013929183087"
+}
