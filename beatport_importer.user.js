@@ -346,24 +346,41 @@
     }]);
   }();
 
-  var styleBlockIconButton = "\n    <style>\n        .harmony-button {\n            display: inline-block;\n            position: relative;\n        }\n\n        .harmony-button:hover {\n            transform: scale(1.1);\n        }\n\n        .harmony-button:active {\n            transform: scale(0.9);\n        }\n    </style>\n";
-  var styleBlockFullButton = "\n    <style>\n        .harmony-button {\n            display: flex;\n            align-items: center;\n            gap: 4px;\n            margin: 0 !important;\n            border-radius: 5px;\n            justify-content: center;\n            cursor: pointer;\n            font-family: Arial;\n            font-size: 12px !important;\n            padding: 3px 6px;\n            border: 1px solid rgba(180,180,180,0.8) !important;\n            background-color: rgba(240,240,240,0.8) !important;\n            color: #334 !important;\n            height: 26px;\n            user-select: none;\n            text-decoration: none !important;\n            box-sizing: border-box;\n        }\n\n        .harmony-button:hover {\n            background-color: rgba(250,250,250,0.9) !important;\n        }\n\n        .harmony-button:active {\n            background-color: rgba(170,170,170,0.8) !important;\n        }\n    </style>\n";
-  function buildHarmonyButton(_ref) {
-    var barcode = _ref.barcode,
-      release_url = _ref.release_url,
-      variant = _ref.variant;
-    var searchParams = new URLSearchParams();
-    if (barcode) {
-      searchParams.set('gtin', barcode);
+  // convert HH:MM:SS or MM:SS to milliseconds
+  function hmsToMilliSeconds(str) {
+    if (typeof str == 'undefined' || str === '' || isNaN(Number(str))) return NaN;
+    if (typeof str == 'number') return str;
+    var t = str.split(':');
+    var s = 0;
+    var m = 1;
+    while (t.length > 0) {
+      s += m * parseInt(t.pop(), 10);
+      m *= 60;
     }
-    if (release_url) {
-      searchParams.set('url', encodeURI(release_url));
-    }
-    searchParams.set('category', 'preferred'); // take Harmony user preferences into account
-    searchParams.set('musicbrainz', ''); // enforce lookup by barcode in MusicBrainz
+    return s * 1000;
+  }
 
-    var harmonyURL = "https://harmony.pulsewidth.org.uk/release?".concat(searchParams.toString());
-    return "\n        ".concat(variant === 'full' ? styleBlockFullButton : styleBlockIconButton, "\n        <a\n            class=\"harmony-button\"\n            title=\"Import this release into MusicBrainz using Harmony (open a new tab)\" \n            target=\"_blank\"\n            href=\"").concat(harmonyURL, "\"\n        >\n            <img src=\"https://harmony.pulsewidth.org.uk/favicon.svg\" alt=\"Harmony icon\" width=\"16\" height=\"16\" />\n            ").concat(variant === 'full' ? 'Import with Harmony' : '', "\n        </a>");
+  // convert ISO8601 duration (limited to hours/minutes/seconds) to milliseconds
+  // format looks like PT1H45M5.789S (note: floats can be used)
+  // https://en.wikipedia.org/wiki/ISO_8601#Durations
+  function ISO8601toMilliSeconds(str) {
+    var regex = /^PT(?:(\d*\.?\d*)H)?(?:(\d*\.?\d*)M)?(?:(\d*\.?\d*)S)?$/;
+    var m = str.replace(',', '.').match(regex);
+    if (!m) return NaN;
+    return (3600 * parseFloat(m[1] || '0') + 60 * parseFloat(m[2] || '0') + parseFloat(m[3] || '0')) * 1000;
+  }
+
+  // compute HTML of import form
+  function buildFormHTML(parameters) {
+    // Build form
+    var innerHTML = "<form class=\"musicbrainz_import musicbrainz_import_add\" action=\"https://musicbrainz.org/release/add\" method=\"post\" target=\"_blank\" accept-charset=\"UTF-8\" charset=\"".concat(document.characterSet, "\">");
+    parameters.forEach(function (parameter) {
+      var value = parameter.value.toString();
+      innerHTML += "<input type='hidden' value='".concat(value.replace(/'/g, '&apos;'), "' name='").concat(parameter.name, "'/>");
+    });
+    innerHTML += '<button type="submit" title="Import this release into MusicBrainz (open a new tab)"><img src="https://raw.githubusercontent.com/metabrainz/design-system/master/brand/logos/MusicBrainz/SVG/MusicBrainz_logo_icon.svg" width="16" height="16" />Import into MB</button>';
+    innerHTML += '</form>';
+    return innerHTML;
   }
 
   function luceneEscape(text) {
@@ -402,66 +419,6 @@
     appendParameter(params, 'type', 'release');
     appendParameter(params, 'advanced', '1');
     return params;
-  }
-
-  function buildSearchLink(release) {
-    var parameters = searchParams(release);
-    var url_params = [];
-    parameters.forEach(function (parameter) {
-      var value = "".concat(parameter.value);
-      url_params.push(encodeURI("".concat(parameter.name, "=").concat(value)));
-    });
-    return "<a class=\"musicbrainz_import\" href=\"https://musicbrainz.org/search?".concat(url_params.join('&'), "\">Search in MusicBrainz</a>");
-  }
-
-  // compute HTML of search button
-  function buildSearchButton(release) {
-    var parameters = searchParams(release);
-    var html = "<form class=\"musicbrainz_import musicbrainz_import_search\" action=\"https://musicbrainz.org/search\" method=\"get\" target=\"_blank\" accept-charset=\"UTF-8\" charset=\"".concat(document.characterSet, "\">");
-    parameters.forEach(function (parameter) {
-      var value = "".concat(parameter.value);
-      html += "<input type='hidden' value='".concat(value.replace(/'/g, '&apos;'), "' name='").concat(parameter.name, "'/>");
-    });
-    html += '<button type="submit" title="Search for this release in MusicBrainz (open a new tab)">Search in MB</button>';
-    html += '</form>';
-    return html;
-  }
-
-  // compute HTML of import form
-  function buildFormHTML(parameters) {
-    // Build form
-    var innerHTML = "<form class=\"musicbrainz_import musicbrainz_import_add\" action=\"https://musicbrainz.org/release/add\" method=\"post\" target=\"_blank\" accept-charset=\"UTF-8\" charset=\"".concat(document.characterSet, "\">");
-    parameters.forEach(function (parameter) {
-      var value = parameter.value.toString();
-      innerHTML += "<input type='hidden' value='".concat(value.replace(/'/g, '&apos;'), "' name='").concat(parameter.name, "'/>");
-    });
-    innerHTML += '<button type="submit" title="Import this release into MusicBrainz (open a new tab)"><img src="https://raw.githubusercontent.com/metabrainz/design-system/master/brand/logos/MusicBrainz/SVG/MusicBrainz_logo_icon.svg" width="16" height="16" />Import into MB</button>';
-    innerHTML += '</form>';
-    return innerHTML;
-  }
-
-  // convert HH:MM:SS or MM:SS to milliseconds
-  function hmsToMilliSeconds(str) {
-    if (typeof str == 'undefined' || str === '' || isNaN(Number(str))) return NaN;
-    if (typeof str == 'number') return str;
-    var t = str.split(':');
-    var s = 0;
-    var m = 1;
-    while (t.length > 0) {
-      s += m * parseInt(t.pop(), 10);
-      m *= 60;
-    }
-    return s * 1000;
-  }
-
-  // convert ISO8601 duration (limited to hours/minutes/seconds) to milliseconds
-  // format looks like PT1H45M5.789S (note: floats can be used)
-  // https://en.wikipedia.org/wiki/ISO_8601#Durations
-  function ISO8601toMilliSeconds(str) {
-    var regex = /^PT(?:(\d*\.?\d*)H)?(?:(\d*\.?\d*)M)?(?:(\d*\.?\d*)S)?$/;
-    var m = str.replace(',', '.').match(regex);
-    if (!m) return NaN;
-    return (3600 * parseFloat(m[1] || '0') + 60 * parseFloat(m[2] || '0') + parseFloat(m[3] || '0')) * 1000;
   }
 
   // Try to guess release type using number of tracks, title and total duration (in millisecs)
@@ -618,6 +575,49 @@
     return parameters;
   }
 
+  var styleBlockIconButton = "\n    <style>\n        .harmony-button {\n            display: inline-block;\n            position: relative;\n        }\n\n        .harmony-button:hover {\n            transform: scale(1.1);\n        }\n\n        .harmony-button:active {\n            transform: scale(0.9);\n        }\n    </style>\n";
+  var styleBlockFullButton = "\n    <style>\n        .harmony-button {\n            display: flex;\n            align-items: center;\n            gap: 4px;\n            margin: 0 !important;\n            border-radius: 5px;\n            justify-content: center;\n            cursor: pointer;\n            font-family: Arial;\n            font-size: 12px !important;\n            padding: 3px 6px;\n            border: 1px solid rgba(180,180,180,0.8) !important;\n            background-color: rgba(240,240,240,0.8) !important;\n            color: #334 !important;\n            height: 26px;\n            user-select: none;\n            text-decoration: none !important;\n            box-sizing: border-box;\n        }\n\n        .harmony-button:hover {\n            background-color: rgba(250,250,250,0.9) !important;\n        }\n\n        .harmony-button:active {\n            background-color: rgba(170,170,170,0.8) !important;\n        }\n    </style>\n";
+  function buildHarmonyButton(_ref) {
+    var barcode = _ref.barcode,
+      release_url = _ref.release_url,
+      variant = _ref.variant;
+    var searchParams = new URLSearchParams();
+    if (barcode) {
+      searchParams.set('gtin', barcode);
+    }
+    if (release_url) {
+      searchParams.set('url', encodeURI(release_url));
+    }
+    searchParams.set('category', 'preferred'); // take Harmony user preferences into account
+    searchParams.set('musicbrainz', ''); // enforce lookup by barcode in MusicBrainz
+
+    var harmonyURL = "https://harmony.pulsewidth.org.uk/release?".concat(searchParams.toString());
+    return "\n        ".concat(variant === 'full' ? styleBlockFullButton : styleBlockIconButton, "\n        <a\n            class=\"harmony-button\"\n            title=\"Import this release into MusicBrainz using Harmony (open a new tab)\" \n            target=\"_blank\"\n            href=\"").concat(harmonyURL, "\"\n        >\n            <img src=\"https://harmony.pulsewidth.org.uk/favicon.svg\" alt=\"Harmony icon\" width=\"16\" height=\"16\" />\n            ").concat(variant === 'full' ? 'Import with Harmony' : '', "\n        </a>");
+  }
+
+  // compute HTML of search button
+  function buildSearchButton(release) {
+    var parameters = searchParams(release);
+    var html = "<form class=\"musicbrainz_import musicbrainz_import_search\" action=\"https://musicbrainz.org/search\" method=\"get\" target=\"_blank\" accept-charset=\"UTF-8\" charset=\"".concat(document.characterSet, "\">");
+    parameters.forEach(function (parameter) {
+      var value = "".concat(parameter.value);
+      html += "<input type='hidden' value='".concat(value.replace(/'/g, '&apos;'), "' name='").concat(parameter.name, "'/>");
+    });
+    html += '<button type="submit" title="Search for this release in MusicBrainz (open a new tab)">Search in MB</button>';
+    html += '</form>';
+    return html;
+  }
+
+  function buildSearchLink(release) {
+    var parameters = searchParams(release);
+    var url_params = [];
+    parameters.forEach(function (parameter) {
+      var value = "".concat(parameter.value);
+      url_params.push(encodeURI("".concat(parameter.name, "=").concat(value)));
+    });
+    return "<a class=\"musicbrainz_import\" href=\"https://musicbrainz.org/search?".concat(url_params.join('&'), "\">Search in MusicBrainz</a>");
+  }
+
   // Convert a list of artists to a list of artist credits with joinphrases
   function makeArtistCredits(artists_list) {
     var artists = artists_list.map(function (item) {
@@ -713,16 +713,6 @@
     return "https://musicbrainz.org/search?".concat(params.join('&'));
   }
 
-  var URL_TYPES = {
-    purchase_for_download: 74,
-    download_for_free: 75,
-    discogs: 76,
-    purchase_for_mail_order: 79,
-    other_databases: 82,
-    stream_for_free: 85,
-    license: 301
-  };
-
   var special_artists = {
     various_artists: {
       name: 'Various Artists',
@@ -749,6 +739,16 @@
       mbid: specialArtist.mbid
     };
   }
+
+  var URL_TYPES = {
+    purchase_for_download: 74,
+    download_for_free: 75,
+    discogs: 76,
+    purchase_for_mail_order: 79,
+    other_databases: 82,
+    stream_for_free: 85,
+    license: 301
+  };
 
   var MBImport = {
     buildHarmonyButton: buildHarmonyButton,
