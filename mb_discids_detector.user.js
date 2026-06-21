@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    http://userscripts.org/users/22504
-// @version      2024.11.26.1
+// @version      2026.06.21.1
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -277,7 +277,7 @@ const MBDiscid = (function () {
     );
     this.log_input_to_entries = function (text) {
         let discs = [];
-        var entries = [];
+        let entries = [];
         $.each(text.split('\n'), function (index, value) {
             let m = toc_entry_matcher.exec(value);
             if (m) {
@@ -296,7 +296,7 @@ const MBDiscid = (function () {
         }
 
         for (let i = 0; i < discs.length; i++) {
-            var discEntries = discs[i];
+            const discEntries = discs[i];
             let layout_type = get_layout_type(discEntries);
             let entries_audio;
             if (layout_type === 'with_data') {
