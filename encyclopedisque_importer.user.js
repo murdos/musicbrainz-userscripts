@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name         Import Encyclopedisque releases to MusicBrainz
-// @version      2026.06.21.2
+// @version      2026.06.21.3
 // @namespace    http://userscripts.org/users/22504
 // @description  Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
@@ -37,35 +37,65 @@ function setupImportUI(release) {
 }
 
 function insertMBLinks() {
-    let current_url = window.location.href;
+    const release_urls_data = [];
+    const artist_urls_data = [];
+    const current_url = window.location.href;
+
     if (current_url.match(/\/disque\//)) {
-        mbLinks.searchAndDisplayMbLink(current_url, 'release', function (link) {
-            document.querySelectorAll('h2 span').forEach(span => {
-                span.insertAdjacentHTML('beforebegin', link);
-            });
+        release_urls_data.push({
+            url: current_url,
+            mb_type: 'release',
+            key: `release:${current_url}`,
+            insert_func(link) {
+                document.querySelectorAll('h2 span').forEach(span => {
+                    span.insertAdjacentHTML('beforebegin', link);
+                });
+            },
         });
     } else if (current_url.match(/\/artiste\//)) {
-        mbLinks.searchAndDisplayMbLink(current_url, 'artist', function (link) {
-            document.querySelectorAll('h2').forEach(h2 => {
-                h2.insertAdjacentHTML('afterbegin', link);
-            });
+        artist_urls_data.push({
+            url: current_url,
+            mb_type: 'artist',
+            key: `artist:${current_url}`,
+            insert_func(link) {
+                document.querySelectorAll('h2').forEach(h2 => {
+                    h2.insertAdjacentHTML('afterbegin', link);
+                });
+            },
         });
     }
 
     document.querySelectorAll('div.v7P a[href*="/disque/"], div.v12P a[href*="/disque/"]').forEach(linkEl => {
-        let external_url = window.location.origin + linkEl.getAttribute('href');
-        mbLinks.searchAndDisplayMbLink(external_url, 'release', function (link) {
-            linkEl.insertAdjacentHTML('afterend', link);
-            linkEl.insertAdjacentHTML('afterend', '<br />');
+        const external_url = window.location.origin + linkEl.getAttribute('href');
+        release_urls_data.push({
+            url: external_url,
+            mb_type: 'release',
+            key: `release:${external_url}`,
+            insert_func(link) {
+                linkEl.insertAdjacentHTML('afterend', link);
+                linkEl.insertAdjacentHTML('afterend', '<br />');
+            },
         });
     });
 
     document.querySelectorAll('h2 a[href*="/artiste/"], div.main a[href*="/artiste/"]').forEach(linkEl => {
-        let external_url = window.location.origin + linkEl.getAttribute('href');
-        mbLinks.searchAndDisplayMbLink(external_url, 'artist', function (link) {
-            linkEl.insertAdjacentHTML('beforebegin', link);
+        const external_url = window.location.origin + linkEl.getAttribute('href');
+        artist_urls_data.push({
+            url: external_url,
+            mb_type: 'artist',
+            key: `artist:${external_url}`,
+            insert_func(link) {
+                linkEl.insertAdjacentHTML('beforebegin', link);
+            },
         });
     });
+
+    if (release_urls_data.length > 0) {
+        mbLinks.searchAndDisplayMbLinks(release_urls_data);
+    }
+    if (artist_urls_data.length > 0) {
+        mbLinks.searchAndDisplayMbLinks(artist_urls_data);
+    }
 }
 
 // Analyze Encyclopedisque data and prepare to release object
