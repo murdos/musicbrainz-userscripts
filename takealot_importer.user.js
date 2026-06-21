@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Takealot releases to MusicBrainz
 // @description  Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
-// @version      2026.05.31.1
+// @version      2026.06.21.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
@@ -391,14 +391,14 @@ function parseFMApage() {
             LOGGER.debug('Uhm I think the idProduct is missing folks and comments left ...');
             let FMAEmbedCode = $('div.cell:nth-child(3) > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
-            FMAEmbedCodeRegex = /product_id\=(\d*)/;
+            FMAEmbedCodeRegex = /product_id=(\d*)/;
             let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[1]; // assign the ID to a variable
         } else if (typeof $('#idProduct').attr('value') === 'undefined' && $('.reviews > a:nth-child(1)').length) {
             LOGGER.debug('Uhm I think the idProduct is missing folks ...');
             let FMAEmbedCode = $('.reviews > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
-            FMAEmbedCodeRegex = /product_id\=(\d*)/;
+            FMAEmbedCodeRegex = /product_id=(\d*)/;
             let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[1]; // assign the ID to a variable
         } else {
@@ -477,8 +477,6 @@ function parse_YYYY_MM_DD(date, obj) {
 function Parsefmarelease(albumobject, trackobject) {
     if (albumobject === undefined) {
         albumobject = [];
-    } else {
-        albumobject = albumobject;
     }
 
     let fmarelease = {};

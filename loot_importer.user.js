@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Loot releases to MusicBrainz
 // @description  Add a button to import Loot.co.za releases to MusicBrainz
-// @version      2026.05.31.1
+// @version      2026.06.21.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
@@ -267,7 +267,7 @@ function ParseLootPage() {
 
             let currenttrack = element.querySelectorAll('td');
             //   var artisttitle_regex = /(.*) - (.*)/; // regex: artist - title
-            var artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
+            const artisttitle_regex = /(.*) (-|–) (.*)/; // regex: artist - title char 45 or 8211
 
             // need to check if this can be replaced with single regex for now check artist-title if
             // not matching check just title
@@ -276,8 +276,8 @@ function ParseLootPage() {
                 descriptiontrack.title = artisttitle[3];
                 descriptiontrack.artist = artisttitle[1];
             } else {
-                var artisttitle_regex = /(.*)/; // regex: title
-                const artisttitle = currenttrack[1].innerText.match(artisttitle_regex);
+                const title_regex = /(.*)/; // regex: title
+                const artisttitle = currenttrack[1].innerText.match(title_regex);
                 descriptiontrack.title = artisttitle[1];
                 descriptiontrack.artist = releaseartist;
             }
@@ -383,10 +383,10 @@ function ParseLootPage() {
 //                                   Loot -> MusicBrainz mapping                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var Languages = new Array();
+const Languages = new Array();
 Languages['Afrikaans'] = 'afr';
 
-var Countries = new Array();
+const Countries = new Array();
 Countries['Afghanistan'] = 'AF';
 Countries['Albania'] = 'AL';
 Countries['Algeria'] = 'DZ';

@@ -28,6 +28,7 @@
         "format:check": "oxfmt --check",
         "lint": "pnpm run eslint",
         "lint-fix": "pnpm run eslint -- --fix",
+        "oxlint": "oxlint --type-aware",
         "eslint": "eslint .",
         "test": "node --strip-types tests/discogs/run.ts",
         "test:discogs": "node --strip-types tests/discogs/run.ts",
@@ -53,6 +54,8 @@
         "husky": "^9.1.7",
         "lint-staged": "^16.2.4",
         "oxfmt": "^0.55.0",
+        "oxlint": "^1.70.0",
+        "oxlint-tsgolint": "^0.23.0",
         "rollup": "^4.62.0",
         "typescript-eslint": "^8.46.1",
         "zod": "^4.4.3"
