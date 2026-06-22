@@ -46,7 +46,7 @@
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/greasemonkey": "^4.0.7",
         "@types/node": "^24.8.1",
-        "@typescript/native-preview": "7.0.0-dev.20260617.2",
+        "@typescript/native-preview": "7.0.0-dev.20260618.1",
         "eslint": "^9.38.0",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-userscripts": "^0.5.6",
