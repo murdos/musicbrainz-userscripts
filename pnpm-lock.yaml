@@ -13,7 +13,7 @@ importers:
         version: 8.0.1
       '@babel/preset-env':
         specifier: ^8.0.1
-        version: 8.0.1(@babel/core@8.0.1)
+        version: 8.0.2(@babel/core@8.0.1)
       '@babel/preset-typescript':
         specifier: ^8.0.1
         version: 8.0.1(@babel/core@8.0.1)
@@ -160,10 +160,6 @@ packages:
     resolution: {integrity: sha512-3W6satvtPuCUkUx63S2jMoW9EQNYkADgs1HTfufmL7gCmAulHMKupA/12WNz4A0GMMFn/YnWWwqOT9IZrJHQjg==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
-  '@babel/helper-plugin-utils@7.29.7':
-    resolution: {integrity: sha512-G7sHYigPY17oO5SYWnfD/0MTBwVR781S/JI643e/JhUYgVgWE/61SoW3NH9KWUKyKq5LVh3npif99Wkt6j86Jw==}
-    engines: {node: '>=6.9.0'}
-
   '@babel/helper-plugin-utils@8.0.1':
     resolution: {integrity: sha512-3PKFgjTyPlhFhorfP+SjKQxLViIL++zWjFOO4hGriYU+Bsm983DxEM1JmDRJVWXV0O9npu+xXRqz7Pbd3mh70g==}
     engines: {node: ^22.18.0 || >=24.11.0}
@@ -200,6 +196,10 @@ packages:
 
   '@babel/helper-validator-identifier@8.0.0':
     resolution: {integrity: sha512-kXxQVZHNOctSJJsqzmcbPSCEkM6oHNnDIkua7g9RCO9xRHj2eCiKvRx2KPdfWR9QxcGWnK/oArrtunmie3rL9g==}
+    engines: {node: ^22.18.0 || >=24.11.0}
+
+  '@babel/helper-validator-identifier@8.0.2':
+    resolution: {integrity: sha512-9Fr9QeyCAyi1BR1jKZ6uYQ24EIhQUx5ReHfQU7drOE+TPOb+w11/dsqLkMOT2U29OdCT71XajrOT8xDc1C7orA==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
   '@babel/helper-validator-option@8.0.0':
@@ -500,8 +500,8 @@ packages:
     peerDependencies:
       '@babel/core': ^8.0.0
 
-  '@babel/plugin-transform-regenerator@8.0.1':
-    resolution: {integrity: sha512-1WjCi/45Mn5e0uvz26FdvRe6bTAvN6WAtkHgIjl0w/LkBvrv4Y5bDR+8YY72r7cefXBfwYUXIHSoxQkrIfnjXQ==}
+  '@babel/plugin-transform-regenerator@8.0.2':
+    resolution: {integrity: sha512-aFfsjCRYducRV4dPnpsBbdRkLjboca9FVDg6HZCgy0Ahvk2ZQ/2exmCRC5qS9P6rsWwrmIheNaIM6A1j2F8KMA==}
     engines: {node: ^22.18.0 || >=24.11.0}
     peerDependencies:
       '@babel/core': ^8.0.0
@@ -578,16 +578,16 @@ packages:
     peerDependencies:
       '@babel/core': ^8.0.0
 
-  '@babel/preset-env@8.0.1':
-    resolution: {integrity: sha512-tiwl69ZQGIbPif28GK8vI/Nm1nYdP+UHXWRnqXl0fjfBS7DWmAs2XvlpVkZyZjVVDxcprcbzCnN93SbuSgz8WQ==}
+  '@babel/preset-env@8.0.2':
+    resolution: {integrity: sha512-CUGLn9hNBCF/eXnwdFAWERbniCcXCRvnKwLV9fegeUEIqv7YlU2MepsWMMM54GcILx5XYMnRh+JAL+K5G+mK6g==}
     engines: {node: ^22.18.0 || >=24.11.0}
     peerDependencies:
       '@babel/core': ^8.0.0
 
-  '@babel/preset-modules@0.1.6-no-external-plugins':
-    resolution: {integrity: sha512-HrcgcIESLm9aIR842yhJ5RWan/gebQUJ6E/E5+rf0y9o6oj7w0Br+sWuL6kEQ/o/AdfvR1Je9jG18/gnpwjEyA==}
+  '@babel/preset-modules@0.2.0':
+    resolution: {integrity: sha512-yz0RBN2fx4fjCeFcTWsWgL7PxSRltvTa0Qg14HkWCU3qS8MO7ZSJlBVbGceynd5C9NsJwwUHNQD3dc6tYO+jqQ==}
     peerDependencies:
-      '@babel/core': ^7.0.0-0 || ^8.0.0-0 <8.0.0
+      '@babel/core': ^8.0.0
 
   '@babel/preset-typescript@8.0.1':
     resolution: {integrity: sha512-qrPhQIN1NLrPmzgazF9XKQqXrOcp/WJly+K+6ReFonn24FZqRJO7clxOJo6Ni75L+2vAqI3cHVU2OJLBxoPp5A==}
@@ -2182,11 +2182,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  semver@7.8.1:
-    resolution: {integrity: sha512-rkVq3IXh+4FDGch+KwzX3aV9W3kO54GyEgpvBzSyctDA6Xtd7RJQV1xmXbeQp5v7+VzLOfVqiutSE6GICgPFvg==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   semver@7.8.4:
     resolution: {integrity: sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==}
     engines: {node: '>=10'}
@@ -2530,14 +2525,12 @@ snapshots:
     dependencies:
       '@babel/core': 8.0.1
       '@babel/helper-module-imports': 8.0.0
-      '@babel/helper-validator-identifier': 8.0.0
+      '@babel/helper-validator-identifier': 8.0.2
       '@babel/traverse': 8.0.0
 
   '@babel/helper-optimise-call-expression@8.0.0':
     dependencies:
       '@babel/types': 8.0.0
-
-  '@babel/helper-plugin-utils@7.29.7': {}
 
   '@babel/helper-plugin-utils@8.0.1(@babel/core@8.0.1)':
     dependencies:
@@ -2569,6 +2562,8 @@ snapshots:
   '@babel/helper-validator-identifier@7.29.7': {}
 
   '@babel/helper-validator-identifier@8.0.0': {}
+
+  '@babel/helper-validator-identifier@8.0.2': {}
 
   '@babel/helper-validator-option@8.0.0': {}
 
@@ -2777,7 +2772,7 @@ snapshots:
       '@babel/core': 8.0.1
       '@babel/helper-module-transforms': 8.0.1(@babel/core@8.0.1)
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
-      '@babel/helper-validator-identifier': 8.0.0
+      '@babel/helper-validator-identifier': 8.0.2
 
   '@babel/plugin-transform-modules-umd@8.0.1(@babel/core@8.0.1)':
     dependencies:
@@ -2854,7 +2849,7 @@ snapshots:
       '@babel/core': 8.0.1
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
 
-  '@babel/plugin-transform-regenerator@8.0.1(@babel/core@8.0.1)':
+  '@babel/plugin-transform-regenerator@8.0.2(@babel/core@8.0.1)':
     dependencies:
       '@babel/core': 8.0.1
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
@@ -2928,7 +2923,7 @@ snapshots:
       '@babel/helper-create-regexp-features-plugin': 8.0.1(@babel/core@8.0.1)
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
 
-  '@babel/preset-env@8.0.1(@babel/core@8.0.1)':
+  '@babel/preset-env@8.0.2(@babel/core@8.0.1)':
     dependencies:
       '@babel/compat-data': 8.0.0
       '@babel/core': 8.0.1
@@ -2980,7 +2975,7 @@ snapshots:
       '@babel/plugin-transform-private-methods': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-private-property-in-object': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-property-literals': 8.0.1(@babel/core@8.0.1)
-      '@babel/plugin-transform-regenerator': 8.0.1(@babel/core@8.0.1)
+      '@babel/plugin-transform-regenerator': 8.0.2(@babel/core@8.0.1)
       '@babel/plugin-transform-regexp-modifiers': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-reserved-words': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-shorthand-properties': 8.0.1(@babel/core@8.0.1)
@@ -2992,16 +2987,18 @@ snapshots:
       '@babel/plugin-transform-unicode-property-regex': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-unicode-regex': 8.0.1(@babel/core@8.0.1)
       '@babel/plugin-transform-unicode-sets-regex': 8.0.1(@babel/core@8.0.1)
-      '@babel/preset-modules': 0.1.6-no-external-plugins(@babel/core@8.0.1)
+      '@babel/preset-modules': 0.2.0(@babel/core@8.0.1)
       babel-plugin-polyfill-corejs3: 1.0.0(@babel/core@8.0.1)
       core-js-compat: 3.49.0
       semver: 7.8.4
 
-  '@babel/preset-modules@0.1.6-no-external-plugins(@babel/core@8.0.1)':
+  '@babel/preset-modules@0.2.0(@babel/core@8.0.1)':
     dependencies:
       '@babel/core': 8.0.1
-      '@babel/helper-plugin-utils': 7.29.7
-      '@babel/types': 7.29.7
+      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
+      '@babel/plugin-transform-dotall-regex': 8.0.1(@babel/core@8.0.1)
+      '@babel/plugin-transform-unicode-property-regex': 8.0.1(@babel/core@8.0.1)
+      '@babel/types': 8.0.0
       esutils: 2.0.3
 
   '@babel/preset-typescript@8.0.1(@babel/core@8.0.1)':
@@ -3477,7 +3474,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.58.2
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.1
+      semver: 7.8.4
       tinyglobby: 0.2.16
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
@@ -4565,8 +4562,6 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.7.3: {}
-
-  semver@7.8.1: {}
 
   semver@7.8.4: {}
 
