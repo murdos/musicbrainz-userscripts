@@ -55,11 +55,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Check if there are any changes
-          if git diff --quiet; then
+          # Stage all changes (including new untracked files)
+          git add -A
+
+          # Check if there is anything to commit
+          if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git add .
             git commit --no-verify -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
             git push origin dist
           fi
