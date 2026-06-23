@@ -33,6 +33,7 @@
         "test": "node --strip-types tests/discogs/run.ts",
         "test:discogs": "node --strip-types tests/discogs/run.ts",
         "test:discogs:update": "node --strip-types tests/discogs/run.ts --update",
+        "generate-readme": "node --strip-types ./tools/generate-readme.ts > README.md",
         "prepare": "husky"
     },
     "devDependencies": {
