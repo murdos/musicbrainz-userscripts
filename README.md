@@ -23,6 +23,7 @@
 - [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
 - [MusicBrainz: Expand/collapse release groups](#expand-collapse-release-groups)
 - [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> MusicBrainz: Future release annotation](#future_release_annotation)
 - [MusicBrainz: Set recording comments for a release](#set-recording-comments)
 - [Musicbrainz DiscIds Detector](#mb_discids_detector)
 - [Musicbrainz UI enhancements](#mb_ui_enhancements)
@@ -187,6 +188,13 @@ Mass cancel open edits with optional edit notes.
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fast-cancel-edits.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/fast-cancel-edits.user.js)
+
+## <a name="future_release_annotation"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> MusicBrainz: Future release annotation
+
+Adds an annotation note when importing a release with a future release date on the release editor. The annotation note serves as a reminder to verify the release info when it is released.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/future_release_annotation.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/future_release_annotation.user.js)
 
 ## <a name="set-recording-comments"></a> MusicBrainz: Set recording comments for a release
 

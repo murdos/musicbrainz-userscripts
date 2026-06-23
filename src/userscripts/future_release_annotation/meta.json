@@ -1,0 +1,18 @@
+{
+    "name": "MusicBrainz: Future release annotation",
+    "description": "Adds an annotation note when importing a release with a future release date on the release editor. The annotation note serves as a reminder to verify the release info when it is released.",
+    "version": "2026.06.23.1",
+    "author": "Raman Sinclair",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/future_release_annotation.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/future_release_annotation.user.js",
+    "match": [
+        "https://musicbrainz.org/release/add*",
+        "https://beta.musicbrainz.org/release/add*",
+        "https://eu.musicbrainz.org/release/add*",
+        "https://test.musicbrainz.org/release/add*"
+    ],
+    "grant": ["none"],
+    "runAt": "document-start",
+    "icon": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png"
+}
