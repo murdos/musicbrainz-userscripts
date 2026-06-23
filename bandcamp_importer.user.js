@@ -19,8 +19,8 @@
 // @run-at       document-start
 // ==/UserScript==
 
-/* oxlint-disable-next-line no-global-assign */
 if (!unsafeWindow) {
+    /* oxlint-disable-next-line no-global-assign */
     unsafeWindow = window;
 }
 

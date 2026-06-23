@@ -16,7 +16,7 @@ const TYPESCRIPT_ICON = '<img src="assets/icons/typescript.svg" alt="TypeScript"
 
 const regexStartHeader = /==UserScript==/i;
 const regexStopHeader = /==\/UserScript==/i;
-const regexKeyval = /^[\s\*/]+@(\S+)\s+(.+)\s*$/i;
+const regexKeyval = /^[\s\*/]+@(\S+)\s+(.+)\s*$/i; // oxlint-disable-line no-useless-escape
 
 type ParsedHeader = Record<string, string[]>;
 
