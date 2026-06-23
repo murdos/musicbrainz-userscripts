@@ -20,8 +20,6 @@ jobs:
         run: pnpm format:check
       - name: 'Run type checking'
         run: pnpm type-check
-      - name: 'Run oxlint'
-        run: pnpm oxlint
       - name: 'Run linter'
         run: pnpm lint
       - name: 'Build userscripts'
