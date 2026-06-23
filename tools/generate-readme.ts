@@ -18,17 +18,45 @@ const regexStartHeader = /==UserScript==/i;
 const regexStopHeader = /==\/UserScript==/i;
 const regexKeyval = /^[\s\*/]+@(\S+)\s+(.+)\s*$/i;
 
-type Header = Record<string, string[]>;
+type ParsedHeader = Record<string, string[]>;
+
+interface ScriptHeader {
+    name: [string, ...string[]];
+    description?: string[];
+    downloadurl?: string[];
+}
 
 interface ScriptItem {
     jsfile: string;
     shortname: string;
-    header: Header;
+    header: ScriptHeader;
 }
 
-function parseUserScriptHeader(jsfilename: string): Header | null {
+function toScriptHeader(parsed: ParsedHeader): ScriptHeader | null {
+    const name = parsed['name'];
+    if (!name) {
+        return null;
+    }
+    const firstName = name[0];
+    if (firstName === undefined) {
+        return null;
+    }
+
+    const header: ScriptHeader = { name: [firstName, ...name.slice(1)] };
+    const description = parsed['description'];
+    if (description?.[0]) {
+        header.description = description;
+    }
+    const downloadurl = parsed['downloadurl'];
+    if (downloadurl?.[0]) {
+        header.downloadurl = downloadurl;
+    }
+    return header;
+}
+
+function parseUserScriptHeader(jsfilename: string): ScriptHeader | null {
     const content = fs.readFileSync(jsfilename, { encoding: 'utf-8' });
-    const header: Header = {};
+    const parsed: ParsedHeader = {};
     let inHeader = false;
 
     for (const line of content.split('\n')) {
@@ -47,15 +75,18 @@ function parseUserScriptHeader(jsfilename: string): Header | null {
         if (!match) {
             continue;
         }
-        const key = match[1].toLowerCase();
+        const key = match[1]?.toLowerCase();
         const value = match[2];
-        if (!header[key]) {
-            header[key] = [];
+        if (key === undefined || value === undefined) {
+            continue;
         }
-        header[key].push(value);
+        if (!parsed[key]) {
+            parsed[key] = [];
+        }
+        parsed[key].push(value);
     }
 
-    return Object.keys(header).length > 0 ? header : null;
+    return toScriptHeader(parsed);
 }
 
 const itemsByShortname: Record<string, ScriptItem> = {};
@@ -86,8 +117,12 @@ if (fs.statSync(srcUserscripts, { throwIfNoEntry: false })?.isDirectory()) {
         if (!fs.statSync(metaPath, { throwIfNoEntry: false })?.isFile()) {
             continue;
         }
-        const meta = JSON.parse(fs.readFileSync(metaPath, { encoding: 'utf-8' }));
-        const header: Header = {
+        const meta = JSON.parse(fs.readFileSync(metaPath, { encoding: 'utf-8' })) as {
+            name: string;
+            description: string;
+            downloadURL: string;
+        };
+        const header: ScriptHeader = {
             name: [meta.name],
             description: [meta.description],
             downloadurl: [meta.downloadURL],
@@ -111,7 +146,11 @@ function isTypescript(shortname: string): boolean {
 
 let items = Object.values(itemsByShortname);
 items = items.filter(item => !item.header.name[0].includes('[DISCONTINUED]'));
-items.sort((a, b) => (a.header.name[0] < b.header.name[0] ? -1 : a.header.name[0] > b.header.name[0] ? 1 : 0));
+items.sort((a, b) => {
+    const nameA = a.header.name[0];
+    const nameB = b.header.name[0];
+    return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+});
 
 const lines: string[] = ['# MusicBrainz UserScripts', ''];
 
@@ -133,15 +172,16 @@ for (const item of items) {
     lines.push(`## <a name="${item.shortname}"></a> ${prefix}${name}`);
     lines.push('');
 
-    if (item.header.description) {
+    if (item.header.description?.[0]) {
         lines.push(item.header.description[0]);
         lines.push('');
     }
 
     const sourceUrl = isTypescript(item.shortname) ? `${sourceBaseDist}/${item.shortname}.user.js` : `${sourceBaseMaster}/${item.jsfile}`;
     lines.push(`[![Source](${sourceButtonUrl})](${sourceUrl})`);
-    if (item.header.downloadurl) {
-        lines.push(`[![Install](${installButtonUrl})](${item.header.downloadurl[0]})`);
+    const downloadUrl = item.header.downloadurl?.[0];
+    if (downloadUrl) {
+        lines.push(`[![Install](${installButtonUrl})](${downloadUrl})`);
     }
 }
 

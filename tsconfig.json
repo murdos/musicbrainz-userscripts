@@ -32,7 +32,7 @@
         },
         "types": ["node"]
     },
-    "include": ["src/**/*", "tests/**/*", "oxfmt.config.ts", "oxlint.config.ts"],
+    "include": ["src/**/*", "tests/**/*", "tools/**/*", "oxfmt.config.ts", "oxlint.config.ts"],
     "typeRoots": ["node_modules/@types", "src/types"],
     "exclude": ["node_modules", "dist", "**/*.user.js"]
 }
