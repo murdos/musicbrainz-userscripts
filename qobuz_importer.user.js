@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.05.31.2
+// @version      2026.06.09.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -291,15 +291,22 @@ function insertLink(release) {
     }
 
     mbUI.append($('<button id="isrcs" type="submit" title="Show list of ISRCs">Show ISRCs</button>'));
+    mbUI.append(
+        MBImport.buildHarmonyButton({
+            barcode: release.barcode,
+            release_url: release.url,
+            variant: 'full',
+        }),
+    );
     mbUI.css({
-        marginBottom: '5px',
+        marginTop: '5px',
         display: 'flex',
         alignItems: 'center',
         gap: '2px',
         flexWrap: 'wrap',
     });
 
-    $('.album-meta .album-meta__title').before(mbUI);
+    $('.album-meta').append(mbUI);
     mbUI.after($(`<textarea id="isrclist" style="display:none">${release.isrcs.join('\n')}</textarea>`));
     $('#isrclist').css({
         width: '100%',

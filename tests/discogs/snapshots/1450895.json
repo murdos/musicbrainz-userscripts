@@ -1,0 +1,236 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Riders To The Stars",
+                    "duration": 288000,
+                    "artist_credit": [],
+                    "number": "A1"
+                },
+                {
+                    "title": "Why Don't We Live Together",
+                    "duration": 225000,
+                    "artist_credit": [],
+                    "number": "A2"
+                },
+                {
+                    "title": "Looks Like We Made It",
+                    "duration": 240000,
+                    "artist_credit": [],
+                    "number": "A3"
+                },
+                {
+                    "title": "New York City Rhythm",
+                    "duration": 312000,
+                    "artist_credit": [],
+                    "number": "A4"
+                },
+                {
+                    "title": "A Very Strange Medley (V.S.M.)",
+                    "duration": 370000,
+                    "artist_credit": [],
+                    "number": "B1"
+                },
+                {
+                    "title": "Kentucky Fried Chicken",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1a"
+                },
+                {
+                    "title": "State Farm Insurance",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1b"
+                },
+                {
+                    "title": "Stridex",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1c"
+                },
+                {
+                    "title": "Band Aids",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1d"
+                },
+                {
+                    "title": "Bowlene",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1e"
+                },
+                {
+                    "title": "Dr. Pepper",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1f"
+                },
+                {
+                    "title": "Pepsi",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1g"
+                },
+                {
+                    "title": "McDonalds",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B1h"
+                },
+                {
+                    "title": "Jump Shout Boogie Medley",
+                    "duration": 496000,
+                    "artist_credit": [],
+                    "number": "B2"
+                },
+                {
+                    "title": "Jump Shout Boogie",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B2a"
+                },
+                {
+                    "title": "Avenue C",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B2b"
+                },
+                {
+                    "title": "Jumpin' At The Woodside",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B2c"
+                },
+                {
+                    "title": "Cloudburst",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B2d"
+                },
+                {
+                    "title": "Bandstand Boogie",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "B2e"
+                },
+                {
+                    "title": "This One's For You",
+                    "duration": 254000,
+                    "artist_credit": [],
+                    "number": "B3"
+                }
+            ],
+            "format": "12\" Vinyl",
+            "title": "Live - Act I"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Beautiful Music (Part 1)",
+                    "duration": 122000,
+                    "artist_credit": [],
+                    "number": "C1"
+                },
+                {
+                    "title": "Daybreak",
+                    "duration": 257000,
+                    "artist_credit": [],
+                    "number": "C2"
+                },
+                {
+                    "title": "Lay Me Down",
+                    "duration": 281000,
+                    "artist_credit": [],
+                    "number": "C3"
+                },
+                {
+                    "title": "Weekend In New England",
+                    "duration": 256000,
+                    "artist_credit": [],
+                    "number": "C4"
+                },
+                {
+                    "title": "Studio Musician",
+                    "duration": 255000,
+                    "artist_credit": [],
+                    "number": "C5"
+                },
+                {
+                    "title": "Beautiful Music (Part 2)",
+                    "duration": 75000,
+                    "artist_credit": [],
+                    "number": "D1"
+                },
+                {
+                    "title": "Could It Be Magic",
+                    "duration": 480000,
+                    "artist_credit": [],
+                    "number": "D2a"
+                },
+                {
+                    "title": "Mandy",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "D2b"
+                },
+                {
+                    "title": "It's A Miracle",
+                    "duration": 314000,
+                    "artist_credit": [],
+                    "number": "D3"
+                },
+                {
+                    "title": "It's Just Another New Years Eve",
+                    "duration": 261000,
+                    "artist_credit": [],
+                    "number": "D4"
+                },
+                {
+                    "title": "I Write The Songs",
+                    "duration": 271000,
+                    "artist_credit": [],
+                    "number": "D5"
+                },
+                {
+                    "title": "Beautiful Music (Part 3)",
+                    "duration": 141000,
+                    "artist_credit": [],
+                    "number": "D6"
+                }
+            ],
+            "format": "12\" Vinyl",
+            "title": "Live - Act II"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Barry Manilow",
+            "credited_name": "Barry Manilow",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Live",
+    "year": 1977,
+    "country": "GB",
+    "labels": [
+        {
+            "name": "Arista",
+            "catno": "DARTY 3",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/1450895",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "type": "album"
+}

@@ -2,66 +2,70 @@
     "name": "musicbrainz-userscripts",
     "version": "1.0.0",
     "description": "Collection of userscripts for MusicBrainz",
-    "type": "module",
-    "scripts": {
-        "build": "tsx src/build/build.ts",
-        "build:watch": "tsx src/build/build.ts --watch",
-        "type-check": "tsc --noEmit",
-        "prettier:format": "prettier --write .",
-        "lint": "pnpm run eslint",
-        "lint-fix": "pnpm run eslint -- --fix",
-        "eslint": "eslint .",
-        "prepare": "husky"
+    "keywords": [
+        "import",
+        "improvements",
+        "musicbrainz",
+        "ui",
+        "userscripts"
+    ],
+    "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
+    "bugs": {
+        "url": "https://github.com/murdos/musicbrainz-userscripts/issues"
     },
+    "license": "SEE LICENSE IN individual userscripts",
+    "author": "Aurélien Mino <aurelien.mino@gmail.com>",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/murdos/musicbrainz-userscripts.git"
     },
-    "keywords": [
-        "musicbrainz",
-        "userscripts",
-        "import",
-        "ui",
-        "improvements"
-    ],
-    "author": "Aurélien Mino <aurelien.mino@gmail.com>",
-    "license": "SEE LICENSE IN individual userscripts",
-    "bugs": {
-        "url": "https://github.com/murdos/musicbrainz-userscripts/issues"
+    "type": "module",
+    "scripts": {
+        "build": "node --strip-types src/build/build.ts",
+        "build:watch": "node --strip-types src/build/build.ts --watch",
+        "type-check": "tsgo",
+        "format": "oxfmt",
+        "format:check": "oxfmt --check",
+        "lint": "pnpm run eslint",
+        "lint-fix": "pnpm run eslint -- --fix",
+        "oxlint": "oxlint --type-aware",
+        "eslint": "eslint .",
+        "test": "node --strip-types tests/discogs/run.ts",
+        "test:discogs": "node --strip-types tests/discogs/run.ts",
+        "test:discogs:update": "node --strip-types tests/discogs/run.ts --update",
+        "prepare": "husky"
     },
-    "homepage": "https://github.com/murdos/musicbrainz-userscripts#readme",
     "devDependencies": {
-        "@babel/core": "^7.27.1",
-        "@babel/preset-env": "^7.27.2",
-        "@babel/preset-typescript": "^7.27.1",
+        "@babel/core": "^8.0.1",
+        "@babel/preset-env": "^8.0.1",
+        "@babel/preset-typescript": "^8.0.1",
         "@eslint/js": "^9.38.0",
         "@rollup/plugin-alias": "^6.0.0",
-        "@rollup/plugin-babel": "^6.0.4",
-        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-babel": "^7.1.0",
+        "@rollup/plugin-commonjs": "^29.0.3",
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/greasemonkey": "^4.0.7",
         "@types/node": "^24.8.1",
+        "@typescript/native-preview": "7.0.0-dev.20260618.1",
         "eslint": "^9.38.0",
-        "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-import": "^2.32.0",
-        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-userscripts": "^0.5.6",
         "globals": "^16.4.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.4",
-        "prettier": "^3.6.2",
-        "rollup": "^4.52.5",
-        "tsx": "^4.19.4",
-        "typescript": "^5.8.3",
+        "oxfmt": "^0.55.0",
+        "oxlint": "^1.70.0",
+        "oxlint-tsgolint": "^0.23.0",
+        "rollup": "^4.62.0",
         "typescript-eslint": "^8.46.1",
-        "zod": "^4.1.12"
+        "zod": "^4.4.3"
     },
-    "packageManager": "pnpm@10.33.4",
+    "lint-staged": {
+        "*.{json,md,yml}": "oxfmt",
+        "*.{js,ts,tsx}": "eslint --fix"
+    },
     "engines": {
         "node": "24.x"
     },
-    "lint-staged": {
-        "*.{json,md,yml}": "prettier --write",
-        "*.{js,ts,tsx}": "eslint --fix"
-    }
+    "packageManager": "pnpm@10.33.4"
 }

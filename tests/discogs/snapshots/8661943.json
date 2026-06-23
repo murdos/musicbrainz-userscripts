@@ -1,0 +1,153 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Riders To The Stars",
+                    "duration": 288000,
+                    "artist_credit": [],
+                    "number": "A1"
+                },
+                {
+                    "title": "Why Don't We Live Together",
+                    "duration": 225000,
+                    "artist_credit": [],
+                    "number": "A2"
+                },
+                {
+                    "title": "Looks Like We Made It",
+                    "duration": 240000,
+                    "artist_credit": [],
+                    "number": "A3"
+                },
+                {
+                    "title": "New York City Rhythm",
+                    "duration": 312000,
+                    "artist_credit": [],
+                    "number": "A4"
+                },
+                {
+                    "title": "A Very Strange Medley (V.S.M.): Kentucky Fried Chicken / State Farm Insurance / Stridex / Band-aids / Bowlene / Dr. Pepper / Pepsi / Mc Donalds",
+                    "duration": 370000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "Jump Shout Boogie Medley: Jump Shout Boogie / Avenue C / Jumpin' At The Woodside / Cloudburst / Bandstand Boogie",
+                    "duration": 496000,
+                    "artist_credit": []
+                },
+                {
+                    "title": "This One's For You",
+                    "duration": 254000,
+                    "artist_credit": [],
+                    "number": "B3"
+                }
+            ],
+            "format": "12\" Vinyl",
+            "title": "Act I"
+        },
+        {
+            "tracks": [
+                {
+                    "title": "Beautiful Music (Part 1)",
+                    "duration": 122000,
+                    "artist_credit": [],
+                    "number": "C1"
+                },
+                {
+                    "title": "Daybreak",
+                    "duration": 257000,
+                    "artist_credit": [],
+                    "number": "C2"
+                },
+                {
+                    "title": "Lay Me Down",
+                    "duration": 281000,
+                    "artist_credit": [],
+                    "number": "C3"
+                },
+                {
+                    "title": "Weekend In New England",
+                    "duration": 256000,
+                    "artist_credit": [],
+                    "number": "C4"
+                },
+                {
+                    "title": "Studio Musician",
+                    "duration": 255000,
+                    "artist_credit": [],
+                    "number": "C5"
+                },
+                {
+                    "title": "Beautiful Music (Part 2)",
+                    "duration": 75000,
+                    "artist_credit": [],
+                    "number": "D1"
+                },
+                {
+                    "title": "Could It Be Magic / Mandy",
+                    "duration": 480000,
+                    "artist_credit": [],
+                    "number": "D2"
+                },
+                {
+                    "title": "It's A Miracle",
+                    "duration": 314000,
+                    "artist_credit": [],
+                    "number": "D3"
+                },
+                {
+                    "title": "It's Just Another New Years Eve",
+                    "duration": 261000,
+                    "artist_credit": [],
+                    "number": "D4"
+                },
+                {
+                    "title": "I Write The Songs",
+                    "duration": null,
+                    "artist_credit": [],
+                    "number": "D5"
+                },
+                {
+                    "title": "Beautiful Music (Part 3)",
+                    "duration": 412000,
+                    "artist_credit": [],
+                    "number": "D6"
+                }
+            ],
+            "format": "12\" Vinyl",
+            "title": "Act II"
+        }
+    ],
+    "maybe_buggy": false,
+    "artist_credit": [
+        {
+            "artist_name": "Barry Manilow",
+            "credited_name": "Barry Manilow",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Live",
+    "year": 1979,
+    "month": 6,
+    "day": 0,
+    "country": "JP",
+    "labels": [
+        {
+            "name": "Arista",
+            "catno": "18RS-58~59",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/8661943",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "type": "album",
+    "packaging": "gatefold cover"
+}

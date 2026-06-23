@@ -1,13 +1,12 @@
 ﻿// ==UserScript==
 // @name         Import Encyclopedisque releases to MusicBrainz
-// @version      2026.05.31.1
+// @version      2026.06.21.3
 // @namespace    http://userscripts.org/users/22504
 // @description  Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
-// @include      http://www.encyclopedisque.fr/disque/*.html
-// @include      http://www.encyclopedisque.fr/artiste/*.html
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
+// @include      https://www.encyclopedisque.fr/disque/*.html
+// @include      https://www.encyclopedisque.fr/artiste/*.html
 // @require      lib/mbimport.js
 // @require      lib/mblinks.js?version=v2026.05.31.1
 // @require      lib/logger.js
@@ -17,20 +16,7 @@
 
 const mbLinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
 
-$(document).ready(function () {
-    MBImportStyle();
-
-    if (window.location.href.match(/encyclopedisque\.fr\/disque\/(\d+)/)) {
-        let release = parseEncyclopedisquePage();
-        setupImportUI(release);
-    }
-
-    insertMBLinks();
-});
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                             Encyclopedisque functions
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* === Encyclopedisque-specific functions === */
 
 function setupImportUI(release) {
     // Form parameters
@@ -38,43 +24,78 @@ function setupImportUI(release) {
     let parameters = MBImport.buildFormParameters(release, edit_note);
 
     // Build form
-    let mbUI = $(MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release)).hide();
-    $('#recherchebox').append(mbUI);
-    $('form.musicbrainz_import button').css({ width: '100%' });
-    mbUI.slideDown();
+    const recherchebox = document.querySelector('#recherchebox');
+    if (!recherchebox) {
+        LOGGER.error('encyclopedisque_importer: #recherchebox not found, cannot insert MBImport UI');
+        return;
+    }
+    const mbUI = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release);
+    recherchebox.insertAdjacentHTML('beforeend', mbUI);
+    document.querySelectorAll('form.musicbrainz_import button').forEach(button => {
+        button.style.width = '100%';
+    });
 }
 
 function insertMBLinks() {
-    let current_url = window.location.href;
+    const release_urls_data = [];
+    const artist_urls_data = [];
+    const current_url = window.location.href;
+
     if (current_url.match(/\/disque\//)) {
-        mbLinks.searchAndDisplayMbLink(current_url, 'release', function (link) {
-            $('h2 span').before(link);
+        release_urls_data.push({
+            url: current_url,
+            mb_type: 'release',
+            key: `release:${current_url}`,
+            insert_func(link) {
+                document.querySelectorAll('h2 span').forEach(span => {
+                    span.insertAdjacentHTML('beforebegin', link);
+                });
+            },
         });
     } else if (current_url.match(/\/artiste\//)) {
-        mbLinks.searchAndDisplayMbLink(current_url, 'artist', function (link) {
-            $('h2').prepend(link);
+        artist_urls_data.push({
+            url: current_url,
+            mb_type: 'artist',
+            key: `artist:${current_url}`,
+            insert_func(link) {
+                document.querySelectorAll('h2').forEach(h2 => {
+                    h2.insertAdjacentHTML('afterbegin', link);
+                });
+            },
         });
     }
 
-    $('div.v7P, div.v12P')
-        .find('a[href*="/disque/"]')
-        .each(function () {
-            let $link = $(this);
-            let external_url = window.location.origin + $link.attr('href');
-            mbLinks.searchAndDisplayMbLink(external_url, 'release', function (link) {
-                $link.after(link).after('<br />');
-            });
+    document.querySelectorAll('div.v7P a[href*="/disque/"], div.v12P a[href*="/disque/"]').forEach(linkEl => {
+        const external_url = window.location.origin + linkEl.getAttribute('href');
+        release_urls_data.push({
+            url: external_url,
+            mb_type: 'release',
+            key: `release:${external_url}`,
+            insert_func(link) {
+                linkEl.insertAdjacentHTML('afterend', link);
+                linkEl.insertAdjacentHTML('afterend', '<br />');
+            },
         });
+    });
 
-    $('h2, div.main')
-        .find('a[href*="/artiste/"]')
-        .each(function () {
-            let $link = $(this);
-            let external_url = window.location.origin + $link.attr('href');
-            mbLinks.searchAndDisplayMbLink(external_url, 'artist', function (link) {
-                $link.before(link);
-            });
+    document.querySelectorAll('h2 a[href*="/artiste/"], div.main a[href*="/artiste/"]').forEach(linkEl => {
+        const external_url = window.location.origin + linkEl.getAttribute('href');
+        artist_urls_data.push({
+            url: external_url,
+            mb_type: 'artist',
+            key: `artist:${external_url}`,
+            insert_func(link) {
+                linkEl.insertAdjacentHTML('beforebegin', link);
+            },
         });
+    });
+
+    if (release_urls_data.length > 0) {
+        mbLinks.searchAndDisplayMbLinks(release_urls_data);
+    }
+    if (artist_urls_data.length > 0) {
+        mbLinks.searchAndDisplayMbLinks(artist_urls_data);
+    }
 }
 
 // Analyze Encyclopedisque data and prepare to release object
@@ -240,3 +261,22 @@ const MONTHS = {
     novembre: 11,
     décembre: 12,
 };
+
+/* === Entry point === */
+
+function init() {
+    MBImportStyle();
+
+    if (window.location.href.match(/encyclopedisque\.fr\/disque\/(\d+)/)) {
+        let release = parseEncyclopedisquePage();
+        setupImportUI(release);
+    }
+
+    insertMBLinks();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

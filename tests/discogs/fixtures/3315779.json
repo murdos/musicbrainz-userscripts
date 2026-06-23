@@ -1,0 +1,870 @@
+{
+    "id": 3315779,
+    "status": "Accepted",
+    "year": 1972,
+    "resource_url": "https://api.discogs.com/releases/3315779",
+    "uri": "https://www.discogs.com/release/3315779-Various-16-Hollandse-Hits-5",
+    "artists": [
+        {
+            "name": "Various",
+            "anv": "",
+            "join": "",
+            "role": "",
+            "tracks": "",
+            "id": 194,
+            "resource_url": "https://api.discogs.com/artists/194"
+        }
+    ],
+    "artists_sort": "Various",
+    "labels": [
+        {
+            "name": "Telstar (2)",
+            "catno": "TPA 89531 TL",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 38442,
+            "resource_url": "https://api.discogs.com/labels/38442",
+            "thumbnail_url": "https://i.discogs.com/NDNYFiq0cbQ5oYu9XsPVQF4zjqNAJGUwhpGlXR6cyns/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTM4NDQy/LTE1MTc2ODI3MDIt/MTQ3MS5qcGVn.jpeg"
+        },
+        {
+            "name": "Telstar (2)",
+            "catno": "TPA 89.531",
+            "entity_type": "1",
+            "entity_type_name": "Label",
+            "id": 38442,
+            "resource_url": "https://api.discogs.com/labels/38442",
+            "thumbnail_url": "https://i.discogs.com/NDNYFiq0cbQ5oYu9XsPVQF4zjqNAJGUwhpGlXR6cyns/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTM4NDQy/LTE1MTc2ODI3MDIt/MTQ3MS5qcGVn.jpeg"
+        }
+    ],
+    "series": [
+        {
+            "name": "Telstar Parade",
+            "catno": "",
+            "entity_type": "2",
+            "entity_type_name": "Series",
+            "id": 332101,
+            "resource_url": "https://api.discogs.com/labels/332101",
+            "thumbnail_url": "https://i.discogs.com/3e4NTF7UEHRMsqsfi0Y5YLvN-1UH2HxgEAVBZah8Arg/rs:fit/g:sm/q:90/h:166/w:585/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9MLTMzMjEw/MS0xNTE3Njg0MTEy/LTY4MjAuanBlZw.jpeg"
+        },
+        {
+            "name": "16 Hollandse Hits",
+            "catno": "5",
+            "entity_type": "2",
+            "entity_type_name": "Series",
+            "id": 998060,
+            "resource_url": "https://api.discogs.com/labels/998060"
+        }
+    ],
+    "companies": [],
+    "formats": [
+        {
+            "name": "Vinyl",
+            "qty": "1",
+            "descriptions": ["LP", "Compilation"]
+        }
+    ],
+    "data_quality": "Needs Vote",
+    "community": {
+        "have": 278,
+        "want": 51,
+        "rating": {
+            "count": 5,
+            "average": 3
+        },
+        "submitter": {
+            "username": "SillyKees",
+            "resource_url": "https://api.discogs.com/users/SillyKees"
+        },
+        "contributors": [
+            {
+                "username": "SillyKees",
+                "resource_url": "https://api.discogs.com/users/SillyKees"
+            },
+            {
+                "username": "Mepeye",
+                "resource_url": "https://api.discogs.com/users/Mepeye"
+            },
+            {
+                "username": "Indie_snake",
+                "resource_url": "https://api.discogs.com/users/Indie_snake"
+            },
+            {
+                "username": "Oldies-Forever",
+                "resource_url": "https://api.discogs.com/users/Oldies-Forever"
+            },
+            {
+                "username": "DiscogsUpdateBot",
+                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
+            },
+            {
+                "username": "MannerHeikki",
+                "resource_url": "https://api.discogs.com/users/MannerHeikki"
+            },
+            {
+                "username": "Stonehedges",
+                "resource_url": "https://api.discogs.com/users/Stonehedges"
+            },
+            {
+                "username": "alain-a",
+                "resource_url": "https://api.discogs.com/users/alain-a"
+            },
+            {
+                "username": "vinylzoekertje",
+                "resource_url": "https://api.discogs.com/users/vinylzoekertje"
+            },
+            {
+                "username": "MaximusMCX",
+                "resource_url": "https://api.discogs.com/users/MaximusMCX"
+            }
+        ],
+        "data_quality": "Needs Vote",
+        "status": "Accepted"
+    },
+    "format_quantity": 1,
+    "date_added": "2012-01-01T08:54:59-08:00",
+    "date_changed": "2022-08-09T12:20:16-07:00",
+    "num_for_sale": 10,
+    "lowest_price": 1.32,
+    "master_id": 1693520,
+    "master_url": "https://api.discogs.com/masters/1693520",
+    "title": "16 Hollandse Hits *5*",
+    "country": "Netherlands",
+    "released": "1972",
+    "released_formatted": "1972",
+    "identifiers": [],
+    "videos": [
+        {
+            "uri": "https://www.youtube.com/watch?v=0JQwueDrweE",
+            "title": "Marjan Kampen - leve leve de liefde.",
+            "description": "Hits!",
+            "duration": 141,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=8gdnSsbb5MQ",
+            "title": "Margrietje - Fred Limpens",
+            "description": "Margrietje gezongen door Fred Limpens.\nOrigineel: Louis Neefs.",
+            "duration": 221,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=1pg2_3i1cp4",
+            "title": "Marjan Kampen - Niemand heeft je ooit gezien [1972]",
+            "description": "Het origineel is van Helga uit 1972\nVan de LP: 16 Hollandse Hits *5* [1972]\nMarjan Kampen - Niemand heeft je ooit gezien",
+            "duration": 153,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=PtdBojdtoEs",
+            "title": "Marjan Kampen   -  Leve leve de liefde",
+            "description": "",
+            "duration": 137,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=lOE_kFlnSsE",
+            "title": "Riek en Jan - Je kan me wel vergeten",
+            "description": "hitzz!",
+            "duration": 131,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=0JQwueDrweE",
+            "title": "Marjan Kampen - leve leve de liefde.",
+            "description": "Hits!",
+            "duration": 141,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=8gdnSsbb5MQ",
+            "title": "Margrietje - Fred Limpens",
+            "description": "Margrietje gezongen door Fred Limpens.\nOrigineel: Louis Neefs.",
+            "duration": 221,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=1pg2_3i1cp4",
+            "title": "Marjan Kampen - Niemand heeft je ooit gezien [1972]",
+            "description": "Het origineel is van Helga uit 1972\nVan de LP: 16 Hollandse Hits *5* [1972]\nMarjan Kampen - Niemand heeft je ooit gezien",
+            "duration": 153,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=PtdBojdtoEs",
+            "title": "Marjan Kampen   -  Leve leve de liefde",
+            "description": "",
+            "duration": 137,
+            "embed": true
+        },
+        {
+            "uri": "https://www.youtube.com/watch?v=lOE_kFlnSsE",
+            "title": "Riek en Jan - Je kan me wel vergeten",
+            "description": "hitzz!",
+            "duration": 131,
+            "embed": true
+        }
+    ],
+    "genres": ["Pop"],
+    "styles": ["Schlager"],
+    "tracklist": [
+        {
+            "position": "A1",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "De Heikrekels",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 485946,
+                    "resource_url": "https://api.discogs.com/artists/485946"
+                }
+            ],
+            "title": "Ik Breng Voor Jullie Zonneschijn !",
+            "extraartists": [
+                {
+                    "name": "Jack White",
+                    "anv": "White",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 133072,
+                    "resource_url": "https://api.discogs.com/artists/133072"
+                },
+                {
+                    "name": "Johnny Hoes",
+                    "anv": "J. Hoes",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 508246,
+                    "resource_url": "https://api.discogs.com/artists/508246"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A2",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Marjan Kampen",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 541006,
+                    "resource_url": "https://api.discogs.com/artists/541006"
+                }
+            ],
+            "title": "Leve, Leve De Liefde !",
+            "extraartists": [
+                {
+                    "name": "Daniel Vangarde",
+                    "anv": "Vangarde",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 217858,
+                    "resource_url": "https://api.discogs.com/artists/217858"
+                },
+                {
+                    "name": "Jean Kluger",
+                    "anv": "Kluger",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 309071,
+                    "resource_url": "https://api.discogs.com/artists/309071"
+                },
+                {
+                    "name": "Nelly Byl",
+                    "anv": "N. Bijl",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 217857,
+                    "resource_url": "https://api.discogs.com/artists/217857"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A3",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Fred Limpens",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 508240,
+                    "resource_url": "https://api.discogs.com/artists/508240"
+                }
+            ],
+            "title": "Margrietje",
+            "extraartists": [
+                {
+                    "name": "Harry van Hoof",
+                    "anv": "H. v. Hoof",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 427842,
+                    "resource_url": "https://api.discogs.com/artists/427842"
+                },
+                {
+                    "name": "Mirjam Gispen",
+                    "anv": "Mirjam",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 2654530,
+                    "resource_url": "https://api.discogs.com/artists/2654530"
+                },
+                {
+                    "name": "Tom Bos",
+                    "anv": "T. Bos",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1042636,
+                    "resource_url": "https://api.discogs.com/artists/1042636"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A4",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Duo Onbekend",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 556836,
+                    "resource_url": "https://api.discogs.com/artists/556836"
+                }
+            ],
+            "title": "Al Ging Ons Pad Niet Altijd Over Rozen !",
+            "extraartists": [
+                {
+                    "name": "Jean Kraft",
+                    "anv": "J. Kraft",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 508245,
+                    "resource_url": "https://api.discogs.com/artists/508245"
+                },
+                {
+                    "name": "Leo de Vos",
+                    "anv": "L. de Vos",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 822368,
+                    "resource_url": "https://api.discogs.com/artists/822368"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A5",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Rafael (16)",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 2557822,
+                    "resource_url": "https://api.discogs.com/artists/2557822"
+                }
+            ],
+            "title": "Werkeloos",
+            "extraartists": [
+                {
+                    "name": "Pierre Kartner",
+                    "anv": "P. Kartner",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 283555,
+                    "resource_url": "https://api.discogs.com/artists/283555"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A6",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Marjan Kampen",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 541006,
+                    "resource_url": "https://api.discogs.com/artists/541006"
+                }
+            ],
+            "title": "Niemand Heeft Je Ooit Gezien",
+            "extraartists": [
+                {
+                    "name": "Kees Korbijn",
+                    "anv": "Korbijn",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 968486,
+                    "resource_url": "https://api.discogs.com/artists/968486"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A7",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Trio De Rog",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 2557821,
+                    "resource_url": "https://api.discogs.com/artists/2557821"
+                }
+            ],
+            "title": "Zomerzon",
+            "extraartists": [
+                {
+                    "name": "Jane Schwartz",
+                    "anv": "Schwart",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1220268,
+                    "resource_url": "https://api.discogs.com/artists/1220268"
+                },
+                {
+                    "name": "Peter Papini",
+                    "anv": "Papini",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1926879,
+                    "resource_url": "https://api.discogs.com/artists/1926879"
+                },
+                {
+                    "name": "Pierre Kartner",
+                    "anv": "Kartner",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 283555,
+                    "resource_url": "https://api.discogs.com/artists/283555"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "A8",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Duo Pils",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 1058332,
+                    "resource_url": "https://api.discogs.com/artists/1058332"
+                }
+            ],
+            "title": "Fleudemeu",
+            "extraartists": [
+                {
+                    "name": "Wim Kersten",
+                    "anv": "Kersten",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 758120,
+                    "resource_url": "https://api.discogs.com/artists/758120"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B1",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Zangeres Zonder Naam",
+                    "anv": "De Zangeres Zonder Naam",
+                    "join": "En",
+                    "role": "",
+                    "tracks": "",
+                    "id": 485923,
+                    "resource_url": "https://api.discogs.com/artists/485923"
+                },
+                {
+                    "name": "The Walkers (2)",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 540523,
+                    "resource_url": "https://api.discogs.com/artists/540523"
+                }
+            ],
+            "title": "Mandolinen In Nicosia",
+            "extraartists": [
+                {
+                    "name": "Dick van der Valk",
+                    "anv": "v.d. Valk",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 726409,
+                    "resource_url": "https://api.discogs.com/artists/726409"
+                },
+                {
+                    "name": "Johnny Hoes",
+                    "anv": "J. Hoes",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 508246,
+                    "resource_url": "https://api.discogs.com/artists/508246"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B2",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Theo Diepenbrock",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 512420,
+                    "resource_url": "https://api.discogs.com/artists/512420"
+                }
+            ],
+            "title": "Met 'n Roos In Je Blonde Haren",
+            "extraartists": [
+                {
+                    "name": "Chris Juwens",
+                    "anv": "Juwens",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 523795,
+                    "resource_url": "https://api.discogs.com/artists/523795"
+                },
+                {
+                    "name": "Jack Bulterman",
+                    "anv": "Bulterman",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 539550,
+                    "resource_url": "https://api.discogs.com/artists/539550"
+                },
+                {
+                    "name": "Joachim Relin",
+                    "anv": "Relin",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 601443,
+                    "resource_url": "https://api.discogs.com/artists/601443"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B3",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Beppie Kraft",
+                    "anv": "",
+                    "join": "En",
+                    "role": "",
+                    "tracks": "",
+                    "id": 937047,
+                    "resource_url": "https://api.discogs.com/artists/937047"
+                },
+                {
+                    "name": "De Arona Stars",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 2557823,
+                    "resource_url": "https://api.discogs.com/artists/2557823"
+                }
+            ],
+            "title": "Mario",
+            "extraartists": [
+                {
+                    "name": "Pierre Kartner",
+                    "anv": "P. Kartner",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 283555,
+                    "resource_url": "https://api.discogs.com/artists/283555"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B4",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Theo Diepenbrock",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 512420,
+                    "resource_url": "https://api.discogs.com/artists/512420"
+                }
+            ],
+            "title": "Meisjes Met Rode Haren",
+            "extraartists": [
+                {
+                    "name": "Hans-Georg Moslener",
+                    "anv": "Moslener",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 1083098,
+                    "resource_url": "https://api.discogs.com/artists/1083098"
+                },
+                {
+                    "name": "Manfred Oberdörffer",
+                    "anv": "Oberdörfer",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 997330,
+                    "resource_url": "https://api.discogs.com/artists/997330"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B5",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Beppie Kraft",
+                    "anv": "",
+                    "join": "En",
+                    "role": "",
+                    "tracks": "",
+                    "id": 937047,
+                    "resource_url": "https://api.discogs.com/artists/937047"
+                },
+                {
+                    "name": "De Arona Stars",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 2557823,
+                    "resource_url": "https://api.discogs.com/artists/2557823"
+                }
+            ],
+            "title": "Jij Hebt Me Bedrogen !",
+            "extraartists": [
+                {
+                    "name": "Pierre Kartner",
+                    "anv": "P. Kartner",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 283555,
+                    "resource_url": "https://api.discogs.com/artists/283555"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B6",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Fred Limpens",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 508240,
+                    "resource_url": "https://api.discogs.com/artists/508240"
+                }
+            ],
+            "title": "Ik Ben Alleen Vannacht",
+            "extraartists": [
+                {
+                    "name": "Johnny Blenco",
+                    "anv": "Blenco",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 337901,
+                    "resource_url": "https://api.discogs.com/artists/337901"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B7",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Riek En Jan",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 2557820,
+                    "resource_url": "https://api.discogs.com/artists/2557820"
+                }
+            ],
+            "title": "Je Kan Me Wel Vergeten !",
+            "extraartists": [
+                {
+                    "name": "Ad Verkooyen",
+                    "anv": "Verkooyen",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 2169113,
+                    "resource_url": "https://api.discogs.com/artists/2169113"
+                }
+            ],
+            "duration": ""
+        },
+        {
+            "position": "B8",
+            "type_": "track",
+            "artists": [
+                {
+                    "name": "Karel Thiel",
+                    "anv": "",
+                    "join": "",
+                    "role": "",
+                    "tracks": "",
+                    "id": 508244,
+                    "resource_url": "https://api.discogs.com/artists/508244"
+                }
+            ],
+            "title": "De Laatste Tango",
+            "extraartists": [
+                {
+                    "name": "Jack de Nijs",
+                    "anv": "De Nijs",
+                    "join": "",
+                    "role": "Written-By",
+                    "tracks": "",
+                    "id": 452257,
+                    "resource_url": "https://api.discogs.com/artists/452257"
+                }
+            ],
+            "duration": ""
+        }
+    ],
+    "extraartists": [
+        {
+            "name": "Het Telstar Koor",
+            "anv": "",
+            "join": "",
+            "role": "Choir",
+            "tracks": "",
+            "id": 1752002,
+            "resource_url": "https://api.discogs.com/artists/1752002"
+        },
+        {
+            "name": "Harry Jansen",
+            "anv": "",
+            "join": "",
+            "role": "Conductor [Choir]",
+            "tracks": "",
+            "id": 1764975,
+            "resource_url": "https://api.discogs.com/artists/1764975"
+        },
+        {
+            "name": "Jean Kraft",
+            "anv": "",
+            "join": "",
+            "role": "Conductor [Orchestra]",
+            "tracks": "",
+            "id": 508245,
+            "resource_url": "https://api.discogs.com/artists/508245"
+        },
+        {
+            "name": "Het Telstar Orkest",
+            "anv": "Het Telstarorkest",
+            "join": "",
+            "role": "Orchestra",
+            "tracks": "",
+            "id": 795212,
+            "resource_url": "https://api.discogs.com/artists/795212"
+        }
+    ],
+    "images": [
+        {
+            "type": "primary",
+            "uri": "https://i.discogs.com/VP8dD9l5hJf4bUeSSbaSADc3k2R2YJQx_Wm1cdiZGAE/rs:fit/g:sm/q:90/h:589/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg0/OC00OTYyLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/VP8dD9l5hJf4bUeSSbaSADc3k2R2YJQx_Wm1cdiZGAE/rs:fit/g:sm/q:90/h:589/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg0/OC00OTYyLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/MPHCIaV9mY9stX-oUx81xC6AhHAlYZ3VgVflQln02Yk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg0/OC00OTYyLmpwZWc.jpeg",
+            "width": 600,
+            "height": 589
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/Q-3M7CtzKjsVvP1G47N47xwnCmZtnyJeph8MuErCbPM/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg1/My02MjAyLmpwZWc.jpeg",
+            "resource_url": "https://i.discogs.com/Q-3M7CtzKjsVvP1G47N47xwnCmZtnyJeph8MuErCbPM/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg1/My02MjAyLmpwZWc.jpeg",
+            "uri150": "https://i.discogs.com/yl5leuV0unxzQxUUm_Qkwts4iXagiXjuJgVBXduivPs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg1/My02MjAyLmpwZWc.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/MwCCNRO4c3o_6uNVd7kIJmEgXHNQLKRVhIlhZEcvBco/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA2/NS5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/MwCCNRO4c3o_6uNVd7kIJmEgXHNQLKRVhIlhZEcvBco/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA2/NS5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/Vee0zFvwu-haS5Tz23k5AXfBmPWemSufIgrukQ1W9OM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA2/NS5qcGVn.jpeg",
+            "width": 600,
+            "height": 600
+        },
+        {
+            "type": "secondary",
+            "uri": "https://i.discogs.com/lWPHhzUQZ0MUCQUiF1f7mq1GcVjsfq-4oQn-oHNuc_8/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA5/OC5qcGVn.jpeg",
+            "resource_url": "https://i.discogs.com/lWPHhzUQZ0MUCQUiF1f7mq1GcVjsfq-4oQn-oHNuc_8/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA5/OC5qcGVn.jpeg",
+            "uri150": "https://i.discogs.com/gr-Ub7D-QX_hLO2UlLNLyXoEy4RLwr2FgBhxs00rWoY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTMyNTQzMTA5/OC5qcGVn.jpeg",
+            "width": 600,
+            "height": 600
+        }
+    ],
+    "thumb": "https://i.discogs.com/MPHCIaV9mY9stX-oUx81xC6AhHAlYZ3VgVflQln02Yk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMzMTU3/NzktMTQ0MzQzMDg0/OC00OTYyLmpwZWc.jpeg",
+    "estimated_weight": 230,
+    "blocked_from_sale": false,
+    "is_offensive": false
+}

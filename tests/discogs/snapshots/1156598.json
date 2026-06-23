@@ -1,0 +1,74 @@
+{
+    "discs": [
+        {
+            "tracks": [
+                {
+                    "title": "Cirkus (Including: Entry Of The Chameleons)",
+                    "duration": 388000,
+                    "artist_credit": [],
+                    "number": "A1"
+                },
+                {
+                    "title": "Indoor Games",
+                    "duration": 338000,
+                    "artist_credit": [],
+                    "number": "A2"
+                },
+                {
+                    "title": "Happy Family",
+                    "duration": 255000,
+                    "artist_credit": [],
+                    "number": "A3"
+                },
+                {
+                    "title": "Lady Of The Dancing Water",
+                    "duration": 163000,
+                    "artist_credit": [],
+                    "number": "A4"
+                },
+                {
+                    "title": "Lizard: Prince Rupert Awakes / Bolero - The Peacock's Tale / The Battle Of Glass Tears (Including:) / Dawn Song / Last Skirmish / Prince Rupert's Lament / Big Top",
+                    "duration": 1344000,
+                    "artist_credit": [],
+                    "number": ""
+                }
+            ],
+            "format": "12\" Vinyl"
+        }
+    ],
+    "maybe_buggy": true,
+    "artist_credit": [
+        {
+            "artist_name": "King Crimson",
+            "credited_name": "King Crimson",
+            "joinphrase": "",
+            "mbid": ""
+        }
+    ],
+    "release_group_mbid": "",
+    "title": "Lizard",
+    "year": 1970,
+    "month": 12,
+    "day": 11,
+    "country": "GB",
+    "labels": [
+        {
+            "name": "Island Records",
+            "catno": "ILPS 9141",
+            "mbid": ""
+        },
+        {
+            "name": "Island Records",
+            "catno": "ILPS-9141",
+            "mbid": ""
+        }
+    ],
+    "urls": [
+        {
+            "url": "https://www.discogs.com/release/1156598",
+            "link_type": 76
+        }
+    ],
+    "secondary_types": [],
+    "type": "album"
+}

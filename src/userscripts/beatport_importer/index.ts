@@ -3,9 +3,9 @@ import { MBImport } from '~/lib/mbimport';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
 import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
-import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
 
 import type { BeatportReleaseData, BeatportTrackData } from './types';
+import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
@@ -194,7 +194,11 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
         window.open(`https://magicisrc.kepstin.ca?${query}`);
     });
 
-    const importLinkHTML = MBImport.buildHarmonyButton({ barcode: mbrelease.barcode, release_url, variant: 'full' });
+    const importLinkHTML = MBImport.buildHarmonyButton({
+        barcode: mbrelease.barcode,
+        release_url,
+        variant: 'full',
+    });
 
     const releaseInfoButtons = document.createElement('div');
     releaseInfoButtons.className = `${lastReleaseInfo.className} musicbrainz-import`;

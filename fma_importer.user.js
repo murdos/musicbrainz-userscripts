@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FMA releases to MusicBrainz
 // @description  Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
-// @version      2026.05.31.1
+// @version      2026.06.21.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
@@ -483,14 +483,10 @@ function parse_MM_DD_YYYY(date, obj) {
 function Parsefmarelease(albumobject, trackobject) {
     if (albumobject === undefined) {
         albumobject = [];
-    } else {
-        albumobject = albumobject;
     }
 
     if (trackobject === undefined) {
         trackobject = [];
-    } else {
-        trackobject = trackobject;
     }
 
     let fmarelease = {};

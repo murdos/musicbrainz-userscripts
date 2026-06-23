@@ -77,7 +77,11 @@ $(document).ready(function () {
                     );
                     mbContentBlock.prepend(mbError);
                     insertMbUI(mbUI);
-                    mbError.css({ 'background-color': '#fbb', 'margin-top': '4px', 'margin-bottom': '4px' });
+                    mbError.css({
+                        'background-color': '#fbb',
+                        'margin-top': '4px',
+                        'margin-bottom': '4px',
+                    });
                     mbUI.slideDown();
                     throw e;
                 }

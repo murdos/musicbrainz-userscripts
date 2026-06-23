@@ -1,8 +1,7 @@
+import js from '@eslint/js';
+import userscripts from 'eslint-plugin-userscripts';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
-import js from '@eslint/js';
-import prettier from 'eslint-plugin-prettier/recommended';
-import userscripts from 'eslint-plugin-userscripts';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
@@ -29,7 +28,6 @@ export default defineConfig([
             '@typescript-eslint/no-non-null-assertion': 'off', // TODO: add correct guardrails and remove this in the future
         },
     },
-    prettier,
     {
         files: ['*.user.js'],
         plugins: {
@@ -64,16 +62,15 @@ export default defineConfig([
         },
 
         rules: {
-            'prettier/prettier': 'error',
-            'prefer-template': 'error',
-            'no-inner-declarations': 'warn',
-            'no-global-assign': 'warn',
-            'no-redeclare': 'warn',
-            'no-self-assign': 'warn',
+            'prefer-template': 'off', // migrated to oxlint
+            'no-inner-declarations': 'off', // migrated to oxlint
+            'no-global-assign': 'off', // migrated to oxlint
+            'no-redeclare': 'off', // migrated to oxlint
+            'no-self-assign': 'off', // migrated to oxlint
             'no-undef': 'warn',
-            'no-useless-concat': 'warn',
-            'no-useless-escape': 'warn',
-            'no-var': 'warn',
+            'no-useless-concat': 'off', // migrated to oxlint
+            'no-useless-escape': 'off', // migrated to oxlint
+            'no-var': 'off', // migrated to oxlint
         },
     },
 ]);

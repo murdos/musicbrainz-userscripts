@@ -169,7 +169,10 @@ background-image: url(https://store.steampowered.com/favicon.ico);
 background-size: 16px;
 }`;
 
-if (!unsafeWindow) unsafeWindow = window;
+/* oxlint-disable-next-line no-global-assign */
+if (!unsafeWindow) {
+    unsafeWindow = window;
+}
 
 function init() {
     // Get pageType (label or artist)

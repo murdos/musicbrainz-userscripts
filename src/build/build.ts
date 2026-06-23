@@ -1,25 +1,30 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { rollup } from 'rollup';
-import { babel, type RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
+
 import alias, { type Alias } from '@rollup/plugin-alias';
+import { babel, type RollupBabelInputPluginOptions } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { rollup } from 'rollup';
 import { z } from 'zod';
 
 const EXTENSIONS = ['.js', '.ts'];
 const BABEL_OPTIONS = {
+    babelrc: false,
+    configFile: false,
     babelHelpers: 'bundled',
     exclude: 'node_modules/**',
     include: ['**/*'],
     extensions: EXTENSIONS,
+    targets: {
+        browsers: ['> 1%', 'last 2 versions', 'not ie <= 8'],
+    },
     presets: [
         [
             '@babel/preset-env',
             {
-                targets: {
-                    browsers: ['> 1%', 'last 2 versions', 'not ie <= 8'],
-                },
+                // Rollup bundles modules; Babel only transpiles syntax for target browsers.
+                modules: false,
             },
         ],
         '@babel/preset-typescript',

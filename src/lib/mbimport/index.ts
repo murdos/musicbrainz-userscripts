@@ -1,15 +1,15 @@
-import { buildHarmonyButton } from './buildHarmonyButton';
-import { buildSearchLink } from './buildSearchLink';
-import { buildSearchButton } from './buildSearchButton';
+import { hmsToMilliSeconds, ISO8601toMilliSeconds } from '../shared/time-functions';
 import { buildFormHTML } from './buildFormHTML';
 import { buildFormParameters } from './buildFormParameters';
-import { makeArtistCredits } from './makeArtistCredits';
+import { buildHarmonyButton } from './buildHarmonyButton';
+import { buildSearchButton } from './buildSearchButton';
+import { buildSearchLink } from './buildSearchLink';
 import { guessReleaseType } from './guessReleaseType';
-import { hmsToMilliSeconds, ISO8601toMilliSeconds } from '../shared/time-functions';
+import { makeArtistCredits } from './makeArtistCredits';
 import { makeEditNote } from './makeEditNote';
 import { searchUrlFor, exactSearchUrlFor } from './searchUrlFor';
-import { URL_TYPES } from './urlTypes';
 import { special_artists, specialArtist } from './specialArtist';
+import { URL_TYPES } from './urlTypes';
 
 export const MBImport = {
     buildHarmonyButton,
