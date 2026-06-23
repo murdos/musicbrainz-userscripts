@@ -43,6 +43,8 @@ const MetadataSchema = z
         match: z.array(z.string()).optional(),
         include: z.array(z.string()).optional(),
         require: z.array(z.string()).optional(),
+        grant: z.array(z.string()).optional(),
+        runAt: z.string().optional(),
         icon: z.string().optional(),
     })
     .refine(data => (data.match && !data.include) || (!data.match && data.include), {
@@ -131,6 +133,16 @@ function generateUserscriptHeader(metadata: UserscriptMetadata): string {
         metadata.require.forEach(url => {
             lines.push(`@require      ${url}`);
         });
+    }
+
+    if (metadata.grant) {
+        metadata.grant.forEach(grant => {
+            lines.push(`@grant        ${grant}`);
+        });
+    }
+
+    if (metadata.runAt) {
+        lines.push(`@run-at       ${metadata.runAt}`);
     }
 
     if (metadata.icon) {
