@@ -171,6 +171,7 @@ background-size: 16px;
 
 /* oxlint-disable-next-line no-global-assign */
 if (!unsafeWindow) {
+    /* oxlint-disable-next-line no-global-assign */
     unsafeWindow = window;
 }
 
