@@ -26,7 +26,7 @@
         "type-check": "tsgo",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
-        "lint": "pnpm run eslint",
+        "lint": "pnpm run oxlint && pnpm run eslint",
         "lint-fix": "pnpm run eslint -- --fix",
         "oxlint": "oxlint --type-aware",
         "eslint": "eslint .",
