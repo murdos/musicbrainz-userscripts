@@ -673,6 +673,7 @@ function parseDiscogsRelease(discogsRelease) {
     let releaseNumber = 1;
     let lastPosition = 0;
     $.each(discogsRelease.tracklist, function (index, discogsTrack) {
+        let tracks = [];
         if (discogsTrack.type_ === 'heading') {
             heading = discogsTrack.title;
             return;
@@ -714,14 +715,19 @@ function parseDiscogsRelease(discogsRelease) {
                 if (subtrack.type_ !== 'track') {
                     return;
                 }
+                let track_new = new Object();
                 if (subtrack.duration) {
+                    track_new.duration = MBImport.hmsToMilliSeconds(subtrack.duration);
                     subtrack_total_duration += MBImport.hmsToMilliSeconds(subtrack.duration);
                 }
                 if (subtrack.title) {
+                    track_new.title = `${track.title}: ${subtrack.title}`;
+                    track_new.artist_credit = track.artist_credit;
                     subtrack_titles.push(subtrack.title);
                 } else {
                     subtrack_titles.push('[unknown]');
                 }
+                tracks.push(track_new);
             });
             if (subtrack_titles.length) {
                 if (track.title) {
@@ -810,7 +816,13 @@ function parseDiscogsRelease(discogsRelease) {
 
         // Trackposition is empty e.g. for release title
         if (trackPosition !== '' && trackPosition != null) {
-            release.discs[discindex].tracks.push(track);
+            if (tracks.length > 0) {
+                for (var i = 0; i < tracks.length; i++) {
+                    release.discs[discindex].tracks.push(tracks[i]);
+                }
+            } else {
+                release.discs[discindex].tracks.push(track);
+            }
         }
 
         if (buggyTrackNumber && !release.maybe_buggy) {
@@ -1159,3 +1171,9 @@ const Countries = {
     'Saint Helena': 'SH',
     'Svalbard and Jan Mayen': 'SJ',
 };
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    parseDiscogsRelease,
+  };
+}
