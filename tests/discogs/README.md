@@ -47,8 +47,9 @@ CI runs `pnpm test:discogs` on every pull request. No Discogs API calls are made
 
     Use the API URL (`https://api.discogs.com/releases/<id>`), not the website URL.
 
-3. Fetch the fixture and generate the snapshot (see below).
-4. Commit the new fixture, snapshot, and config change.
+3. Fetch the fixture.
+4. Run all tests. Missing snapshot will be automatically created.
+5. Commit the new fixture, snapshot, and config change.
 
 Pick releases that cover distinct edge cases (multi-disc tracklists, unusual side numbering, nested sub-tracks, etc.) rather than many similar ones.
 
@@ -60,7 +61,7 @@ Run all tests:
 pnpm test:discogs
 ```
 
-Fetch fixtures from the Discogs API and regenerate all snapshots (needed after adding a release):
+Fetch fixtures from the Discogs API (needed after adding a release):
 
 ```bash
 pnpm test:discogs:update-fixtures
@@ -69,9 +70,9 @@ pnpm test:discogs:update-fixtures
 Approve updated snapshots after an intentional parser change (no network request):
 
 ```bash
-./node_modules/.bin/vitest run tests/discogs -u
+pnpm test:discogs -u
 ```
 
-After adding an entry to `config.ts`, run `pnpm test:discogs:update-fixtures` once to create its fixture and snapshot, then `pnpm test:discogs` to confirm everything passes.
+After adding an entry to `config.ts`, run `pnpm test:discogs:update-fixtures` once to create its fixture, then `pnpm test:discogs` to initialize its snapshot and confirm everything passes.
 
-If a test fails after a parser change you intended, review the diff, then run `vitest -u` to approve the new snapshots and commit the updated files.
+If a test fails after a parser change you intended, review the diff, then run `pnpm test:discogs -u` to approve the new snapshots and commit the updated files.
