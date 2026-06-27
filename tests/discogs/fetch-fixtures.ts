@@ -3,13 +3,9 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { RELEASES } from './config.ts';
-import { loadParseDiscogsRelease } from './load-parser.ts';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(DIR, 'fixtures');
-const SNAPSHOTS_DIR = path.join(DIR, 'snapshots');
-
-const parseDiscogsRelease = loadParseDiscogsRelease();
 
 function stableStringify(value: unknown): string {
     return JSON.stringify(value, null, 4);
@@ -17,10 +13,6 @@ function stableStringify(value: unknown): string {
 
 function fixturePath(id: number): string {
     return path.join(FIXTURES_DIR, `${id}.json`);
-}
-
-function snapshotPath(id: number): string {
-    return path.join(SNAPSHOTS_DIR, `${id}.json`);
 }
 
 async function fetchFixture(url: string): Promise<Record<string, unknown>> {
@@ -52,9 +44,6 @@ async function updateRelease(url: string): Promise<void> {
 
     fs.mkdirSync(FIXTURES_DIR, { recursive: true });
     fs.writeFileSync(fixturePath(id), stableStringify(fixture));
-
-    fs.mkdirSync(SNAPSHOTS_DIR, { recursive: true });
-    fs.writeFileSync(snapshotPath(id), stableStringify(parseDiscogsRelease(fixture)));
 
     process.stdout.write(`updated ${id}\n`);
 }
