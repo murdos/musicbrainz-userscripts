@@ -1,0 +1,13 @@
+{
+    "name": "Import ElasticStage releases to MusicBrainz",
+    "description": "One-click importing of releases from elasticstage.com release pages into MusicBrainz",
+    "version": "2026.06.28.1",
+    "author": "Raman Sinclair",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js",
+    "match": ["https://elasticstage.com/*"],
+    "grant": ["none"],
+    "runAt": "document-start",
+    "icon": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png"
+}
