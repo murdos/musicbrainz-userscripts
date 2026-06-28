@@ -7,6 +7,7 @@
 - [Import CD1D releases to MusicBrainz](#cd1d_importer)
 - [Import Deezer releases into MusicBrainz](#deezer_importer)
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
 - [Import FMA releases to MusicBrainz](#fma_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
@@ -76,6 +77,13 @@ Add a button to import Discogs releases to MusicBrainz and add links to matching
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
+
+## <a name="elasticstage_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz
+
+One-click importing of releases from elasticstage.com release pages into MusicBrainz
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/elasticstage_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js)
 
 ## <a name="encyclopedisque_importer"></a> Import Encyclopedisque releases to MusicBrainz
 
