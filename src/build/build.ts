@@ -17,7 +17,7 @@ const BABEL_OPTIONS = {
     include: ['**/*'],
     extensions: EXTENSIONS,
     targets: {
-        browsers: ['> 1%', 'last 2 versions', 'not ie <= 8'],
+        browsers: ['baseline 2022'],
     },
     presets: [
         [
