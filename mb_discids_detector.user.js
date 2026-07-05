@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @version      2026.07.05.3
+// @version      2026.07.05.4
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -9,7 +9,6 @@
 // @match        https://redacted.sh/torrents.php?id=*
 // @match        https://lztr.me/torrents.php?id=*
 // @match        https://notwhat.cd/torrents.php?id=*
-// @require      https://pajhome.org.uk/crypt/md5/sha1.js
 // @require      lib/logger.js
 // ==/UserScript==
 
@@ -89,13 +88,13 @@ function gazellePageHandler() {
             // Get log content
             fetch(logUrl)
                 .then(response => response.text())
-                .then(data => {
+                .then(async data => {
                     const doc = new DOMParser().parseFromString(data, 'text/html');
                     const pres = doc.querySelectorAll('pre');
                     LOGGER.debug('Log content', pres);
-                    const discs = analyze_log_files(pres);
+                    const discs = await analyze_log_files(pres);
                     LOGGER.debug('Number of disc found', discs.length);
-                    check_and_display_discs(
+                    await check_and_display_discs(
                         artistName,
                         releaseName,
                         discs,
@@ -141,7 +140,13 @@ function computeAttachURL(mb_toc_numbers, artistName, releaseName) {
     return url;
 }
 
-function analyze_log_files(log_files) {
+async function sha1MusicBrainzDiscId(message) {
+    const hash = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(message));
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(hash)));
+    return b64.replace(/\+/g, '.').replace(/\//g, '_').replace(/=/g, '-');
+}
+
+async function analyze_log_files(log_files) {
     let discs = [];
     for (const log_file of log_files) {
         const discsInLog = MBDiscid.log_input_to_entries(log_file.textContent);
@@ -154,7 +159,7 @@ function analyze_log_files(log_files) {
     let keys = new Object();
     let uniqueDiscs = new Array();
     for (let i = 0; i < discs.length; i++) {
-        let discid = MBDiscid.calculate_mb_discid(discs[i]);
+        let discid = await MBDiscid.calculate_mb_discid(discs[i]);
         if (discid in keys) {
             continue;
         } else {
@@ -166,14 +171,14 @@ function analyze_log_files(log_files) {
     return discs;
 }
 
-function check_and_display_discs(artistName, releaseName, discs, displayDiscHandler, displayResultHandler) {
+async function check_and_display_discs(artistName, releaseName, discs, displayDiscHandler, displayResultHandler) {
     // For each disc, check if it's in MusicBrainz database
     for (let i = 0; i < discs.length; i++) {
         let entries = discs[i];
         let discNumber = i + 1;
         if (entries.length > 0) {
             let mb_toc_numbers = MBDiscid.calculate_mb_toc_numbers(entries);
-            let discid = MBDiscid.calculate_mb_discid(entries);
+            let discid = await MBDiscid.calculate_mb_discid(entries);
             LOGGER.info(`Computed discid :${discid}`);
             displayDiscHandler(mb_toc_numbers, discid, discNumber);
 
@@ -324,7 +329,7 @@ const MBDiscid = (function () {
         return decimalToHexString(discid_num);
     };
 
-    this.calculate_mb_discid = function (entries) {
+    this.calculate_mb_discid = async function (entries) {
         let hex_left_pad = function (input, totalChars) {
             input = `${parseInt(input, 10).toString(16).toUpperCase()}`;
             let padWith = '0';
@@ -354,10 +359,7 @@ const MBDiscid = (function () {
             message = message + hex_left_pad(offset, 8);
         }
 
-        b64pad = '=';
-        let discid = b64_sha1(message);
-        discid = discid.replace(/\+/g, '.').replace(/\//g, '_').replace(/=/g, '-');
-        return discid;
+        return sha1MusicBrainzDiscId(message);
     };
 
     return this;
