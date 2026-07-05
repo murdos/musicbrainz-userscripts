@@ -6,8 +6,8 @@ jobs:
     name: 'lint checks'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4.4.0
+      - uses: actions/checkout@v7.0.0
+      - uses: pnpm/action-setup@v6.0.9
         with:
           run_install: false
       - uses: actions/setup-node@v6.4.0
