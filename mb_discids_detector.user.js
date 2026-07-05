@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @version      2026.07.05.4
+// @version      2026.07.05.5
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -217,7 +217,6 @@ async function check_and_display_discs(artistName, releaseName, discs, displayDi
 // Released under the MIT License
 
 const MBDiscid = (function () {
-    this.SECTORS_PER_SECOND = 75;
     this.PREGAP = 150;
     this.DATA_TRACK_GAP = 11400;
 
@@ -295,38 +294,6 @@ const MBDiscid = (function () {
             return parseInt(entry[4], 10) + PREGAP;
         });
         return [1, entries.length, leadout_offset].concat(offsets);
-    };
-
-    this.calculate_cddb_id = function (entries) {
-        let sum_of_digits = function (n) {
-            let sum = 0;
-            while (n > 0) {
-                sum = sum + (n % 10);
-                n = Math.floor(n / 10);
-            }
-            return sum;
-        };
-
-        let decimalToHexString = function (number) {
-            if (number < 0) {
-                number = 0xffffffff + number + 1;
-            }
-
-            return number.toString(16).toUpperCase();
-        };
-
-        let length_seconds = Math.floor(
-            (parseInt(entries[entries.length - 1][5], 10) - parseInt(entries[0][4], 10) + 1) / this.SECTORS_PER_SECOND,
-        );
-        let checksum = 0;
-        for (const entry of entries) {
-            checksum += sum_of_digits(Math.floor((parseInt(entry[4], 10) + PREGAP) / SECTORS_PER_SECOND));
-        }
-
-        let xx = checksum % 255;
-        let discid_num = (xx << 24) | (length_seconds << 8) | entries.length;
-        //return discid_num
-        return decimalToHexString(discid_num);
     };
 
     this.calculate_mb_discid = async function (entries) {
