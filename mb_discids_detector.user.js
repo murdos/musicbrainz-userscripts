@@ -1,16 +1,20 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @version      2026.07.05.6
+// @version      2026.07.05.7
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
-// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
-// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js
 // @match        https://orpheus.network/torrents.php?id=*
 // @match        https://redacted.sh/torrents.php?id=*
 // @match        https://lztr.me/torrents.php?id=*
 // @match        https://notwhat.cd/torrents.php?id=*
 // @require      lib/logger.js
 // ==/UserScript==
+
+console.warn(
+    '[Musicbrainz DiscIds Detector]: ⚠️ This userscript has been rewritten in TypeScript and is now hosted at a new URL. It should auto-update to use the TS version automatically, but if it didn’t and you’re seeing this message, please upgrade it manually from https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js.',
+);
 
 LOGGER.setLevel('info');
 
