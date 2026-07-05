@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.7.5.4
+// @version      2026.7.5.5
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
@@ -338,12 +338,8 @@ $(document).ready(function () {
     }
 
     // Release header buttons (search, copy) - on all release pages including sub-pages (cover-art, aliases, tags, etc.)
-    const releaseHeaderRegex = new RegExp(
-        'musicbrainz.org/release/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})(?:/[^?#]*)?(?:#.*)?$',
-        'i',
-    );
-    if (window.location.href.match(releaseHeaderRegex)) {
-        const mbid = window.location.href.match(releaseHeaderRegex)[1];
+    if (window.location.href.match(releaseRegex)) {
+        const mbid = window.location.href.match(releaseRegex)[1];
         const $releaseHeader = $('div.wrap-anywhere.releaseheader, div.releaseheader').first();
         const $h1 = $releaseHeader.children('h1');
         const releaseTitle = $h1.length ? $h1.text().replace(/\s+/g, ' ').trim() : '';
