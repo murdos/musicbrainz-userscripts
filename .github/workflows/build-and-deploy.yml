@@ -5,6 +5,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     name: 'Build userscripts and deploy to dist branch'
