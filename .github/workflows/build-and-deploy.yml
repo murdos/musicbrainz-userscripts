@@ -34,6 +34,23 @@ jobs:
       - name: Build userscripts
         run: pnpm build
 
+      - name: Bump versions for changed scripts
+        id: bump-versions
+        run: pnpm bump-versions
+
+      - name: Rebuild after version bumps
+        if: steps.bump-versions.outputs.changed == 'true'
+        run: pnpm build
+
+      - name: Commit version bumps to master
+        if: steps.bump-versions.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/userscripts/*/meta.json
+          git commit -m "chore: bump userscript versions [skip ci]"
+          git push origin master
+
       - name: Checkout dist branch
         run: |
           git fetch origin dist:dist
