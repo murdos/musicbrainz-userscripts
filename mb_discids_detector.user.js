@@ -1,19 +1,15 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    http://userscripts.org/users/22504
-// @version      2026.07.05.1
+// @version      2026.07.05.2
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
-// @include      http://avaxhome.ws/music/*
-// @include      https://orpheus.network/torrents.php?id=*
-// @include      https://passtheheadphones.me/torrents.php?id=*
-// @include      https://redacted.sh/torrents.php?id=*
-// @include      http*://lztr.us/torrents.php?id=*
-// @include      http*://lztr.me/torrents.php?id=*
-// @include      http*://mutracker.org/torrents.php?id=*
-// @include      https://notwhat.cd/torrents.php?id=*
-// @require      http://pajhome.org.uk/crypt/md5/sha1.js
+// @match        https://orpheus.network/torrents.php?id=*
+// @match        https://redacted.sh/torrents.php?id=*
+// @match        https://lztr.me/torrents.php?id=*
+// @match        https://notwhat.cd/torrents.php?id=*
+// @require      https://pajhome.org.uk/crypt/md5/sha1.js
 // @require      lib/logger.js
 // ==/UserScript==
 
@@ -31,63 +27,11 @@ function onReady(fn) {
 }
 
 onReady(function () {
-    if (window.location.host.match(/orpheus\.network|redacted\.sh|passtheheadphones\.me|lztr\.(us|me)|mutracker\.org|notwhat\.cd/)) {
+    if (window.location.host.match(/orpheus\.network|redacted\.sh|passtheheadphones\.me|lztr\.(us|me)|notwhat\.cd/)) {
         LOGGER.info('Gazelle site detected');
         gazellePageHandler();
-    } else if (window.location.host.match(/avaxhome\.ws/)) {
-        avaxHomePageHandler();
     }
 });
-
-function avaxHomePageHandler() {
-    // Find artist and release titles
-    let artistName = '';
-    let releaseName = '';
-    const titleEl = document.querySelector('div.title h1');
-    const m = titleEl?.textContent.match(/(.*) (?:-|–) (.*)( \(\d{4}\))?/);
-    if (m) {
-        artistName = m[1];
-        releaseName = m[2];
-    }
-    if (artistName == 'VA') artistName = 'Various Artists';
-
-    // Find and analyze EAC log
-    for (const spoiler of document.querySelectorAll('div.spoiler')) {
-        const link = spoiler.querySelector('a');
-        if (!link?.textContent.match(/(EAC|log)/i)) {
-            continue;
-        }
-        for (const eacLog of spoiler.querySelectorAll('div')) {
-            const discs = analyze_log_files([eacLog]);
-
-            // Check and display
-            check_and_display_discs(
-                artistName,
-                releaseName,
-                discs,
-                function (mb_toc_numbers, discid, discNumber) {
-                    let center = spoiler.previousElementSibling;
-                    while (center && !center.matches('div.center')) {
-                        center = center.previousElementSibling;
-                    }
-                    center?.insertAdjacentHTML(
-                        'beforeend',
-                        `<br /><strong>${discs.length > 1 ? `Disc ${discNumber}: ` : ''}MB DiscId </strong><span id="${discid}"></span>`,
-                    );
-                },
-                function (mb_toc_numbers, discid, discNumber, found) {
-                    const url = computeAttachURL(mb_toc_numbers, artistName, releaseName);
-                    let html = `<a href="${url}">${discid}</a>`;
-                    if (found) {
-                        html = `${html}<img src="${CHECK_IMAGE}" />`;
-                    }
-                    const el = document.getElementById(discid);
-                    if (el) el.innerHTML = html;
-                },
-            );
-        }
-    }
-}
 
 function gazellePageHandler() {
     const serverHost = window.location.host;
