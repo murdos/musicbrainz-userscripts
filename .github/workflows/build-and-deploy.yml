@@ -68,6 +68,7 @@ jobs:
           rm -rf dist
 
       - name: Commit and push changes
+        id: deploy
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -78,17 +79,24 @@ jobs:
           # Check if there is anything to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit --no-verify -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
             git push origin dist
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create summary
         run: |
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "Built userscripts from commit: \`$(git rev-parse HEAD)\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Built Files:" >> $GITHUB_STEP_SUMMARY
-          find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
-            echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
-          done
+
+          if [ "${{ steps.deploy.outputs.changed }}" = "true" ]; then
+            echo "Built userscripts from commit: \`$(git rev-parse HEAD)\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Built Files:" >> $GITHUB_STEP_SUMMARY
+            find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
+              echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "No changes — dist branch was already up to date." >> $GITHUB_STEP_SUMMARY
+          fi
