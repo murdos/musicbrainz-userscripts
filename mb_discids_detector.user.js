@@ -575,13 +575,10 @@
   var MB_BASE_URL = 'https://musicbrainz.org';
   var GAZELLE_HOST_PATTERN = /orpheus\.network|redacted\.sh|lztr\.me|notwhat\.cd/;
   function computeAttachUrl(mbTocNumbers, mbArtistName, mbReleaseName) {
-    var tocNumbers = mbTocNumbers.join('%20');
-    var artistName = encodeURIComponent(mbArtistName);
-    var releaseName = encodeURIComponent(mbReleaseName);
     var mbURL = new URL("".concat(MB_BASE_URL, "/cdtoc/attach"));
-    mbURL.searchParams.set('toc', tocNumbers);
-    mbURL.searchParams.set('artist-name', artistName);
-    mbURL.searchParams.set('release-name', releaseName);
+    mbURL.searchParams.set('toc', mbTocNumbers.join(' '));
+    mbURL.searchParams.set('artist-name', mbArtistName);
+    mbURL.searchParams.set('release-name', mbReleaseName);
     return mbURL.toString();
   }
   function checkAndDisplayDiscs(_x) {
