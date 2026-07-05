@@ -10,8 +10,6 @@ export interface TocEntry {
 
 export type DisplayDiscHandler = (mbTocNumbers: number[], discid: string, discNumber: number) => void;
 
-export type DisplayResultHandler = (mbTocNumbers: number[], discid: string, discNumber: number, found: boolean) => void;
-
 export interface DiscIdLookupResponse {
     error?: string;
 }
