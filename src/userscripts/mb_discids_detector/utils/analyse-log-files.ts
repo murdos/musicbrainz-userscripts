@@ -1,11 +1,13 @@
 import type { TocEntry } from '../types';
+import { getElementTextWithLineBreaks } from './get-element-text-with-line-breaks';
 import { MBDiscid } from './mb-discid';
 
 export async function analyzeLogFiles(logFiles: NodeListOf<Element> | Element[]): Promise<TocEntry[][]> {
     const discs: TocEntry[][] = [];
 
     for (const logFile of logFiles) {
-        const discsInLog = MBDiscid.logInputToEntries(logFile.textContent);
+        const logText = getElementTextWithLineBreaks(logFile);
+        const discsInLog = MBDiscid.logInputToEntries(logText);
         discs.push(...discsInLog);
     }
 
