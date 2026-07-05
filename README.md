@@ -26,7 +26,7 @@
 - [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> MusicBrainz: Future release annotation](#future_release_annotation)
 - [MusicBrainz: Set recording comments for a release](#set-recording-comments)
-- [Musicbrainz DiscIds Detector](#mb_discids_detector)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Musicbrainz DiscIds Detector](#mb_discids_detector)
 - [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
 ## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
@@ -211,12 +211,12 @@ Batch set recording comments from a Release page.
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/set-recording-comments.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js)
 
-## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
+## <a name="mb_discids_detector"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Musicbrainz DiscIds Detector
 
 Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_discids_detector.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js)
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/mb_discids_detector.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js)
 
 ## <a name="mb_ui_enhancements"></a> Musicbrainz UI enhancements
 
