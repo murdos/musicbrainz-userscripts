@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
-// @version      2026.07.05.8
+// @version      2026.07.05.10
 // @author       [unknown]
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js
@@ -10,6 +10,10 @@
 // @match        https://redacted.sh/torrents.php?id=*
 // @match        https://lztr.me/torrents.php?id=*
 // @match        https://notwhat.cd/torrents.php?id=*
+// @match        https://rutracker.me/forum/viewtopic.php?t=*
+// @match        https://rutracker.org/forum/viewtopic.php?t=*
+// @match        https://new-team.org/viewtopic.php?t=*
+// @match        https://nnmclub.to/forum/viewtopic.php?t=*
 // @grant        none
 // ==/UserScript==
 
@@ -233,22 +237,12 @@
       }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2));
     }, _regeneratorDefine(e, r, n, t);
   }
-  function _regeneratorValues(e) {
-    if (null != e) {
-      var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"],
-        r = 0;
-      if (t) return t.call(e);
-      if ("function" == typeof e.next) return e;
-      if (!isNaN(e.length)) return {
-        next: function () {
-          return e && r >= e.length && (e = void 0), {
-            value: e && e[r++],
-            done: !e
-          };
-        }
-      };
-    }
-    throw new TypeError(typeof e + " is not iterable");
+  function _taggedTemplateLiteral(e, t) {
+    return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, {
+      raw: {
+        value: Object.freeze(t)
+      }
+    }));
   }
   function _toConsumableArray(r) {
     return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
@@ -345,6 +339,55 @@
       }
     }]);
   }();
+
+  var MB_BASE_URL = 'https://musicbrainz.org';
+  var MB_API_URL = function MB_API_URL(discid) {
+    return "".concat(MB_BASE_URL, "/ws/2/discid/").concat(discid, "?cdstubs=no");
+  };
+  var GAZELLE_HOST_PATTERN = /orpheus\.network|redacted\.sh|lztr\.me|notwhat\.cd/;
+  var BB_FORUM_HOST_PATTERN = /rutracker\.(me|org)|new-team\.org|nnmclub\.to/;
+  var LOGGER = new Logger('mb_discids_detector', LogLevel.INFO);
+
+  function getElementTextWithLineBreaks(element) {
+    var lines = [];
+    var currentLine = '';
+    var flushLine = function flushLine() {
+      lines.push(currentLine);
+      currentLine = '';
+    };
+    var _walk = function walk(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        var _node$textContent;
+        currentLine += (_node$textContent = node.textContent) !== null && _node$textContent !== void 0 ? _node$textContent : '';
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+      var tagName = node.tagName.toUpperCase();
+      if (tagName === 'BR') {
+        flushLine();
+        return;
+      }
+      var _iterator = _createForOfIteratorHelper(node.childNodes),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var child = _step.value;
+          _walk(child);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    };
+    _walk(element);
+    if (currentLine.length > 0 || lines.length === 0) {
+      lines.push(currentLine);
+    }
+    return lines.join('\n');
+  }
 
   // MBDiscid code comes from https://gist.github.com/kolen/766668
   // Copyright 2010, kolen
@@ -521,7 +564,7 @@
   }
   function _analyzeLogFiles() {
     _analyzeLogFiles = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(logFiles) {
-      var discs, _iterator, _step, logFile, discsInLog, seenDiscids, uniqueDiscs, _i, _discs, disc, discid;
+      var discs, _iterator, _step, logFile, logText, discsInLog, seenDiscids, uniqueDiscs, _i, _discs, disc, discid;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -530,7 +573,8 @@
             try {
               for (_iterator.s(); !(_step = _iterator.n()).done;) {
                 logFile = _step.value;
-                discsInLog = MBDiscid.logInputToEntries(logFile.textContent);
+                logText = getElementTextWithLineBreaks(logFile);
+                discsInLog = MBDiscid.logInputToEntries(logText);
                 discs.push.apply(discs, _toConsumableArray(discsInLog));
               }
             } catch (err) {
@@ -571,9 +615,6 @@
     return _analyzeLogFiles.apply(this, arguments);
   }
 
-  var LOGGER = new Logger('mb_discids_detector', LogLevel.INFO);
-  var MB_BASE_URL = 'https://musicbrainz.org';
-  var GAZELLE_HOST_PATTERN = /orpheus\.network|redacted\.sh|lztr\.me|notwhat\.cd/;
   function computeAttachUrl(mbTocNumbers, mbArtistName, mbReleaseName) {
     var mbURL = new URL("".concat(MB_BASE_URL, "/cdtoc/attach"));
     mbURL.searchParams.set('toc', mbTocNumbers.join(' '));
@@ -581,104 +622,318 @@
     mbURL.searchParams.set('release-name', mbReleaseName);
     return mbURL.toString();
   }
-  function checkAndDisplayDiscs(_x) {
-    return _checkAndDisplayDiscs.apply(this, arguments);
+  function createDiscIdLink(discid, mbTocNumbers, artistName, releaseName, found) {
+    var htmlElement = document.createElement('a');
+    htmlElement.href = computeAttachUrl(mbTocNumbers, artistName, releaseName);
+    htmlElement.textContent = discid;
+    if (found) {
+      htmlElement.style.backgroundColor = '#d0f1d0';
+      htmlElement.style.color = 'rgb(30, 70, 32)';
+      htmlElement.style.border = '1px solid rgb(30, 70, 32)';
+      htmlElement.style.paddingInline = '3px';
+      htmlElement.style.borderRadius = '3px';
+    }
+    return htmlElement;
   }
-  function _checkAndDisplayDiscs() {
-    _checkAndDisplayDiscs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(_ref) {
-      var discs, displayDiscHandler, displayResultHandler, _loop, _ret, i;
-      return _regenerator().w(function (_context3) {
-        while (1) switch (_context3.n) {
+  var checkAndDisplayDiscs = /*#__PURE__*/function () {
+    var _checkAndDisplayDiscs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(_ref) {
+      var artistName, releaseName, discs, displayDiscHandler, getElementIdForResultDisplay, i, _document$getElementB, entries, discNumber, mbTocNumbers, discid, found, response, data, htmlElement, _t;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.p = _context.n) {
           case 0:
-            discs = _ref.discs, displayDiscHandler = _ref.displayDiscHandler, displayResultHandler = _ref.displayResultHandler;
-            _loop = /*#__PURE__*/_regenerator().m(function _loop() {
-              var entries, discNumber, mbTocNumbers, discid;
-              return _regenerator().w(function (_context2) {
-                while (1) switch (_context2.n) {
-                  case 0:
-                    entries = discs[i];
-                    if (!(!entries || entries.length === 0)) {
-                      _context2.n = 1;
-                      break;
-                    }
-                    return _context2.a(2, 0);
-                  case 1:
-                    discNumber = i + 1;
-                    mbTocNumbers = MBDiscid.calculateMbTocNumbers(entries);
-                    if (mbTocNumbers) {
-                      _context2.n = 2;
-                      break;
-                    }
-                    return _context2.a(2, 0);
-                  case 2:
-                    _context2.n = 3;
-                    return MBDiscid.calculateMbDiscid(entries);
-                  case 3:
-                    discid = _context2.v;
-                    LOGGER.info("Computed discid :".concat(discid));
-                    displayDiscHandler(mbTocNumbers, discid, discNumber);
-                    void fetch("".concat(MB_BASE_URL, "/ws/2/discid/").concat(discid, "?cdstubs=no"), {
-                      headers: {
-                        Accept: 'application/json'
-                      }
-                    }).then(function (response) {
-                      if (!response.ok) {
-                        displayResultHandler(mbTocNumbers, discid, discNumber, false);
-                        return null;
-                      }
-                      return response.json();
-                    }).then(function (data) {
-                      if (!data) {
-                        return;
-                      }
-                      var existsInMusicbrainz = !('error' in data);
-                      displayResultHandler(mbTocNumbers, discid, discNumber, existsInMusicbrainz);
-                    }).catch(function () {
-                      displayResultHandler(mbTocNumbers, discid, discNumber, false);
-                    });
-                  case 4:
-                    return _context2.a(2);
-                }
-              }, _loop);
-            });
+            artistName = _ref.artistName, releaseName = _ref.releaseName, discs = _ref.discs, displayDiscHandler = _ref.displayDiscHandler, getElementIdForResultDisplay = _ref.getElementIdForResultDisplay;
             i = 0;
           case 1:
             if (!(i < discs.length)) {
-              _context3.n = 4;
+              _context.n = 12;
               break;
             }
-            return _context3.d(_regeneratorValues(_loop()), 2);
+            entries = discs[i];
+            if (!(!entries || entries.length === 0)) {
+              _context.n = 2;
+              break;
+            }
+            return _context.a(3, 11);
           case 2:
-            _ret = _context3.v;
-            if (!(_ret === 0)) {
-              _context3.n = 3;
+            discNumber = i + 1;
+            mbTocNumbers = MBDiscid.calculateMbTocNumbers(entries);
+            if (mbTocNumbers) {
+              _context.n = 3;
               break;
             }
-            return _context3.a(3, 3);
+            return _context.a(3, 11);
+          case 3:
+            _context.n = 4;
+            return MBDiscid.calculateMbDiscid(entries);
+          case 4:
+            discid = _context.v;
+            LOGGER.info("Computed discid :".concat(discid));
+            displayDiscHandler(mbTocNumbers, discid, discNumber);
+            found = false;
+            _context.p = 5;
+            _context.n = 6;
+            return fetch(MB_API_URL(discid), {
+              headers: {
+                Accept: 'application/json'
+              }
+            });
+          case 6:
+            response = _context.v;
+            if (!response.ok) {
+              _context.n = 8;
+              break;
+            }
+            _context.n = 7;
+            return response.json();
+          case 7:
+            data = _context.v;
+            if (!('error' in data)) {
+              found = true;
+            }
+          case 8:
+            _context.n = 10;
+            break;
+          case 9:
+            _context.p = 9;
+            _t = _context.v;
+            LOGGER.error("Failed to check if discid ".concat(discid, " is in MusicBrainz database"), _t);
+          case 10:
+            // Display the result
+            htmlElement = createDiscIdLink(discid, mbTocNumbers, artistName, releaseName, found);
+            LOGGER.debug("#".concat(getElementIdForResultDisplay(discNumber)));
+            (_document$getElementB = document.getElementById(getElementIdForResultDisplay(discNumber))) === null || _document$getElementB === void 0 || _document$getElementB.appendChild(htmlElement);
+          case 11:
+            i++;
+            _context.n = 1;
+            break;
+          case 12:
+            return _context.a(2);
+        }
+      }, _callee, null, [[5, 9]]);
+    }));
+    function checkAndDisplayDiscs(_x) {
+      return _checkAndDisplayDiscs.apply(this, arguments);
+    }
+    return checkAndDisplayDiscs;
+  }();
+
+  var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9;
+  var EAC_LOG_HEADER_PATTERN = String.raw(_templateObject || (_templateObject = _taggedTemplateLiteral(["(?:EAC extraction logfile|EAC Auslese-Logdatei|\u041E\u0442\u0447(?:\u0435|\u0451)\u0442 EAC \u043E\u0431 \u0438\u0437\u0432\u043B\u0435\u0447\u0435\u043D\u0438\u0438|\u0417\u0432\u0456\u0442 EAC \u043F\u0440\u043E \u0432\u0438\u0434\u043E\u0431\u0443\u0432\u0430\u043D\u043D\u044F)"])));
+  var EAC_LOG_PATTERN = new RegExp(EAC_LOG_HEADER_PATTERN, 'i');
+  var EAC_LOG_ARTIST_RELEASE_PATTERN = new RegExp(String.raw(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["", "[^\n]*\ns*(.+?)s*/s*(.+?)(?:\n|$)"], ["", "[^\\n]*\\n\\s*(.+?)\\s*\\/\\s*(.+?)(?:\\n|$)"])), EAC_LOG_HEADER_PATTERN), 'i');
+  var parseArtistReleaseFromEacLog = function parseArtistReleaseFromEacLog(logText) {
+    var _match$1$trim, _match$, _match$2$trim, _match$2;
+    var match = EAC_LOG_ARTIST_RELEASE_PATTERN.exec(logText);
+    if (!match) {
+      return null;
+    }
+    var artistName = (_match$1$trim = (_match$ = match[1]) === null || _match$ === void 0 ? void 0 : _match$.trim()) !== null && _match$1$trim !== void 0 ? _match$1$trim : '';
+    var releaseName = (_match$2$trim = (_match$2 = match[2]) === null || _match$2 === void 0 ? void 0 : _match$2.trim()) !== null && _match$2$trim !== void 0 ? _match$2$trim : '';
+    if (artistName.toLowerCase() === 'unknown artist' || releaseName.toLowerCase() === 'unknown title') {
+      artistName = '';
+    }
+    if (releaseName.toLowerCase() === 'unknown title' || releaseName.toLowerCase() === 'неизвестное название') {
+      releaseName = '';
+    }
+    return {
+      artistName: artistName,
+      releaseName: releaseName
+    };
+  };
+  var LABEL_PACK_PATTERN = /(?:Sub)*Label(?:: | - | Pack)/i;
+  var COLLECTION_PATTERN_V1 = /^(.+?)(?:\s+\([^)]*\))?\s+[-/]\s+(?:Official\s+|\d+\s+Releases\s+|Официальная\s+)*(?:Discography|Дискография)/i;
+  var COLLECTION_PATTERN_V2 = /^(.+?)(?:\s+\([^)]*\))?\s+[-/]\s+(?:Официальная\s+|Official\s+|Official\sSoundtrack\s+)*(?:Collection|Коллекция)/i;
+  var YEAR_PATTERN = String.raw(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["(?:19|20)d{2}|197?"], ["(?:19|20)\\d{2}|197\\?"])));
+  var YEAR_RANGE_PATTERN = String.raw(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["(?:", ")s*-s*(?:", ")"], ["(?:", ")\\s*-\\s*(?:", ")"])), YEAR_PATTERN, YEAR_PATTERN);
+
+  // Artist - Release - 2026
+  // Artist - Release - 1957 (1999 Japan Edition)
+  var ARTIST_RELEASE_DASH_YEAR_PATTERN = new RegExp(String.raw(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["^(.+?)s+-s+(.+?)s+-s+(", ")(?:\b|[,s(])"], ["^(.+?)\\s+-\\s+(.+?)\\s+-\\s+(", ")(?:\\b|[,\\s(])"])), YEAR_PATTERN), 'i');
+
+  // Artist - Release - 1982 - 2026
+  var ARTIST_RELEASE_DASH_YEAR_RANGE_PATTERN = new RegExp(String.raw(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["^(.+?)s+-s+(.+?)s+-s+(", ")(?:\b|[,s(])"], ["^(.+?)\\s+-\\s+(.+?)\\s+-\\s+(", ")(?:\\b|[,\\s(])"])), YEAR_RANGE_PATTERN), 'i');
+
+  // Artist - Release (2024)
+  var ARTIST_RELEASE_PAREN_YEAR_PATTERN = new RegExp(String.raw(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["^(.+?)s+-s+(.+?)s+((", "))(?:\b|[,s[])"], ["^(.+?)\\s+-\\s+(.+?)\\s+\\((", ")\\)(?:\\b|[,\\s\\[])"])), YEAR_PATTERN), 'i');
+
+  // Artist - Release, 2000-2016
+  // Artist - Release, 1963 -2007
+  var ARTIST_RELEASE_COMMA_YEAR_RANGE_PATTERN = new RegExp(String.raw(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["^(.+?)s+-s+(.+?),s*(", ")(?:\b|[,s[])"], ["^(.+?)\\s+-\\s+(.+?),\\s*(", ")(?:\\b|[,\\s\\[])"])), YEAR_RANGE_PATTERN), 'i');
+
+  // Artist - Release, 2025
+  var ARTIST_RELEASE_COMMA_YEAR_PATTERN = new RegExp(String.raw(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral(["^(.+?)s+-s+(.+?),s*(", ")(?:\b|[,s[])"], ["^(.+?)\\s+-\\s+(.+?),\\s*(", ")(?:\\b|[,\\s\\[])"])), YEAR_PATTERN), 'i');
+
+  // Artist - Release [FLAC|...]
+  var ARTIST_RELEASE_BEFORE_FORMAT_BLOCK_PATTERN = /^(.+?)\s+-\s+(.+?)\s+\[[^\]]+\]/i;
+
+  // Last-resort fallback: Artist - Release
+  var ARTIST_RELEASE_FALLBACK_PATTERN = /^(.+?)\s+-\s+(.+?)(?:,|\[|$)/i;
+  var normalizeForumTopicTitle = function normalizeForumTopicTitle(title) {
+    return title.replace(/[–—-]/g, '-') // normalize dash variants
+    .replace(/\s+/g, ' ') // collapse whitespace
+    .trim().replace(/^(?:\([^)]+\)\s*)+/, '') // strip leading genre parentheses: (Rock, Pop)
+    .replace(/^(?:\[[^\]]+\]\s*)+/, '') // strip leading format tags: [CD], [24/192], [LP/MB/DAT]
+    .trim();
+  };
+  var cleanParsedValue = function cleanParsedValue(value) {
+    return value.replace(/\s+/g, ' ').replace(/\s+[-/]\s*$/, '').trim();
+  };
+  var tryMatchArtistRelease = function tryMatchArtistRelease(title, patterns) {
+    var _iterator = _createForOfIteratorHelper(patterns),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var _match$3, _match$4;
+        var pattern = _step.value;
+        var match = title.match(pattern);
+        if (!match) {
+          continue;
+        }
+        var artistName = cleanParsedValue((_match$3 = match[1]) !== null && _match$3 !== void 0 ? _match$3 : '');
+        var releaseName = cleanParsedValue((_match$4 = match[2]) !== null && _match$4 !== void 0 ? _match$4 : '');
+        if (artistName || releaseName) {
+          return {
+            artistName: artistName,
+            releaseName: releaseName
+          };
+        }
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+    return null;
+  };
+  var parseArtistReleaseFromForumPost = function parseArtistReleaseFromForumPost() {
+    var _pageHeader$textConte;
+    var pageHeader = document.querySelector('h1.maintitle a, h1 a.maintitle');
+    var pageTitle = document.title.replace(/\s*(::|\u2022)[^]*$/, '');
+    var title = normalizeForumTopicTitle((_pageHeader$textConte = pageHeader === null || pageHeader === void 0 ? void 0 : pageHeader.textContent) !== null && _pageHeader$textConte !== void 0 ? _pageHeader$textConte : pageTitle);
+
+    // Label packs are not artist releases.
+    var isLabelPack = LABEL_PACK_PATTERN.test(title);
+    if (isLabelPack) {
+      // Abandon parsing since we can't reliably determine the artist and release name
+      return {
+        artistName: '',
+        releaseName: ''
+      };
+    }
+    var isCollectionV1 = title.match(COLLECTION_PATTERN_V1);
+    var isCollectionV2 = title.match(COLLECTION_PATTERN_V2);
+    if (isCollectionV1 || isCollectionV2) {
+      var _ref, _isCollectionV1$1$tri, _isCollectionV1$, _isCollectionV2$;
+      var artistName = (_ref = (_isCollectionV1$1$tri = isCollectionV1 === null || isCollectionV1 === void 0 || (_isCollectionV1$ = isCollectionV1[1]) === null || _isCollectionV1$ === void 0 ? void 0 : _isCollectionV1$.trim()) !== null && _isCollectionV1$1$tri !== void 0 ? _isCollectionV1$1$tri : isCollectionV2 === null || isCollectionV2 === void 0 || (_isCollectionV2$ = isCollectionV2[1]) === null || _isCollectionV2$ === void 0 ? void 0 : _isCollectionV2$.trim()) !== null && _ref !== void 0 ? _ref : '';
+      return {
+        artistName: artistName,
+        releaseName: ''
+      };
+    }
+    var parsed = tryMatchArtistRelease(title, [ARTIST_RELEASE_DASH_YEAR_RANGE_PATTERN, ARTIST_RELEASE_DASH_YEAR_PATTERN, ARTIST_RELEASE_PAREN_YEAR_PATTERN, ARTIST_RELEASE_COMMA_YEAR_RANGE_PATTERN, ARTIST_RELEASE_COMMA_YEAR_PATTERN, ARTIST_RELEASE_BEFORE_FORMAT_BLOCK_PATTERN, ARTIST_RELEASE_FALLBACK_PATTERN]);
+    return parsed !== null && parsed !== void 0 ? parsed : {
+      artistName: '',
+      releaseName: ''
+    };
+  };
+
+  var processInlineEacLog = /*#__PURE__*/function () {
+    var _processInlineEacLog = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(_ref) {
+      var pre, logIndex, fallbackArtist, fallbackRelease, logText, fromLog, artistName, releaseName, elementPrefix, discs, targetContainer;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.n) {
+          case 0:
+            pre = _ref.pre, logIndex = _ref.logIndex, fallbackArtist = _ref.fallbackArtist, fallbackRelease = _ref.fallbackRelease;
+            logText = getElementTextWithLineBreaks(pre);
+            fromLog = parseArtistReleaseFromEacLog(logText);
+            artistName = (fromLog === null || fromLog === void 0 ? void 0 : fromLog.artistName) || fallbackArtist;
+            releaseName = (fromLog === null || fromLog === void 0 ? void 0 : fromLog.releaseName) || fallbackRelease;
+            elementPrefix = "mb_discid_".concat(logIndex);
+            _context.n = 1;
+            return analyzeLogFiles([pre]);
+          case 1:
+            discs = _context.v;
+            LOGGER.debug('Number of disc found in inline log', discs.length);
+            if (!(discs.length === 0)) {
+              _context.n = 2;
+              break;
+            }
+            return _context.a(2);
+          case 2:
+            pre.insertAdjacentHTML('afterend', "<div class=\"mb-discids-detector\" style=\"margin-top: 0.5em;\"></div>");
+            targetContainer = pre.nextElementSibling;
+            _context.n = 3;
+            return checkAndDisplayDiscs({
+              artistName: artistName,
+              releaseName: releaseName,
+              discs: discs,
+              displayDiscHandler: function displayDiscHandler(_mbTocNumbers, _discid, discNumber) {
+                targetContainer === null || targetContainer === void 0 || targetContainer.insertAdjacentHTML('beforeend', "<div><strong>".concat(discs.length > 1 ? "Disc ".concat(discNumber, ": ") : '', "MB DiscId: </strong><span id=\"").concat(elementPrefix, "_disc").concat(discNumber, "\"></span></div>"));
+              },
+              getElementIdForResultDisplay: function getElementIdForResultDisplay(discNumber) {
+                return "".concat(elementPrefix, "_disc").concat(discNumber);
+              }
+            });
+          case 3:
+            return _context.a(2);
+        }
+      }, _callee);
+    }));
+    function processInlineEacLog(_x) {
+      return _processInlineEacLog.apply(this, arguments);
+    }
+    return processInlineEacLog;
+  }();
+  var bbForumPageHandler = /*#__PURE__*/function () {
+    var _bbForumPageHandler = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var _parseArtistReleaseFr, artistName, releaseName, eacLogs, i, pre;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.n) {
+          case 0:
+            _parseArtistReleaseFr = parseArtistReleaseFromForumPost(), artistName = _parseArtistReleaseFr.artistName, releaseName = _parseArtistReleaseFr.releaseName;
+            LOGGER.debug('artist:', artistName, '- releaseName:', releaseName);
+            eacLogs = _toConsumableArray(document.querySelectorAll('pre')).filter(function (preElement) {
+              return EAC_LOG_PATTERN.test(preElement.textContent);
+            });
+            LOGGER.info("Found ".concat(eacLogs.length, " inline EAC log(s)"));
+            i = 0;
+          case 1:
+            if (!(i < eacLogs.length)) {
+              _context2.n = 4;
+              break;
+            }
+            pre = eacLogs[i];
+            if (pre) {
+              _context2.n = 2;
+              break;
+            }
+            return _context2.a(3, 3);
+          case 2:
+            _context2.n = 3;
+            return processInlineEacLog({
+              pre: pre,
+              logIndex: i,
+              fallbackArtist: artistName,
+              fallbackRelease: releaseName
+            });
           case 3:
             i++;
-            _context3.n = 1;
+            _context2.n = 1;
             break;
           case 4:
-            return _context3.a(2);
+            return _context2.a(2);
         }
       }, _callee2);
     }));
-    return _checkAndDisplayDiscs.apply(this, arguments);
-  }
-  function parseReleaseInfo(serverHost) {
-    var _document$querySelect, _document$querySelect2, _match$, _match$2;
-    var titleAndArtists = (_document$querySelect = (_document$querySelect2 = document.querySelector('#content div.thin h2')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.textContent) !== null && _document$querySelect !== void 0 ? _document$querySelect : '';
-    var regularPattern = /(.*) - (.*) \[.*\] \[.*/;
-    var orpheusPattern = /(.*) [-–] (.*) \[.*\]( \[.*)?/;
-    var pattern = serverHost.match(/orpheus/) ? orpheusPattern : regularPattern;
-    var match = titleAndArtists.match(pattern);
-    return {
-      artistName: (_match$ = match === null || match === void 0 ? void 0 : match[1]) !== null && _match$ !== void 0 ? _match$ : '',
-      releaseName: (_match$2 = match === null || match === void 0 ? void 0 : match[2]) !== null && _match$2 !== void 0 ? _match$2 : ''
-    };
-  }
-  function resolveLogAction(onclick, serverHost) {
+    function bbForumPageHandler() {
+      return _bbForumPageHandler.apply(this, arguments);
+    }
+    return bbForumPageHandler;
+  }();
+
+  var resolveLogAction = function resolveLogAction(_ref) {
+    var onclick = _ref.onclick,
+      serverHost = _ref.serverHost;
     if (onclick.match(/show_logs/)) {
       if (serverHost.match(/orpheus/)) {
         LOGGER.debug('Orpheus');
@@ -699,7 +954,7 @@
       return 'viewlog';
     }
     return null;
-  }
+  };
   function processLogLink(_ref2) {
     var _link$getAttribute;
     var link = _ref2.link,
@@ -711,7 +966,10 @@
     }
     LOGGER.debug('Log link', link);
     var onclick = (_link$getAttribute = link.getAttribute('onclick')) !== null && _link$getAttribute !== void 0 ? _link$getAttribute : '';
-    var logAction = resolveLogAction(onclick, serverHost);
+    var logAction = resolveLogAction({
+      onclick: onclick,
+      serverHost: serverHost
+    });
     if (!logAction) {
       return;
     }
@@ -742,25 +1000,14 @@
               LOGGER.debug('Number of disc found', discs.length);
               _context.n = 2;
               return checkAndDisplayDiscs({
+                artistName: artistName,
+                releaseName: releaseName,
                 discs: discs,
                 displayDiscHandler: function displayDiscHandler(_mbTocNumbers, _discid, discNumber) {
                   targetContainer === null || targetContainer === void 0 || targetContainer.insertAdjacentHTML('beforeend', "<br /><strong>".concat(discs.length > 1 ? "Disc ".concat(discNumber, ": ") : '', "MB DiscId: </strong><span id=\"").concat(torrentId, "_disc").concat(discNumber, "\"></span>"));
                 },
-                displayResultHandler: function displayResultHandler(mbTocNumbers, discid, discNumber, found) {
-                  var _document$getElementB;
-                  var url = computeAttachUrl(mbTocNumbers, artistName, releaseName);
-                  var htmlElement = document.createElement('a');
-                  htmlElement.href = url;
-                  htmlElement.textContent = discid;
-                  if (found) {
-                    htmlElement.style.backgroundColor = '#d0f1d0';
-                    htmlElement.style.color = 'rgb(30, 70, 32)';
-                    htmlElement.style.border = '1px solid rgb(30, 70, 32)';
-                    htmlElement.style.paddingInline = '3px';
-                    htmlElement.style.borderRadius = '3px';
-                  }
-                  LOGGER.debug("#".concat(torrentId, "_disc").concat(discNumber));
-                  (_document$getElementB = document.getElementById("".concat(torrentId, "_disc").concat(discNumber))) === null || _document$getElementB === void 0 || _document$getElementB.appendChild(htmlElement);
+                getElementIdForResultDisplay: function getElementIdForResultDisplay(discNumber) {
+                  return "".concat(torrentId, "_disc").concat(discNumber);
                 }
               });
             case 2:
@@ -768,14 +1015,26 @@
           }
         }, _callee);
       }));
-      return function (_x2) {
+      return function (_x) {
         return _ref3.apply(this, arguments);
       };
     }()).catch(function (err) {
       LOGGER.error('Failed to fetch log', logUrl, err);
     });
   }
-  function gazellePageHandler() {
+  var parseReleaseInfo = function parseReleaseInfo(serverHost) {
+    var _document$querySelect, _document$querySelect2, _match$, _match$2;
+    var titleAndArtists = (_document$querySelect = (_document$querySelect2 = document.querySelector('#content div.thin h2')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.textContent) !== null && _document$querySelect !== void 0 ? _document$querySelect : '';
+    var regularPattern = /(.*) - (.*) \[.*\] \[.*/;
+    var orpheusPattern = /(.*) [-–] (.*) \[.*\]( \[.*)?/;
+    var pattern = serverHost.match(/orpheus/) ? orpheusPattern : regularPattern;
+    var match = titleAndArtists.match(pattern);
+    return {
+      artistName: (_match$ = match === null || match === void 0 ? void 0 : match[1]) !== null && _match$ !== void 0 ? _match$ : '',
+      releaseName: (_match$2 = match === null || match === void 0 ? void 0 : match[2]) !== null && _match$2 !== void 0 ? _match$2 : ''
+    };
+  };
+  var gazellePageHandler = function gazellePageHandler() {
     var serverHost = window.location.host;
     var _parseReleaseInfo = parseReleaseInfo(serverHost),
       artistName = _parseReleaseInfo.artistName,
@@ -816,13 +1075,19 @@
     } finally {
       _iterator.f();
     }
-  }
+  };
+
   function init() {
-    if (!window.location.host.match(GAZELLE_HOST_PATTERN)) {
+    var serverHost = window.location.host;
+    if (serverHost.match(GAZELLE_HOST_PATTERN)) {
+      LOGGER.info('Gazelle site detected');
+      gazellePageHandler();
       return;
     }
-    LOGGER.info('Gazelle site detected');
-    gazellePageHandler();
+    if (serverHost.match(BB_FORUM_HOST_PATTERN)) {
+      LOGGER.info('BB Forum site detected');
+      void bbForumPageHandler();
+    }
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
