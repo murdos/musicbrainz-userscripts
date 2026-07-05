@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz DiscIds Detector
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @version      2026.07.05.5
+// @version      2026.07.05.6
 // @description  Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js
@@ -23,7 +23,7 @@ function onReady(fn) {
 }
 
 onReady(function () {
-    if (window.location.host.match(/orpheus\.network|redacted\.sh|passtheheadphones\.me|lztr\.(us|me)|notwhat\.cd/)) {
+    if (window.location.host.match(/orpheus\.network|redacted\.sh|lztr\.me|notwhat\.cd/)) {
         LOGGER.info('Gazelle site detected');
         gazellePageHandler();
     }
@@ -66,7 +66,7 @@ function gazellePageHandler() {
                 if (window.location.host.match(/orpheus/)) {
                     LOGGER.debug('Orpheus');
                     logAction = 'viewlog';
-                } else if (window.location.host.match(/redacted|passtheheadphones/)) {
+                } else if (window.location.host.match(/redacted/)) {
                     LOGGER.debug('RED');
                     logAction = 'loglist';
                 }
