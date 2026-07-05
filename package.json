@@ -23,6 +23,7 @@
     "scripts": {
         "build": "node --strip-types src/build/build.ts",
         "build:watch": "node --strip-types src/build/build.ts --watch",
+        "bump-versions": "node --strip-types src/build/bump-versions-if-changed.ts",
         "type-check": "tsgo",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
