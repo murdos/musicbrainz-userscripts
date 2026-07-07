@@ -4,7 +4,6 @@
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
-- [Import CD1D releases to MusicBrainz](#cd1d_importer)
 - [Import Deezer releases into MusicBrainz](#deezer_importer)
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
@@ -56,13 +55,6 @@ Add a button on Boomkat release pages to open MusicBrainz release editor with pr
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js)
-
-## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
-
-Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
 
 ## <a name="deezer_importer"></a> Import Deezer releases into MusicBrainz
 
