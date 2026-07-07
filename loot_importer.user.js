@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Import Loot releases to MusicBrainz
 // @description  Add a button to import Loot.co.za releases to MusicBrainz
-// @version      2026.06.21.1
+// @version      2026.7.7.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js
-// @include      http*://www.loot.co.za/product/*
+// @match        https://www.loot.co.za/product/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
