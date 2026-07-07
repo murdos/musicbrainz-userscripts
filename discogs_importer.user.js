@@ -6,10 +6,9 @@
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @include      http*://www.discogs.com/*
-// @include      http*://*.discogs.com/*release/*
-// @exclude      http*://*.discogs.com/*release/*?f=xml*
-// @exclude      http*://www.discogs.com/release/add
+// @match        https://www.discogs.com/*
+// @match        https://www.discogs.com/release/*
+// @exclude      https://www.discogs.com/release/add
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
