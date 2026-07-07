@@ -12,6 +12,8 @@
 // @require      lib/logger.js
 // ==/UserScript==
 
+/* eslint-disable */
+
 console.warn(
     '[Musicbrainz DiscIds Detector]: ⚠️ This userscript has been rewritten in TypeScript and is now hosted at a new URL. It should auto-update to use the TS version automatically, but if it didn’t and you’re seeing this message, please upgrade it manually from https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js.',
 );

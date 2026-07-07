@@ -31,7 +31,6 @@ const OPEN_QOBUZ_BASE = 'https://open.qobuz.com';
 
 let is_classical = false; // release detected as classical
 let album_artist_data = {}; // for switching album artists on classical
-let raw_release_data;
 
 function getOpenQobuzArtistUrl(artistId) {
     return `${OPEN_QOBUZ_BASE}/artist/${artistId}`;
