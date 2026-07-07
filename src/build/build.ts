@@ -31,26 +31,21 @@ const BABEL_OPTIONS = {
     ],
 } satisfies RollupBabelInputPluginOptions;
 
-const MetadataSchema = z
-    .strictObject({
-        name: z.string(),
-        description: z.string(),
-        version: z.string(),
-        author: z.string(),
-        namespace: z.string(),
-        downloadURL: z.string(),
-        updateURL: z.string(),
-        match: z.array(z.string()).optional(),
-        include: z.array(z.string()).optional(),
-        require: z.array(z.string()).optional(),
-        grant: z.array(z.string()).optional(),
-        runAt: z.string().optional(),
-        icon: z.string().optional(),
-    })
-    .refine(data => (data.match && !data.include) || (!data.match && data.include), {
-        message: 'Either `match` or `include` must be provided, not both.',
-        path: ['match', 'include'],
-    });
+const MetadataSchema = z.strictObject({
+    name: z.string(),
+    description: z.string(),
+    version: z.string(),
+    author: z.string(),
+    namespace: z.string(),
+    downloadURL: z.string(),
+    updateURL: z.string(),
+    match: z.array(z.string()),
+    require: z.array(z.string()).optional(),
+    grant: z.array(z.string()).optional(),
+    runAt: z.string().optional(),
+    icon: z.string().optional(),
+});
+
 type UserscriptMetadata = z.infer<typeof MetadataSchema>;
 
 async function buildUserscript(userscriptName: string): Promise<void> {
@@ -119,15 +114,9 @@ function generateUserscriptHeader(metadata: UserscriptMetadata): string {
     lines.push(`@downloadURL  ${metadata.downloadURL}`);
     lines.push(`@updateURL    ${metadata.updateURL}`);
 
-    if (metadata.match) {
-        metadata.match.forEach(pattern => {
-            lines.push(`@match        ${pattern}`);
-        });
-    } else if (metadata.include) {
-        metadata.include.forEach(pattern => {
-            lines.push(`@include      ${pattern}`);
-        });
-    }
+    metadata.match.forEach(pattern => {
+        lines.push(`@match        ${pattern}`);
+    });
 
     if (metadata.require) {
         metadata.require.forEach(url => {
