@@ -5,11 +5,17 @@ import { checkAndDisplayDiscs } from '../utils/check-and-display-disks';
 
 interface ResolveLogActionProps {
     onclick: string;
+    link: HTMLAnchorElement;
     serverHost: string;
 }
 
-const resolveLogAction = ({ onclick, serverHost }: ResolveLogActionProps): LogAction | null => {
+const resolveLogAction = ({ onclick, link, serverHost }: ResolveLogActionProps): LogAction | null => {
+    if (serverHost.match(/orpheus/) && link.classList.contains('view-riplog')) {
+        LOGGER.debug('Orpheus');
+        return 'viewlog';
+    }
     if (onclick.match(/show_logs/)) {
+        // TODO: Orpheus had changed the way to show logs, so this is not working anymore. Will keep it here just in case and remove in the future.
         if (serverHost.match(/orpheus/)) {
             LOGGER.debug('Orpheus');
             return 'viewlog';
@@ -31,6 +37,56 @@ const resolveLogAction = ({ onclick, serverHost }: ResolveLogActionProps): LogAc
     return null;
 };
 
+const getTorrentIdFromHref = (link: HTMLAnchorElement): string | null => {
+    const href = link.getAttribute('href');
+    if (!href) {
+        return null;
+    }
+
+    const url = new URL(href, window.location.origin);
+    const torrentId = url.searchParams.get('torrentid');
+    if (torrentId) {
+        return torrentId;
+    }
+
+    const action = url.searchParams.get('action');
+    if (
+        (url.pathname.endsWith('/torrents.php') && action === 'download') ||
+        (url.pathname.endsWith('/ajax.php') && action === 'torrent') ||
+        (url.pathname.endsWith('/reportsv2.php') && action === 'report')
+    ) {
+        return url.searchParams.get('id');
+    }
+
+    return null;
+};
+
+const resolveTorrentId = (link: HTMLAnchorElement, onclick: string): string | null => {
+    const inlineHandlerMatch = /(show_logs|get_log|show_log)\('(\d+)/.exec(onclick);
+    if (inlineHandlerMatch?.[2]) {
+        return inlineHandlerMatch[2];
+    }
+
+    const dataIdContainer = link.closest<HTMLElement>('[data-id]');
+    if (dataIdContainer?.dataset['id']) {
+        return dataIdContainer.dataset['id'];
+    }
+
+    const torrentInfo = link.closest('tr') ?? link.parentElement;
+    if (!torrentInfo) {
+        return null;
+    }
+
+    for (const torrentLink of torrentInfo.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+        const torrentId = getTorrentIdFromHref(torrentLink);
+        if (torrentId) {
+            return torrentId;
+        }
+    }
+
+    return null;
+};
+
 interface ProcessLogLinkProps {
     link: HTMLAnchorElement;
     artistName: string;
@@ -45,14 +101,13 @@ function processLogLink({ link, artistName, releaseName, serverHost }: ProcessLo
 
     LOGGER.debug('Log link', link);
     const onclick = link.getAttribute('onclick') ?? '';
-    const logAction = resolveLogAction({ onclick, serverHost });
+    const logAction = resolveLogAction({ onclick, link, serverHost });
     if (!logAction) {
         return;
     }
 
-    const targetContainer = link.closest('.linkbox');
-    const torrentIdMatch = /(show_logs|get_log|show_log)\('(\d+)/.exec(onclick);
-    const torrentId = torrentIdMatch?.[2];
+    const targetContainer = link.closest('.linkbox') ?? link.closest('[data-id]') ?? link.parentElement;
+    const torrentId = resolveTorrentId(link, onclick);
     if (!torrentId) {
         return;
     }
