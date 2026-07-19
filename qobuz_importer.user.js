@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.09.1
+// @version      2026.07.19.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -515,13 +515,48 @@ function removeMbSearchLinksBefore(element) {
     }
 }
 
+/*
+ * Search placeholders are only useful before an unresolved Qobuz link. If a placeholder or resolved MB icon is already there, leave the DOM as-is.
+ */
+function hasMbIndicatorBeforeElement(element) {
+    const sibling = element.previousElementSibling;
+    return Boolean(sibling?.classList.contains('mb_searchit') || sibling?.matches('a[href^="https://musicbrainz.org/"]'));
+}
+
 function insertMbSearchLinkBeforeElement(element, mb_type, entityName) {
-    removeMbSearchLinksBefore(element);
+    if (hasMbIndicatorBeforeElement(element)) {
+        return;
+    }
     element.insertAdjacentHTML('beforebegin', createMbSearchLink(mb_type, entityName));
+}
+
+/*
+ * Extract the MB href from the generated link HTML so alias lookups can be deduped by target entity, not by the Qobuz URL variant that found it.
+ */
+function getLinkHref(link) {
+    const template = document.createElement('template');
+    template.innerHTML = link.trim();
+    const anchor = template.content.querySelector('a[href]');
+    return anchor?.href;
+}
+
+/*
+ * Discography pages query several URL forms for the same Qobuz entity. When two aliases resolve to the same MB URL, avoid inserting the same icon twice.
+ */
+function hasMbLinkBeforeElement(element, href) {
+    let sibling = element.previousElementSibling;
+    while (sibling?.classList.contains('mb_searchit') || sibling?.matches('a[href^="https://musicbrainz.org/"]')) {
+        if (sibling instanceof HTMLAnchorElement && sibling.href === href) {
+            return true;
+        }
+        sibling = sibling.previousElementSibling;
+    }
+    return false;
 }
 
 function insertMbLinkBeforeElements(elements, link) {
     const styledLink = link.replace('<a ', '<a style="vertical-align:top" ');
+    const href = getLinkHref(styledLink);
     const insertedElements = new Set();
 
     for (const element of elements) {
@@ -529,6 +564,9 @@ function insertMbLinkBeforeElements(elements, link) {
             continue;
         }
         insertedElements.add(element);
+        if (href && hasMbLinkBeforeElement(element, href)) {
+            continue;
+        }
         removeMbSearchLinksBefore(element);
         element.insertAdjacentHTML('beforebegin', styledLink);
     }
