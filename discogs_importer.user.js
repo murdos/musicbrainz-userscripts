@@ -1172,8 +1172,8 @@ const Countries = {
     'Svalbard and Jan Mayen': 'SJ',
 };
 
-if (typeof module !== "undefined") {
-  module.exports = {
-    parseDiscogsRelease,
-  };
+if (typeof module !== 'undefined') {
+    module.exports = {
+        parseDiscogsRelease,
+    };
 }
