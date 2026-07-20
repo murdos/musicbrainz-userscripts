@@ -93,50 +93,10 @@
         }
     ],
     "data_quality": "Correct",
-    "community": {
-        "have": 243,
-        "want": 21,
-        "rating": {
-            "count": 16,
-            "average": 4.44
-        },
-        "submitter": {
-            "username": "DaveTheVan",
-            "resource_url": "https://api.discogs.com/users/DaveTheVan"
-        },
-        "contributors": [
-            {
-                "username": "DaveTheVan",
-                "resource_url": "https://api.discogs.com/users/DaveTheVan"
-            },
-            {
-                "username": "_Hawkhead_",
-                "resource_url": "https://api.discogs.com/users/_Hawkhead_"
-            },
-            {
-                "username": "TBlikeng",
-                "resource_url": "https://api.discogs.com/users/TBlikeng"
-            },
-            {
-                "username": "IvanDobsky",
-                "resource_url": "https://api.discogs.com/users/IvanDobsky"
-            },
-            {
-                "username": "Nooway",
-                "resource_url": "https://api.discogs.com/users/Nooway"
-            },
-            {
-                "username": "zombiekev",
-                "resource_url": "https://api.discogs.com/users/zombiekev"
-            }
-        ],
-        "data_quality": "Correct",
-        "status": "Accepted"
-    },
     "format_quantity": 2,
     "date_added": "2020-12-05T08:39:54-08:00",
     "date_changed": "2021-10-14T07:20:54-07:00",
-    "num_for_sale": 23,
+    "num_for_sale": 22,
     "lowest_price": 13.2,
     "master_id": 1862472,
     "master_url": "https://api.discogs.com/masters/1862472",

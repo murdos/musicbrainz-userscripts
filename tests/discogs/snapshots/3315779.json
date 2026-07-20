@@ -263,7 +263,5 @@
             "link_type": 76
         }
     ],
-    "secondary_types": [
-        "compilation"
-    ]
+    "secondary_types": ["compilation"]
 }
