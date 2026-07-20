@@ -44,5 +44,4 @@ export default defineConfig({
         'no-useless-escape': 'warn',
         'no-var': 'warn',
     },
-    ignorePatterns: ['node_modules/**', '.git/**'],
 });

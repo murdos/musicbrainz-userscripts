@@ -110,147 +110,11 @@
         }
     ],
     "data_quality": "Correct",
-    "community": {
-        "have": 3158,
-        "want": 1359,
-        "rating": {
-            "count": 389,
-            "average": 4.36
-        },
-        "submitter": {
-            "username": "kinoeyevert",
-            "resource_url": "https://api.discogs.com/users/kinoeyevert"
-        },
-        "contributors": [
-            {
-                "username": "kinoeyevert",
-                "resource_url": "https://api.discogs.com/users/kinoeyevert"
-            },
-            {
-                "username": "kwulf",
-                "resource_url": "https://api.discogs.com/users/kwulf"
-            },
-            {
-                "username": "marcelrecords",
-                "resource_url": "https://api.discogs.com/users/marcelrecords"
-            },
-            {
-                "username": "blach",
-                "resource_url": "https://api.discogs.com/users/blach"
-            },
-            {
-                "username": "mcdustsucker",
-                "resource_url": "https://api.discogs.com/users/mcdustsucker"
-            },
-            {
-                "username": "jos_jaspers",
-                "resource_url": "https://api.discogs.com/users/jos_jaspers"
-            },
-            {
-                "username": "Lovinda",
-                "resource_url": "https://api.discogs.com/users/Lovinda"
-            },
-            {
-                "username": "3tone",
-                "resource_url": "https://api.discogs.com/users/3tone"
-            },
-            {
-                "username": "Rossmichael",
-                "resource_url": "https://api.discogs.com/users/Rossmichael"
-            },
-            {
-                "username": "nik",
-                "resource_url": "https://api.discogs.com/users/nik"
-            },
-            {
-                "username": "MannerHeikki",
-                "resource_url": "https://api.discogs.com/users/MannerHeikki"
-            },
-            {
-                "username": "kosats",
-                "resource_url": "https://api.discogs.com/users/kosats"
-            },
-            {
-                "username": "home-of-the-record",
-                "resource_url": "https://api.discogs.com/users/home-of-the-record"
-            },
-            {
-                "username": "Stathisan",
-                "resource_url": "https://api.discogs.com/users/Stathisan"
-            },
-            {
-                "username": "pshico87",
-                "resource_url": "https://api.discogs.com/users/pshico87"
-            },
-            {
-                "username": "karlglogauer",
-                "resource_url": "https://api.discogs.com/users/karlglogauer"
-            },
-            {
-                "username": "yuhann",
-                "resource_url": "https://api.discogs.com/users/yuhann"
-            },
-            {
-                "username": "solmaz.malek",
-                "resource_url": "https://api.discogs.com/users/solmaz.malek"
-            },
-            {
-                "username": "allvinyl2",
-                "resource_url": "https://api.discogs.com/users/allvinyl2"
-            },
-            {
-                "username": "Vinylfan4",
-                "resource_url": "https://api.discogs.com/users/Vinylfan4"
-            },
-            {
-                "username": "DasBosun",
-                "resource_url": "https://api.discogs.com/users/DasBosun"
-            },
-            {
-                "username": "mashanovmv",
-                "resource_url": "https://api.discogs.com/users/mashanovmv"
-            },
-            {
-                "username": "bdierkes",
-                "resource_url": "https://api.discogs.com/users/bdierkes"
-            },
-            {
-                "username": "Dreammare",
-                "resource_url": "https://api.discogs.com/users/Dreammare"
-            },
-            {
-                "username": "romel55",
-                "resource_url": "https://api.discogs.com/users/romel55"
-            },
-            {
-                "username": "dr._phibes_02",
-                "resource_url": "https://api.discogs.com/users/dr._phibes_02"
-            },
-            {
-                "username": "floodzoog",
-                "resource_url": "https://api.discogs.com/users/floodzoog"
-            },
-            {
-                "username": "anjo29",
-                "resource_url": "https://api.discogs.com/users/anjo29"
-            },
-            {
-                "username": "ernstlx",
-                "resource_url": "https://api.discogs.com/users/ernstlx"
-            },
-            {
-                "username": "templar53",
-                "resource_url": "https://api.discogs.com/users/templar53"
-            }
-        ],
-        "data_quality": "Correct",
-        "status": "Accepted"
-    },
     "format_quantity": 1,
     "date_added": "2008-01-15T05:20:44-08:00",
     "date_changed": "2025-02-16T06:54:30-08:00",
-    "num_for_sale": 95,
-    "lowest_price": 2.42,
+    "num_for_sale": 98,
+    "lowest_price": 2.38,
     "master_id": 498,
     "master_url": "https://api.discogs.com/masters/498",
     "title": "Lizard",
@@ -388,13 +252,6 @@
             "uri": "https://www.youtube.com/watch?v=SUc8luH-I6c",
             "title": "King Crimson - Lizard (Prince Rupert Awakes / Bolero / The Battle Of Glass Tears / Big Top)",
             "description": "Full Album Playlist: \nhttps://www.youtube.com/playlist?list=PLXhfRoiJBIivF7WWLowP0hkPDypPtqInQ\n\nLIZARD\n(Fripp / Sinfield)\n\nPRINCE RUPERT AWAKES\n\nFarewell the temple master’s bells \nHis kiosk and his black worm seed \nCourtship solely of his word \nWith Eden",
-            "duration": 0,
-            "embed": true
-        },
-        {
-            "uri": "https://www.youtube.com/watch?v=Zx4FOsyetMs",
-            "title": "King Crimson - Lizard (Album Visualiser)",
-            "description": "00:00:00 Cirkus (Including 'Entry Of The Cameleons')\n00:06:28 Indoor Games\n00:12:03 Happy Family\n00:16:26 Lady Of The Dancing Water\n00:19:14 Lizard ('Prince Rupert Awakes'/ 'Bolero'/ 'The Battle Of Glass Tears'/ 'Big Top')\n00:42:35 Studio Sessions: 'Cirku",
             "duration": 0,
             "embed": true
         }

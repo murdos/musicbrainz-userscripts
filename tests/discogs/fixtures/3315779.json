@@ -64,66 +64,10 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 278,
-        "want": 51,
-        "rating": {
-            "count": 5,
-            "average": 3
-        },
-        "submitter": {
-            "username": "SillyKees",
-            "resource_url": "https://api.discogs.com/users/SillyKees"
-        },
-        "contributors": [
-            {
-                "username": "SillyKees",
-                "resource_url": "https://api.discogs.com/users/SillyKees"
-            },
-            {
-                "username": "Mepeye",
-                "resource_url": "https://api.discogs.com/users/Mepeye"
-            },
-            {
-                "username": "Indie_snake",
-                "resource_url": "https://api.discogs.com/users/Indie_snake"
-            },
-            {
-                "username": "Oldies-Forever",
-                "resource_url": "https://api.discogs.com/users/Oldies-Forever"
-            },
-            {
-                "username": "DiscogsUpdateBot",
-                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
-            },
-            {
-                "username": "MannerHeikki",
-                "resource_url": "https://api.discogs.com/users/MannerHeikki"
-            },
-            {
-                "username": "Stonehedges",
-                "resource_url": "https://api.discogs.com/users/Stonehedges"
-            },
-            {
-                "username": "alain-a",
-                "resource_url": "https://api.discogs.com/users/alain-a"
-            },
-            {
-                "username": "vinylzoekertje",
-                "resource_url": "https://api.discogs.com/users/vinylzoekertje"
-            },
-            {
-                "username": "MaximusMCX",
-                "resource_url": "https://api.discogs.com/users/MaximusMCX"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 1,
     "date_added": "2012-01-01T08:54:59-08:00",
     "date_changed": "2022-08-09T12:20:16-07:00",
-    "num_for_sale": 10,
+    "num_for_sale": 9,
     "lowest_price": 1.32,
     "master_id": 1693520,
     "master_url": "https://api.discogs.com/masters/1693520",

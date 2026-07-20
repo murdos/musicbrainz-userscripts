@@ -1,15 +1,18 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.06.21.1
+// @version      2026.7.20.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @include      /^https:\/\/[^/]+\/(?:(?:(?:album|track))\/[^/]+|music)$/
 // @include      /^https:\/\/([^.]+)\.bandcamp\.com((?:\/(?:(?:album|track))\/[^/]+|\/|\/music)?)$/
+// @match        https://*.bandcamp.com/*
+// @match        https://bandcamp.com/discover*
 // @include      /^https:\/\/bandcamp\.com\/private\//
 // @include      /^https:\/\/([^.]+)\.bandcamp\.com\/private\//
 // @include      /^https?:\/\/web\.archive\.org\/web\/\d+\/https?:\/\/[^/]+(?:\/(?:album|track)\/[^/]+\/?|\/music\/?|\/?)$/
+// @match        https://web.archive.org/web/*
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
 // @require      lib/mblinks.js?version=v2026.05.31.1
@@ -19,8 +22,10 @@
 // @run-at       document-start
 // ==/UserScript==
 
-/* oxlint-disable-next-line no-global-assign */
+// @ts-nocheck
+
 if (!unsafeWindow) {
+    /* oxlint-disable-next-line no-global-assign */
     unsafeWindow = window;
 }
 
@@ -398,7 +403,7 @@ const BandcampImport = {
     },
 };
 
-if (window.location.hostname === 'web.archive.org') {
+if (window.location.hostname === 'web.archive.org' && !!unsafeWindow.TralbumData) {
     const targetWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
     let _realWombat;
 
@@ -498,6 +503,94 @@ const collectDiscographyReleaseLinks = ({ linksMatcher, hostnames, insertionLoca
         }
     });
     return urls_data;
+};
+
+const isDiscoverPage = () =>
+    unsafeWindow.location.hostname === 'bandcamp.com' && /^\/discover(?:\/|$)/.test(unsafeWindow.location.pathname);
+
+/**
+ * Return the canonical URL for an album displayed in a Bandcamp Discover card.
+ * Discover-specific query parameters are intentionally omitted because MusicBrainz
+ * stores relationships against the album URL itself.
+ */
+const getDiscoverAlbumUrl = link => {
+    try {
+        const url = new URL(link.href, unsafeWindow.location.origin);
+        const isBandcampUrl = url.hostname === 'bandcamp.com' || url.hostname.endsWith('.bandcamp.com');
+        if (!isBandcampUrl || !url.pathname.startsWith('/album/')) return null;
+        return `${url.protocol}//${url.hostname}${url.pathname.replace(/\/$/, '')}`;
+    } catch {
+        return null;
+    }
+};
+
+/**
+ * Add MusicBrainz release links to the current and subsequently loaded Discover cards.
+ */
+const initDiscoverPage = () => {
+    const mblinks = new MBLinks('BCI_MBLINKS_CACHE', 2);
+    const processedLinks = new WeakSet();
+    const albumLinkSelector = '.results-grid-item .meta p > a[href]';
+
+    const collectAlbumLinks = root => {
+        const albumLinks = [];
+        if (root instanceof Element && root.matches(albumLinkSelector)) albumLinks.push(root);
+        if (root.querySelectorAll) albumLinks.push(...root.querySelectorAll(albumLinkSelector));
+        return albumLinks;
+    };
+
+    const addReleaseLinks = roots => {
+        const urlsData = [];
+
+        roots.flatMap(collectAlbumLinks).forEach(albumLink => {
+            if (processedLinks.has(albumLink)) return;
+
+            const albumUrl = getDiscoverAlbumUrl(albumLink);
+            if (!albumUrl) return;
+            processedLinks.add(albumLink);
+
+            const seenReleaseMbids = new Set();
+            urlsData.push({
+                url: albumUrl,
+                mb_type: 'release',
+                key: `release:${albumUrl}`,
+                insert_func: link => {
+                    const mbUrl = link.match(/href="([^"]+)"/)?.[1];
+                    if (!mbUrl) return;
+                    const mbid = mbUrl.slice(-36);
+                    if (seenReleaseMbids.has(mbid) || !albumLink.isConnected) return;
+                    seenReleaseMbids.add(mbid);
+                    // Make our MB link render inline with the Bandcamp album link
+                    Object.assign(albumLink.parentElement.style, {
+                        alignItems: 'flex-start',
+                        columnGap: '4px',
+                        display: 'flex',
+                    });
+                    albumLink.insertAdjacentHTML('beforebegin', link);
+                    albumLink.previousElementSibling.style.flexShrink = '0';
+                },
+            });
+        });
+
+        if (urlsData.length > 0) mblinks.searchAndDisplayMbLinks(urlsData);
+    };
+
+    addReleaseLinks([document]);
+
+    const observer = new MutationObserver(mutations => {
+        const changedRoots = mutations.flatMap(mutation =>
+            mutation.type === 'attributes'
+                ? [mutation.target]
+                : Array.from(mutation.addedNodes).filter(node => node.nodeType === Node.ELEMENT_NODE),
+        );
+        if (changedRoots.length > 0) addReleaseLinks(changedRoots);
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['href'],
+    });
 };
 
 function init() {
@@ -791,8 +884,16 @@ function init() {
     }
 }
 
+const run = () => {
+    if (isDiscoverPage()) {
+        initDiscoverPage();
+    } else {
+        init();
+    }
+};
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', run);
 } else {
-    init();
+    run();
 }

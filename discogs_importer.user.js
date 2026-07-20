@@ -2,14 +2,13 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2026.05.31.1
+// @version      2026.7.20.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
-// @include      http*://www.discogs.com/*
-// @include      http*://*.discogs.com/*release/*
-// @exclude      http*://*.discogs.com/*release/*?f=xml*
-// @exclude      http*://www.discogs.com/release/add
+// @match        https://www.discogs.com/*
+// @match        https://www.discogs.com/release/*
+// @exclude      https://www.discogs.com/release/add
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
@@ -17,6 +16,8 @@
 // @require      lib/mbimportstyle.js
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
+
+// @ts-nocheck
 
 // prevent JQuery conflicts, see http://wiki.greasespot.net/@grant
 this.$ = this.jQuery = jQuery.noConflict(true);
@@ -38,6 +39,13 @@ const mbLinks = new MBLinks('DISCOGS_MBLINKS_CACHE', '1');
 $(document).ready(function () {
     MBImportStyle();
     MBSearchItStyle();
+
+    // User Collection and Wantlist pages
+    const entityListPage = getDiscogsEntityListPage();
+    if (entityListPage) {
+        initDiscogsEntityListPage(entityListPage);
+        return;
+    }
 
     const current_page_key = getDiscogsLinkKey(
         window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '').replace('/master/view/', '/master/'),
@@ -93,6 +101,165 @@ $(document).ready(function () {
         });
     }
 });
+
+////////////////////////////////////////////////
+// Display MusicBrainz links on collection and wantlist pages
+////////////////////////////////////////////////
+
+function getDiscogsEntityListPage() {
+    if (/^\/user\/[^/]+\/collection\/?$/.test(window.location.pathname)) {
+        return {
+            getEntitySelector: discogsType => `[role="row"] [role="cell"][data-field="title"] a[href*="/${discogsType}/"]`,
+        };
+    }
+
+    if (/^\/mywantlist\/?$/.test(window.location.pathname)) {
+        return {
+            getEntitySelector: discogsType => {
+                const entityContainer = 'table.release_list_table tbody td.artist_title span.release_title';
+                if (discogsType === 'release') return `${entityContainer} .release_title_link > a[href*="/release/"]`;
+                return `${entityContainer} > a[href*="/${discogsType}/"]`;
+            },
+        };
+    }
+
+    return null;
+}
+
+const discogsEntityListTypes = [
+    { discogsType: 'release', mbType: 'release', mark: 'R' },
+    { discogsType: 'artist', mbType: 'artist', mark: 'A' },
+    { discogsType: 'label', mbType: 'label', mark: 'L' },
+];
+
+function getDiscogsEntityInfo(link, discogsType) {
+    const entityKey = getDiscogsLinkKey(link.href);
+    const entityInfo = link_infos[entityKey];
+    return entityInfo?.type === discogsType ? { key: entityKey, ...entityInfo } : null;
+}
+
+function collectDiscogsEntityLinks(root, selector) {
+    const links = [];
+
+    if (root.nodeType === Node.ELEMENT_NODE && root.matches(selector)) links.push(root);
+    if (root.querySelectorAll) links.push(...root.querySelectorAll(selector));
+
+    return links;
+}
+
+function removeDiscogsListMbIndicators(entityLink) {
+    while (entityLink.previousElementSibling?.hasAttribute('data-mb-discogs-list-indicator')) {
+        entityLink.previousElementSibling.remove();
+    }
+}
+
+function keepDiscogsListIndicatorWithEntity(entityLink) {
+    if (entityLink.parentElement?.hasAttribute('data-mb-discogs-list-nowrap')) return;
+
+    const wrapper = document.createElement('span');
+    wrapper.setAttribute('data-mb-discogs-list-nowrap', '');
+    wrapper.style.whiteSpace = 'nowrap';
+    entityLink.before(wrapper);
+    wrapper.append(entityLink);
+}
+
+function removeDiscogsListEntitySearchLink(entityLink) {
+    if (entityLink.previousElementSibling?.getAttribute('data-mb-discogs-list-indicator') === 'search') {
+        entityLink.previousElementSibling.remove();
+    }
+}
+
+function insertDiscogsListEntitySearchLink(entityLink, mbType, mark) {
+    const searchIndicator = document.createElement('span');
+    searchIndicator.className = 'mb_valign mb_searchit';
+    searchIndicator.setAttribute('data-mb-discogs-list-indicator', 'search');
+
+    const searchLink = document.createElement('a');
+    searchLink.className = 'mb_search_link';
+    searchLink.target = '_blank';
+    searchLink.title = `Search this ${mbType} on MusicBrainz (open in a new tab)`;
+    searchLink.href = MBImport.searchUrlFor(mbType, entityLink.textContent.trim());
+    searchLink.innerHTML = `<small>${mark}</small>?`;
+    searchIndicator.append(searchLink);
+    entityLink.before(searchIndicator);
+}
+
+function insertDiscogsListMbLink(entityLink, link) {
+    entityLink.insertAdjacentHTML('beforebegin', link.trim());
+    const mbLink = entityLink.previousElementSibling;
+    if (!mbLink) return;
+
+    mbLink.setAttribute('data-mb-discogs-list-indicator', 'link');
+}
+
+function initDiscogsEntityListPage(pageConfig) {
+    const pendingRoots = new Set();
+    let scanScheduled = false;
+
+    const addEntityLinks = roots => {
+        discogsEntityListTypes.forEach(({ discogsType, mbType, mark }) => {
+            const urlsData = [];
+            const processedEntityUrlAttribute = `data-mb-discogs-list-${discogsType}-url`;
+            const entitySelector = pageConfig.getEntitySelector(discogsType);
+
+            roots
+                .flatMap(root => collectDiscogsEntityLinks(root, entitySelector))
+                .forEach(entityLink => {
+                    const entityInfo = getDiscogsEntityInfo(entityLink, discogsType);
+                    if (!entityInfo || entityLink.getAttribute(processedEntityUrlAttribute) === entityInfo.clean_url) return;
+
+                    keepDiscogsListIndicatorWithEntity(entityLink);
+                    removeDiscogsListMbIndicators(entityLink);
+                    insertDiscogsListEntitySearchLink(entityLink, mbType, mark);
+                    entityLink.setAttribute(processedEntityUrlAttribute, entityInfo.clean_url);
+                    urlsData.push({
+                        url: entityInfo.clean_url,
+                        mb_type: mbType,
+                        key: getCacheKeyFromInfo(entityInfo.key, mbType),
+                        insert_func: link => {
+                            if (!entityLink.isConnected || getDiscogsEntityInfo(entityLink, discogsType)?.key !== entityInfo.key) return;
+                            removeDiscogsListEntitySearchLink(entityLink);
+                            insertDiscogsListMbLink(entityLink, link);
+                        },
+                    });
+                });
+
+            if (urlsData.length > 0) mbLinks.searchAndDisplayMbLinks(urlsData);
+        });
+    };
+
+    const scheduleScan = root => {
+        pendingRoots.add(root);
+        if (scanScheduled) return;
+        scanScheduled = true;
+        setTimeout(() => {
+            scanScheduled = false;
+            const roots = Array.from(pendingRoots);
+            pendingRoots.clear();
+            addEntityLinks(roots);
+        });
+    };
+
+    scheduleScan(document);
+
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'attributes') {
+                scheduleScan(mutation.target);
+            } else {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) scheduleScan(node);
+                });
+            }
+        });
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['href'],
+    });
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                              Display links of equivalent MusicBrainz entities                                      //

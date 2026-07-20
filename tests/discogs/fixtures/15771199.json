@@ -89,38 +89,6 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 145,
-        "want": 29,
-        "rating": {
-            "count": 6,
-            "average": 4.17
-        },
-        "submitter": {
-            "username": "IvanDobsky",
-            "resource_url": "https://api.discogs.com/users/IvanDobsky"
-        },
-        "contributors": [
-            {
-                "username": "IvanDobsky",
-                "resource_url": "https://api.discogs.com/users/IvanDobsky"
-            },
-            {
-                "username": "Disgone",
-                "resource_url": "https://api.discogs.com/users/Disgone"
-            },
-            {
-                "username": "Broedi",
-                "resource_url": "https://api.discogs.com/users/Broedi"
-            },
-            {
-                "username": "paquet",
-                "resource_url": "https://api.discogs.com/users/paquet"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 3,
     "date_added": "2020-08-15T06:18:06-07:00",
     "date_changed": "2020-09-27T14:18:48-07:00",

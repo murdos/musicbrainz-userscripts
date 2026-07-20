@@ -87,34 +87,6 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 17,
-        "want": 1,
-        "rating": {
-            "count": 1,
-            "average": 4
-        },
-        "submitter": {
-            "username": "steverogers",
-            "resource_url": "https://api.discogs.com/users/steverogers"
-        },
-        "contributors": [
-            {
-                "username": "steverogers",
-                "resource_url": "https://api.discogs.com/users/steverogers"
-            },
-            {
-                "username": "demier777",
-                "resource_url": "https://api.discogs.com/users/demier777"
-            },
-            {
-                "username": "M3acull",
-                "resource_url": "https://api.discogs.com/users/M3acull"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 41,
     "date_added": "2020-05-15T15:52:30-07:00",
     "date_changed": "2024-01-17T00:55:56-08:00",
