@@ -124,50 +124,10 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 41,
-        "want": 7,
-        "rating": {
-            "count": 2,
-            "average": 5
-        },
-        "submitter": {
-            "username": "Frysian",
-            "resource_url": "https://api.discogs.com/users/Frysian"
-        },
-        "contributors": [
-            {
-                "username": "Frysian",
-                "resource_url": "https://api.discogs.com/users/Frysian"
-            },
-            {
-                "username": "Rossmichael",
-                "resource_url": "https://api.discogs.com/users/Rossmichael"
-            },
-            {
-                "username": "DiscogsUpdateBot",
-                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
-            },
-            {
-                "username": "Zanyramorsky",
-                "resource_url": "https://api.discogs.com/users/Zanyramorsky"
-            },
-            {
-                "username": "officialandbootz",
-                "resource_url": "https://api.discogs.com/users/officialandbootz"
-            },
-            {
-                "username": "Stathisan",
-                "resource_url": "https://api.discogs.com/users/Stathisan"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 2,
     "date_added": "2014-07-13T07:03:36-07:00",
     "date_changed": "2025-07-30T08:48:25-07:00",
-    "num_for_sale": 6,
+    "num_for_sale": 7,
     "lowest_price": 3.95,
     "title": "The Complete Harpsichord Concertos",
     "country": "UK & Europe",

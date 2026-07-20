@@ -8,7 +8,7 @@ const DIR = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(DIR, 'fixtures');
 
 function stableStringify(value: unknown): string {
-    return JSON.stringify(value, null, 4);
+    return `${JSON.stringify(value, null, 4)}\n`;
 }
 
 function fixturePath(id: number): string {
@@ -41,6 +41,9 @@ function releaseIdFromFixture(fixture: Record<string, unknown>, url: string): nu
 async function updateRelease(url: string): Promise<void> {
     const fixture = await fetchFixture(url);
     const id = releaseIdFromFixture(fixture, url);
+
+    // Delete unused fields that change too often and are not needed by the script.
+    delete fixture['community'];
 
     fs.mkdirSync(FIXTURES_DIR, { recursive: true });
     fs.writeFileSync(fixturePath(id), stableStringify(fixture));

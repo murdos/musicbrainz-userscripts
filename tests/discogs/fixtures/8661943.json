@@ -39,42 +39,6 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 6,
-        "want": 10,
-        "rating": {
-            "count": 2,
-            "average": 4
-        },
-        "submitter": {
-            "username": "majorChernitsa",
-            "resource_url": "https://api.discogs.com/users/majorChernitsa"
-        },
-        "contributors": [
-            {
-                "username": "majorChernitsa",
-                "resource_url": "https://api.discogs.com/users/majorChernitsa"
-            },
-            {
-                "username": "brand0",
-                "resource_url": "https://api.discogs.com/users/brand0"
-            },
-            {
-                "username": "Qdisc",
-                "resource_url": "https://api.discogs.com/users/Qdisc"
-            },
-            {
-                "username": "mirrinda",
-                "resource_url": "https://api.discogs.com/users/mirrinda"
-            },
-            {
-                "username": "Same.Old.Me",
-                "resource_url": "https://api.discogs.com/users/Same.Old.Me"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 2,
     "date_added": "2016-06-16T19:56:48-07:00",
     "date_changed": "2020-03-09T04:25:27-07:00",
