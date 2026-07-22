@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.7.5.5
+// @version      2026.7.23.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
-// @icon         http://wiki.musicbrainz.org/-/images/3/3d/Musicbrainz_logo.png
+// @icon         http://wiki.musicbrainz.org/images/3/3d/Musicbrainz_logo.png
 // @namespace    http://userscripts.org/users/22504
 // @match        https://*musicbrainz.org/*
 // @match        http://*musicbrainz.org/*
@@ -177,6 +177,20 @@ function setRelEditorShortcutsMenu() {
 }
 setRelEditorShortcutsMenu();
 
+// Set [no label] button: menu command to enable/disable (default disabled)
+function setNoLabelButtonMenu() {
+    if (typeof GM_registerMenuCommand !== 'function') return;
+    GM_registerMenuCommand(
+        `${GM_getValue('noLabelButtonEnabled', false) ? '☑' : '☐'} Set [no label] button`,
+        function () {
+            GM_setValue('noLabelButtonEnabled', !GM_getValue('noLabelButtonEnabled', false));
+            setNoLabelButtonMenu();
+        },
+        { autoClose: false, id: 'noLabelButton' },
+    );
+}
+setNoLabelButtonMenu();
+
 $(document).ready(function () {
     // Follow the instructions found at https://www.last.fm/api/authentication
     // then paste your API Key between the single quotes in the variable below.
@@ -191,6 +205,71 @@ $(document).ready(function () {
     $('head').append(
         '<style>.release-title-action-btn { opacity: 0.8; transition: transform 0.15s ease, opacity 0.15s ease; } .release-title-action-btn:hover { opacity: 1; transform: scale(1.15); } .release-title-action-btn:active { transform: scale(1.05); }</style>',
     );
+
+    // Set a release label row to the special [no label] entity and [none] cat. no.
+    const releaseEditorPageRegex = /^\/release\/(?:add|[a-f0-9-]{36}\/edit)\/?$/i;
+    if (releaseEditorPageRegex.test(window.location.pathname) && GM_getValue('noLabelButtonEnabled', false)) {
+        $('head').append(`<style>
+.mb-ui-set-no-label {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 16px);
+    transform: translateY(-50%);
+    padding: 2px 6px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: linear-gradient(#fff, #f1f1f1);
+    color: #444;
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+}
+.mb-ui-set-no-label:hover,
+.mb-ui-set-no-label:focus-visible {
+    border-color: #888;
+    background: linear-gradient(#fff, #e7e7e7);
+}
+.mb-ui-set-no-label:active {
+    transform: translateY(calc(-50% + 1px));
+    background: #e3e3e3;
+    box-shadow: none;
+}
+.mb-ui-label-row {
+    position: relative;
+}
+</style>`);
+
+        const setInputValue = function (input, value) {
+            input.value = value;
+            input.dispatchEvent(new InputEvent('input', { bubbles: true, data: value, inputType: 'insertFromPaste' }));
+        };
+
+        const addNoLabelButtons = function () {
+            document.querySelectorAll('input[id^="label-"]').forEach(function (labelInput) {
+                const row = labelInput.closest('tr');
+                const catnoInput = row && row.querySelector('input[id^="catno-"]');
+                const removeButton = row && row.querySelector('.remove-release-label');
+                if (!catnoInput || !removeButton || row.querySelector('.mb-ui-set-no-label')) return;
+                row.classList.add('mb-ui-label-row');
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'mb-ui-set-no-label';
+                button.textContent = '[no label]';
+                button.title = 'Set label to [no label] and catalog number to [none]';
+                button.addEventListener('click', function () {
+                    setInputValue(labelInput, '157afde4-4bf5-4039-8ad2-5a15acc85176');
+                    setInputValue(catnoInput, '[none]');
+                });
+                removeButton.insertAdjacentElement('beforebegin', button);
+            });
+        };
+
+        addNoLabelButtons();
+        new MutationObserver(addNoLabelButtons).observe(document.body, { childList: true, subtree: true });
+    }
 
     const artistRegex = new RegExp('musicbrainz.org/artist/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$', 'i');
 
