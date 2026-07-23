@@ -89,7 +89,10 @@ function parseRelease(data) {
     release.url = `https://www.qobuz.com${data.relative_url}`; // no lang
     release.openQobuzUrl = getOpenQobuzAlbumUrl(data.id);
 
-    release.title = data.title;
+    release.title = data.title.trim();
+    if (data.version) {
+        release.title += ` (${data.version})`;
+    }
     if ($.inArray('Classique', data.genres_list) != -1) {
         is_classical = true;
         release.classical = {};
@@ -168,7 +171,10 @@ function parseRelease(data) {
             tracks = [];
         }
         let track = {};
-        track.title = trackobj.title.replace('"', '"');
+        track.title = trackobj.title.replace('"', '"').trim();
+        if (trackobj.version) {
+            track.title += ` (${trackobj.version})`;
+        }
         track.duration = trackobj.duration * 1000;
         let performers = getPerformers(trackobj);
         if (is_classical) {
