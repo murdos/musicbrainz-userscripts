@@ -882,6 +882,20 @@ function parseDiscogsRelease(discogsRelease) {
                 if (subtrack.type_ !== 'track') {
                     return;
                 }
+		const position = subtrack.position || '';
+		const isSubPosition = /^(.*\d)(?:\.(?:\d+|[a-z])|[a-z])$/i.test(position);
+
+		if (isSubPosition) {
+                    if (subtrack.duration) {
+			subtrack_total_duration += MBImport.hmsToMilliSeconds(subtrack.duration);
+                    }
+                    if (subtrack.title) {
+			subtrack_titles.push(subtrack.title);
+                    } else {
+			subtrack_titles.push('[unknown]');
+                    }
+		    return;
+		}
                 let track_new = new Object();
                 if (subtrack.duration) {
                     track_new.duration = MBImport.hmsToMilliSeconds(subtrack.duration);
