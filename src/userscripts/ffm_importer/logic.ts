@@ -1,6 +1,7 @@
 export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
 export const URL_RELATIONSHIP_TYPES = {
+    asin: 77,
     purchaseForDownload: 74,
     downloadForFree: 75,
     otherDatabases: 82,
@@ -125,6 +126,20 @@ function hostnameMatches(url: URL, domain: string): boolean {
     return url.hostname === domain || url.hostname.endsWith(`.${domain}`);
 }
 
+function amazonAsinFromUrl(rawUrl: string): string | undefined {
+    try {
+        const url = new URL(rawUrl);
+        if (!/(^|\.)amazon\.[a-z]{2,}(\.[a-z]{2})?$/i.test(url.hostname)) return undefined;
+
+        const parts = url.pathname.split('/').filter(Boolean);
+        const asinIndex = parts.findIndex((part, index) => /^(dp|product)$/i.test(part) && index < parts.length - 1);
+        const asin = asinIndex >= 0 ? parts[asinIndex + 1] : undefined;
+        return asin && /^[A-Z0-9]{10}$/i.test(asin) ? asin.toUpperCase() : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
 /** Identify the provider entity represented by a URL while ignoring storefront and tracking differences. */
 export function canonicalServiceUrlKey(rawUrl: string, rawService: string): string {
     const service = normalizeServiceName(rawService);
@@ -151,9 +166,14 @@ export function canonicalServiceUrlKey(rawUrl: string, rawService: string): stri
                 providerId = pathValueAfter(url, 'album');
                 return providerId ? `${service}:album:${providerId}` : normalizeServiceUrl(rawUrl, service);
             case 'amazon':
+            case 'amazonstore': {
+                const asin = amazonAsinFromUrl(rawUrl);
+                if (asin) return `amazon:asin:${asin}`;
+                if (service === 'amazonstore') return normalizeServiceUrl(rawUrl, service);
                 if (!url.hostname.startsWith('music.amazon.')) return rawUrl;
                 providerId = pathValueAfter(url, 'albums');
                 return providerId ? `amazon:album:${providerId}` : normalizeServiceUrl(rawUrl, service);
+            }
             case 'youtube':
             case 'youtubemusic':
                 if (!hostnameMatches(url, 'youtube.com')) return rawUrl;
@@ -209,6 +229,7 @@ export function chooseHarmonyLink(links: ServiceLink[]): ServiceLink | undefined
 export function relationshipTypeFor(link: ServiceLink): number {
     const action = link.action.toLowerCase();
     const service = normalizeServiceName(link.service);
+    if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
     if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
     if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport', 'junodownload'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;

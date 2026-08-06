@@ -46,6 +46,12 @@ describe('FFM importer logic', () => {
         expect(findCanonicallyMatchedLinkUrls(links, [musicBrainzAppleUrl])).toEqual([ffmAppleUrl, ffmAppleUrl]);
     });
 
+    it('matches equivalent Amazon product URLs by ASIN', () => {
+        expect(canonicalServiceUrlKey('https://www.amazon.com/gp/product/B0H47BDZJR', 'amazonstore')).toBe(
+            canonicalServiceUrlKey('https://amazon.com/dp/B0H47BDZJR', 'amazonstore'),
+        );
+    });
+
     it('extracts URL resources from a release lookup', () => {
         expect(
             extractReleaseUrlResources({
@@ -83,6 +89,9 @@ describe('FFM importer logic', () => {
         expect(relationshipTypeFor(serviceLink('qobuz'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz', undefined, 'Buy'))).toBe(URL_RELATIONSHIP_TYPES.purchaseForDownload);
         expect(relationshipTypeFor(serviceLink('archive', undefined, 'Free download'))).toBe(URL_RELATIONSHIP_TYPES.downloadForFree);
+        expect(relationshipTypeFor(serviceLink('amazonstore', 'https://www.amazon.com/gp/product/B0H47BDZJR', 'Buy'))).toBe(
+            URL_RELATIONSHIP_TYPES.asin,
+        );
     });
 
     it('collects every release matched by the provider URLs so ambiguity is visible', () => {
