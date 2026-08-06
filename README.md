@@ -8,6 +8,7 @@
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz](#ffm_importer)
 - [Import FMA releases to MusicBrainz](#fma_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
 - [Import Loot releases to MusicBrainz](#loot_importer)
@@ -82,6 +83,13 @@ Easily import Encyclopedisque releases into MusicBrainz
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
+
+## <a name="ffm_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz
+
+Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/ffm_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js)
 
 ## <a name="fma_importer"></a> Import FMA releases to MusicBrainz
 

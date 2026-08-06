@@ -40,6 +40,7 @@ const MetadataSchema = z.strictObject({
     downloadURL: z.string(),
     updateURL: z.string(),
     match: z.array(z.string()),
+    connect: z.array(z.string()).optional(),
     require: z.array(z.string()).optional(),
     grant: z.array(z.string()).optional(),
     runAt: z.string().optional(),
@@ -117,6 +118,12 @@ function generateUserscriptHeader(metadata: UserscriptMetadata): string {
     metadata.match.forEach(pattern => {
         lines.push(`@match        ${pattern}`);
     });
+
+    if (metadata.connect) {
+        metadata.connect.forEach(host => {
+            lines.push(`@connect      ${host}`);
+        });
+    }
 
     if (metadata.require) {
         metadata.require.forEach(url => {
