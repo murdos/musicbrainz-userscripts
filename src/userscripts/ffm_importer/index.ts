@@ -432,7 +432,10 @@ function submitMissingLinks(server: MusicBrainzServer, releaseId: string, links:
     form.hidden = true;
 
     const parameters: Array<[string, string]> = [
-        ['edit_note', `Added URL relationships from ${window.location.href.replace(/[?#].*$/, '')}`],
+        [
+            'edit_note',
+            `Added URL relationships from ${window.location.href.replace(/[?#].*$/, '')}\n\nUsing '''${GM_info.script.name}''' ${GM_info.script.version} from https://github.com/murdos/musicbrainz-userscripts`,
+        ],
         ['redirect_uri', `${server}/release/${releaseId}`],
     ];
     links.forEach((link, index) => {
