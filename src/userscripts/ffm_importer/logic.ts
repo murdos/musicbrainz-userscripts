@@ -1,5 +1,7 @@
 export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
+const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+
 export const URL_RELATIONSHIP_TYPES = {
     asin: 77,
     purchaseForDownload: 74,
@@ -70,9 +72,8 @@ export function normalizeServiceName(service: string): string {
 }
 
 function removeTrackingParameters(url: URL): void {
-    const trackingNames = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     for (const name of [...url.searchParams.keys()]) {
-        if (name.toLowerCase().startsWith('utm_') || trackingNames.has(name.toLowerCase())) {
+        if (name.toLowerCase().startsWith('utm_') || TRACKING_PARAMETER_NAMES.has(name.toLowerCase())) {
             url.searchParams.delete(name);
         }
     }
