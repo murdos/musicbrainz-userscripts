@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.06.1
+// @version      2026.08.07.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -19,6 +19,7 @@
     'use strict';
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
+    const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
       purchaseForDownload: 74,
@@ -61,9 +62,8 @@
       return normalized;
     }
     function removeTrackingParameters(url) {
-      const trackingNames = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
       for (const name of [...url.searchParams.keys()]) {
-        if (name.toLowerCase().startsWith('utm_') || trackingNames.has(name.toLowerCase())) {
+        if (name.toLowerCase().startsWith('utm_') || TRACKING_PARAMETER_NAMES.has(name.toLowerCase())) {
           url.searchParams.delete(name);
         }
       }
