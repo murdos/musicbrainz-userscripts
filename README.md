@@ -42,6 +42,13 @@ Add a button on Bandcamp's album pages to open MusicBrainz release editor with p
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/bandcamp_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js)
 
+## <a name="ampwall_importer"></a> Import Ampwall releases to MusicBrainz
+
+Add a button on Ampwall's album pages to open MusicBrainz release editor with pre-filled data for the selected release
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/ampwall_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/ampwall_importer.user.js)
+
 ## <a name="beatport_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz
 
 One-click importing of releases from beatport.com/release pages into MusicBrainz
@@ -139,6 +146,13 @@ Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/qobuz_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js)
+
+## <a name="subvert_importer"></a> Import Subvert.fm releases to MusicBrainz
+
+Add a button on Subvert.fm's album pages to open MusicBrainz release editor with pre-filled data for the selected release
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/subvert_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/subvert_importer.user.js)
 
 ## <a name="takealot_importer"></a> Import Takealot releases to MusicBrainz
 
