@@ -1,0 +1,108 @@
+{
+    "id": 629506181,
+    "title": "Die With A Smile",
+    "upc": "602475093060",
+    "link": "https://www.deezer.com/album/629506181",
+    "share": "https://www.deezer.com/album/629506181?utm_source=deezer&utm_content=album-629506181&utm_term=0_1786166529&utm_medium=web",
+    "cover": "https://api.deezer.com/album/629506181/image",
+    "cover_small": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/56x56-000000-80-0-0.jpg",
+    "cover_medium": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/250x250-000000-80-0-0.jpg",
+    "cover_big": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/500x500-000000-80-0-0.jpg",
+    "cover_xl": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/1000x1000-000000-80-0-0.jpg",
+    "md5_image": "4bd5903f4ce8f2601916bfadb44efe8a",
+    "genre_id": 132,
+    "genres": {
+        "data": [
+            {
+                "id": 132,
+                "name": "Pop",
+                "picture": "https://api.deezer.com/genre/132/image",
+                "type": "genre"
+            }
+        ]
+    },
+    "label": "Interscope",
+    "nb_tracks": 1,
+    "duration": 250,
+    "fans": 27507,
+    "release_date": "2024-08-16",
+    "record_type": "single",
+    "available": true,
+    "tracklist": "https://api.deezer.com/album/629506181/tracks",
+    "explicit_lyrics": false,
+    "explicit_content_lyrics": 0,
+    "explicit_content_cover": 0,
+    "contributors": [
+        {
+            "id": 75491,
+            "name": "Lady Gaga",
+            "link": "https://www.deezer.com/artist/75491",
+            "share": "https://www.deezer.com/artist/75491?utm_source=deezer&utm_content=artist-75491&utm_term=0_1786166529&utm_medium=web",
+            "picture": "https://api.deezer.com/artist/75491/image",
+            "picture_small": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/56x56-000000-80-0-0.jpg",
+            "picture_medium": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/250x250-000000-80-0-0.jpg",
+            "picture_big": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/500x500-000000-80-0-0.jpg",
+            "picture_xl": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/1000x1000-000000-80-0-0.jpg",
+            "radio": true,
+            "tracklist": "https://api.deezer.com/artist/75491/top?limit=50",
+            "type": "artist",
+            "role": "Main"
+        },
+        {
+            "id": 429675,
+            "name": "Bruno Mars",
+            "link": "https://www.deezer.com/artist/429675",
+            "share": "https://www.deezer.com/artist/429675?utm_source=deezer&utm_content=artist-429675&utm_term=0_1786166529&utm_medium=web",
+            "picture": "https://api.deezer.com/artist/429675/image",
+            "picture_small": "https://cdn-images.dzcdn.net/images/artist/90f0b5b11df4f87ee878f38569b5995b/56x56-000000-80-0-0.jpg",
+            "picture_medium": "https://cdn-images.dzcdn.net/images/artist/90f0b5b11df4f87ee878f38569b5995b/250x250-000000-80-0-0.jpg",
+            "picture_big": "https://cdn-images.dzcdn.net/images/artist/90f0b5b11df4f87ee878f38569b5995b/500x500-000000-80-0-0.jpg",
+            "picture_xl": "https://cdn-images.dzcdn.net/images/artist/90f0b5b11df4f87ee878f38569b5995b/1000x1000-000000-80-0-0.jpg",
+            "radio": true,
+            "tracklist": "https://api.deezer.com/artist/429675/top?limit=50",
+            "type": "artist",
+            "role": "Main"
+        }
+    ],
+    "artist": {
+        "id": 75491,
+        "name": "Lady Gaga",
+        "picture": "https://api.deezer.com/artist/75491/image",
+        "picture_small": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/56x56-000000-80-0-0.jpg",
+        "picture_medium": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/250x250-000000-80-0-0.jpg",
+        "picture_big": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/500x500-000000-80-0-0.jpg",
+        "picture_xl": "https://cdn-images.dzcdn.net/images/artist/7565262f7661b0d762621a8d69ba6f49/1000x1000-000000-80-0-0.jpg",
+        "tracklist": "https://api.deezer.com/artist/75491/top?limit=50",
+        "type": "artist"
+    },
+    "type": "album",
+    "tracks": {
+        "data": [
+            {
+                "id": 2947516331,
+                "readable": true,
+                "title": "Die With A Smile",
+                "title_short": "Die With A Smile",
+                "title_version": "",
+                "isrc": "USUM72409273",
+                "link": "https://www.deezer.com/track/2947516331",
+                "duration": 250,
+                "track_position": 1,
+                "disk_number": 1,
+                "rank": 997757,
+                "explicit_lyrics": false,
+                "explicit_content_lyrics": 0,
+                "explicit_content_cover": 0,
+                "preview": "https://cdnt-preview.dzcdn.net/api/1/1/4/5/9/0/459c235b39ef8badd04c5ef181f58c24.mp3?hdnea=exp=1786167429~acl=/api/1/1/4/5/9/0/459c235b39ef8badd04c5ef181f58c24.mp3*~data=user_id=0,application_id=42~hmac=405d7281d930aa93f8c99ec07908bb3f1b47b64f0bb7ec6addc07570f5773349",
+                "md5_image": "4bd5903f4ce8f2601916bfadb44efe8a",
+                "artist": {
+                    "id": 75491,
+                    "name": "Lady Gaga",
+                    "tracklist": "https://api.deezer.com/artist/75491/top?limit=50",
+                    "type": "artist"
+                },
+                "type": "track"
+            }
+        ]
+    }
+}
