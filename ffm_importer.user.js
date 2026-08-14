@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.14.2
+// @version      2026.08.14.3
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -20,6 +20,7 @@
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+    const IGNORED_SERVICES = new Set(['junodownload']);
     const STREAMING_SERVICES = new Set(['amazon', 'apple', 'boomplay', 'deezer', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'spotify', 'tidal', 'youtube', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
@@ -61,6 +62,9 @@
       if (normalized === 'amazonmusic') return 'amazon';
       if (normalized === 'ytmusic') return 'youtubemusic';
       return normalized;
+    }
+    function isIgnoredService(service) {
+      return IGNORED_SERVICES.has(normalizeServiceName(service));
     }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
@@ -208,7 +212,7 @@
       const service = normalizeServiceName(link.service);
       if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
       if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
-      if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport', 'junodownload'].includes(service)) {
+      if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
       }
       if (STREAMING_SERVICES.has(service)) {
@@ -335,7 +339,7 @@
       for (const element of document.querySelectorAll('a[service][href]')) {
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
-        if (!service || !element.href) continue;
+        if (!service || isIgnoredService(service) || !element.href) continue;
         const count = (counters.get(service) ?? 0) + 1;
         counters.set(service, count);
         anchors.push({
