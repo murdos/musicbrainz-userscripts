@@ -11,6 +11,7 @@ import {
     isIgnoredService,
     normalizeServiceUrl,
     relationshipTypeFor,
+    resolveLegacyBoomplayResources,
     URL_RELATIONSHIP_TYPES,
     type ServiceLink,
 } from '../../src/userscripts/ffm_importer/logic';
@@ -35,6 +36,12 @@ describe('FFM importer logic', () => {
             'https://www.youtube.com/playlist?list=OLAK5uy_example',
         );
         expect(normalizeServiceUrl('http://www.tidal.com/album/543361480', 'tidal')).toBe('https://tidal.com/album/543361480');
+        expect(
+            normalizeServiceUrl(
+                'https://www.boomplay.com/albums/EQUABbK_Gy8KOODzT4ow4hGX?srModel=openapi_featurefm&ffm=FFM_example',
+                'boomplay',
+            ),
+        ).toBe('https://www.boomplay.com/albums/EQUABbK_Gy8KOODzT4ow4hGX');
     });
 
     it('matches regional Apple URLs by album ID', () => {
@@ -51,6 +58,21 @@ describe('FFM importer logic', () => {
         expect(canonicalServiceUrlKey('https://www.amazon.com/gp/product/B0H47BDZJR', 'amazonstore')).toBe(
             canonicalServiceUrlKey('https://amazon.com/dp/B0H47BDZJR', 'amazonstore'),
         );
+    });
+
+    it('matches current Boomplay links to legacy numeric MusicBrainz URLs through redirects', async () => {
+        const legacyUrl = 'https://www.boomplay.com/albums/134155234';
+        const currentUrl = 'https://www.boomplay.com/albums/EQUABbK_Gy8KOODzT4ow4hGX';
+        const unrelatedUrl = 'https://open.spotify.com/album/example';
+        const resources = await resolveLegacyBoomplayResources([legacyUrl, unrelatedUrl], url => {
+            expect(url).toBe(legacyUrl);
+            return Promise.resolve(currentUrl);
+        });
+
+        expect(resources).toEqual([currentUrl, unrelatedUrl]);
+        expect(findCanonicallyMatchedLinkUrls([serviceLink('boomplay', `${currentUrl}?ffm=tracking`)], resources)).toEqual([
+            `${currentUrl}?ffm=tracking`,
+        ]);
     });
 
     it('extracts URL resources from a release lookup', () => {
