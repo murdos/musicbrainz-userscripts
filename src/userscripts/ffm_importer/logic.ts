@@ -233,9 +233,9 @@ function isLegacyBoomplayAlbumUrl(rawUrl: string): boolean {
     }
 }
 
-/** Follow legacy numeric Boomplay album URLs to their current opaque identifiers. */
-export async function resolveLegacyBoomplayResources(resources: string[], resolveUrl: (url: string) => Promise<string>): Promise<string[]> {
-    return Promise.all(
+/** Add the current destinations of legacy numeric Boomplay album URLs as comparison aliases. */
+export async function expandLegacyBoomplayResources(resources: string[], resolveUrl: (url: string) => Promise<string>): Promise<string[]> {
+    const aliases = await Promise.all(
         resources.map(async resource => {
             if (!isLegacyBoomplayAlbumUrl(resource)) return resource;
             try {
@@ -245,6 +245,7 @@ export async function resolveLegacyBoomplayResources(resources: string[], resolv
             }
         }),
     );
+    return [...new Set([...resources, ...aliases])];
 }
 
 /** Return every resolved provider link that is not linked to the matched release. */
