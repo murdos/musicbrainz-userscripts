@@ -83,7 +83,6 @@ describe('FFM importer logic', () => {
     });
 
     it('maps service actions to MusicBrainz URL relationship types', () => {
-        expect(relationshipTypeFor(serviceLink('youtube'))).toBe(URL_RELATIONSHIP_TYPES.streamForFree);
         expect(relationshipTypeFor(serviceLink('amazon'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('youtubemusic'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
@@ -92,6 +91,16 @@ describe('FFM importer logic', () => {
         expect(relationshipTypeFor(serviceLink('amazonstore', 'https://www.amazon.com/gp/product/B0H47BDZJR', 'Buy'))).toBe(
             URL_RELATIONSHIP_TYPES.asin,
         );
+    });
+
+    it.each([
+        ['youtube', 'https://www.youtube.com/playlist?list=OLAK5uy_nr0dk1Se2buX6pUFiN_aQ-T_T4mXwZLkY'],
+        ['soundcloud', 'https://soundcloud.com/ndnlmusic/requies-ft-rita-kolesnikova'],
+        ['deezer', 'https://www.deezer.com/album/1011676351'],
+        ['boomplay', 'https://www.boomplay.com/albums/134155234'],
+        ['spotify', 'https://open.spotify.com/album/6Gg9AE43TMWRM8iXBjj5CB'],
+    ])('maps %s links without CTA text to streaming pages', (service, url) => {
+        expect(relationshipTypeFor(serviceLink(service, url, ''))).toBe(URL_RELATIONSHIP_TYPES.streaming);
     });
 
     it('collects every release matched by the provider URLs so ambiguity is visible', () => {
