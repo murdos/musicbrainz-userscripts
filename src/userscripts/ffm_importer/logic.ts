@@ -1,6 +1,20 @@
 export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+const STREAMING_SERVICES = new Set([
+    'amazon',
+    'apple',
+    'boomplay',
+    'deezer',
+    'itunes',
+    'pandora',
+    'qobuz',
+    'soundcloud',
+    'spotify',
+    'tidal',
+    'youtube',
+    'youtubemusic',
+]);
 
 export const URL_RELATIONSHIP_TYPES = {
     asin: 77,
@@ -235,7 +249,7 @@ export function relationshipTypeFor(link: ServiceLink): number {
     if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport', 'junodownload'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
     }
-    if (['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'tidal', 'youtubemusic'].includes(service)) {
+    if (STREAMING_SERVICES.has(service)) {
         return URL_RELATIONSHIP_TYPES.streaming;
     }
     if (action.includes('play') || action.includes('listen') || action.includes('stream')) {
