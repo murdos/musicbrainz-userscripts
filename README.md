@@ -87,7 +87,7 @@ Easily import Encyclopedisque releases into MusicBrainz
 
 ## <a name="ffm_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz
 
-Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
+Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz. FFM is a link aggregator service from www.feature.fm.
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/ffm_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js)
@@ -157,7 +157,7 @@ One-click importing of releases from vgmdb.net into MusicBrainz. **⚠️ Curren
 
 ## <a name="bfan_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz
 
-Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz
+Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bfan_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js)
