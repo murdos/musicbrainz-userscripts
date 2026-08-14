@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.07.1
+// @version      2026.08.14.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
 // @match        https://ffm.to/*
-// @match        https://www.ffm.to/*
+// @match        https://*.ffm.to/*
 // @connect      *
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
