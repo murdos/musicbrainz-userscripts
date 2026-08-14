@@ -76,17 +76,6 @@ function buildUI(releaseUrl: string, data: DeezerAlbum): HTMLElement {
     });
     container.appendChild(isrcForm);
 
-    const isrcHuntLink = document.createElement('a');
-    isrcHuntLink.className = 'musicbrainz_import';
-    const albumId = extractAlbumIdFromPath(window.location.pathname);
-    isrcHuntLink.href = `https://isrchunt.com/deezer/importisrc?releaseId=${albumId}`;
-    isrcHuntLink.target = '_blank';
-    isrcHuntLink.rel = 'noopener noreferrer';
-    isrcHuntLink.innerHTML = `<button type="button" title="Open in ISRC Hunt" style="background-color: #3b82f6 !important; color: white !important;">
-        ISRC Hunt
-    </button>`;
-    container.appendChild(isrcHuntLink);
-
     if (barcode) {
         const barcodeBadge = document.createElement('span');
         barcodeBadge.id = MB_BARCODE_ID;
