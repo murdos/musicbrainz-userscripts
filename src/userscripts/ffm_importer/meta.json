@@ -1,6 +1,6 @@
 {
     "name": "Import FFM releases to MusicBrainz",
-    "description": "Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz",
+    "description": "Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz. FFM is a link aggregator service from www.feature.fm.",
     "version": "2026.08.14.7",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",

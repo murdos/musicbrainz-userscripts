@@ -1,6 +1,6 @@
 {
     "name": "Import bfan.link releases to MusicBrainz",
-    "description": "Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz",
+    "description": "Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.",
     "version": "2026.08.14.1",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
