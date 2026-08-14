@@ -4,33 +4,24 @@ import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { DeezerAlbum } from '../../src/userscripts/deezer_importer/types';
-import { cleanTrackTitle, parseDeezerRelease } from '../../src/userscripts/deezer_importer/utils/parseDeezerRelease';
+import { formatTrackTitle, parseDeezerRelease } from '../../src/userscripts/deezer_importer/utils/parseDeezerRelease';
 
 function loadFixture(albumId: string): DeezerAlbum {
     const fixturePath = path.resolve(__dirname, 'fixtures', `${albumId}.json`);
     return JSON.parse(fs.readFileSync(fixturePath, 'utf8')) as DeezerAlbum;
 }
 
-describe('Deezer importer title normalization', () => {
-    it('strips redundant Original Mix version strings', () => {
-        expect(cleanTrackTitle('Solaris', 'Original Mix')).toBe('Solaris');
-        expect(cleanTrackTitle('Solaris', '(Original Mix)')).toBe('Solaris');
-        expect(cleanTrackTitle('Solaris', '  (original mix)  ')).toBe('Solaris');
-        expect(cleanTrackTitle('Tacata (Original Mix)')).toBe('Tacata');
-        expect(cleanTrackTitle("Ole Ola (I' M from Brazil) [Original Mix]")).toBe("Ole Ola (I' M from Brazil)");
-        expect(cleanTrackTitle("IL Gioco Dell'estate (Original Mix)")).toBe("IL Gioco Dell'estate");
-    });
-
-    it('preserves and appends legitimate version tags', () => {
-        expect(cleanTrackTitle('Solaris', 'Live at Wembley')).toBe('Solaris (Live at Wembley)');
-        expect(cleanTrackTitle('Solaris', '(Radio Edit)')).toBe('Solaris (Radio Edit)');
-        expect(cleanTrackTitle('Solaris (Radio Edit)', 'Radio Edit')).toBe('Solaris (Radio Edit)');
-        expect(cleanTrackTitle('Solaris', '[2024 Remaster]')).toBe('Solaris [2024 Remaster]');
+describe('Deezer importer title formatting', () => {
+    it('appends title_version unless it matches (Original Mix)', () => {
+        expect(formatTrackTitle('Solaris', '(Original Mix)')).toBe('Solaris');
+        expect(formatTrackTitle('Solaris', '  (original mix)  ')).toBe('Solaris');
+        expect(formatTrackTitle('Solaris', 'Live at Wembley')).toBe('Solaris Live at Wembley');
+        expect(formatTrackTitle('Solaris', '(Radio Edit)')).toBe('Solaris (Radio Edit)');
     });
 
     it('handles empty or missing version tags', () => {
-        expect(cleanTrackTitle('Solaris', undefined)).toBe('Solaris');
-        expect(cleanTrackTitle('Solaris', '')).toBe('Solaris');
+        expect(formatTrackTitle('Solaris', undefined)).toBe('Solaris');
+        expect(formatTrackTitle('Solaris', '')).toBe('Solaris');
     });
 });
 
