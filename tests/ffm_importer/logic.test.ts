@@ -8,6 +8,7 @@ import {
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
     findReleaseMatches,
+    isIgnoredService,
     normalizeServiceUrl,
     relationshipTypeFor,
     URL_RELATIONSHIP_TYPES,
@@ -80,6 +81,11 @@ describe('FFM importer logic', () => {
         const links = [serviceLink('apple'), serviceLink('tidal'), serviceLink('spotify')];
         expect(chooseHarmonyLink(links)?.service).toBe('spotify');
         expect(chooseHarmonyLink(links.slice(0, 2))?.service).toBe('tidal');
+    });
+
+    it('ignores sunset Juno Download services', () => {
+        expect(isIgnoredService('junodownload')).toBe(true);
+        expect(isIgnoredService('beatport')).toBe(false);
     });
 
     it('maps service actions to MusicBrainz URL relationship types', () => {

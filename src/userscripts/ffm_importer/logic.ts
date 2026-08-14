@@ -1,6 +1,7 @@
 export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+const IGNORED_SERVICES = new Set(['junodownload']);
 const STREAMING_SERVICES = new Set([
     'amazon',
     'apple',
@@ -83,6 +84,10 @@ export function normalizeServiceName(service: string): string {
     if (normalized === 'amazonmusic') return 'amazon';
     if (normalized === 'ytmusic') return 'youtubemusic';
     return normalized;
+}
+
+export function isIgnoredService(service: string): boolean {
+    return IGNORED_SERVICES.has(normalizeServiceName(service));
 }
 
 function removeTrackingParameters(url: URL): void {
@@ -246,7 +251,7 @@ export function relationshipTypeFor(link: ServiceLink): number {
     const service = normalizeServiceName(link.service);
     if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
     if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
-    if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport', 'junodownload'].includes(service)) {
+    if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
     }
     if (STREAMING_SERVICES.has(service)) {

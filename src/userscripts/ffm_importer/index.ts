@@ -5,6 +5,7 @@ import {
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
     findReleaseMatches,
+    isIgnoredService,
     normalizeServiceName,
     normalizeServiceUrl,
     relationshipTypeFor,
@@ -143,7 +144,7 @@ function collectServiceAnchors(): ServiceAnchor[] {
     for (const element of document.querySelectorAll<HTMLAnchorElement>('a[service][href]')) {
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
-        if (!service || !element.href) continue;
+        if (!service || isIgnoredService(service) || !element.href) continue;
 
         const count = (counters.get(service) ?? 0) + 1;
         counters.set(service, count);
