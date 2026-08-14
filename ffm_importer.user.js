@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.14.3
+// @version      2026.08.14.4
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -21,7 +21,8 @@
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     const IGNORED_SERVICES = new Set(['junodownload']);
-    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'boomplay', 'deezer', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'spotify', 'tidal', 'youtube', 'youtubemusic']);
+    const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
+    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
       purchaseForDownload: 74,
@@ -214,6 +215,9 @@
       if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
       if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
+      }
+      if (FREE_STREAMING_SERVICES.has(service)) {
+        return URL_RELATIONSHIP_TYPES.streamForFree;
       }
       if (STREAMING_SERVICES.has(service)) {
         return URL_RELATIONSHIP_TYPES.streaming;
