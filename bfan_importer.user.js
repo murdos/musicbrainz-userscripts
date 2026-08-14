@@ -1,16 +1,13 @@
 // ==UserScript==
-// @name         Import FFM releases to MusicBrainz
-// @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.14.7
+// @name         Import bfan.link releases to MusicBrainz
+// @description  Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz
+// @version      2026.08.14.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
-// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
-// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
-// @match        https://ffm.to/*
-// @match        https://*.ffm.to/*
-// @connect      *
-// @grant        GM.xmlHttpRequest
-// @grant        GM_xmlhttpRequest
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
+// @match        https://bfan.link/*
+// @match        https://*.bfan.link/*
 // @run-at       document-idle
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
 // ==/UserScript==
@@ -20,7 +17,6 @@
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
-    const IGNORED_SERVICES = new Set(['junodownload']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
     const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
@@ -31,41 +27,12 @@
       streamForFree: 85,
       streaming: 980
     };
-    function findStringProperty(value, names) {
-      if (!value || typeof value !== 'object') return undefined;
-      for (const [key, child] of Object.entries(value)) {
-        if (names.has(key.toLowerCase()) && typeof child === 'string') return child;
-      }
-      for (const child of Object.values(value)) {
-        const found = findStringProperty(child, names);
-        if (found) return found;
-      }
-      return undefined;
-    }
-
-    /** Extract the destination URL carried in an FFM `cd` tracking payload. */
-    function decodeFfmDestination(sourceUrl) {
-      try {
-        const encoded = new URL(sourceUrl).searchParams.get('cd');
-        if (!encoded) return undefined;
-        const base64 = encoded.replaceAll('-', '+').replaceAll('_', '/').padEnd(Math.ceil(encoded.length / 4) * 4, '=');
-        const binary = atob(base64);
-        const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
-        const payload = JSON.parse(new TextDecoder().decode(bytes));
-        return findStringProperty(payload, new Set(['desturl', 'destinationurl', 'destination']));
-      } catch {
-        return undefined;
-      }
-    }
     function normalizeServiceName(service) {
       const normalized = service.trim().toLowerCase().replaceAll(/[^a-z0-9]/g, '');
       if (normalized === 'applemusic') return 'apple';
       if (normalized === 'amazonmusic') return 'amazon';
       if (normalized === 'ytmusic') return 'youtubemusic';
       return normalized;
-    }
-    function isIgnoredService(service) {
-      return IGNORED_SERVICES.has(normalizeServiceName(service));
     }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
@@ -725,35 +692,74 @@
       await checkMusicBrainz(server);
     }
 
+    function record(value) {
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined;
+    }
+
+    /** Read release-provider destinations from bfan.link's Next.js hydration payload. */
+    function extractBfanServiceData(payload) {
+      const root = record(payload);
+      const props = record(root?.['props']);
+      const pageProps = record(props?.['pageProps']);
+      const backlink = record(pageProps?.['backlinkStaticData']);
+      const stores = record(backlink?.['stores']);
+      if (!backlink || !stores) return [];
+      const mode = backlink['mode'] === 'prerelease' ? 'prereleaseLandingCTAs' : 'postreleaseLandingCTAs';
+      const ctas = record(backlink[mode]);
+      const options = record(ctas?.['options']);
+      const displayOrder = Array.isArray(ctas?.['displayOrder']) ? ctas['displayOrder'].filter(value => typeof value === 'string') : Object.keys(stores);
+      const links = [];
+      for (const storeName of displayOrder) {
+        const store = record(stores[storeName]);
+        const urls = record(store?.['urls']);
+        const option = record(options?.[storeName]);
+        const sourceUrl = urls?.['default'];
+        if (typeof sourceUrl !== 'string' || !sourceUrl || option?.['isDisplayed'] === false) continue;
+        const service = normalizeServiceName(storeName);
+        if (!service) continue;
+        links.push({
+          service,
+          label: typeof store?.['displayName'] === 'string' ? store['displayName'] : storeName,
+          action: typeof option?.['label'] === 'string' ? option['label'] : '',
+          sourceUrl
+        });
+      }
+      return links;
+    }
+
+    function readServiceData() {
+      const nextData = document.querySelector('script#__NEXT_DATA__')?.textContent;
+      if (!nextData) return [];
+      try {
+        return extractBfanServiceData(JSON.parse(nextData));
+      } catch {
+        return [];
+      }
+    }
     function collectServiceElements() {
-      const counters = new Map();
+      const dataByService = new Map(readServiceData().map(data => [data.service, data]));
       const elements = [];
-      for (const element of document.querySelectorAll('a[service][href]')) {
-        const rawService = element.getAttribute('service') ?? '';
+      for (const element of document.querySelectorAll('[data-testid="call-to-actions"] > [data-testid]')) {
+        const rawService = element.dataset['testid'] ?? '';
         const service = normalizeServiceName(rawService);
-        if (!service || isIgnoredService(service) || !element.href) continue;
-        const count = (counters.get(service) ?? 0) + 1;
-        counters.set(service, count);
+        const data = dataByService.get(service);
+        if (!data) continue;
         elements.push({
-          cacheKey: count === 1 ? service : `${service}:${count}`,
+          cacheKey: service,
           element,
           service,
-          label: element.querySelector('.service-title')?.textContent.trim() || rawService,
-          action: element.querySelector('.service-text')?.textContent.trim() || '',
-          sourceUrl: element.href
+          label: element.querySelector('img[alt]')?.alt || data.label,
+          action: element.querySelector('button')?.textContent.trim() || data.action,
+          sourceUrl: data.sourceUrl
         });
       }
       return elements;
     }
     void runSmartLinkImporter({
-      id: 'ffm',
-      siteName: 'FFM',
+      id: 'bfan',
+      siteName: 'bfan.link',
       collectServiceElements,
-      resolveDestination: element => decodeFfmDestination(element.sourceUrl) ?? followRedirect(element.sourceUrl),
-      mountPanel: panel => {
-        const musicServices = document.querySelector('.music-services-section');
-        if (musicServices?.parentElement) musicServices.parentElement.insertBefore(panel, musicServices);else document.body.appendChild(panel);
-      }
+      resolveDestination: element => element.sourceUrl
     });
 
 })();
