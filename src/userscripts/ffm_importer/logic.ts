@@ -110,6 +110,9 @@ export function normalizeServiceUrl(rawUrl: string, rawService: string): string 
         url.hostname = 'www.deezer.com';
         url.pathname = url.pathname.replace(/^\/[a-z]{2}\/album\//i, '/album/');
         url.search = '';
+    } else if (service === 'boomplay') {
+        url.hostname = 'www.boomplay.com';
+        url.search = '';
     } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
         const video = url.searchParams.get('v');
@@ -219,6 +222,29 @@ export function findCanonicallyMatchedLinkUrls(links: ServiceLink[], releaseReso
             return releaseResources.some(resource => canonicalServiceUrlKey(resource, link.service) === linkKey);
         })
         .map(link => link.url);
+}
+
+function isLegacyBoomplayAlbumUrl(rawUrl: string): boolean {
+    try {
+        const url = new URL(rawUrl);
+        return hostnameMatches(url, 'boomplay.com') && /^\/albums\/\d+\/?$/.test(url.pathname);
+    } catch {
+        return false;
+    }
+}
+
+/** Follow legacy numeric Boomplay album URLs to their current opaque identifiers. */
+export async function resolveLegacyBoomplayResources(resources: string[], resolveUrl: (url: string) => Promise<string>): Promise<string[]> {
+    return Promise.all(
+        resources.map(async resource => {
+            if (!isLegacyBoomplayAlbumUrl(resource)) return resource;
+            try {
+                return await resolveUrl(resource);
+            } catch {
+                return resource;
+            }
+        }),
+    );
 }
 
 /** Return every resolved provider link that is not linked to the matched release. */

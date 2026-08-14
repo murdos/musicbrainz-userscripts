@@ -9,6 +9,7 @@ import {
     normalizeServiceName,
     normalizeServiceUrl,
     relationshipTypeFor,
+    resolveLegacyBoomplayResources,
     type ReleaseMatch,
     type ServiceLink,
 } from './logic';
@@ -257,7 +258,10 @@ async function includeReleaseRelationships(links: ServiceLink[], server: MusicBr
 
     const response = await fetch(endpoint, { headers: { Accept: 'application/json' } });
     if (!response.ok) throw new Error(`MusicBrainz release lookup failed with HTTP ${response.status}`);
-    const resources = extractReleaseUrlResources(await response.json());
+    let resources = extractReleaseUrlResources(await response.json());
+    if (links.some(link => normalizeServiceName(link.service) === 'boomplay')) {
+        resources = await resolveLegacyBoomplayResources(resources, followRedirect);
+    }
     return { releaseId: match.releaseId, matchedUrls: findCanonicallyMatchedLinkUrls(links, resources) };
 }
 
