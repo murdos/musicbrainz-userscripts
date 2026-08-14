@@ -2,6 +2,8 @@
 
 This userscript helps connect an `ffm.to` smart-link page to its MusicBrainz release. It can start a release import through Harmony and add provider URLs that are missing from an existing release.
 
+It supports both `ffm.to` and branded subdomains such as `label-caster.ffm.to`.
+
 ## How it works
 
 The importer runs in a few stages:

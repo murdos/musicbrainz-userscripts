@@ -6,7 +6,7 @@
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
-    "match": ["https://ffm.to/*", "https://www.ffm.to/*"],
+    "match": ["https://ffm.to/*", "https://*.ffm.to/*"],
     "connect": ["*"],
     "grant": ["GM.xmlHttpRequest", "GM_xmlhttpRequest"],
     "runAt": "document-idle",
