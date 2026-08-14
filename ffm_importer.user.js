@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.14.5
+// @version      2026.08.14.6
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -208,9 +208,9 @@
       }
     }
 
-    /** Follow legacy numeric Boomplay album URLs to their current opaque identifiers. */
-    async function resolveLegacyBoomplayResources(resources, resolveUrl) {
-      return Promise.all(resources.map(async resource => {
+    /** Add the current destinations of legacy numeric Boomplay album URLs as comparison aliases. */
+    async function expandLegacyBoomplayResources(resources, resolveUrl) {
+      const aliases = await Promise.all(resources.map(async resource => {
         if (!isLegacyBoomplayAlbumUrl(resource)) return resource;
         try {
           return await resolveUrl(resource);
@@ -218,6 +218,7 @@
           return resource;
         }
       }));
+      return [...new Set([...resources, ...aliases])];
     }
 
     /** Return every resolved provider link that is not linked to the matched release. */
@@ -476,7 +477,7 @@
       if (!response.ok) throw new Error(`MusicBrainz release lookup failed with HTTP ${response.status}`);
       let resources = extractReleaseUrlResources(await response.json());
       if (links.some(link => normalizeServiceName(link.service) === 'boomplay')) {
-        resources = await resolveLegacyBoomplayResources(resources, followRedirect);
+        resources = await expandLegacyBoomplayResources(resources, followRedirect);
       }
       return {
         releaseId: match.releaseId,
