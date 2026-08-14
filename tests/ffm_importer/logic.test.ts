@@ -4,6 +4,7 @@ import {
     chooseHarmonyLink,
     canonicalServiceUrlKey,
     decodeFfmDestination,
+    expandLegacyBoomplayResources,
     extractReleaseUrlResources,
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
@@ -11,7 +12,6 @@ import {
     isIgnoredService,
     normalizeServiceUrl,
     relationshipTypeFor,
-    resolveLegacyBoomplayResources,
     URL_RELATIONSHIP_TYPES,
     type ServiceLink,
 } from '../../src/userscripts/ffm_importer/logic';
@@ -64,12 +64,13 @@ describe('FFM importer logic', () => {
         const legacyUrl = 'https://www.boomplay.com/albums/134155234';
         const currentUrl = 'https://www.boomplay.com/albums/EQUABbK_Gy8KOODzT4ow4hGX';
         const unrelatedUrl = 'https://open.spotify.com/album/example';
-        const resources = await resolveLegacyBoomplayResources([legacyUrl, unrelatedUrl], url => {
+        const resources = await expandLegacyBoomplayResources([legacyUrl, unrelatedUrl], url => {
             expect(url).toBe(legacyUrl);
             return Promise.resolve(currentUrl);
         });
 
-        expect(resources).toEqual([currentUrl, unrelatedUrl]);
+        expect(resources).toEqual([legacyUrl, unrelatedUrl, currentUrl]);
+        expect(findCanonicallyMatchedLinkUrls([serviceLink('boomplay', legacyUrl)], resources)).toEqual([legacyUrl]);
         expect(findCanonicallyMatchedLinkUrls([serviceLink('boomplay', `${currentUrl}?ffm=tracking`)], resources)).toEqual([
             `${currentUrl}?ffm=tracking`,
         ]);

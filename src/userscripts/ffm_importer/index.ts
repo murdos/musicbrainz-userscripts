@@ -1,6 +1,7 @@
 import {
     chooseHarmonyLink,
     decodeFfmDestination,
+    expandLegacyBoomplayResources,
     extractReleaseUrlResources,
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
@@ -9,7 +10,6 @@ import {
     normalizeServiceName,
     normalizeServiceUrl,
     relationshipTypeFor,
-    resolveLegacyBoomplayResources,
     type ReleaseMatch,
     type ServiceLink,
 } from './logic';
@@ -260,7 +260,7 @@ async function includeReleaseRelationships(links: ServiceLink[], server: MusicBr
     if (!response.ok) throw new Error(`MusicBrainz release lookup failed with HTTP ${response.status}`);
     let resources = extractReleaseUrlResources(await response.json());
     if (links.some(link => normalizeServiceName(link.service) === 'boomplay')) {
-        resources = await resolveLegacyBoomplayResources(resources, followRedirect);
+        resources = await expandLegacyBoomplayResources(resources, followRedirect);
     }
     return { releaseId: match.releaseId, matchedUrls: findCanonicallyMatchedLinkUrls(links, resources) };
 }
