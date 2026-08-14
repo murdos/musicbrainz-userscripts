@@ -99,14 +99,23 @@ describe('FFM importer logic', () => {
         );
     });
 
+    it('maps SoundCloud links without CTA text to streaming pages', () => {
+        const link = serviceLink('soundcloud', 'https://soundcloud.com/ndnlmusic/requies-ft-rita-kolesnikova', '');
+        expect(relationshipTypeFor(link)).toBe(URL_RELATIONSHIP_TYPES.streaming);
+    });
+
     it.each([
         ['youtube', 'https://www.youtube.com/playlist?list=OLAK5uy_nr0dk1Se2buX6pUFiN_aQ-T_T4mXwZLkY'],
-        ['soundcloud', 'https://soundcloud.com/ndnlmusic/requies-ft-rita-kolesnikova'],
         ['deezer', 'https://www.deezer.com/album/1011676351'],
         ['boomplay', 'https://www.boomplay.com/albums/134155234'],
         ['spotify', 'https://open.spotify.com/album/6Gg9AE43TMWRM8iXBjj5CB'],
-    ])('maps %s links without CTA text to streaming pages', (service, url) => {
-        expect(relationshipTypeFor(serviceLink(service, url, ''))).toBe(URL_RELATIONSHIP_TYPES.streaming);
+    ])('maps %s links without CTA text to free streaming pages', (service, url) => {
+        expect(relationshipTypeFor(serviceLink(service, url, ''))).toBe(URL_RELATIONSHIP_TYPES.streamForFree);
+    });
+
+    it('keeps YouTube Music as a subscription streaming page', () => {
+        const link = serviceLink('youtubemusic', 'https://music.youtube.com/playlist?list=OLAK5uy_example', '');
+        expect(relationshipTypeFor(link)).toBe(URL_RELATIONSHIP_TYPES.streaming);
     });
 
     it('collects every release matched by the provider URLs so ambiguity is visible', () => {

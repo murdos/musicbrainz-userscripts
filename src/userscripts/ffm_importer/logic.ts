@@ -2,20 +2,8 @@ export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandca
 
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
 const IGNORED_SERVICES = new Set(['junodownload']);
-const STREAMING_SERVICES = new Set([
-    'amazon',
-    'apple',
-    'boomplay',
-    'deezer',
-    'itunes',
-    'pandora',
-    'qobuz',
-    'soundcloud',
-    'spotify',
-    'tidal',
-    'youtube',
-    'youtubemusic',
-]);
+const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
+const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
 
 export const URL_RELATIONSHIP_TYPES = {
     asin: 77,
@@ -253,6 +241,9 @@ export function relationshipTypeFor(link: ServiceLink): number {
     if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
     if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
+    }
+    if (FREE_STREAMING_SERVICES.has(service)) {
+        return URL_RELATIONSHIP_TYPES.streamForFree;
     }
     if (STREAMING_SERVICES.has(service)) {
         return URL_RELATIONSHIP_TYPES.streaming;
