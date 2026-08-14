@@ -99,6 +99,7 @@ export function normalizeServiceUrl(rawUrl: string, rawService: string): string 
 
     if (service === 'apple' || service === 'itunes') {
         url.hostname = 'music.apple.com';
+        url.pathname = url.pathname.replace(/\/id(\d+)\/?$/, '/$1');
         url.search = '';
     } else if (service === 'spotify') {
         url.hostname = 'open.spotify.com';

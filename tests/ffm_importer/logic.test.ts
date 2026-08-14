@@ -14,7 +14,7 @@ import {
     relationshipTypeFor,
     URL_RELATIONSHIP_TYPES,
     type ServiceLink,
-} from '../../src/userscripts/ffm_importer/logic';
+} from '../../src/lib/smart-link-importer/logic';
 
 function serviceLink(service: string, url = `https://example.com/${service}`, action = 'Play'): ServiceLink {
     return { service, label: service, action, sourceUrl: 'https://api.ffm.to/link', url };
@@ -32,6 +32,9 @@ describe('FFM importer logic', () => {
         expect(
             normalizeServiceUrl('https://geo.music.apple.com/au/album/buried-memories-single/6791224822?app=music&ls=1&ct=FFM', 'apple'),
         ).toBe('https://music.apple.com/au/album/buried-memories-single/6791224822');
+        expect(normalizeServiceUrl('https://geo.itunes.apple.com/at/album/id6766895394?at=1l3v9Tx&ct=BL', 'appleMusic')).toBe(
+            'https://music.apple.com/at/album/6766895394',
+        );
         expect(normalizeServiceUrl('https://www.youtube.com/playlist?list=OLAK5uy_example&src=FFM&lid=tracking', 'youtube')).toBe(
             'https://www.youtube.com/playlist?list=OLAK5uy_example',
         );
