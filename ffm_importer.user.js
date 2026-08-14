@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz
-// @version      2026.08.14.4
+// @version      2026.08.14.5
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -95,6 +95,9 @@
       } else if (service === 'deezer') {
         url.hostname = 'www.deezer.com';
         url.pathname = url.pathname.replace(/^\/[a-z]{2}\/album\//i, '/album/');
+        url.search = '';
+      } else if (service === 'boomplay') {
+        url.hostname = 'www.boomplay.com';
         url.search = '';
       } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
@@ -195,6 +198,26 @@
         const linkKey = canonicalServiceUrlKey(link.url, link.service);
         return releaseResources.some(resource => canonicalServiceUrlKey(resource, link.service) === linkKey);
       }).map(link => link.url);
+    }
+    function isLegacyBoomplayAlbumUrl(rawUrl) {
+      try {
+        const url = new URL(rawUrl);
+        return hostnameMatches(url, 'boomplay.com') && /^\/albums\/\d+\/?$/.test(url.pathname);
+      } catch {
+        return false;
+      }
+    }
+
+    /** Follow legacy numeric Boomplay album URLs to their current opaque identifiers. */
+    async function resolveLegacyBoomplayResources(resources, resolveUrl) {
+      return Promise.all(resources.map(async resource => {
+        if (!isLegacyBoomplayAlbumUrl(resource)) return resource;
+        try {
+          return await resolveUrl(resource);
+        } catch {
+          return resource;
+        }
+      }));
     }
 
     /** Return every resolved provider link that is not linked to the matched release. */
@@ -451,7 +474,10 @@
         }
       });
       if (!response.ok) throw new Error(`MusicBrainz release lookup failed with HTTP ${response.status}`);
-      const resources = extractReleaseUrlResources(await response.json());
+      let resources = extractReleaseUrlResources(await response.json());
+      if (links.some(link => normalizeServiceName(link.service) === 'boomplay')) {
+        resources = await resolveLegacyBoomplayResources(resources, followRedirect);
+      }
       return {
         releaseId: match.releaseId,
         matchedUrls: findCanonicallyMatchedLinkUrls(links, resources)
