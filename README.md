@@ -18,6 +18,7 @@
 - [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 - [Import Takealot releases to MusicBrainz](#takealot_importer)
 - [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz](#bfan_importer)
 - [MusicBrainz: 1200px CAA](#mb_1200px_caa)
 - [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
 - [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
@@ -153,6 +154,13 @@ One-click importing of releases from vgmdb.net into MusicBrainz. **⚠️ Curren
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/vgmdb_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js)
+
+## <a name="bfan_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz
+
+Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bfan_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js)
 
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
