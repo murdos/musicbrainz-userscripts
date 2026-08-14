@@ -1,7 +1,7 @@
 {
     "name": "Import FFM releases to MusicBrainz",
     "description": "Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz",
-    "version": "2026.08.14.3",
+    "version": "2026.08.14.4",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
