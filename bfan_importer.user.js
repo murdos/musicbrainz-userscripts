@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import bfan.link releases to MusicBrainz
 // @description  Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
-// @version      2026.08.14.2
+// @version      2026.08.15.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
@@ -18,7 +18,7 @@
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
-    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
+    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
       purchaseForDownload: 74,

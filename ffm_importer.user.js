@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz. FFM is a link aggregator service from www.feature.fm.
-// @version      2026.08.14.8
+// @version      2026.08.15.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -22,7 +22,7 @@
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     const IGNORED_SERVICES = new Set(['junodownload']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
-    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
+    const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
       purchaseForDownload: 74,
