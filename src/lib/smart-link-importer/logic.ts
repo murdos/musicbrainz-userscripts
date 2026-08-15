@@ -3,7 +3,7 @@ export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandca
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
 const IGNORED_SERVICES = new Set(['junodownload']);
 const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
-const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
+const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
 
 export const URL_RELATIONSHIP_TYPES = {
     asin: 77,
