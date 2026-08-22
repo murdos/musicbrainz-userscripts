@@ -4,7 +4,7 @@
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
-- [Import Deezer releases into MusicBrainz](#deezer_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Deezer releases into MusicBrainz](#deezer_importer)
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
@@ -57,12 +57,12 @@ Add a button on Boomkat release pages to open MusicBrainz release editor with pr
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js)
 
-## <a name="deezer_importer"></a> Import Deezer releases into MusicBrainz
+## <a name="deezer_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Deezer releases into MusicBrainz
 
 One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
 
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/deezer_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/deezer_importer.user.js)
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/deezer_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js)
 
 ## <a name="discogs_importer"></a> Import Discogs releases to MusicBrainz
 
