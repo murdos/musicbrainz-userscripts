@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.07.19.1
+// @version      2026.8.23.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
-// @include      /^https?://www\.qobuz\.com/[^/]+/(album|interpreter|label)(/[^/?]+)+(\?.*)?$/
+// @match        https://www.qobuz.com/*/album/*
+// @match        https://www.qobuz.com/*/interpreter/*
+// @match        https://www.qobuz.com/*/label/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js

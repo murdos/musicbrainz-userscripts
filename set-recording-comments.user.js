@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         MusicBrainz: Set recording comments for a release
 // @description  Batch set recording comments from a Release page.
-// @version      2026.5.31
+// @version      2026.8.23.1
 // @author       Michael Wiencek
 // @license      X11
 // @namespace    790382e7-8714-47a7-bfbd-528d0caa2333
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js
-// @include      /^https?:\/\/(\w+\.)?musicbrainz\.(org|eu)\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/
+// @match        https://*.musicbrainz.org/release/*
+// @match        https://*.musicbrainz.eu/release/*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -39,7 +40,12 @@
 // authorization.
 // ==/License==
 
-setTimeout(setRecordingComments, 1000);
+const SUPPORTED_URL_REGEX =
+    /^https:\/\/(\w+\.)?musicbrainz\.(org|eu)\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\/disc\/\d+|(\?.+?)?$)/;
+
+if (SUPPORTED_URL_REGEX.test(location.href)) {
+    setTimeout(setRecordingComments, 1000);
+}
 
 // Keep this intermediate function in case we need to recall it on mb-hydration events, one day
 function setRecordingComments() {
