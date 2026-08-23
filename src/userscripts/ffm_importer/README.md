@@ -27,11 +27,14 @@ Resolved FFM destinations are cached in local storage to avoid repeatedly follow
 
 If none of the provider URLs find a release, the page can instead be imported with Harmony. If the URLs point to different releases, the importer stops and reports the ambiguity.
 
+Other examples:
+`https://orcd.co/salvaging-the-future`
+
 ## Requests and modes
 
 The script makes read-only JSON requests to the MusicBrainz `/ws/2/url` and `/ws/2/release/{mbid}` endpoints. Adding links is not automatic: it opens a normal MusicBrainz edit form for review and submission.
 
-The panel can target either `musicbrainz.org` or `beta.musicbrainz.org`, and remembers the selected server. Its two actions are:
+The panel can target either `musicbrainz.org` or `beta.musicbrainz.org`. The selected server is stored by the userscript manager, so it is remembered across `ffm.to`, branded subdomains, and `orcd.co`. Its two actions are:
 
 - **Import with Harmony** — open Harmony using a preferred provider URL.
 - **Add Missing Links** — update the uniquely matched MusicBrainz release with the URLs that are not present.

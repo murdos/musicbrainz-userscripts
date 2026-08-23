@@ -1,3 +1,4 @@
+import { getGmApi, getOptionalGlobal } from '../userscript-api';
 import {
     chooseHarmonyLink,
     expandLegacyBoomplayResources,
@@ -11,12 +12,9 @@ import {
     type ReleaseMatch,
     type ServiceLink,
 } from './logic';
+import { MUSICBRAINZ_SERVERS, readServerPreference, saveServerPreference, type MusicBrainzServer } from './server-preference';
 
-const SERVER_PREFERENCE_KEY = 'smartlink-mb-importer:server';
 const HYDRATION_SETTLE_MS = 1_000;
-const MUSICBRAINZ_SERVERS = ['https://musicbrainz.org', 'https://beta.musicbrainz.org'] as const;
-
-type MusicBrainzServer = (typeof MUSICBRAINZ_SERVERS)[number];
 
 interface PageCache {
     links: Record<string, ServiceLink>;
@@ -39,23 +37,6 @@ export interface SmartLinkImporterConfig {
     resolveDestination: (element: ServiceElement) => string | Promise<string>;
     mountPanel?: (panel: HTMLElement) => void;
 }
-
-interface GmResponse {
-    finalUrl?: string;
-    responseURL?: string;
-    status: number;
-}
-
-interface GmRequestDetails {
-    method: string;
-    url: string;
-    timeout: number;
-    onload: (response: GmResponse) => void;
-    onerror: () => void;
-    ontimeout: () => void;
-}
-
-type GmRequest = (details: GmRequestDetails) => unknown;
 
 interface ImportPanel {
     root: HTMLElement;
@@ -94,34 +75,8 @@ function savePageCache(config: SmartLinkImporterConfig, cache: PageCache): void 
     }
 }
 
-function readServerPreference(): MusicBrainzServer {
-    try {
-        const stored = window.localStorage.getItem(SERVER_PREFERENCE_KEY);
-        if (MUSICBRAINZ_SERVERS.includes(stored as MusicBrainzServer)) return stored as MusicBrainzServer;
-    } catch {
-        // Fall through to production.
-    }
-    return MUSICBRAINZ_SERVERS[0];
-}
-
-function saveServerPreference(server: MusicBrainzServer): void {
-    try {
-        window.localStorage.setItem(SERVER_PREFERENCE_KEY, server);
-    } catch {
-        // Preference persistence is optional.
-    }
-}
-
-function gmRequest(): GmRequest | undefined {
-    const userscriptGlobal = globalThis as typeof globalThis & {
-        GM?: { xmlHttpRequest?: GmRequest };
-        GM_xmlhttpRequest?: GmRequest;
-    };
-    return userscriptGlobal.GM?.xmlHttpRequest ?? userscriptGlobal.GM_xmlhttpRequest;
-}
-
 export function followRedirect(sourceUrl: string): Promise<string> {
-    const request = gmRequest();
+    const request = getGmApi('xmlHttpRequest');
     if (!request) return Promise.reject(new Error('No userscript cross-origin request API is available'));
 
     return new Promise((resolve, reject) => {
@@ -133,7 +88,7 @@ export function followRedirect(sourceUrl: string): Promise<string> {
             url: sourceUrl,
             timeout: 20_000,
             onload: response => {
-                const destination = response.finalUrl ?? response.responseURL;
+                const destination = response.finalUrl;
                 if (response.status >= 200 && response.status < 400 && destination) resolve(destination);
                 else failed();
             },
@@ -419,8 +374,7 @@ function submitMissingLinks(config: SmartLinkImporterConfig, server: MusicBrainz
     form.acceptCharset = 'UTF-8';
     form.hidden = true;
 
-    const userscriptInfo = (globalThis as typeof globalThis & { GM_info?: { script?: { name?: string; version?: string } } }).GM_info
-        ?.script;
+    const userscriptInfo = (getOptionalGlobal('GM_info') as Partial<typeof GM_info> | undefined)?.script;
     const scriptName = userscriptInfo?.name ?? `${config.siteName} MusicBrainz importer`;
     const scriptVersion = userscriptInfo?.version ? ` ${userscriptInfo.version}` : '';
     const parameters: Array<[string, string]> = [
@@ -461,7 +415,7 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
     const mbPanelId = panelId(config);
     if (document.getElementById(mbPanelId)) return;
 
-    const server = readServerPreference();
+    const server = await readServerPreference();
     const cache = readPageCache(config);
     const elements = await waitForServiceElements(config);
 
@@ -525,7 +479,7 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
 
     panel.server.addEventListener('change', () => {
         const selectedServer = panel.server.value as MusicBrainzServer;
-        saveServerPreference(selectedServer);
+        void saveServerPreference(selectedServer);
         void checkMusicBrainz(selectedServer);
     });
     keepPanelMounted(config, panel, () => {

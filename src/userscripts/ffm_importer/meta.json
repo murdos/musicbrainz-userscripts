@@ -8,7 +8,7 @@
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
     "match": ["https://ffm.to/*", "https://*.ffm.to/*", "https://orcd.co/*", "https://*.orcd.co/*"],
     "connect": ["*"],
-    "grant": ["GM.xmlHttpRequest", "GM_xmlhttpRequest"],
+    "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
     "runAt": "document-idle",
     "icon": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png"
 }
