@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
-// @description  Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz. FFM is a link aggregator service from www.feature.fm.
-// @version      2026.08.15.1
+// @description  Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
+// @version      2026.08.23.3
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
 // @match        https://ffm.to/*
 // @match        https://*.ffm.to/*
+// @match        https://orcd.co/*
+// @match        https://*.orcd.co/*
 // @connect      *
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -21,12 +23,14 @@
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
     const IGNORED_SERVICES = new Set(['junodownload']);
+    const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
     const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
       asin: 77,
       purchaseForDownload: 74,
       downloadForFree: 75,
+      discographyEntry: 288,
       otherDatabases: 82,
       streamForFree: 85,
       streaming: 980
@@ -67,6 +71,11 @@
     function isIgnoredService(service) {
       return IGNORED_SERVICES.has(normalizeServiceName(service));
     }
+
+    /** Avoid attaching retailer pages for a physical edition to a matched digital release. */
+    function isPhysicalMediaLink(service, action) {
+      return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
+    }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
         if (name.toLowerCase().startsWith('utm_') || TRACKING_PARAMETER_NAMES.has(name.toLowerCase())) {
@@ -99,6 +108,8 @@
         url.search = '';
       } else if (service === 'boomplay') {
         url.hostname = 'www.boomplay.com';
+        url.search = '';
+      } else if (service === 'qobuz') {
         url.search = '';
       } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
@@ -237,6 +248,7 @@
       const action = link.action.toLowerCase();
       const service = normalizeServiceName(link.service);
       if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
+      if (service === 'officialsite') return URL_RELATIONSHIP_TYPES.discographyEntry;
       if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
       if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
@@ -731,15 +743,16 @@
       for (const element of document.querySelectorAll('a[service][href]')) {
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
-        if (!service || isIgnoredService(service) || !element.href) continue;
+        const action = element.querySelector('.service-text, .music-service-cta-text__overflow')?.textContent.trim() || '';
+        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
         const count = (counters.get(service) ?? 0) + 1;
         counters.set(service, count);
         elements.push({
           cacheKey: count === 1 ? service : `${service}:${count}`,
           element,
           service,
-          label: element.querySelector('.service-title')?.textContent.trim() || rawService,
-          action: element.querySelector('.service-text')?.textContent.trim() || '',
+          label: element.querySelector('.service-title')?.textContent.trim() || element.querySelector('img[alt]')?.alt || rawService,
+          action,
           sourceUrl: element.href
         });
       }
@@ -747,7 +760,7 @@
     }
     void runSmartLinkImporter({
       id: 'ffm',
-      siteName: 'FFM',
+      siteName: window.location.hostname.endsWith('orcd.co') ? 'ORCD' : 'FFM',
       collectServiceElements,
       resolveDestination: element => decodeFfmDestination(element.sourceUrl) ?? followRedirect(element.sourceUrl),
       mountPanel: panel => {

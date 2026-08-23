@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import bfan.link releases to MusicBrainz
 // @description  Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
-// @version      2026.08.15.1
+// @version      2026.08.23.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
@@ -23,6 +23,7 @@
       asin: 77,
       purchaseForDownload: 74,
       downloadForFree: 75,
+      discographyEntry: 288,
       otherDatabases: 82,
       streamForFree: 85,
       streaming: 980
@@ -66,6 +67,8 @@
         url.search = '';
       } else if (service === 'boomplay') {
         url.hostname = 'www.boomplay.com';
+        url.search = '';
+      } else if (service === 'qobuz') {
         url.search = '';
       } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
@@ -204,6 +207,7 @@
       const action = link.action.toLowerCase();
       const service = normalizeServiceName(link.service);
       if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
+      if (service === 'officialsite') return URL_RELATIONSHIP_TYPES.discographyEntry;
       if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
       if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
