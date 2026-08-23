@@ -2,6 +2,7 @@ export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandca
 
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
 const IGNORED_SERVICES = new Set(['junodownload']);
+const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
 const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
 const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
 
@@ -9,6 +10,7 @@ export const URL_RELATIONSHIP_TYPES = {
     asin: 77,
     purchaseForDownload: 74,
     downloadForFree: 75,
+    discographyEntry: 288,
     otherDatabases: 82,
     streamForFree: 85,
     streaming: 980,
@@ -78,6 +80,11 @@ export function isIgnoredService(service: string): boolean {
     return IGNORED_SERVICES.has(normalizeServiceName(service));
 }
 
+/** Avoid attaching retailer pages for a physical edition to a matched digital release. */
+export function isPhysicalMediaLink(service: string, action: string): boolean {
+    return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
+}
+
 function removeTrackingParameters(url: URL): void {
     for (const name of [...url.searchParams.keys()]) {
         if (name.toLowerCase().startsWith('utm_') || TRACKING_PARAMETER_NAMES.has(name.toLowerCase())) {
@@ -113,6 +120,8 @@ export function normalizeServiceUrl(rawUrl: string, rawService: string): string 
         url.search = '';
     } else if (service === 'boomplay') {
         url.hostname = 'www.boomplay.com';
+        url.search = '';
+    } else if (service === 'qobuz') {
         url.search = '';
     } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
@@ -266,6 +275,7 @@ export function relationshipTypeFor(link: ServiceLink): number {
     const action = link.action.toLowerCase();
     const service = normalizeServiceName(link.service);
     if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
+    if (service === 'officialsite') return URL_RELATIONSHIP_TYPES.discographyEntry;
     if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
     if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;

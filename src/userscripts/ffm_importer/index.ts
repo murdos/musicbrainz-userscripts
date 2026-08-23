@@ -1,5 +1,5 @@
 import { followRedirect, runSmartLinkImporter, type ServiceElement } from '~/lib/smart-link-importer';
-import { decodeFfmDestination, isIgnoredService, normalizeServiceName } from '~/lib/smart-link-importer/logic';
+import { decodeFfmDestination, isIgnoredService, isPhysicalMediaLink, normalizeServiceName } from '~/lib/smart-link-importer/logic';
 
 function collectServiceElements(): ServiceElement[] {
     const counters = new Map<string, number>();
@@ -7,7 +7,8 @@ function collectServiceElements(): ServiceElement[] {
     for (const element of document.querySelectorAll<HTMLAnchorElement>('a[service][href]')) {
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
-        if (!service || isIgnoredService(service) || !element.href) continue;
+        const action = element.querySelector<HTMLElement>('.service-text, .music-service-cta-text__overflow')?.textContent.trim() || '';
+        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
 
         const count = (counters.get(service) ?? 0) + 1;
         counters.set(service, count);
@@ -15,8 +16,11 @@ function collectServiceElements(): ServiceElement[] {
             cacheKey: count === 1 ? service : `${service}:${count}`,
             element,
             service,
-            label: element.querySelector<HTMLElement>('.service-title')?.textContent.trim() || rawService,
-            action: element.querySelector<HTMLElement>('.service-text')?.textContent.trim() || '',
+            label:
+                element.querySelector<HTMLElement>('.service-title')?.textContent.trim() ||
+                element.querySelector<HTMLImageElement>('img[alt]')?.alt ||
+                rawService,
+            action,
             sourceUrl: element.href,
         });
     }
@@ -25,7 +29,7 @@ function collectServiceElements(): ServiceElement[] {
 
 void runSmartLinkImporter({
     id: 'ffm',
-    siteName: 'FFM',
+    siteName: window.location.hostname.endsWith('orcd.co') ? 'ORCD' : 'FFM',
     collectServiceElements,
     resolveDestination: element => decodeFfmDestination(element.sourceUrl) ?? followRedirect(element.sourceUrl),
     mountPanel: panel => {

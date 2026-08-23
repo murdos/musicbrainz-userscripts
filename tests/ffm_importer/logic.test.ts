@@ -10,6 +10,7 @@ import {
     findMissingLinks,
     findReleaseMatches,
     isIgnoredService,
+    isPhysicalMediaLink,
     normalizeServiceUrl,
     relationshipTypeFor,
     URL_RELATIONSHIP_TYPES,
@@ -45,6 +46,12 @@ describe('FFM importer logic', () => {
                 'boomplay',
             ),
         ).toBe('https://www.boomplay.com/albums/EQUABbK_Gy8KOODzT4ow4hGX');
+        expect(
+            normalizeServiceUrl(
+                'https://www.qobuz.com/us-en/album/salvaging-the-future-dean-de-benedictis/ki3mxj3oly9vd?qbzs=partner&qbzc=feature-fm',
+                'qobuz',
+            ),
+        ).toBe('https://www.qobuz.com/us-en/album/salvaging-the-future-dean-de-benedictis/ki3mxj3oly9vd');
     });
 
     it('matches regional Apple URLs by album ID', () => {
@@ -114,12 +121,23 @@ describe('FFM importer logic', () => {
         expect(isIgnoredService('beatport')).toBe(false);
     });
 
+    it('identifies physical-media retailer links that may represent a different release', () => {
+        expect(isPhysicalMediaLink('amazoncdvinyl', 'CD')).toBe(true);
+        expect(isPhysicalMediaLink('unknown-store', 'CD (Europe)')).toBe(true);
+        expect(isPhysicalMediaLink('unknown-store', 'Buy Vinyl')).toBe(true);
+        expect(isPhysicalMediaLink('bandcamp', 'Buy Now')).toBe(false);
+        expect(isPhysicalMediaLink('tidal', 'Play (Hi-Res)')).toBe(false);
+    });
+
     it('maps service actions to MusicBrainz URL relationship types', () => {
         expect(relationshipTypeFor(serviceLink('amazon'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('youtubemusic'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz', undefined, 'Buy'))).toBe(URL_RELATIONSHIP_TYPES.purchaseForDownload);
         expect(relationshipTypeFor(serviceLink('archive', undefined, 'Free download'))).toBe(URL_RELATIONSHIP_TYPES.downloadForFree);
+        expect(relationshipTypeFor(serviceLink('officialsite', 'https://spottedpeccary.com/shop/example', 'Go To'))).toBe(
+            URL_RELATIONSHIP_TYPES.discographyEntry,
+        );
         expect(relationshipTypeFor(serviceLink('amazonstore', 'https://www.amazon.com/gp/product/B0H47BDZJR', 'Buy'))).toBe(
             URL_RELATIONSHIP_TYPES.asin,
         );
