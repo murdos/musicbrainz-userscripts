@@ -87,7 +87,7 @@ Easily import Encyclopedisque releases into MusicBrainz
 
 ## <a name="ffm_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz
 
-Import ffm.to smart links with Harmony and add their remaining URL relationships to MusicBrainz. FFM is a link aggregator service from www.feature.fm.
+Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/ffm_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js)

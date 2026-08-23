@@ -1,14 +1,15 @@
 # FFM importer
 
-This userscript helps connect an `ffm.to` smart-link page to its MusicBrainz release. It can start a release import through Harmony and add provider URLs that are missing from an existing release.
+This userscript helps connect a Feature.fm smart-link page to its MusicBrainz release. It can start a release import through Harmony and add provider URLs that are missing from an existing release.
 
-It supports both `ffm.to` and branded subdomains such as `label-caster.ffm.to`.
+It supports `ffm.to`, branded subdomains such as `label-caster.ffm.to`, and `orcd.co` links.
 
 ## How it works
 
 The importer runs in a few stages:
 
 1. It collects the music-service links rendered by FFM and resolves their final destinations. Destinations embedded in FFM's link data are decoded locally; other links are resolved by following their redirects.
+   Physical-media retailer links (CD, vinyl, or cassette) are excluded because they can describe a different MusicBrainz release than the digital provider links.
 2. It asks the MusicBrainz URL web service which releases are related to any of those destinations.
 3. It continues only when exactly one release is found. No match leaves Harmony available for a new import, while multiple matches produce an ambiguity warning and disable the import actions.
 4. For a single match, it fetches that release with `url-rels`, compares every FFM destination with the current MusicBrainz relationships, and marks links that are already present. This step was only added to handle the region-specific URLs that MB Search cannot support yet, e.g. `https://music.apple.com/us/album/...` vs `https://music.apple.com/gb/album/...`. (https://tickets.metabrainz.org/browse/SEARCH-748)
