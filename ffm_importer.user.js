@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.08.23.3
+// @version      2026.08.23.4
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -11,7 +11,11 @@
 // @match        https://orcd.co/*
 // @match        https://*.orcd.co/*
 // @connect      *
+// @grant        GM.getValue
+// @grant        GM.setValue
 // @grant        GM.xmlHttpRequest
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @run-at       document-idle
 // @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
@@ -19,6 +23,20 @@
 
 (function () {
     'use strict';
+
+    const LEGACY_GM_API_NAMES = {
+      getValue: 'GM_getValue',
+      setValue: 'GM_setValue',
+      xmlHttpRequest: 'GM_xmlhttpRequest'
+    };
+    function getOptionalGlobal(name) {
+      return Reflect.get(globalThis, name);
+    }
+    function getGmApi(name) {
+      const modernGM = getOptionalGlobal('GM');
+      const modernApi = modernGM?.[name];
+      return modernApi ?? getOptionalGlobal(LEGACY_GM_API_NAMES[name]);
+    }
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
@@ -301,8 +319,56 @@
     }
 
     const SERVER_PREFERENCE_KEY = 'smartlink-mb-importer:server';
+    const MUSICBRAINZ_SERVERS = ['https://musicbrainz.org', 'https://beta.musicbrainz.org', 'https://musicbrainz.eu'];
+    function isMusicBrainzServer(value) {
+      return MUSICBRAINZ_SERVERS.includes(value);
+    }
+    function localServerPreference() {
+      try {
+        const stored = window.localStorage.getItem(SERVER_PREFERENCE_KEY);
+        if (isMusicBrainzServer(stored)) return stored;
+      } catch {
+        // Fall through when page storage is unavailable.
+      }
+      return undefined;
+    }
+    async function readServerPreference() {
+      const getValue = getGmApi('getValue');
+      if (getValue) {
+        try {
+          const stored = await getValue(SERVER_PREFERENCE_KEY);
+          if (isMusicBrainzServer(stored)) return stored;
+
+          // Migrate the old origin-scoped preference when the script is upgraded.
+          const legacyPreference = localServerPreference();
+          if (legacyPreference) {
+            await saveServerPreference(legacyPreference);
+            return legacyPreference;
+          }
+        } catch {
+          // Fall back to page storage when userscript storage is unavailable.
+        }
+      }
+      return localServerPreference() ?? MUSICBRAINZ_SERVERS[0];
+    }
+    async function saveServerPreference(server) {
+      const setValue = getGmApi('setValue');
+      try {
+        if (setValue) {
+          await setValue(SERVER_PREFERENCE_KEY, server);
+          return;
+        }
+      } catch {
+        // Fall back to page storage when userscript storage is unavailable.
+      }
+      try {
+        window.localStorage.setItem(SERVER_PREFERENCE_KEY, server);
+      } catch {
+        // Preference persistence is optional.
+      }
+    }
+
     const HYDRATION_SETTLE_MS = 1_000;
-    const MUSICBRAINZ_SERVERS = ['https://musicbrainz.org', 'https://beta.musicbrainz.org'];
     function pageCacheKey(config) {
       return `${config.id}-mb-importer:v1:${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
     }
@@ -331,28 +397,8 @@
         // The importer still works for this page load when storage is unavailable.
       }
     }
-    function readServerPreference() {
-      try {
-        const stored = window.localStorage.getItem(SERVER_PREFERENCE_KEY);
-        if (MUSICBRAINZ_SERVERS.includes(stored)) return stored;
-      } catch {
-        // Fall through to production.
-      }
-      return MUSICBRAINZ_SERVERS[0];
-    }
-    function saveServerPreference(server) {
-      try {
-        window.localStorage.setItem(SERVER_PREFERENCE_KEY, server);
-      } catch {
-        // Preference persistence is optional.
-      }
-    }
-    function gmRequest() {
-      const userscriptGlobal = globalThis;
-      return userscriptGlobal.GM?.xmlHttpRequest ?? userscriptGlobal.GM_xmlhttpRequest;
-    }
     function followRedirect(sourceUrl) {
-      const request = gmRequest();
+      const request = getGmApi('xmlHttpRequest');
       if (!request) return Promise.reject(new Error('No userscript cross-origin request API is available'));
       return new Promise((resolve, reject) => {
         const failed = () => {
@@ -363,7 +409,7 @@
           url: sourceUrl,
           timeout: 20_000,
           onload: response => {
-            const destination = response.finalUrl ?? response.responseURL;
+            const destination = response.finalUrl;
             if (response.status >= 200 && response.status < 400 && destination) resolve(destination);else failed();
           },
           onerror: failed,
@@ -640,7 +686,7 @@
       form.target = '_blank';
       form.acceptCharset = 'UTF-8';
       form.hidden = true;
-      const userscriptInfo = globalThis.GM_info?.script;
+      const userscriptInfo = getOptionalGlobal('GM_info')?.script;
       const scriptName = userscriptInfo?.name ?? `${config.siteName} MusicBrainz importer`;
       const scriptVersion = userscriptInfo?.version ? ` ${userscriptInfo.version}` : '';
       const parameters = [['edit_note', `Added URL relationships from ${window.location.href.replace(/[?#].*$/, '')}\n\nUsing '''${scriptName}'''${scriptVersion} from https://github.com/murdos/musicbrainz-userscripts`], ['redirect_uri', `${server}/release/${releaseId}`]];
@@ -672,7 +718,7 @@
     async function runSmartLinkImporter(config) {
       const mbPanelId = panelId(config);
       if (document.getElementById(mbPanelId)) return;
-      const server = readServerPreference();
+      const server = await readServerPreference();
       const cache = readPageCache(config);
       const elements = await waitForServiceElements(config);
       if (document.getElementById(mbPanelId)) return;
@@ -728,7 +774,7 @@
       };
       panel.server.addEventListener('change', () => {
         const selectedServer = panel.server.value;
-        saveServerPreference(selectedServer);
+        void saveServerPreference(selectedServer);
         void checkMusicBrainz(selectedServer);
       });
       keepPanelMounted(config, panel, () => {
