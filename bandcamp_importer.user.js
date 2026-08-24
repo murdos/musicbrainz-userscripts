@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.8.23.1
+// @version      2026.8.24.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -113,6 +113,21 @@ const resolveDiscographyHostnames = tralbumUrl => {
     return hostnames;
 };
 
+const buildBandcampAnnotation = current => {
+    const sections = [
+        ['Credits', current.credits],
+        ['About', current.about],
+    ].flatMap(([heading, content]) => {
+        const trimmedContent = typeof content === 'string' ? content.trim().replaceAll('\r', '') : '';
+        return trimmedContent ? [`=== ${heading} from Bandcamp ===`, trimmedContent] : [];
+    });
+    if (!sections.length) return '';
+
+    // Square brackets have special meaning in MusicBrainz annotation markup.
+    const annotation = sections.join('\n\n');
+    return annotation.replaceAll('[', '&#91;').replaceAll(']', '&#93;');
+};
+
 const BandcampImport = {
     // Analyze Bandcamp data and return a release object
     retrieveReleaseInfo: function (isPrivateStream) {
@@ -143,6 +158,7 @@ const BandcampImport = {
             urls: [],
             url: releaseUrl,
             alternateUrls,
+            annotation: buildBandcampAnnotation(bandcampAlbumData.current),
         };
 
         // Grab release title
