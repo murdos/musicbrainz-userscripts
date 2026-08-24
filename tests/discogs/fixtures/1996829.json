@@ -74,66 +74,6 @@
         }
     ],
     "data_quality": "Needs Vote",
-    "community": {
-        "have": 51,
-        "want": 6,
-        "rating": {
-            "count": 3,
-            "average": 3.33
-        },
-        "submitter": {
-            "username": "Markus",
-            "resource_url": "https://api.discogs.com/users/Markus"
-        },
-        "contributors": [
-            {
-                "username": "Markus",
-                "resource_url": "https://api.discogs.com/users/Markus"
-            },
-            {
-                "username": "MidMusic",
-                "resource_url": "https://api.discogs.com/users/MidMusic"
-            },
-            {
-                "username": "ThisGuyFrritz",
-                "resource_url": "https://api.discogs.com/users/ThisGuyFrritz"
-            },
-            {
-                "username": "Internaut",
-                "resource_url": "https://api.discogs.com/users/Internaut"
-            },
-            {
-                "username": "DiscogsUpdateBot",
-                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
-            },
-            {
-                "username": "vivaldi55",
-                "resource_url": "https://api.discogs.com/users/vivaldi55"
-            },
-            {
-                "username": "stramineushomo",
-                "resource_url": "https://api.discogs.com/users/stramineushomo"
-            },
-            {
-                "username": "oceanographer",
-                "resource_url": "https://api.discogs.com/users/oceanographer"
-            },
-            {
-                "username": "ericvisser",
-                "resource_url": "https://api.discogs.com/users/ericvisser"
-            },
-            {
-                "username": "officialandbootz",
-                "resource_url": "https://api.discogs.com/users/officialandbootz"
-            },
-            {
-                "username": "gemini80s",
-                "resource_url": "https://api.discogs.com/users/gemini80s"
-            }
-        ],
-        "data_quality": "Needs Vote",
-        "status": "Accepted"
-    },
     "format_quantity": 1,
     "date_added": "2009-11-06T16:38:33-08:00",
     "date_changed": "2022-12-01T03:50:46-08:00",

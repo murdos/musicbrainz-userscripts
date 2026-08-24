@@ -1,0 +1,20 @@
+{
+    "name": "Musicbrainz DiscIds Detector",
+    "description": "Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.",
+    "version": "2026.07.17.2",
+    "author": "[unknown]",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js",
+    "match": [
+        "https://orpheus.network/torrents.php?id=*",
+        "https://redacted.sh/torrents.php?id=*",
+        "https://lztr.me/torrents.php?id=*",
+        "https://notwhat.cd/torrents.php?id=*",
+        "https://rutracker.me/forum/viewtopic.php?t=*",
+        "https://rutracker.org/forum/viewtopic.php?t=*",
+        "https://new-team.org/viewtopic.php*",
+        "https://nnmclub.to/forum/viewtopic.php?t=*"
+    ],
+    "grant": ["none"]
+}

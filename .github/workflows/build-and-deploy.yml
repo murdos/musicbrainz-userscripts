@@ -5,22 +5,35 @@ on:
     branches: [master]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     name: 'Build userscripts and deploy to dist branch'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master branch
-        uses: actions/checkout@v6
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3.2.0
         with:
-          fetch-depth: 0
+          client-id: ${{ secrets.PUSH_APP_ID }}
+          private-key: ${{ secrets.PUSH_APP_PRIVATE_KEY }}
 
-      - uses: pnpm/action-setup@v4.4.0
+      - name: Checkout master branch
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true
+
+      - uses: pnpm/action-setup@v6.0.10
         with:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v6.5.0
         with:
           node-version-file: 'package.json'
           cache: 'pnpm'
@@ -33,6 +46,23 @@ jobs:
 
       - name: Build userscripts
         run: pnpm build
+
+      - name: Bump versions for changed scripts
+        id: bump-versions
+        run: pnpm bump-versions
+
+      - name: Rebuild after version bumps
+        if: steps.bump-versions.outputs.changed == 'true'
+        run: pnpm build
+
+      - name: Commit version bumps to master
+        if: steps.bump-versions.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/userscripts/*/meta.json
+          git commit -m "chore: bump userscript versions [skip ci]"
+          git push origin master
 
       - name: Checkout dist branch
         run: |
@@ -51,6 +81,7 @@ jobs:
           rm -rf dist
 
       - name: Commit and push changes
+        id: deploy
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -61,17 +92,24 @@ jobs:
           # Check if there is anything to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit --no-verify -m "Build userscripts from master branch $(git rev-parse --short HEAD)"
             git push origin dist
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create summary
         run: |
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "Built userscripts from commit: \`$(git rev-parse HEAD)\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Built Files:" >> $GITHUB_STEP_SUMMARY
-          find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
-            echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
-          done
+
+          if [ "${{ steps.deploy.outputs.changed }}" = "true" ]; then
+            echo "Built userscripts from commit: \`$(git rev-parse HEAD)\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Built Files:" >> $GITHUB_STEP_SUMMARY
+            find . -name "*.user.js" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
+              echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "No changes — dist branch was already up to date." >> $GITHUB_STEP_SUMMARY
+          fi

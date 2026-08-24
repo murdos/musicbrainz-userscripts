@@ -233,79 +233,11 @@
         }
     ],
     "data_quality": "Correct",
-    "community": {
-        "have": 323,
-        "want": 16,
-        "rating": {
-            "count": 16,
-            "average": 3.44
-        },
-        "submitter": {
-            "username": "aclbernie",
-            "resource_url": "https://api.discogs.com/users/aclbernie"
-        },
-        "contributors": [
-            {
-                "username": "aclbernie",
-                "resource_url": "https://api.discogs.com/users/aclbernie"
-            },
-            {
-                "username": "love-vinyl-records",
-                "resource_url": "https://api.discogs.com/users/love-vinyl-records"
-            },
-            {
-                "username": "Kergillian",
-                "resource_url": "https://api.discogs.com/users/Kergillian"
-            },
-            {
-                "username": "MaximusMCX",
-                "resource_url": "https://api.discogs.com/users/MaximusMCX"
-            },
-            {
-                "username": "harbour",
-                "resource_url": "https://api.discogs.com/users/harbour"
-            },
-            {
-                "username": "Bladerunner1858",
-                "resource_url": "https://api.discogs.com/users/Bladerunner1858"
-            },
-            {
-                "username": "gone4sure",
-                "resource_url": "https://api.discogs.com/users/gone4sure"
-            },
-            {
-                "username": "themusicgoesaround",
-                "resource_url": "https://api.discogs.com/users/themusicgoesaround"
-            },
-            {
-                "username": "vokuhila",
-                "resource_url": "https://api.discogs.com/users/vokuhila"
-            },
-            {
-                "username": "johntugby",
-                "resource_url": "https://api.discogs.com/users/johntugby"
-            },
-            {
-                "username": "uzumaki",
-                "resource_url": "https://api.discogs.com/users/uzumaki"
-            },
-            {
-                "username": "capitolfive",
-                "resource_url": "https://api.discogs.com/users/capitolfive"
-            },
-            {
-                "username": "andygrayrecords",
-                "resource_url": "https://api.discogs.com/users/andygrayrecords"
-            }
-        ],
-        "data_quality": "Correct",
-        "status": "Accepted"
-    },
     "format_quantity": 2,
     "date_added": "2008-09-07T01:35:40-07:00",
     "date_changed": "2020-01-12T09:14:01-08:00",
-    "num_for_sale": 70,
-    "lowest_price": 0.17,
+    "num_for_sale": 72,
+    "lowest_price": 0.18,
     "master_id": 77692,
     "master_url": "https://api.discogs.com/masters/77692",
     "title": "Live",

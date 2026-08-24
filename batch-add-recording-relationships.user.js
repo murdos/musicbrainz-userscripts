@@ -730,7 +730,7 @@ function batch_recording_rels(gm_info) {
             );
         }
 
-        let $reload = style_buttons($('<button>Reload</button>'))
+        style_buttons($('<button>Reload</button>'))
             .click(function () {
                 $button_cell.css('display', 'none');
                 $msg.text(`Loading works for ${name}...`);

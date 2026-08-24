@@ -4,13 +4,13 @@
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
-- [Import CD1D releases to MusicBrainz](#cd1d_importer)
 - [Import Deezer releases into MusicBrainz](#deezer_importer)
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz](#ffm_importer)
 - [Import FMA releases to MusicBrainz](#fma_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
-- [Import Juno Download releases to MusicBrainz](#juno_download_importer)
 - [Import Loot releases to MusicBrainz](#loot_importer)
 - [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 - [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
@@ -18,6 +18,7 @@
 - [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 - [Import Takealot releases to MusicBrainz](#takealot_importer)
 - [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz](#bfan_importer)
 - [MusicBrainz: 1200px CAA](#mb_1200px_caa)
 - [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
 - [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
@@ -25,7 +26,7 @@
 - [MusicBrainz: Fast cancel edits](#fast-cancel-edits)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> MusicBrainz: Future release annotation](#future_release_annotation)
 - [MusicBrainz: Set recording comments for a release](#set-recording-comments)
-- [Musicbrainz DiscIds Detector](#mb_discids_detector)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Musicbrainz DiscIds Detector](#mb_discids_detector)
 - [Musicbrainz UI enhancements](#mb_ui_enhancements)
 
 ## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
@@ -56,13 +57,6 @@ Add a button on Boomkat release pages to open MusicBrainz release editor with pr
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/boomkat_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js)
 
-## <a name="cd1d_importer"></a> Import CD1D releases to MusicBrainz
-
-Add a button on CD1D.com release pages allowing to open MusicBrainz release editor with pre-filled data for the selected release
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/cd1d_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js)
-
 ## <a name="deezer_importer"></a> Import Deezer releases into MusicBrainz
 
 One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
@@ -77,12 +71,26 @@ Add a button to import Discogs releases to MusicBrainz and add links to matching
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js)
 
+## <a name="elasticstage_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz
+
+One-click importing of releases from elasticstage.com release pages into MusicBrainz
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/elasticstage_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js)
+
 ## <a name="encyclopedisque_importer"></a> Import Encyclopedisque releases to MusicBrainz
 
 Easily import Encyclopedisque releases into MusicBrainz
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
+
+## <a name="ffm_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz
+
+Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/ffm_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js)
 
 ## <a name="fma_importer"></a> Import FMA releases to MusicBrainz
 
@@ -97,13 +105,6 @@ One-click importing of releases from hdtracks.com into MusicBrainz. Also allows 
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/hdtracks_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/hdtracks_importer.user.js)
-
-## <a name="juno_download_importer"></a> Import Juno Download releases to MusicBrainz
-
-One-click importing of releases from junodownload.com/products pages into MusicBrainz
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/juno_download_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js)
 
 ## <a name="loot_importer"></a> Import Loot releases to MusicBrainz
 
@@ -154,6 +155,13 @@ One-click importing of releases from vgmdb.net into MusicBrainz. **⚠️ Curren
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/vgmdb_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js)
 
+## <a name="bfan_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz
+
+Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bfan_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js)
+
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
 Use the 1200px images for the pop‐up/previews on Release cover art pages.
@@ -203,12 +211,12 @@ Batch set recording comments from a Release page.
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/set-recording-comments.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/set-recording-comments.user.js)
 
-## <a name="mb_discids_detector"></a> Musicbrainz DiscIds Detector
+## <a name="mb_discids_detector"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Musicbrainz DiscIds Detector
 
 Generate MusicBrainz DiscIds from online EAC logs, and check existence in MusicBrainz database.
 
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_discids_detector.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_discids_detector.user.js)
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/mb_discids_detector.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mb_discids_detector.user.js)
 
 ## <a name="mb_ui_enhancements"></a> Musicbrainz UI enhancements
 

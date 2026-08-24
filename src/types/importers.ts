@@ -17,7 +17,7 @@ export interface URL {
 }
 
 export interface Track {
-    number?: number;
+    number?: number | string;
     title: string;
     duration?: number | string;
     artist_credit: ArtistCredit[];

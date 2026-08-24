@@ -58,42 +58,6 @@
         }
     ],
     "data_quality": "Correct",
-    "community": {
-        "have": 102,
-        "want": 59,
-        "rating": {
-            "count": 22,
-            "average": 4.36
-        },
-        "submitter": {
-            "username": "krrratz",
-            "resource_url": "https://api.discogs.com/users/krrratz"
-        },
-        "contributors": [
-            {
-                "username": "krrratz",
-                "resource_url": "https://api.discogs.com/users/krrratz"
-            },
-            {
-                "username": "bzzp",
-                "resource_url": "https://api.discogs.com/users/bzzp"
-            },
-            {
-                "username": "stassen",
-                "resource_url": "https://api.discogs.com/users/stassen"
-            },
-            {
-                "username": "DiscogsUpdateBot",
-                "resource_url": "https://api.discogs.com/users/DiscogsUpdateBot"
-            },
-            {
-                "username": "betadron",
-                "resource_url": "https://api.discogs.com/users/betadron"
-            }
-        ],
-        "data_quality": "Correct",
-        "status": "Accepted"
-    },
     "format_quantity": 1,
     "date_added": "2005-01-08T21:20:57-08:00",
     "date_changed": "2015-05-04T08:40:44-07:00",

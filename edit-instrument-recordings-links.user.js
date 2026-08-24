@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         MusicBrainz: Add recording edit links to instrument pages
+// @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @description  Direct links to the recording edit page are added to instruments' recordings pages.
-// @version      2019.6.20.1
+// @version      2026.7.7.1
 // @author       Nicolás Tamargo
 // @license      X11
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/edit-instrument-recordings-links.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/edit-instrument-recordings-links.user.js
-// @include      *://musicbrainz.org/instrument/*/recordings*
-// @include      *://*.musicbrainz.org/instrument/*/recordings*
+// @match        https://*.musicbrainz.org/instrument/*/recordings*
 // @grant        none
 // ==/UserScript==
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Display shortcut for relationships on MusicBrainz
 // @description  Display icon shortcut for relationships of release-group, release, recording and work: e.g. Amazon, Discogs, Wikipedia, ... links. This allows to access some relationships without opening the entity page.
-// @version      2026.5.30.2
+// @version      2026.8.7.1
 // @author       Aurelien Mino <aurelien.mino@gmail.com>
 // @licence      GPL (http://www.gnu.org/copyleft/gpl.html)
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js
@@ -29,12 +29,14 @@ const urlRelationsIconClasses = {
     allmusic: 'allmusic',
     'amazon asin': 'amazon',
     'creative commons licensed download': 'creativecommons',
+    'official homepage': 'home',
     discogs: 'discogs',
     imdb: 'imdb',
     lyrics: 'lyrics',
     secondhandsongs: 'secondhandsongs',
     vgmdb: 'vgmdb',
     wikidata: 'wikidata',
+    wikipedia: 'wikipedia',
     'discography entry': 'home',
 };
 
@@ -46,6 +48,11 @@ const otherDatabasesIconClasses = {
     'www.worldcat.org': 'worldcat',
     'nocs.acum.org.il': 'acum',
     'stereo-ve-mono.com': 'stereo-ve-mono',
+    'lantis.jp': 'lantis',
+    'jvcmusic.co.jp': 'jvcmusic',
+    'metal-archives.com': 'metalarchives',
+    'www.sonymusic.co.jp': 'sonymusic',
+    'www.offiziellecharts.de': 'offiziellecharts',
 };
 
 const streamingIconClasses = {
@@ -61,9 +68,13 @@ const streamingIconClasses = {
     'soundcloud.com': 'soundcloud',
     'open.spotify.com': 'spotify',
     'tidal.com': 'tidal',
+    'dlsite.com': 'dlsite',
     'beatport.com': 'beatport',
+    'mora.jp': 'mora',
     'music.youtube.com': 'youtubemusic',
-    'youtube.com': 'youtube',
+    'music.bugs.co.kr': 'bugs',
+    'melon.com': 'melon',
+    'www.youtube.com': 'youtube',
     'archive.org': 'archive',
     'mediafire.com': 'mediafire',
     'store.steampowered.com': 'steam',
@@ -154,9 +165,26 @@ td.relationships span.favicon.ended {
     background-image: url(https://www.hdtracks.com/favicon.ico);
     background-size: 16px;
 }
+
+.sonymusic-favicon {
+    background-image: url(https://www.sonymusic.co.jp/favicon.ico);
+    background-size: 16px;
+}
+
+.dlsite-favicon {
+    background-image: url(https://www.dlsite.com/images/web/common/favicon.ico);
+    background-size: 16px;
+}
+
+.jvcmusic-favicon {
+    background-image: url(https://www.jvcmusic.co.jp/favicon.ico);
+    background-size: 16px;
+}
+
 .creativecommons-favicon {
     background-image: url(https://creativecommons.org/favicon.ico);
 }
+
 .lyrics-favicon {
     /* archived version, originally from http://www.nomy.nu/img/lyrics-icon.gif */
     background-image: url(data:image/gif;base64,R0lGODlhEQARALMAAAAAAP////z8/Onp6dzc3KmpqaGhoZGRkYyMjHx8fP///wAAAAAAAAAAAAAAAAAAACH5BAEAAAoALAAAAAARABEAAARNUBCUqr0JEVnI+GA4EJ0WnGiKTskQGEcsy0YwVK6q2/g7/7Vba6cTumA/Gm9ITBl9yViw10Q9kdEps7o8RqU8EzcwIXlEIrOEgsFoBBEAOw==);

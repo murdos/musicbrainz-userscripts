@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Import Takealot releases to MusicBrainz
 // @description  Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
-// @version      2026.06.21.1
+// @version      2026.7.7.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
-// @include      http*://www.takealot.com/*
+// @match        https://www.takealot.com/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
@@ -36,14 +36,13 @@ if (DEBUG) {
 
 // promise to ensure all api calls are done before we parse the release
 const tracks_deferred = $.Deferred();
-const retrieve_tracks_promise = tracks_deferred.promise();
+tracks_deferred.promise();
 
 // object to store all global attributes collected for the release
 const release_attributes = {}; // albumid, total_pages, artist_name, label
 
 // arrays to store the data retrieved from API to parse for MB release
 const album_api_array = []; // album information [0]
-const tracks_api_array = []; // track information [0,1,2,..] one element for each pagination in FMA tracks API
 
 $(document).ready(function () {
     LOGGER.info('Document Ready & Takealot Userscript Executing');
@@ -65,9 +64,8 @@ $(document).ready(function () {
         $.when(retrieve_album_detail).done(function () {
             LOGGER.info('All the AJAX API calls are done continue to build the release object ...');
             LOGGER.debug(`ALBUM Object > ${album_api_array[0]}`);
-            // LOGGER.debug("TRACK Object > " + tracks_api_array);
 
-            let FreeMusicArchiveRelease = new Parsefmarelease(album_api_array[0], tracks_api_array);
+            let FreeMusicArchiveRelease = new Parsefmarelease(album_api_array[0]);
             insertMBSection(FreeMusicArchiveRelease);
 
             let album_link = window.location.href;
@@ -143,7 +141,7 @@ const updateAPISection = {
     },
     ApiKey: function (apikey) {
         this.apikey = apikey;
-        $('#lbut-lt-fma-api-key-id').text(FMA_API);
+        $('#lbut-lt-fma-api-key-id').text(`FMA_API: ${this.apikey}`);
         return 'complete';
     },
     AlbumAjaxStatus: function (ajaxstatus) {
@@ -301,45 +299,6 @@ function insertMBSection(release) {
     mbUI.slideDown();
 }
 
-// Insert MusicBrainz API section on FMA page to enter API Key
-function insertAPIKEYSection() {
-    LOGGER.debug('FMA insertAPIKEYSection Function Executing');
-
-    let mbUI = $(
-        '<div id="musicbrainz_apikey" class="section musicbrainz"><h4 class="wlinepad"><span class="hd">Import FMA API KEY for MusicBrainz</span></h4></div>',
-    ).hide();
-    if (DEBUG)
-        mbUI.css({
-            border: '1px dotted red',
-        });
-
-    let mbContentBlock = $('<div class="section_content"></div>');
-    mbUI.append(mbContentBlock);
-
-    // Build section
-    let innerHTML =
-        '<span class="mhd-nosep">Please enter API Key found <a class="donate" href="https://freemusicarchive.org/member/api_key" target="_blank">here</a></span>';
-    innerHTML = `${innerHTML}<div id="mb_buttons"><input id="apikey_input" type="text" name="apikey_input" value=""><br><input id="api_key_submit" type="submit" value="Import API KEY"></div>`;
-    mbContentBlock.append(innerHTML);
-
-    insertMbUI(mbUI); // Insert the MusicBrainzUI
-
-    $('#musicbrainz_apikey').css({
-        display: 'block',
-        float: 'right',
-        height: '120px',
-        width: '49%',
-    });
-
-    $('#mb_buttons').css({
-        display: 'inline-block',
-        float: 'right',
-        height: '80px',
-    });
-
-    mbUI.slideDown();
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                       Retrieve data from TAL API                                                   //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,23 +348,23 @@ function parseFMApage() {
 
         if (typeof $('#idProduct').attr('value') === 'undefined' && $('div.cell:nth-child(3) > a:nth-child(1)').length) {
             LOGGER.debug('Uhm I think the idProduct is missing folks and comments left ...');
-            let FMAEmbedCode = $('div.cell:nth-child(3) > a:nth-child(1)').attr('href');
+            const FMAEmbedCode = $('div.cell:nth-child(3) > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
-            FMAEmbedCodeRegex = /product_id=(\d*)/;
-            let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
+            const FMAEmbedCodeRegex = /product_id=(\d*)/;
+            const FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[1]; // assign the ID to a variable
         } else if (typeof $('#idProduct').attr('value') === 'undefined' && $('.reviews > a:nth-child(1)').length) {
             LOGGER.debug('Uhm I think the idProduct is missing folks ...');
-            let FMAEmbedCode = $('.reviews > a:nth-child(1)').attr('href');
+            const FMAEmbedCode = $('.reviews > a:nth-child(1)').attr('href');
             LOGGER.debug('The album id for API: ', FMAEmbedCode);
-            FMAEmbedCodeRegex = /product_id=(\d*)/;
-            let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
+            const FMAEmbedCodeRegex = /product_id=(\d*)/;
+            const FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[1]; // assign the ID to a variable
         } else {
             LOGGER.debug('Aha got that idProduct value, Jipeeeee ...');
-            let FMAEmbedCode = $('#idProduct').attr('value');
-            FMAEmbedCodeRegex = /\d{8}/; // regex to match the value from the idProduct object
-            let FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
+            const FMAEmbedCode = $('#idProduct').attr('value');
+            const FMAEmbedCodeRegex = /\d{8}/; // regex to match the value from the idProduct object
+            const FMAAlbumIdMatch = FMAEmbedCode.match(FMAEmbedCodeRegex); // match the Id
             release_attributes.albumid = FMAAlbumIdMatch[0]; // assign the ID to a variable
         }
 
@@ -440,23 +399,6 @@ function parseFMApage() {
 //                            Analyze FMA data and return a release object                                            //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Parse the date string and set object properties day, month, year
-function parse_MM_DD_YYYY(date, obj) {
-    if (!date) return;
-    let m = date.split(/\D+/, 3).map(function (e) {
-        return parseInt(e, 10);
-    });
-    if (m[0] !== undefined) {
-        obj.month = m[0];
-        if (m[1] !== undefined) {
-            obj.day = m[1];
-            if (m[2] !== undefined) {
-                obj.year = m[2];
-            }
-        }
-    }
-}
-
 function parse_YYYY_MM_DD(date, obj) {
     if (!date) return;
     let m = date.split(/\D+/, 3).map(function (e) {
@@ -474,7 +416,7 @@ function parse_YYYY_MM_DD(date, obj) {
 }
 
 // parse the release from the album and track objects
-function Parsefmarelease(albumobject, trackobject) {
+function Parsefmarelease(albumobject) {
     if (albumobject === undefined) {
         albumobject = [];
     }
@@ -704,7 +646,7 @@ function Parsefmarelease(albumobject, trackobject) {
         //var lines = alltracklist.val().split('\n');
         let lines = alltracklist.split(/\r?\n/);
 
-        takealot_format = 'v2_type1';
+        const takealot_format = 'v2_type1';
 
         // Tracks
         let tracklistarray = new Array(); // create the track list array
@@ -718,15 +660,14 @@ function Parsefmarelease(albumobject, trackobject) {
             //let trackdetails = lines[j];
             // sample: [ Disc 01 Track 01 ] What Do You Mean? - Justin Bieber
             // do this up in regex tester now...
-            //disctracktitleregex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*) - (.*)/;
-            //let disctracktitle = trackdetails.match(disctracktitleregex);
+            const disctracktitleregex = /\[ Disc (\d{2}) Track.(\b\d{2}) \] (.*) - (.*)/;
+            const disctracktitle = lines[j].match(disctracktitleregex);
 
             let currentdiscnumber = 1;
             lastdiscnumber = 1;
 
             if (currentdiscnumber == 1) {
                 let track = {};
-                let track_artist_credit = [];
 
                 track.number = j + 1;
                 track.title = lines[j];
