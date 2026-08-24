@@ -1,34 +1,19 @@
 import { Logger } from '../../../lib/logger';
+import { getGmApi } from '../../../lib/userscript-api';
 import type { DeezerAlbum, DeezerTracksResponse } from '../types';
-
-declare const GM: { xmlHttpRequest?: (details: GmRequestDetails) => unknown } | undefined;
-declare const GM_xmlhttpRequest: ((details: GmRequestDetails) => unknown) | undefined;
-
-interface GmResponse {
-    responseText: string;
-    status: number;
-}
-
-interface GmRequestDetails {
-    method: string;
-    url: string;
-    onload: (response: GmResponse) => void;
-    onerror: (response: GmResponse) => void;
-}
 
 const releaseCache = new Map<string, DeezerAlbum>();
 
 function httpGetJson<T>(url: string, logger: Logger): Promise<T | null> {
+    const request = getGmApi('xmlHttpRequest');
+
+    if (!request) {
+        logger.error('Userscript requires GM_xmlHttpRequest or GM.xmlHttpRequest');
+        return Promise.resolve(null);
+    }
+
     return new Promise(resolve => {
-        const gmReq = (typeof GM !== 'undefined' && GM.xmlHttpRequest) || (typeof GM_xmlhttpRequest !== 'undefined' && GM_xmlhttpRequest);
-
-        if (!gmReq) {
-            logger.error('Userscript requires GM_xmlHttpRequest or GM.xmlHttpRequest');
-            resolve(null);
-            return;
-        }
-
-        gmReq({
+        request({
             method: 'GET',
             url,
             onload: res => {
