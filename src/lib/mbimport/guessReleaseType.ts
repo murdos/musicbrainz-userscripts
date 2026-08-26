@@ -39,7 +39,7 @@ function isMultiTrackSingle(numTracks: number, trackTitles: readonly string[]): 
  * Guess a primary release type in descending order of confidence:
  *
  * 1. Reject invalid track counts.
- * 2. Honor an explicit "EP" token in the release title. It takes precedence over every other signal, including "Single" and version-title deduplication.
+ * 2. Honor an explicit "EP" or "E.P." token in the release title. It takes precedence over every other signal, including "Single" and version-title deduplication.
  * 3. Honor an explicit "Single" token when the release remains within broad track count and duration guards. Unlike "EP", "single" is common English text and therefore needs basic false-positive protection.
  * 4. Normalize track titles by removing technical version qualifiers such as "Remix", "Instrumental", "Edit", "Live", and "Version". If every track then has the same non-empty title, classify the release as a multi-track Single.
  * 5. If duration is missing, use track count only where it is reasonably decisive: one track is a Single, three to six tracks is an EP, and seven or more tracks is an album. Leave two tracks unclassified because both Singles and electronic EPs commonly have two tracks.
@@ -52,7 +52,7 @@ export function guessReleaseType(title: string, numTracks: number, durationMs: n
 
     const releaseTitle = typeof title === 'string' ? title : '';
     const hasSingle = /\bsingle\b/i.test(releaseTitle);
-    const hasEP = /\bEP\b/i.test(releaseTitle);
+    const hasEP = /\bE\.?P\b\.?/i.test(releaseTitle);
     const hasDuration = Number.isFinite(durationMs) && durationMs > 0;
     const durationMinutes = hasDuration ? durationMs / 60_000 : Number.NaN;
 

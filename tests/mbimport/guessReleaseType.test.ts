@@ -22,7 +22,7 @@ describe('guessReleaseType implementation', () => {
     });
 
     describe('explicit release-title tokens', () => {
-        it.each(['Example EP', 'Example ep', 'EP: Example'])('honors the EP token in %j', title => {
+        it.each(['Example EP', 'Example ep', 'EP: Example', 'Example E.P.', 'E.P.: Example'])('honors the EP token in %j', title => {
             expect(guessReleaseType(title, 1, minutes(2))).toBe('EP');
         });
 
