@@ -10,5 +10,5 @@
     "connect": ["*"],
     "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
     "runAt": "document-idle",
-    "icon": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png"
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
 }
