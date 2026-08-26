@@ -16,5 +16,6 @@
         "https://new-team.org/viewtopic.php*",
         "https://nnmclub.to/forum/viewtopic.php?t=*"
     ],
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg",
     "grant": ["none"]
 }
