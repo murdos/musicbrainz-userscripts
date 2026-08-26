@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import ElasticStage releases to MusicBrainz
 // @description  One-click importing of releases from elasticstage.com release pages into MusicBrainz
-// @version      2026.08.07.1
+// @version      2026.08.26.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js
@@ -9,7 +9,7 @@
 // @match        https://elasticstage.com/*
 // @grant        none
 // @run-at       document-start
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
 (function () {

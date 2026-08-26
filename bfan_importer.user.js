@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import bfan.link releases to MusicBrainz
 // @description  Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
-// @version      2026.08.23.2
+// @version      2026.08.26.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
@@ -13,7 +13,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @run-at       document-idle
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
 (function () {

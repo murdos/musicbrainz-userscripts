@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz: Future release annotation
 // @description  Adds an annotation note when importing a release with a future release date on the release editor. The annotation note serves as a reminder to verify the release info when it is released.
-// @version      2026.06.23.1
+// @version      2026.08.26.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/future_release_annotation.user.js
@@ -12,7 +12,7 @@
 // @match        https://test.musicbrainz.org/release/add*
 // @grant        none
 // @run-at       document-start
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
 (function () {
