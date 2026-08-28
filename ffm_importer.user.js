@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FFM releases to MusicBrainz
 // @description  Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.08.26.1
+// @version      2026.08.28.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js
@@ -634,7 +634,7 @@
       for (const value of MUSICBRAINZ_SERVERS) {
         const option = document.createElement('option');
         option.value = value;
-        option.textContent = value === MUSICBRAINZ_SERVERS[0] ? 'musicbrainz.org' : 'beta.musicbrainz.org';
+        option.textContent = new URL(value).hostname;
         option.selected = value === server;
         serverSelect.appendChild(option);
       }

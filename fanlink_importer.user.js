@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Fanlink releases to MusicBrainz
 // @description  Import fanlink.tv smart links with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.08.28.1
+// @version      2026.08.28.2
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js
@@ -606,7 +606,7 @@
       for (const value of MUSICBRAINZ_SERVERS) {
         const option = document.createElement('option');
         option.value = value;
-        option.textContent = value === MUSICBRAINZ_SERVERS[0] ? 'musicbrainz.org' : 'beta.musicbrainz.org';
+        option.textContent = new URL(value).hostname;
         option.selected = value === server;
         serverSelect.appendChild(option);
       }
