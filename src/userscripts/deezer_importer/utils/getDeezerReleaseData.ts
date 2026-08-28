@@ -1,5 +1,6 @@
-import { Logger } from '../../../lib/logger';
-import { getGmApi } from '../../../lib/userscript-api';
+import { Logger } from '~/lib/logger';
+import { getGmApi } from '~/lib/userscript-api';
+
 import type { DeezerAlbum, DeezerTracksResponse } from '../types';
 
 const releaseCache = new Map<string, DeezerAlbum>();

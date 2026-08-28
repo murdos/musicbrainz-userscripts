@@ -1,4 +1,4 @@
-import type { Release } from '../../types/importers';
+import type { Release } from '~/types/importers';
 
 export type DeezerErrorType =
     | 'Exception'
@@ -130,5 +130,4 @@ export interface DeezerAlbum {
 export interface ParsedDeezerRelease {
     release: Release;
     isrcs: (string | null)[];
-    barcode?: string | undefined;
 }

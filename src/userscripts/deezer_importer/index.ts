@@ -1,15 +1,11 @@
-import { Logger, LogLevel } from '../../lib/logger';
-import { MBImport } from '../../lib/mbimport';
-import { MBImportStyle } from '../../lib/mbimportstyle';
+import { Logger, LogLevel } from '~/lib/logger';
+import { MBImport } from '~/lib/mbimport';
+import { MBImportStyle } from '~/lib/mbimportstyle';
+
 import { getDeezerReleaseData } from './utils/getDeezerReleaseData';
 import { parseDeezerRelease } from './utils/parseDeezerRelease';
 
 const LOGGER = new Logger('deezer_importer', LogLevel.INFO);
-
-function extractAlbumIdFromPath(pathname: string): string | null {
-    const match = /(?:^|\/)(?:[a-z]{2}(?:-[a-z]{2})?\/)?album\/(\d+)/i.exec(pathname);
-    return match?.[1] ?? null;
-}
 
 function waitForEl(selector: string, callback: () => void): void {
     if (document.querySelector(selector)) {
@@ -21,23 +17,17 @@ function waitForEl(selector: string, callback: () => void): void {
     }
 }
 
-function insertLink(releaseUrl: string, data: Parameters<typeof parseDeezerRelease>[1]): void {
-    const { release, isrcs } = parseDeezerRelease(releaseUrl, data);
+function insertLink(release: Parameters<typeof MBImport.buildFormParameters>[0], releaseUrl: string, isrcs: (string | null)[]): void {
     const editNote = MBImport.makeEditNote(releaseUrl, 'Deezer');
     const parameters = MBImport.buildFormParameters(release, editNote);
 
-    const mbUIContainer = document.createElement('div');
-    mbUIContainer.style.display = 'none';
-    mbUIContainer.style.flexDirection = 'row';
-    mbUIContainer.style.alignItems = 'center';
+    const importItem = document.createElement('div');
+    importItem.className = 'toolbar-item';
+    importItem.innerHTML = MBImport.buildFormHTML(parameters);
 
-    const formHTML = MBImport.buildFormHTML(parameters);
-    const searchHTML = MBImport.buildSearchButton(release);
-
-    mbUIContainer.innerHTML = `
-        <div class="toolbar-item">${formHTML}</div>
-        <div class="toolbar-item">${searchHTML}</div>
-    `;
+    const searchItem = document.createElement('div');
+    searchItem.className = 'toolbar-item';
+    searchItem.innerHTML = MBImport.buildSearchButton(release);
 
     const isrcItem = document.createElement('div');
     isrcItem.className = 'toolbar-item';
@@ -46,58 +36,61 @@ function insertLink(releaseUrl: string, data: Parameters<typeof parseDeezerRelea
     isrcForm.className = 'musicbrainz_import';
 
     const isrcButton = document.createElement('button');
-    isrcButton.type = 'button';
-    isrcButton.title = 'Submit ISRCs to MusicBrainz with kepstin’s MagicISRC';
+    isrcButton.type = 'submit';
+    isrcButton.title = "Submit ISRCs to MusicBrainz with kepstin's MagicISRC";
     isrcButton.innerHTML = '<span>Submit ISRCs</span>';
-    isrcButton.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-        const queryParts = [`edit-note=${encodeURIComponent(editNote)}`];
-        isrcs.forEach((isrc, index) => {
-            queryParts.push(isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`);
-        });
-        window.open(`https://magicisrc.kepstin.ca?${queryParts.join('&')}`);
-    });
 
     isrcForm.appendChild(isrcButton);
+    isrcForm.addEventListener('click', (event: Event) => {
+        event.preventDefault();
+        const query = [
+            `edit-note=${encodeURIComponent(editNote)}`,
+            ...isrcs.map((isrc, index) => (isrc == null ? `isrc${index + 1}=` : `isrc${index + 1}=${isrc}`)),
+        ].join('&');
+        window.open(`https://magicisrc.kepstin.ca?${query}`);
+    });
+
     isrcItem.appendChild(isrcForm);
-    mbUIContainer.appendChild(isrcItem);
+
+    const toolbarItems = [importItem, searchItem, isrcItem];
 
     waitForEl('[data-testid="toolbar"]', () => {
         const toolbar = document.querySelector<HTMLElement>('[data-testid="toolbar"]');
         if (toolbar) {
             toolbar.style.alignItems = 'center';
-            toolbar.appendChild(mbUIContainer);
-            mbUIContainer.style.display = 'flex';
+            toolbar.append(...toolbarItems);
         }
     });
 
+    // Deezer Mobile is a completely different App, so we need to mount differently
     waitForEl('[data-tracking-label="main-CTA"]', () => {
         const cta = document.querySelector<HTMLElement>('[data-tracking-label="main-CTA"]');
         if (cta) {
-            const mobileWrapper = document.createElement('div');
-            mobileWrapper.style.cssText =
+            const mbUIContainer = document.createElement('div');
+            mbUIContainer.style.cssText =
                 'display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; gap: 4px;';
-            mobileWrapper.appendChild(mbUIContainer);
-            cta.insertAdjacentElement('afterend', mobileWrapper);
-            mbUIContainer.style.display = 'flex';
+            mbUIContainer.append(...toolbarItems);
+            cta.insertAdjacentElement('afterend', mbUIContainer);
         }
     });
 }
 
 function init(): void {
-    const albumId = extractAlbumIdFromPath(window.location.pathname);
-    if (!albumId) {
-        return;
-    }
-
+    // allow 1 second for Deezer SPA to initialize
     setTimeout(() => {
         MBImportStyle();
-        const releaseUrl = window.location.href.split('?')[0]?.split('#')[0] ?? window.location.href;
+        const releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
+        const releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
 
-        void getDeezerReleaseData(albumId, LOGGER)
+        if (!releaseId || !/^\d+$/.test(releaseId)) {
+            return;
+        }
+
+        void getDeezerReleaseData(releaseId, LOGGER)
             .then(data => {
                 if (data) {
-                    insertLink(releaseUrl, data);
+                    const { release, isrcs } = parseDeezerRelease(releaseUrl, data);
+                    insertLink(release, releaseUrl, isrcs);
                 }
             })
             .catch((err: unknown) => {
