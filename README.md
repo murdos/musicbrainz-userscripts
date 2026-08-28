@@ -10,6 +10,7 @@
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz](#ffm_importer)
 - [Import FMA releases to MusicBrainz](#fma_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Fanlink releases to MusicBrainz](#fanlink_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
 - [Import Loot releases to MusicBrainz](#loot_importer)
 - [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
@@ -98,6 +99,13 @@ Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fma_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js)
+
+## <a name="fanlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Fanlink releases to MusicBrainz
+
+Import fanlink.tv smart links with Harmony and add their remaining URL relationships to MusicBrainz.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/fanlink_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js)
 
 ## <a name="hdtracks_importer"></a> Import HDtracks releases into MusicBrainz
 
