@@ -3,7 +3,7 @@
 // @description  See what's inside a release group without having to follow its URL. Also adds convenient edit links for it.
 // @namespace    http://userscripts.org/users/266906
 // @author       Michael Wiencek <mwtuea@gmail.com>
-// @version      2026.7.7.1
+// @version      2026.8.28.1
 // @license      GPL
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/expand-collapse-release-groups.user.js
@@ -87,6 +87,7 @@ function create_button(url, dom_callback, success_callback, error_callback) {
     button.style.cursor = 'pointer';
     button.style.marginRight = '4px';
     button.style.color = '#777';
+    button.style.userSelect = 'none';
 
     button.addEventListener(
         'mousedown',
