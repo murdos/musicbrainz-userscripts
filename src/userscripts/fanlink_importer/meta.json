@@ -1,0 +1,14 @@
+{
+    "name": "Import Fanlink releases to MusicBrainz",
+    "description": "Import fanlink.tv smart links with Harmony and add their remaining URL relationships to MusicBrainz.",
+    "version": "2026.08.28.2",
+    "author": "Raman Sinclair",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js",
+    "match": ["https://fanlink.tv/*", "https://*.fanlink.tv/*"],
+    "connect": ["*"],
+    "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
+    "runAt": "document-idle",
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
+}

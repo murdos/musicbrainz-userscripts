@@ -6,7 +6,7 @@
 // @version      2026.7.7.1
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/cd1d_importer.user.js
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
 /* Import releases from http://cd1d.com to MusicBrainz */

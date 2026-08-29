@@ -2,10 +2,10 @@
 // @name         Import Naxos Music Library 3 releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @author       loujine
-// @version      2026.8.23.1
+// @version      2026.8.26.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library3_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/naxos_library3_importer.user.js
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @description  Add a button to import Naxos Music Library 3 releases to MusicBrainz
 // @compatible   firefox+tampermonkey
 // @license      MIT

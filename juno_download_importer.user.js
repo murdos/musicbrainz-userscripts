@@ -6,7 +6,7 @@
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/juno_download_importer.user.js
 // @match        https://*.musicbrainz.org/*
-// @icon         https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/images/Musicbrainz_import_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
 console.warn(

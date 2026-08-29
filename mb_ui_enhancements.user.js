@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.7.23.1
+// @version      2026.8.26.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
-// @icon         http://wiki.musicbrainz.org/images/3/3d/Musicbrainz_logo.png
+// @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @namespace    http://userscripts.org/users/22504
 // @match        https://*musicbrainz.org/*
 // @match        http://*musicbrainz.org/*
@@ -16,6 +16,7 @@
 // @resource     errorIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/error.svg?v=2026.2.12.3
 // @resource     searchIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search.svg?v=2026.2.12.3
 // @resource     searchArtistIcon https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/assets/icons/search-artist.svg?v=2026.2.12.3
+// @resource     harmonyIcon https://harmony.pulsewidth.org.uk/favicon.svg?v=2026.8.25.3
 // @grant        GM_getResourceURL
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
@@ -621,37 +622,47 @@ $(document).ready(function () {
         }
     }
 
-    // Display a-tisket links next to Deezer, Spotify, iTunes and Apple Music links
-    if (window.location.href.match(releaseRegex)) {
-        document.querySelectorAll('div#bottom-credits a').forEach(function (link) {
-            if (link.href.match(/deezer.com|(music|itunes).apple.com|spotify.com/)) {
-                let id;
-                let fragment;
-                let country;
-                if (link.href.match(/deezer.com/)) {
-                    id = new URL(link.href).pathname.split('/').slice(-1)[0];
-                    fragment = 'deez';
-                    country = 'GB%2CUS%2CIN';
-                } else if (link.href.match(/apple.com/)) {
-                    id = new URL(link.href).pathname.split('/', 5).slice(-1)[0].replace('id', '');
-                    fragment = 'itu';
-                    country = new URL(link.href).pathname.split('/', 2)[1];
-                } else if (link.href.match(/spotify.com/)) {
-                    id = new URL(link.href).pathname.split('/', 5).slice(-1)[0];
-                    fragment = 'spf';
-                    country = 'GB%2CUS%2CIN';
-                }
+    // Display a Harmony lookup link when the release has a supported provider URL
+    const releaseMatch = window.location.href.match(releaseRegex);
+    if (releaseMatch) {
+        const harmonyProviderHostname =
+            /^(?:[^.]+\.bandcamp\.com|www\.beatport\.com|music\.bugs\.co\.kr|(?:www\.)?deezer\.com|www\.discogs\.com|(?:geo\.)?(?:itunes|music)\.apple\.com|(?:www|m2)\.melon\.com|mora\.jp|ototoy\.jp|(?:play|www|open)\.qobuz\.com|open\.spotify\.com|(?:(?:www|listen)\.)?tidal\.com)$/i;
+        const barcode = document.querySelector('#sidebar dd.barcode')?.textContent.trim();
+        const validGtin =
+            barcode && /^(?:\d{8}|\d{12,14})$/.test(barcode)
+                ? barcode
+                      .split('')
+                      .reduce((checksum, digit, index) => checksum + Number(digit) * ((barcode.length - index) % 2 ? 1 : 3), 0) %
+                      10 ===
+                  0
+                : false;
+        const externalLinks = document.querySelector('#sidebar h2.external-links + ul.external_links');
 
-                let next = link.nextElementSibling.nextElementSibling;
-                let newlink = document.createElement('a');
-                newlink.href = `https://atisket.pulsewidth.org.uk/?preferred_countries=${country}&${fragment}_id=${id}&preferred_vendor=${fragment}`;
-                newlink.text = 'a-tisket';
+        const supportedProviderUrls = Array.from(externalLinks?.querySelectorAll('li a[href]') ?? [])
+            .map(link => new URL(link.href))
+            .filter(url => harmonyProviderHostname.test(url.hostname));
+        const lowerPriorityHostname = /^(?:[^.]+\.bandcamp\.com|www\.beatport\.com|(?:geo\.)?(?:itunes|music)\.apple\.com)$/i;
+        const providerUrl = supportedProviderUrls.find(url => !lowerPriorityHostname.test(url.hostname)) ?? supportedProviderUrls[0];
 
-                next.before(document.createTextNode(' ['));
-                next.before(newlink);
-                next.before(document.createTextNode(']'));
-            }
-        });
+        if (providerUrl) {
+            const harmonyUrl = new URL('https://harmony.pulsewidth.org.uk/release');
+            harmonyUrl.searchParams.set('url', providerUrl.href);
+            harmonyUrl.searchParams.set('category', 'preferred');
+            harmonyUrl.searchParams.set('musicbrainz', releaseMatch[1]);
+            if (validGtin) harmonyUrl.searchParams.set('gtin', barcode);
+
+            const harmonyLink = document.createElement('a');
+            harmonyLink.href = harmonyUrl.href;
+            harmonyLink.target = '_blank';
+            harmonyLink.rel = 'noopener';
+            harmonyLink.textContent = 'Lookup with Harmony';
+
+            const harmonyItem = document.createElement('li');
+            harmonyItem.style.backgroundImage = `url("${GM_getResourceURL('harmonyIcon')}")`;
+            harmonyItem.style.backgroundSize = '16px 16px';
+            harmonyItem.appendChild(harmonyLink);
+            externalLinks.appendChild(harmonyItem);
+        }
     }
 
     // Discogs link rollover

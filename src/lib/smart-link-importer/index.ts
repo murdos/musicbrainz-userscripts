@@ -318,7 +318,7 @@ function createPanel(config: SmartLinkImporterConfig, server: MusicBrainzServer)
     for (const value of MUSICBRAINZ_SERVERS) {
         const option = document.createElement('option');
         option.value = value;
-        option.textContent = value === MUSICBRAINZ_SERVERS[0] ? 'musicbrainz.org' : 'beta.musicbrainz.org';
+        option.textContent = new URL(value).hostname;
         option.selected = value === server;
         serverSelect.appendChild(option);
     }

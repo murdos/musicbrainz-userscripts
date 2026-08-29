@@ -2,14 +2,14 @@
 // @name            MusicBrainz: 1200px CAA
 // @name:da         MusicBrainz: 1200px CAA
 // @namespace       https://github.com/murdos/musicbrainz-userscripts/
-// @version         2021.4.16
+// @version         2026.8.26
 // @author          Frederik “Freso” S. Olesen
 // @license         GPL-3.0-or-later
 // @description     Use the 1200px images for the pop‐up/previews on Release cover art pages.
 // @description:da  Brug 1200px billeder for pop‐op/forhåndsvisninger af udgivelses omslagskunstsider.
 // @homepageURL     https://github.com/murdos/musicbrainz-userscripts/
 // @homepage        https://github.com/murdos/musicbrainz-userscripts/
-// @icon            https://coverartarchive.org/img/big_logo.svg
+// @icon            https://metabrainz.org/static/img/projects/cover_art_archive.svg
 // @updateURL       https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_1200px_caa.user.js
 // @downloadURL     https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_1200px_caa.user.js
 // @supportURL      https://github.com/murdos/musicbrainz-userscripts/issues
