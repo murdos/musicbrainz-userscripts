@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.08.26.1
+// @version      2026.08.30.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -64,7 +64,7 @@
 
     // convert HH:MM:SS or MM:SS to milliseconds
     function hmsToMilliSeconds(str) {
-      if (typeof str == 'undefined' || str === '' || isNaN(Number(str))) return NaN;
+      if (typeof str == 'undefined' || str === null || str === '') return NaN;
       if (typeof str == 'number') return str;
       const t = str.split(':');
       let s = 0;
