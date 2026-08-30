@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import ElasticStage releases to MusicBrainz
 // @description  One-click importing of releases from elasticstage.com release pages into MusicBrainz
-// @version      2026.08.30.1
+// @version      2026.08.30.2
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js
@@ -391,6 +391,49 @@
       return `<a class="musicbrainz_import" href="https://musicbrainz.org/search?${url_params.join('&')}">Search in MusicBrainz</a>`;
     }
 
+    function searchUrlFor(type, what) {
+      type = type.replace('-', '_');
+      const params = [`query=${luceneEscape(what)}`, `type=${type}`, 'indexed=1'];
+      return `https://musicbrainz.org/search?${params.join('&')}`;
+    }
+    function exactSearchUrlFor(type, what, limit = 25) {
+      type = type.replace('-', '_');
+      const query = `"${luceneEscape(what)}"`;
+      const params = [`query=${encodeURIComponent(query)}`, `type=${type}`, `limit=${limit}`, 'method=advanced'];
+      return `https://musicbrainz.org/search?${params.join('&')}`;
+    }
+
+    const MB_SEARCH_MARKS = {
+      artist: 'A',
+      release: 'R',
+      'release-group': 'G',
+      place: 'P',
+      label: 'L',
+      series: 'S'
+    };
+    /**
+     * Create the compact entity search indicator used next to external entity links.
+     * Placement and replacement with resolved MusicBrainz links are left to the caller.
+     */
+    function createEntitySearchLink(mbType, entityName, {
+      searchMode = 'indexed'
+    } = {}) {
+      const normalizedType = mbType.replaceAll('_', '-');
+      const mark = MB_SEARCH_MARKS[normalizedType] || '';
+      const displayType = normalizedType in MB_SEARCH_MARKS ? normalizedType.replaceAll('-', ' ') : 'entity';
+      const href = searchMode === 'exact' ? exactSearchUrlFor(mbType, entityName) : searchUrlFor(mbType, entityName);
+      const indicator = document.createElement('span');
+      indicator.className = 'mb_valign mb_searchit';
+      const searchLink = document.createElement('a');
+      searchLink.className = 'mb_search_link';
+      searchLink.target = '_blank';
+      searchLink.title = `Search this ${displayType} on MusicBrainz (open in a new tab)`;
+      searchLink.href = href;
+      searchLink.innerHTML = `<small>${mark}</small>?`;
+      indicator.append(searchLink);
+      return indicator;
+    }
+
     // Convert a list of artists to a list of artist credits with joinphrases
     function makeArtistCredits(artists_list) {
       const artists = artists_list.map(function (item) {
@@ -461,18 +504,6 @@
       return `Imported from ${release_url}${format ? ` (${format})` : ''} using ${importer_name} import script from ${home}`;
     }
 
-    function searchUrlFor(type, what) {
-      type = type.replace('-', '_');
-      const params = [`query=${luceneEscape(what)}`, `type=${type}`, 'indexed=1'];
-      return `https://musicbrainz.org/search?${params.join('&')}`;
-    }
-    function exactSearchUrlFor(type, what, limit = 25) {
-      type = type.replace('-', '_');
-      const query = `"${luceneEscape(what)}"`;
-      const params = [`query=${encodeURIComponent(query)}`, `type=${type}`, `limit=${limit}`, 'method=advanced'];
-      return `https://musicbrainz.org/search?${params.join('&')}`;
-    }
-
     const special_artists = {
       various_artists: {
         name: 'Various Artists',
@@ -514,6 +545,7 @@
       buildHarmonyButton,
       buildSearchLink,
       buildSearchButton,
+      createEntitySearchLink,
       buildFormHTML,
       buildFormParameters,
       makeArtistCredits,
