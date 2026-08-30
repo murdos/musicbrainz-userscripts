@@ -4,6 +4,7 @@ import { buildFormParameters } from './buildFormParameters';
 import { buildHarmonyButton } from './buildHarmonyButton';
 import { buildSearchButton } from './buildSearchButton';
 import { buildSearchLink } from './buildSearchLink';
+import { createEntitySearchLink } from './createEntitySearchLink';
 import { guessReleaseType } from './guessReleaseType';
 import { makeArtistCredits } from './makeArtistCredits';
 import { makeEditNote } from './makeEditNote';
@@ -15,6 +16,7 @@ export const MBImport = {
     buildHarmonyButton,
     buildSearchLink,
     buildSearchButton,
+    createEntitySearchLink,
     buildFormHTML,
     buildFormParameters,
     makeArtistCredits,

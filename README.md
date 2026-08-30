@@ -13,6 +13,7 @@
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Fanlink releases to MusicBrainz](#fanlink_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
 - [Import Loot releases to MusicBrainz](#loot_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mastermix releases to MusicBrainz](#mastermix_importer)
 - [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
 - [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
 - [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
@@ -120,6 +121,13 @@ Add a button to import Loot.co.za releases to MusicBrainz
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/loot_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/loot_importer.user.js)
+
+## <a name="mastermix_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mastermix releases to MusicBrainz
+
+Import Mastermix releases and show links to matching MusicBrainz releases
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/mastermix_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js)
 
 ## <a name="metalarchives_importer"></a> Import Metal Archives releases into MusicBrainz
 
