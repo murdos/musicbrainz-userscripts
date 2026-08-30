@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.8.26.1
+// @version      2026.8.30.2
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -30,6 +30,7 @@ if (DEBUG) {
 const various_artists_ids = [26887, 145383, 353325, 183869, 997899, 2225160];
 const various_composers_ids = [573076];
 const OPEN_QOBUZ_BASE = 'https://open.qobuz.com';
+const PLAY_QOBUZ_BASE = 'https://play.qobuz.com';
 
 let is_classical = false; // release detected as classical
 let album_artist_data = {}; // for switching album artists on classical
@@ -40,6 +41,18 @@ function getOpenQobuzArtistUrl(artistId) {
 
 function getOpenQobuzAlbumUrl(albumId) {
     return `${OPEN_QOBUZ_BASE}/album/${albumId}`;
+}
+
+function getPlayQobuzLabelUrl(labelId) {
+    return `${PLAY_QOBUZ_BASE}/label/${labelId}`;
+}
+
+function getPlayQobuzArtistUrl(artistId) {
+    return `${PLAY_QOBUZ_BASE}/artist/${artistId}`;
+}
+
+function getPlayQobuzAlbumUrl(albumId) {
+    return `${PLAY_QOBUZ_BASE}/album/${albumId}`;
 }
 
 /**
@@ -54,6 +67,25 @@ function getOpenQobuzUrlFromWwwUrl(url) {
     match = url.match(/\/album\/[^/]+\/([^/?#]+)\/?(?:\?|#|$)/);
     if (match) {
         return getOpenQobuzAlbumUrl(match[1]);
+    }
+    return null;
+}
+
+/**
+ * Derive a play.qobuz.com lookup URL from a www.qobuz.com entity URL.
+ */
+function getPlayQobuzUrlFromWwwUrl(url) {
+    let match = url.match(/\/interpreter\/[^/]+\/(\d+)\/?(?:\?|#|$)/);
+    if (match) {
+        return getPlayQobuzArtistUrl(match[1]);
+    }
+    match = url.match(/\/album\/[^/]+\/([^/?#]+)\/?(?:\?|#|$)/);
+    if (match) {
+        return getPlayQobuzAlbumUrl(match[1]);
+    }
+    match = url.match(/\/label\/[^/]+\/download-streaming-albums\/(\d+)\/?(?:\?|#|$)/);
+    if (match) {
+        return getPlayQobuzLabelUrl(match[1]);
     }
     return null;
 }
@@ -90,6 +122,7 @@ function parseRelease(data) {
     release.script = 'Latn';
     release.url = `https://www.qobuz.com${data.relative_url}`; // no lang
     release.openQobuzUrl = getOpenQobuzAlbumUrl(data.id);
+    release.playQobuzUrl = getPlayQobuzAlbumUrl(data.id);
 
     release.title = data.title;
     if ($.inArray('Classique', data.genres_list) != -1) {
@@ -119,6 +152,7 @@ function parseRelease(data) {
         release.artist_credit = MBImport.makeArtistCredits([data.artist.name]);
         release.artist_credit[0].qobuzUrl = `https://www.qobuz.com/${locale}/interpreter/${data.artist.slug}/${data.artist.id}`;
         release.artist_credit[0].openQobuzUrl = getOpenQobuzArtistUrl(data.artist.id);
+        release.artist_credit[0].playQobuzUrl = getPlayQobuzArtistUrl(data.artist.id);
     }
 
     release.packaging = 'None';
@@ -404,6 +438,9 @@ function lookupReleaseAndDisplayLinks({ release, mblinks }) {
     if (release.openQobuzUrl) {
         releaseLookupUrls.push(release.openQobuzUrl);
     }
+    if (release.playQobuzUrl) {
+        releaseLookupUrls.push(release.playQobuzUrl);
+    }
     releaseLookupUrls.push(release.url); // locale-independent URL
     if (window.location.href) {
         releaseLookupUrls.push(window.location.href.split('?')[0].split('#')[0]); // URL with locale
@@ -438,6 +475,9 @@ function lookupArtistAndDisplayLinks({ release, mblinks }) {
         if (artist.openQobuzUrl) {
             artistLookupUrls.push(artist.openQobuzUrl);
         }
+        if (artist.playQobuzUrl) {
+            artistLookupUrls.push(artist.playQobuzUrl);
+        }
         if (artist.qobuzUrl) {
             artistLookupUrls.push(artist.qobuzUrl);
         }
@@ -447,8 +487,7 @@ function lookupArtistAndDisplayLinks({ release, mblinks }) {
         }
 
         // Try to get artist MBID from cache and add it to release data
-        let artist_mbid =
-            (artist.openQobuzUrl && mblinks.resolveMBID(artist.openQobuzUrl)) || (artist.qobuzUrl && mblinks.resolveMBID(artist.qobuzUrl));
+        const artist_mbid = artistLookupUrls.map(url => mblinks.resolveMBID(url)).find(Boolean);
         if (artist_mbid) {
             artist.mbid = artist_mbid;
         }
@@ -460,18 +499,26 @@ function lookupArtistAndDisplayLinks({ release, mblinks }) {
  */
 function lookupLabelAndDisplayLinks({ release, mblinks }) {
     const locale = getCurrentLocale();
+    let isLabelLinkInserted = false;
     const insertLabelLinkCb = function (link) {
+        if (isLabelLinkInserted) {
+            return;
+        }
         const label_link = $(`li.album-meta__item a.album-meta__link[href*="/${locale}/label/"]`);
         if (label_link) {
             label_link.after(link);
+            isLabelLinkInserted = true;
         }
     };
 
     for (const label of release.labels) {
-        mblinks.searchAndDisplayMbLink(label.qobuzUrl, 'label', insertLabelLinkCb);
+        const labelLookupUrls = getEntityUrls(label.qobuzUrl, locale);
+        for (const url of labelLookupUrls) {
+            mblinks.searchAndDisplayMbLink(url, 'label', insertLabelLinkCb);
+        }
 
         // Try to get label MBID from cache and add it to release data
-        let label_mbid = mblinks.resolveMBID(label.qobuzUrl);
+        const label_mbid = labelLookupUrls.map(url => mblinks.resolveMBID(url)).find(Boolean);
         if (label_mbid) {
             label.mbid = label_mbid;
         }
@@ -479,9 +526,9 @@ function lookupLabelAndDisplayLinks({ release, mblinks }) {
 }
 
 /**
- * Return all Qobuz URL variants to use for MB lookups: open.qobuz.com, locale-dependent
- * www.qobuz.com/{locale}, and locale-independent www.qobuz.com where applicable.
- * Label URLs only support the www.qobuz.com variants.
+ * Return all Qobuz URL variants to use for MB lookups: locale-dependent and
+ * locale-independent www.qobuz.com, plus open.qobuz.com and play.qobuz.com
+ * where supported.
  */
 function getEntityUrls(url, locale) {
     const urls = new Set([url]);
@@ -493,6 +540,11 @@ function getEntityUrls(url, locale) {
     const openQobuzUrl = getOpenQobuzUrlFromWwwUrl(url);
     if (openQobuzUrl) {
         urls.add(openQobuzUrl);
+    }
+
+    const playQobuzUrl = getPlayQobuzUrlFromWwwUrl(url);
+    if (playQobuzUrl) {
+        urls.add(playQobuzUrl);
     }
 
     return [...urls];
