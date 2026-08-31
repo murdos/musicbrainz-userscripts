@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2026.8.26.1
+// @version      2026.8.29
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -57,9 +57,6 @@ $(document).ready(function () {
     // it should be possible to react to pjax events
     $('div#pjax_container').attr('id', 'pjax_disabled');
 
-    // Display links of equivalent MusicBrainz entities
-    insertMBLinks(current_page_key);
-
     // Add an import button in a new section in sidebar, if we're on a release page
     let current_page_info = link_infos[current_page_key];
     if (current_page_info.type === 'release') {
@@ -99,6 +96,9 @@ $(document).ready(function () {
                 LOGGER.error('AJAX error thrown: ', errorThrown);
             },
         });
+    } else {
+        // Display links of equivalent MusicBrainz entities
+        insertMBLinks(current_page_key);
     }
 });
 
@@ -310,12 +310,17 @@ function insertMBLinks(current_page_key) {
                         mark = entities[mb_type].mark;
                         entity_name = mb_type.replace(/[_-]/g, ' ');
                     }
+                    let search_text = $link.text();
+                    if (link_infos[current_page_key].type == 'release' && link_infos[mlink].type == 'master' && link_infos[current_page_key].title) {
+                        // Use release title for release page master search, instead of link title: “See all versions”
+                        search_text = link_infos[current_page_key].title;
+                    }
                     $link
                         .closest('span.mb_wrapper')
                         .prepend(
                             `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${MBImport.searchUrlFor(
                                 mb_type,
-                                $link.text(),
+                                search_text,
                             )}"><small>${mark}</small>?</a></span>`,
                         );
                 }
@@ -594,6 +599,10 @@ function insertMbUI(mbUI) {
 // Insert links in Discogs page
 function insertMBSection(release, current_page_key) {
     const current_page_info = link_infos[current_page_key];
+
+    // Display links of equivalent MusicBrainz entities once release title (needed for RG search) has been fetched
+    link_infos[current_page_key].title = release.title;
+    insertMBLinks(current_page_key);
 
     const mbUI = $('<div class="section musicbrainz"><header><h3>MusicBrainz</h3></header></div>').hide();
 
