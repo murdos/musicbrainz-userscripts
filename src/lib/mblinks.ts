@@ -17,6 +17,8 @@ export interface MBLinkQuery {
     mb_type: string;
     insert_func: (link: string) => void;
     key?: string;
+    /** Lucene-compatible regular expression used to match URL search results. */
+    url_regex?: string;
 }
 
 interface CacheUrl {
@@ -37,10 +39,13 @@ interface Relation {
 interface UrlResponse {
     resource: string;
     relations?: Relation[];
+    'relation-list'?: { relations?: Relation[] }[];
 }
 
 interface BatchResponse extends Partial<UrlResponse> {
     urls?: UrlResponse[];
+    count?: number;
+    offset?: number;
 }
 
 interface LinkInfo {
@@ -130,46 +135,59 @@ function processUrlMatch({
     resource: string;
     relations: Relation[] | undefined;
 }): void {
-    const matching_urls_data = batch.filter(u => u.url === resource);
+    const matching_urls_data = batch.filter(query => {
+        if (!query.url_regex) return query.url === resource;
+        try {
+            return new RegExp(`^(?:${query.url_regex})$`).test(resource);
+        } catch {
+            return false;
+        }
+    });
     if (matching_urls_data.length === 0) return;
-
-    const reference = matching_urls_data[0]!;
-    const key = reference.key || reference.url;
-    const _type = reference.mb_type.replace('-', '_');
-
-    if (!mblinks.cache[key]) {
-        mblinks.cache[key] = {
-            timestamp: new Date().getTime(),
-            urls: [],
-        };
-    }
 
     if (!relations) return;
 
-    // Build map of mb_url -> ended (true only if every relation for that URL+entity is ended).
-    const urlData: Record<string, { ended: boolean }> = {};
-    relations.forEach(relation => {
-        if (_type in relation) {
-            const entity = relation[_type] as { id: string };
-            const mb_url = `${mblinks.mb_server}/${reference.mb_type}/${entity.id}`;
-            if (!(mb_url in urlData)) urlData[mb_url] = { ended: true };
-            if (!relation.ended) urlData[mb_url]!.ended = false;
-        }
-    });
+    matching_urls_data.forEach(reference => {
+        const key = reference.key || reference.url;
+        const _type = reference.mb_type.replace('-', '_');
 
-    const cacheUrls = mblinks.cache[key].urls!;
-    const getUrl = (entry: string | CacheUrl) => (typeof entry === 'string' ? entry : entry.url);
-    Object.keys(urlData).forEach(mb_url => {
-        const ended = urlData[mb_url]!.ended;
-        const alreadyCached = cacheUrls.some(e => getUrl(e) === mb_url);
-        if (!alreadyCached) {
-            cacheUrls.push({ url: mb_url, ended: _type === 'release' ? ended : false });
+        if (!mblinks.cache[key]) {
+            mblinks.cache[key] = {
+                timestamp: new Date().getTime(),
+                urls: [],
+            };
         }
-        const link = mblinks.createMusicBrainzLink(mb_url, _type, _type === 'release' ? { ended } : {});
-        matching_urls_data.forEach(m => {
-            m.insert_func(link);
+
+        // Build map of mb_url -> ended (true only if every relation for that URL+entity is ended).
+        const urlData: Record<string, { ended: boolean }> = {};
+        relations.forEach(relation => {
+            if (_type in relation) {
+                const entity = relation[_type] as { id: string };
+                const mb_url = `${mblinks.mb_server}/${reference.mb_type}/${entity.id}`;
+                if (!(mb_url in urlData)) urlData[mb_url] = { ended: true };
+                if (!relation.ended) urlData[mb_url]!.ended = false;
+            }
+        });
+
+        const cacheUrls = mblinks.cache[key].urls!;
+        const getUrl = (entry: string | CacheUrl) => (typeof entry === 'string' ? entry : entry.url);
+        Object.keys(urlData).forEach(mb_url => {
+            const ended = urlData[mb_url]!.ended;
+            const alreadyCached = cacheUrls.some(e => getUrl(e) === mb_url);
+            if (!alreadyCached) {
+                cacheUrls.push({ url: mb_url, ended: _type === 'release' ? ended : false });
+            }
+            const link = mblinks.createMusicBrainzLink(mb_url, _type, _type === 'release' ? { ended } : {});
+            reference.insert_func(link);
         });
     });
+}
+
+function searchRelations(url: UrlResponse): Relation[] | undefined {
+    if (url.relations) return url.relations;
+    const relationLists = url['relation-list'];
+    if (!relationLists) return undefined;
+    return relationLists.flatMap(relationList => relationList.relations ?? []);
 }
 
 // user_cache_key = textual key used to store cached data in local storage
@@ -447,6 +465,79 @@ export class MBLinks {
                 },
             );
         }
+    }
+
+    /**
+     * Search MusicBrainz's indexed URL field with Lucene regular expressions.
+     */
+    searchAndDisplayMbLinksByRegex(urls_data: MBLinkQuery[]): void {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        const mblinks = this;
+        const uncachedQueries: MBLinkQuery[] = [];
+
+        urls_data.forEach(data => {
+            const key = data.key || data.url;
+            if (this.is_cached(key)) {
+                const dataType = data.mb_type.replace('-', '_');
+                mblinks.cache[key]!.urls!.forEach(cacheEntry => {
+                    const mbUrl = typeof cacheEntry === 'string' ? cacheEntry : cacheEntry.url;
+                    const ended = typeof cacheEntry === 'string' ? false : cacheEntry.ended;
+                    data.insert_func(mblinks.createMusicBrainzLink(mbUrl, dataType, dataType === 'release' ? { ended } : {}));
+                });
+            } else if (data.url_regex) {
+                uncachedQueries.push(data);
+            }
+        });
+
+        const batchSize = 20;
+        for (let i = 0; i < uncachedQueries.length; i += batchSize) {
+            const batch = uncachedQueries.slice(i, i + batchSize);
+            const regex = batch.map(data => `(${data.url_regex})`).join('|');
+            this.enqueueRegexSearchPage(batch, regex, 0);
+        }
+    }
+
+    private enqueueRegexSearchPage(batch: MBLinkQuery[], regex: string, offset: number): void {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        const mblinks = this;
+        const search = `url:/(${regex})/`;
+        const query = `${mblinks.mb_server}/ws/2/url?query=${encodeURIComponent(search)}&fmt=json&limit=100&offset=${offset}`;
+        let handlers: ((data: BatchResponse) => void)[] = [];
+        const request = mblinks.ajax_requests[query];
+        if (typeof request === 'object') handlers = request.context.handlers;
+
+        handlers.push(function (data) {
+            const urls = data.urls ?? [];
+            urls.forEach(urlData => {
+                processUrlMatch({
+                    mblinks,
+                    batch,
+                    resource: urlData.resource,
+                    relations: searchRelations(urlData),
+                });
+            });
+            mblinks.saveCache();
+
+            const responseOffset = data.offset ?? offset;
+            const nextOffset = responseOffset + urls.length;
+            if (typeof data.count === 'number' && urls.length > 0 && nextOffset < data.count) {
+                mblinks.enqueueRegexSearchPage(batch, regex, nextOffset);
+            }
+        });
+
+        mblinks.ajax_requests.push(
+            query,
+            function () {
+                // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback context.
+                const ctx = this;
+                ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
+                    ctx.handlers.forEach(handler => {
+                        handler(data);
+                    });
+                });
+            },
+            { handlers, query, mblinks },
+        );
     }
 }
 
