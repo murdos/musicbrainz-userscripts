@@ -182,20 +182,35 @@ describe('MBLinks regex URL search', () => {
         expect(requestTimes[2]! - requestTimes[1]!).toBeGreaterThanOrEqual(1000);
     });
 
-    it('uses exponential backoff for repeated 503 responses', async () => {
+    it('keeps retrying 503 responses with exponential backoff', async () => {
         const requestTimes: number[] = [];
         const fetchMock = vi.fn(() => {
             requestTimes.push(Date.now());
-            const ok = requestTimes.length === 4;
+            const ok = requestTimes.length === 6;
             return Promise.resolve({ ok, status: ok ? 200 : 503, json: () => Promise.resolve({}) });
         });
         vi.stubGlobal('fetch', fetchMock);
         const mblinks = new MBLinks('QOBUZ_BACKOFF_TEST');
 
         mblinks.getJSONWithRetry('request', vi.fn());
-        await vi.advanceTimersByTimeAsync(8000);
+        await vi.advanceTimersByTimeAsync(32_000);
 
-        expect(fetchMock).toHaveBeenCalledTimes(4);
-        expect(requestTimes.map((time, index) => (index === 0 ? 0 : time - requestTimes[index - 1]!))).toEqual([0, 1000, 2000, 4000]);
+        expect(fetchMock).toHaveBeenCalledTimes(6);
+        expect(requestTimes.map((time, index) => (index === 0 ? 0 : time - requestTimes[index - 1]!))).toEqual([
+            0, 1000, 2000, 4000, 8000, 16_000,
+        ]);
+    });
+
+    it('stops retrying before the five-minute retry budget is exceeded', async () => {
+        const fetchMock = vi.fn(() => Promise.resolve({ ok: false, status: 503 }));
+        const done = vi.fn();
+        vi.stubGlobal('fetch', fetchMock);
+        const mblinks = new MBLinks('QOBUZ_RETRY_BUDGET_TEST');
+
+        mblinks.getJSONWithRetry('request', vi.fn(), done);
+        await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+
+        expect(fetchMock).toHaveBeenCalledTimes(14);
+        expect(done).toHaveBeenCalledOnce();
     });
 });
