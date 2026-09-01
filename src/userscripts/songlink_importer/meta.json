@@ -1,0 +1,13 @@
+{
+    "name": "Import Songlink releases to MusicBrainz",
+    "description": "Import song.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.",
+    "version": "2026.09.01.1",
+    "author": "Raman Sinclair",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/songlink_importer.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/songlink_importer.user.js",
+    "match": ["https://song.link/*", "https://*.song.link/*"],
+    "grant": ["GM.getValue", "GM.setValue", "GM_getValue", "GM_setValue"],
+    "runAt": "document-idle",
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
+}
