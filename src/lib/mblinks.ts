@@ -244,14 +244,13 @@ export class MBLinks {
     }
 
     /**
-     * GET JSON with retry on 5xx errors (e.g. 503). Retries up to 3 times with a delay between attempts.
+     * GET JSON with retry on 5xx errors (e.g. 503). Retries up to 3 times with exponential backoff.
      * @param url - The URL to request.
      * @param successCallback - Called with response data on success.
      * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
      */
     getJSONWithRetry(url: string, successCallback: (data: BatchResponse) => void, alwaysCallback?: () => void): void {
         const maxRetries = 3;
-        const retryDelayMs = 2000;
         let attempt = 0;
 
         const doRequest = () => {
@@ -275,6 +274,7 @@ export class MBLinks {
                     const status = isErrorWithStatus(error) ? error.status : 0;
                     const is5xx = status >= 500 && status < 600;
                     if (is5xx && attempt <= maxRetries) {
+                        const retryDelayMs = 1000 * 2 ** (attempt - 1);
                         setTimeout(() => {
                             this.scheduleRequest(doRequest);
                         }, retryDelayMs);

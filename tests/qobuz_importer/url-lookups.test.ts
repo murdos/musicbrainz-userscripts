@@ -181,4 +181,21 @@ describe('MBLinks regex URL search', () => {
         expect(requestTimes[1]! - requestTimes[0]!).toBeGreaterThanOrEqual(1000);
         expect(requestTimes[2]! - requestTimes[1]!).toBeGreaterThanOrEqual(1000);
     });
+
+    it('uses exponential backoff for repeated 503 responses', async () => {
+        const requestTimes: number[] = [];
+        const fetchMock = vi.fn(() => {
+            requestTimes.push(Date.now());
+            const ok = requestTimes.length === 4;
+            return Promise.resolve({ ok, status: ok ? 200 : 503, json: () => Promise.resolve({}) });
+        });
+        vi.stubGlobal('fetch', fetchMock);
+        const mblinks = new MBLinks('QOBUZ_BACKOFF_TEST');
+
+        mblinks.getJSONWithRetry('request', vi.fn());
+        await vi.advanceTimersByTimeAsync(8000);
+
+        expect(fetchMock).toHaveBeenCalledTimes(4);
+        expect(requestTimes.map((time, index) => (index === 0 ? 0 : time - requestTimes[index - 1]!))).toEqual([0, 1000, 2000, 4000]);
+    });
 });
