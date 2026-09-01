@@ -157,4 +157,28 @@ describe('MBLinks regex URL search', () => {
         expect(insert).toHaveBeenCalledWith(expect.stringContaining('/artist/12345678-1234-1234-1234-123456789abc'));
         expect(mblinks.resolveMBID('qobuz:artist:8365719')).toBe('12345678-1234-1234-1234-123456789abc');
     });
+
+    it('keeps retries at least one second apart from other requests', async () => {
+        const requestTimes: number[] = [];
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce(() => {
+                requestTimes.push(Date.now());
+                return Promise.resolve({ ok: false, status: 503 });
+            })
+            .mockImplementation(() => {
+                requestTimes.push(Date.now());
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+            });
+        vi.stubGlobal('fetch', fetchMock);
+        const mblinks = new MBLinks('QOBUZ_RETRY_TEST');
+
+        mblinks.getJSONWithRetry('first', vi.fn());
+        mblinks.getJSONWithRetry('second', vi.fn());
+        await vi.advanceTimersByTimeAsync(3000);
+
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+        expect(requestTimes[1]! - requestTimes[0]!).toBeGreaterThanOrEqual(1000);
+        expect(requestTimes[2]! - requestTimes[1]!).toBeGreaterThanOrEqual(1000);
+    });
 });

@@ -196,6 +196,7 @@ function searchRelations(url: UrlResponse): Relation[] | undefined {
 export class MBLinks {
     supports_local_storage: boolean;
     ajax_requests = new AjaxRequests();
+    private nextRequestAt = 0;
     cache: Record<string, CacheEntry> = {};
     expirationMinutes: number;
     user_cache_key: string;
@@ -253,7 +254,7 @@ export class MBLinks {
         const retryDelayMs = 2000;
         let attempt = 0;
 
-        function doRequest() {
+        const doRequest = () => {
             attempt += 1;
             fetch(url, { headers: { Accept: 'application/json' } })
                 .then(function (response) {
@@ -270,17 +271,28 @@ export class MBLinks {
                         alwaysCallback();
                     }
                 })
-                .catch(function (error: unknown) {
+                .catch((error: unknown) => {
                     const status = isErrorWithStatus(error) ? error.status : 0;
                     const is5xx = status >= 500 && status < 600;
                     if (is5xx && attempt <= maxRetries) {
-                        setTimeout(doRequest, retryDelayMs);
+                        setTimeout(() => {
+                            this.scheduleRequest(doRequest);
+                        }, retryDelayMs);
                     } else if (typeof alwaysCallback === 'function') {
                         alwaysCallback();
                     }
                 });
-        }
-        doRequest();
+        };
+        this.scheduleRequest(doRequest);
+    }
+
+    private scheduleRequest(request: () => void): void {
+        const now = Date.now();
+        const runAt = Math.max(now, this.nextRequestAt);
+        this.nextRequestAt = runAt + 1000;
+        const delay = runAt - now;
+        if (delay === 0) request();
+        else setTimeout(request, delay);
     }
 
     initCache(): void {
