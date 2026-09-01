@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.01.1
+// @version      2026.09.01.2
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -776,6 +776,7 @@
     class MBLinks {
       supports_local_storage;
       ajax_requests = new AjaxRequests();
+      nextRequestAt = 0;
       cache = {};
       expirationMinutes;
       user_cache_key;
@@ -828,7 +829,7 @@
         const maxRetries = 3;
         const retryDelayMs = 2000;
         let attempt = 0;
-        function doRequest() {
+        const doRequest = () => {
           attempt += 1;
           fetch(url, {
             headers: {
@@ -846,17 +847,26 @@
             if (typeof alwaysCallback === 'function') {
               alwaysCallback();
             }
-          }).catch(function (error) {
+          }).catch(error => {
             const status = isErrorWithStatus(error) ? error.status : 0;
             const is5xx = status >= 500 && status < 600;
             if (is5xx && attempt <= maxRetries) {
-              setTimeout(doRequest, retryDelayMs);
+              setTimeout(() => {
+                this.scheduleRequest(doRequest);
+              }, retryDelayMs);
             } else if (typeof alwaysCallback === 'function') {
               alwaysCallback();
             }
           });
-        }
-        doRequest();
+        };
+        this.scheduleRequest(doRequest);
+      }
+      scheduleRequest(request) {
+        const now = Date.now();
+        const runAt = Math.max(now, this.nextRequestAt);
+        this.nextRequestAt = runAt + 1000;
+        const delay = runAt - now;
+        if (delay === 0) request();else setTimeout(request, delay);
       }
       initCache() {
         if (!this.supports_local_storage) return;
