@@ -1,7 +1,7 @@
 {
     "name": "Import Mastermix releases to MusicBrainz",
     "description": "Import Mastermix releases and show links to matching MusicBrainz releases",
-    "version": "2026.09.01.1",
+    "version": "2026.09.01.2",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js",
