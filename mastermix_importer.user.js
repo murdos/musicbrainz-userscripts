@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.01.3
+// @version      2026.09.01.4
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -820,13 +820,14 @@
       }
 
       /**
-       * GET JSON with retry on 5xx errors (e.g. 503). Retries up to 3 times with exponential backoff.
+       * GET JSON with retry on 5xx errors (e.g. 503), using exponential backoff capped at 30 seconds
+       * and a five-minute retry budget.
        * @param url - The URL to request.
        * @param successCallback - Called with response data on success.
        * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
        */
       getJSONWithRetry(url, successCallback, alwaysCallback) {
-        const maxRetries = 3;
+        const retryDeadline = Date.now() + 5 * 60 * 1000;
         let attempt = 0;
         const doRequest = () => {
           attempt += 1;
@@ -849,11 +850,15 @@
           }).catch(error => {
             const status = isErrorWithStatus(error) ? error.status : 0;
             const is5xx = status >= 500 && status < 600;
-            if (is5xx && attempt <= maxRetries) {
-              const retryDelayMs = 1000 * 2 ** (attempt - 1);
-              setTimeout(() => {
-                this.scheduleRequest(doRequest);
-              }, retryDelayMs);
+            if (is5xx) {
+              const retryDelayMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
+              if (Date.now() + retryDelayMs <= retryDeadline) {
+                setTimeout(() => {
+                  this.scheduleRequest(doRequest);
+                }, retryDelayMs);
+              } else if (typeof alwaysCallback === 'function') {
+                alwaysCallback();
+              }
             } else if (typeof alwaysCallback === 'function') {
               alwaysCallback();
             }
