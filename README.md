@@ -18,6 +18,7 @@
 - [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
 - [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
 - [Import Qobuz releases to MusicBrainz](#qobuz_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Songlink releases to MusicBrainz](#songlink_importer)
 - [Import Takealot releases to MusicBrainz](#takealot_importer)
 - [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz](#bfan_importer)
@@ -156,6 +157,13 @@ Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/qobuz_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js)
+
+## <a name="songlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Songlink releases to MusicBrainz
+
+Import song.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/songlink_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/songlink_importer.user.js)
 
 ## <a name="takealot_importer"></a> Import Takealot releases to MusicBrainz
 

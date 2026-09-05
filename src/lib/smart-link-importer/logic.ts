@@ -123,6 +123,8 @@ export function normalizeServiceUrl(rawUrl: string, rawService: string): string 
         url.search = '';
     } else if (service === 'qobuz') {
         url.search = '';
+    } else if (service === 'amazon' && url.hostname.startsWith('music.amazon.') && /\/albums\//i.test(url.pathname)) {
+        url.search = '';
     } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
         const video = url.searchParams.get('v');
