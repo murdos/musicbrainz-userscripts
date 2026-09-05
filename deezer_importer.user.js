@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Import Deezer releases into MusicBrainz
 // @description  One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version      2026.8.26.3
+// @version      2026.09.05.1
 // @author       atj
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js
-// @match        https://www.deezer.com/*/album/*
+// @match        https://www.deezer.com/*
 // @connect      api.deezer.com
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -604,6 +604,72 @@
       _add_css(css_import_button);
     }
 
+    /**
+     * Subscribe to Single Page Application (SPA) navigation events.
+     * Uses pushState/replaceState interception when possible; falls back to URL polling in sandboxed environments
+     * (e.g. Firefox/Greasemonkey) where the page uses a different history object.
+     *
+     * @param onNavigate - Callback function to execute when navigation occurs
+     * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
+     * @param pollInterval - If set, polls location.href for changes; use when pushState interception doesn't work (default: 400ms, 0 to disable)
+     * @returns Cleanup function to unsubscribe from navigation events
+     */
+    function subscribeToSPANavigation({
+      onNavigate,
+      delay = 200,
+      pollInterval = 400
+    }) {
+      let currentUrl = window.location.href;
+      const originalPushState = history.pushState.bind(history);
+      const originalReplaceState = history.replaceState.bind(history);
+      const scheduleOnNavigate = () => {
+        const newUrl = window.location.href;
+        if (newUrl !== currentUrl) {
+          currentUrl = newUrl;
+          setTimeout(() => {
+            void onNavigate();
+          }, delay);
+        }
+      };
+      let pushStatePatched = false;
+      let replaceStatePatched = false;
+      try {
+        history.pushState = function (...args) {
+          originalPushState.apply(history, args);
+          scheduleOnNavigate();
+        };
+        pushStatePatched = true;
+      } catch {
+        // pushState is read-only in some sandboxed environments
+      }
+      try {
+        history.replaceState = function (...args) {
+          originalReplaceState.apply(history, args);
+          scheduleOnNavigate();
+        };
+        replaceStatePatched = true;
+      } catch {
+        // replaceState is read-only in some sandboxed environments
+      }
+      let pollTimer;
+      if (pollInterval > 0) {
+        pollTimer = setInterval(scheduleOnNavigate, pollInterval);
+      }
+      const popstateHandler = () => {
+        currentUrl = window.location.href;
+        setTimeout(() => {
+          void onNavigate();
+        }, delay);
+      };
+      window.addEventListener('popstate', popstateHandler);
+      return () => {
+        if (pollTimer) clearInterval(pollTimer);
+        if (pushStatePatched) history.pushState = originalPushState;
+        if (replaceStatePatched) history.replaceState = originalReplaceState;
+        window.removeEventListener('popstate', popstateHandler);
+      };
+    }
+
     const LEGACY_GM_API_NAMES = {
       getValue: 'GM_getValue',
       setValue: 'GM_setValue',
@@ -770,16 +836,28 @@
     }
 
     const LOGGER = new Logger('deezer_importer', LogLevel.INFO);
-    function waitForEl(selector, callback) {
-      if (document.querySelector(selector)) {
-        callback();
+    let currentRunId = 0;
+    let mountedElements = [];
+    function cleanup() {
+      mountedElements.forEach(el => {
+        el.remove();
+      });
+      mountedElements = [];
+    }
+    function waitForEl(selector, runId, callback) {
+      if (runId !== currentRunId) {
+        return;
+      }
+      const el = document.querySelector(selector);
+      if (el) {
+        callback(el);
       } else {
         setTimeout(() => {
-          waitForEl(selector, callback);
+          waitForEl(selector, runId, callback);
         }, 100);
       }
     }
-    function insertLink(release, releaseUrl, isrcs) {
+    function insertLink(release, releaseUrl, isrcs, runId) {
       const editNote = MBImport.makeEditNote(releaseUrl, 'Deezer');
       const parameters = MBImport.buildFormParameters(release, editNote);
       const importItem = document.createElement('div');
@@ -804,46 +882,58 @@
       });
       isrcItem.appendChild(isrcForm);
       const toolbarItems = [importItem, searchItem, isrcItem];
-      waitForEl('[data-testid="toolbar"]', () => {
-        const toolbar = document.querySelector('[data-testid="toolbar"]');
-        if (toolbar) {
+      waitForEl('[data-testid="toolbar"]', runId, toolbar => {
+        if (runId === currentRunId) {
           toolbar.style.alignItems = 'center';
           toolbar.append(...toolbarItems);
+          mountedElements.push(...toolbarItems);
         }
       });
 
       // Deezer Mobile is a completely different App, so we need to mount differently
-      waitForEl('[data-tracking-label="main-CTA"]', () => {
-        const cta = document.querySelector('[data-tracking-label="main-CTA"]');
-        if (cta) {
+      waitForEl('[data-tracking-label="main-CTA"]', runId, cta => {
+        if (runId === currentRunId) {
           const mbUIContainer = document.createElement('div');
           mbUIContainer.style.cssText = 'display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; gap: 4px;';
           mbUIContainer.append(...toolbarItems);
           cta.insertAdjacentElement('afterend', mbUIContainer);
+          mountedElements.push(mbUIContainer);
         }
       });
     }
-    function init() {
-      // allow 1 second for Deezer SPA to initialize
-      setTimeout(() => {
-        MBImportStyle();
-        const releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
-        const releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
-        if (!releaseId || !/^\d+$/.test(releaseId)) {
+    function processPage() {
+      const runId = ++currentRunId;
+      cleanup();
+      const releaseUrl = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
+      const releaseId = releaseUrl.replace(/^https?:\/\/www\.deezer\.com\/[^/]+\/album\//i, '');
+      if (!releaseId || !/^\d+$/.test(releaseId)) {
+        return Promise.resolve();
+      }
+      return getDeezerReleaseData(releaseId, LOGGER).then(data => {
+        if (runId !== currentRunId) {
           return;
         }
-        void getDeezerReleaseData(releaseId, LOGGER).then(data => {
-          if (data) {
-            const {
-              release,
-              isrcs
-            } = parseDeezerRelease(releaseUrl, data);
-            insertLink(release, releaseUrl, isrcs);
-          }
-        }).catch(err => {
-          LOGGER.error('Failed to parse release: ', err);
-        });
+        if (data) {
+          const {
+            release,
+            isrcs
+          } = parseDeezerRelease(releaseUrl, data);
+          insertLink(release, releaseUrl, isrcs, runId);
+        }
+      }).catch(err => {
+        LOGGER.error('Failed to parse release: ', err);
+      });
+    }
+    function init() {
+      MBImportStyle();
+
+      // allow 1 second for Deezer SPA to initialize
+      setTimeout(() => {
+        void processPage();
       }, 1000);
+      subscribeToSPANavigation({
+        onNavigate: () => processPage()
+      });
     }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
