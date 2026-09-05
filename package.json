@@ -27,24 +27,21 @@
         "type-check": "tsgo",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
-        "lint": "pnpm run oxlint && pnpm run eslint",
-        "lint-fix": "pnpm run eslint -- --fix",
+        "lint": "pnpm run oxlint",
+        "lint-fix": "pnpm run oxlint --fix",
         "oxlint": "oxlint --type-aware",
-        "eslint": "eslint .",
         "check": "pnpm run format:check && pnpm run type-check && pnpm run lint",
         "test": "vitest run",
         "test:discogs": "vitest run tests/discogs",
         "test:discogs:update-snapshots": "node --strip-types tests/discogs/update-snapshots.ts && oxfmt tests/discogs/snapshots",
         "test:discogs:update-fixtures": "node --strip-types tests/discogs/fetch-fixtures.ts && pnpm run format tests/discogs/fixtures",
         "test:watch": "vitest",
-        "generate-readme": "node --strip-types ./tools/generate-readme.ts > README.md",
-        "prepare": "husky"
+        "generate-readme": "node --strip-types ./tools/generate-readme.ts > README.md"
     },
     "devDependencies": {
         "@babel/core": "^8.0.1",
         "@babel/preset-env": "^8.0.1",
         "@babel/preset-typescript": "^8.0.1",
-        "@eslint/js": "^9.38.0",
         "@rollup/plugin-alias": "^6.0.0",
         "@rollup/plugin-babel": "^7.1.0",
         "@rollup/plugin-commonjs": "^29.0.3",
@@ -52,23 +49,13 @@
         "@types/node": "^24.8.1",
         "@types/tampermonkey": "^5.0.5",
         "@typescript/native-preview": "7.0.0-dev.20260707.2",
-        "eslint": "^9.38.0",
-        "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-userscripts": "^0.5.6",
-        "globals": "^16.4.0",
-        "husky": "^9.1.7",
-        "lint-staged": "^16.2.4",
         "oxfmt": "^0.65.0",
         "oxlint": "^1.70.0",
         "oxlint-tsgolint": "^0.25.0",
         "rollup": "^4.62.0",
-        "typescript-eslint": "^8.46.1",
         "vitest": "^4.1.9",
         "zod": "^4.4.3"
-    },
-    "lint-staged": {
-        "*.{json,md,yml}": "oxfmt",
-        "*.{js,ts,tsx}": "eslint --fix"
     },
     "engines": {
         "node": "24.x"

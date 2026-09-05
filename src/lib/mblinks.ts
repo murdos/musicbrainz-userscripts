@@ -107,7 +107,7 @@ class AjaxRequests {
         const handler = request.handler;
         const context = request.context;
         this.first = request.next;
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Kept in line with the original request queue.
+        // oxlint-disable-next-line typescript/no-dynamic-delete -- Kept in line with the original request queue.
         delete this[key]; // delete this property
         return handler.bind(context);
     }
@@ -397,7 +397,7 @@ export class MBLinks {
     // urls_data should be an array of objects with the following structure:
     // { url: string, mb_type: string, insert_func: function, key: string }
     searchAndDisplayMbLinks(urls_data: MBLinkQuery[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback contexts.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback contexts.
         const mblinks = this;
 
         // Filter out URLs that are already cached
@@ -467,7 +467,7 @@ export class MBLinks {
             mblinks.ajax_requests.push(
                 query,
                 function () {
-                    // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback context.
+                    // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
                     const ctx = this;
                     ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
                         ctx.handlers.forEach(handler => {
@@ -488,7 +488,7 @@ export class MBLinks {
      * Search MusicBrainz's indexed URL field with Lucene regular expressions.
      */
     searchAndDisplayMbLinksByRegex(urls_data: MBLinkQuery[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
         const mblinks = this;
         const uncachedQueries: MBLinkQuery[] = [];
 
@@ -515,7 +515,7 @@ export class MBLinks {
     }
 
     private enqueueRegexSearchPage(batch: MBLinkQuery[], regex: string, offset: number): void {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
         const mblinks = this;
         const search = `url:/(${regex})/`;
         const query = `${mblinks.mb_server}/ws/2/url?query=${encodeURIComponent(search)}&fmt=json&limit=100&offset=${offset}`;
@@ -545,7 +545,7 @@ export class MBLinks {
         mblinks.ajax_requests.push(
             query,
             function () {
-                // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback context.
+                // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
                 const ctx = this;
                 ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
                     ctx.handlers.forEach(handler => {

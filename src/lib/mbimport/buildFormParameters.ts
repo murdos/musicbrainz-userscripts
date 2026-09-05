@@ -116,7 +116,7 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
                     }
                     appendParameter(parameters, `mediums.${i}.track.${j}.length`, tracklength);
                     // @ts-expect-error TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
-                    if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // eslint-disable-line @typescript-eslint/no-unsafe-argument
+                    if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // oxlint-disable-line typescript/no-unsafe-argument
                     buildArtistCreditsFormParameters(parameters, `mediums.${i}.track.${j}.`, track.artist_credit);
                 }
             }
