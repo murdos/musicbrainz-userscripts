@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.01.4
+// @version      2026.09.05.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -273,7 +273,7 @@
               }
               appendParameter(parameters, `mediums.${i}.track.${j}.length`, tracklength);
               // @ts-expect-error TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
-              if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // eslint-disable-line @typescript-eslint/no-unsafe-argument
+              if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // oxlint-disable-line typescript/no-unsafe-argument
               buildArtistCreditsFormParameters(parameters, `mediums.${i}.track.${j}.`, track.artist_credit);
             }
           }
@@ -690,7 +690,7 @@
         const handler = request.handler;
         const context = request.context;
         this.first = request.next;
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Kept in line with the original request queue.
+        // oxlint-disable-next-line typescript/no-dynamic-delete -- Kept in line with the original request queue.
         delete this[key]; // delete this property
         return handler.bind(context);
       }
@@ -960,7 +960,7 @@
       // urls_data should be an array of objects with the following structure:
       // { url: string, mb_type: string, insert_func: function, key: string }
       searchAndDisplayMbLinks(urls_data) {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback contexts.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback contexts.
         const mblinks = this;
 
         // Filter out URLs that are already cached
@@ -1027,7 +1027,7 @@
             mblinks.saveCache();
           });
           mblinks.ajax_requests.push(query, function () {
-            // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback context.
+            // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
             const ctx = this;
             ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
               ctx.handlers.forEach(handler => {
@@ -1046,7 +1046,7 @@
        * Search MusicBrainz's indexed URL field with Lucene regular expressions.
        */
       searchAndDisplayMbLinksByRegex(urls_data) {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
         const mblinks = this;
         const uncachedQueries = [];
         urls_data.forEach(data => {
@@ -1072,7 +1072,7 @@
         }
       }
       enqueueRegexSearchPage(batch, regex, offset) {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the callback contexts above.
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
         const mblinks = this;
         const search = `url:/(${regex})/`;
         const query = `${mblinks.mb_server}/ws/2/url?query=${encodeURIComponent(search)}&fmt=json&limit=100&offset=${offset}`;
@@ -1097,7 +1097,7 @@
           }
         });
         mblinks.ajax_requests.push(query, function () {
-          // eslint-disable-next-line @typescript-eslint/no-this-alias -- Kept in line with the original callback context.
+          // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
           const ctx = this;
           ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
             ctx.handlers.forEach(handler => {

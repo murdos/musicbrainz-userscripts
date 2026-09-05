@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.08.30.2
+// @version      2026.09.05.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -272,7 +272,7 @@
               }
               appendParameter(parameters, `mediums.${i}.track.${j}.length`, tracklength);
               // @ts-expect-error TODO: recording is not a property of Track and in no importer scripts a recording is found in a track. Once all scripts are migrated, we need to see if we can remove this line entirely.
-              if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // eslint-disable-line @typescript-eslint/no-unsafe-argument
+              if (track.recording) appendParameter(parameters, `mediums.${i}.track.${j}.recording`, track.recording); // oxlint-disable-line typescript/no-unsafe-argument
               buildArtistCreditsFormParameters(parameters, `mediums.${i}.track.${j}.`, track.artist_credit);
             }
           }
