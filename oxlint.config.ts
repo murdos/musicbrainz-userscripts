@@ -2,6 +2,7 @@ import { defineConfig } from 'oxlint';
 
 export default defineConfig({
     plugins: ['eslint', 'typescript', 'node', 'oxc', 'import'],
+    jsPlugins: ['eslint-plugin-userscripts'], // Oxlint has no native userscripts rules, so run eslint-plugin-userscripts through its ESLint-compatible JavaScript plugin API.
     options: {
         typeAware: true,
     },
@@ -31,6 +32,21 @@ export default defineConfig({
                 MBImport: 'readonly',
                 MBLinks: 'readonly',
                 MBSearchItStyle: 'readonly',
+            },
+            rules: {
+                'userscripts/filename-user': ['error', 'always'],
+                'userscripts/no-invalid-metadata': ['error', { top: 'required' }],
+                'userscripts/require-name': ['error', 'required'],
+                'userscripts/require-description': ['error', 'required'],
+                'userscripts/require-version': ['error', 'required'],
+                'userscripts/require-attribute-space-prefix': 'error',
+                'userscripts/use-homepage-and-url': 'error',
+                'userscripts/require-download-url': 'error',
+                'userscripts/align-attributes': ['error', 2],
+                'userscripts/metadata-spacing': 'error',
+                'userscripts/no-invalid-headers': ['error', { allowed: ['licence'] }],
+                'userscripts/no-invalid-grant': 'error',
+                'userscripts/better-use-match': 'warn',
             },
         },
     ],

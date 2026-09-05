@@ -1,1 +1,6 @@
 minimumReleaseAge: 4320 # 3 days
+
+# eslint-plugin-userscripts only needs ESLint when ESLint hosts the plugin.
+# Oxlint provides the rule API when loading it through jsPlugins.
+overrides:
+  'eslint-plugin-userscripts>eslint': '-'
