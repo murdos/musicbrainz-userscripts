@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.05.1
+// @version      2026.09.06.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -137,29 +137,71 @@
       return params;
     }
 
-    // Try to guess release type using number of tracks, title and total duration (in millisecs)
-    function guessReleaseType(title, num_tracks, duration_ms) {
-      if (num_tracks < 1) return '';
-      let has_single = !!title.match(/\bsingle\b/i);
-      let has_EP = !!title.match(/\bEP\b/i);
-      if (has_single && has_EP) {
-        has_single = false;
-        has_EP = false;
+    const VERSION_MARKER = /\b(?:acoustic|clean|club|demo|dub|edit|explicit|extended|instrumental|karaoke|live|mix|mono|radio|remaster(?:ed)?|remix|stereo|version|vocal)\b/i;
+
+    /** Remove version information while retaining the actual work title. */
+    function normalizeTrackTitle(title) {
+      let normalized = title.normalize('NFKC').toLocaleLowerCase();
+
+      // Remove bracketed qualifiers such as "(Jane Doe Remix)" or "[Live]".
+      normalized = normalized.replace(/\s*[([{]([^\])}]*?)[\])}]/g, (match, contents) => VERSION_MARKER.test(contents) ? '' : match);
+
+      // Also support unbracketed suffixes such as " - Radio Edit".
+      normalized = normalized.replace(/\s*[-–—:]\s*([^\n]*)$/, (match, suffix) => VERSION_MARKER.test(suffix) ? '' : match);
+      return normalized.replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
+    }
+    function isMultiTrackSingle(numTracks, trackTitles) {
+      if (!Array.isArray(trackTitles) || numTracks < 2 || trackTitles.length !== numTracks || trackTitles.some(title => typeof title !== 'string')) {
+        return false;
       }
-      const perhaps_single = has_single && num_tracks <= 4 || num_tracks <= 2;
-      const perhaps_EP = has_EP || num_tracks > 2 && num_tracks <= 6;
-      const perhaps_album = num_tracks > 8;
-      if (isNaN(duration_ms)) {
-        // no duration, try to guess with title and number of tracks
-        if (perhaps_single && !perhaps_EP && !perhaps_album) return 'single';
-        if (!perhaps_single && perhaps_EP && !perhaps_album) return 'EP';
-        if (!perhaps_single && !perhaps_EP && perhaps_album) return 'album';
+      const normalizedTitles = trackTitles.map(normalizeTrackTitle);
+      return normalizedTitles.every(title => title.length > 0 && title === normalizedTitles[0]);
+    }
+
+    /**
+     * Guess a primary release type in descending order of confidence:
+     *
+     * 1. Reject invalid track counts.
+     * 2. Honor an explicit "EP" or "E.P." token in the release title. It takes precedence over every other signal, including "Single" and version-title deduplication.
+     * 3. Honor an explicit "Single" token when the release remains within broad track count and duration guards. Unlike "EP", "single" is common English text and therefore needs basic false-positive protection.
+     * 4. Normalize track titles by removing technical version qualifiers such as "Remix", "Instrumental", "Edit", "Live", and "Version". If every track then has the same non-empty title, classify the release as a multi-track Single.
+     * 5. If duration is missing, use track count only where it is reasonably decisive: one track is a Single, three to six tracks is an EP, and seven or more tracks is an album. Leave two tracks unclassified because both Singles and electronic EPs commonly have two tracks.
+     * 6. With duration available, seven or more tracks or more than 30 minutes is an album. For releases with fewer than seven tracks, one to seven minutes is a Single; more than seven and up to 30 minutes with at least two tracks is an EP. Leave sub-minute releases and one-track releases between seven and 30 minutes unclassified rather than making a weak guess.
+     *
+     * `durationMs` is the complete release duration. Pass NaN when one or more track durations are unavailable. `trackTitles` must contain every track title for the multi-track Single check to apply.
+     */
+    function guessReleaseType(title, numTracks, durationMs, trackTitles = []) {
+      if (!Number.isInteger(numTracks) || numTracks < 1) return '';
+      const releaseTitle = typeof title === 'string' ? title : '';
+      const hasSingle = /\bsingle\b/i.test(releaseTitle);
+      const hasEP = /\bE\.?P\b\.?/i.test(releaseTitle);
+      const hasDuration = Number.isFinite(durationMs) && durationMs > 0;
+      const durationMinutes = hasDuration ? durationMs / 60_000 : Number.NaN;
+
+      // "EP" is a comparatively unambiguous marketing token and takes precedence, including over track-title deduplication and a simultaneous "Single" token.
+      if (hasEP) return 'EP';
+
+      // "Single" is a common English word, so retain broad sanity limits. A missing duration is not evidence against an otherwise plausible explicit token.
+      if (hasSingle && numTracks <= 8 && (!hasDuration || durationMinutes <= 50)) return 'single';
+
+      // Remix/version bundles of one work are normally marketed as singles. Do this before count/duration heuristics so large remix bundles can still be detected.
+      if (isMultiTrackSingle(numTracks, trackTitles)) return 'single';
+      if (!hasDuration) {
+        if (numTracks === 1) return 'single';
+        if (numTracks >= 3 && numTracks <= 6) return 'EP';
+        if (numTracks >= 7) return 'album';
+        // A two-track release without duration can plausibly be a Single or an EP.
         return '';
       }
-      const duration_mn = duration_ms / (60 * 1000);
-      if (perhaps_single && duration_mn >= 1 && duration_mn < 7) return 'single';
-      if (perhaps_EP && duration_mn > 7 && duration_mn <= 30) return 'EP';
-      if (perhaps_album && duration_mn > 30) return 'album';
+
+      // Track count is strong evidence for albums even when individual tracks are short.
+      if (numTracks >= 7) return 'album';
+      if (durationMinutes > 30) return 'album';
+      if (durationMinutes < 1) return '';
+      if (durationMinutes <= 7) return 'single';
+      if (numTracks >= 2) return 'EP';
+
+      // A long one-track release is album-like; 7..30 minutes remains too ambiguous.
       return '';
     }
 
@@ -251,6 +293,7 @@
       let total_tracks = 0;
       let total_tracks_with_duration = 0;
       let total_duration = 0;
+      const track_titles = [];
       for (let i = 0; i < release.discs.length; i++) {
         const disc = release.discs[i];
         if (disc) {
@@ -262,6 +305,7 @@
             const track = disc.tracks[j];
             if (track) {
               total_tracks++;
+              track_titles.push(track.title);
               if (track.number) appendParameter(parameters, `mediums.${i}.track.${j}.number`, track.number);
               appendParameter(parameters, `mediums.${i}.track.${j}.name`, track.title);
               let tracklength = '?:??';
@@ -281,8 +325,10 @@
       }
 
       // Guess release type if not given
-      if (!release.type && release.title && total_tracks == total_tracks_with_duration) {
-        release.type = guessReleaseType(release.title, total_tracks, total_duration);
+      if (!release.type && release.title) {
+        const allTracksHaveDuration = total_tracks === total_tracks_with_duration;
+        const complete_duration = allTracksHaveDuration ? total_duration : Number.NaN;
+        release.type = guessReleaseType(release.title, total_tracks, complete_duration, track_titles);
       }
       if (release.type) appendParameter(parameters, 'type', release.type);
 
