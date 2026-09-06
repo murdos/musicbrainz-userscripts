@@ -6,15 +6,8 @@
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js",
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js",
-    "match": [
-        "https://www.deezer.com/*"
-    ],
-    "connect": [
-        "api.deezer.com"
-    ],
-    "grant": [
-        "GM.xmlHttpRequest",
-        "GM_xmlhttpRequest"
-    ],
+    "match": ["https://www.deezer.com/*"],
+    "connect": ["api.deezer.com"],
+    "grant": ["GM.xmlHttpRequest", "GM_xmlhttpRequest"],
     "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
 }
