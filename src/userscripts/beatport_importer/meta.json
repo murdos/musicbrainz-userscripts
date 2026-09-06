@@ -6,8 +6,6 @@
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js",
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js",
-    "match": [
-        "https://www.beatport.com/*"
-    ],
+    "match": ["https://www.beatport.com/*"],
     "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
 }

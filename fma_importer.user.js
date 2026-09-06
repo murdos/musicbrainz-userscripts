@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import FMA releases to MusicBrainz
 // @description  Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
-// @version      2026.9.1
+// @version      2026.9.6
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js

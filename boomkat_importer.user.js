@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Boomkat releases to Musicbrainz
 // @description  Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2025.9.28
+// @version      2026.9.6
 // @license      X11
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js

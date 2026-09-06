@@ -6,12 +6,8 @@
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js",
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js",
-    "match": [
-        "https://elasticstage.com/*"
-    ],
-    "grant": [
-        "none"
-    ],
+    "match": ["https://elasticstage.com/*"],
+    "grant": ["none"],
     "runAt": "document-start",
     "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
 }
