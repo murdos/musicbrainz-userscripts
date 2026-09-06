@@ -30,6 +30,17 @@ function bumpVersion(version: string): string {
     return `${today}.1`;
 }
 
+function updateMetaVersion(content: string, version: string): string {
+    const versionProperty = /^(\s*"version"\s*:\s*)"[^"]*"(\s*,?\s*)$/gm;
+    const matches = [...content.matchAll(versionProperty)];
+
+    if (matches.length !== 1) {
+        throw new Error(`Expected exactly one version property, found ${matches.length}`);
+    }
+
+    return content.replace(versionProperty, `$1${JSON.stringify(version)}$2`);
+}
+
 function readDeployedUserscript(userscriptName: string): string | null {
     try {
         return execSync(`git show origin/${DEPLOY_BRANCH}:${userscriptName}.user.js`, {
@@ -69,11 +80,12 @@ async function main(): Promise<void> {
             continue;
         }
 
-        const meta = JSON.parse(await fs.readFile(metaPath, 'utf8')) as { version: string };
-        meta.version = bumpVersion(meta.version);
-        await fs.writeFile(metaPath, `${JSON.stringify(meta, null, 4)}\n`, 'utf8');
-        bumped.push({ name: userscriptName, version: meta.version });
-        console.log(`Bumped ${userscriptName} to ${meta.version}`);
+        const metaContent = await fs.readFile(metaPath, 'utf8');
+        const meta = JSON.parse(metaContent) as { version: string };
+        const version = bumpVersion(meta.version);
+        await fs.writeFile(metaPath, updateMetaVersion(metaContent, version), 'utf8');
+        bumped.push({ name: userscriptName, version });
+        console.log(`Bumped ${userscriptName} to ${version}`);
     }
 
     const githubOutput = process.env['GITHUB_OUTPUT'];
