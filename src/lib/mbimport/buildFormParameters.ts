@@ -94,6 +94,7 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
     let total_tracks = 0;
     let total_tracks_with_duration = 0;
     let total_duration = 0;
+    const track_titles: string[] = [];
     for (let i = 0; i < release.discs.length; i++) {
         const disc = release.discs[i];
         if (disc) {
@@ -105,6 +106,7 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
                 const track = disc.tracks[j];
                 if (track) {
                     total_tracks++;
+                    track_titles.push(track.title);
                     if (track.number) appendParameter(parameters, `mediums.${i}.track.${j}.number`, track.number);
                     appendParameter(parameters, `mediums.${i}.track.${j}.name`, track.title);
                     let tracklength = '?:??';
@@ -124,8 +126,10 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
     }
 
     // Guess release type if not given
-    if (!release.type && release.title && total_tracks == total_tracks_with_duration) {
-        release.type = guessReleaseType(release.title, total_tracks, total_duration);
+    if (!release.type && release.title) {
+        const allTracksHaveDuration = total_tracks === total_tracks_with_duration;
+        const complete_duration = allTracksHaveDuration ? total_duration : Number.NaN;
+        release.type = guessReleaseType(release.title, total_tracks, complete_duration, track_titles);
     }
     if (release.type) appendParameter(parameters, 'type', release.type);
 
