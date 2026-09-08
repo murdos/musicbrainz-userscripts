@@ -1,6 +1,6 @@
 export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
-const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'si', 'src', 'tag']);
 const IGNORED_SERVICES = new Set(['junodownload']);
 const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
 const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
