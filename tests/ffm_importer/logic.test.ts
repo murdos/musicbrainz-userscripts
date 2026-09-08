@@ -52,6 +52,9 @@ describe('FFM importer logic', () => {
                 'qobuz',
             ),
         ).toBe('https://www.qobuz.com/us-en/album/salvaging-the-future-dean-de-benedictis/ki3mxj3oly9vd');
+        expect(normalizeServiceUrl('https://example.com/release?si=share-id&utm_source=clipboard', 'other')).toBe(
+            'https://example.com/release',
+        );
     });
 
     it('matches regional Apple URLs by album ID', () => {

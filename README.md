@@ -1,6 +1,7 @@
 # MusicBrainz UserScripts
 
 - [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import BandLink releases to MusicBrainz](#bandlink_importer)
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
@@ -37,6 +38,13 @@ Display icon shortcut for relationships of release-group, release, recording and
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_relationship_shortcuts.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js)
+
+## <a name="bandlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import BandLink releases to MusicBrainz
+
+Import band.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bandlink_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bandlink_importer.user.js)
 
 ## <a name="bandcamp_importer"></a> Import Bandcamp releases to MusicBrainz
 
