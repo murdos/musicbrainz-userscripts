@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         Import bfan.link releases to MusicBrainz
-// @description  Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
+// @name         Import BandLink releases to MusicBrainz
+// @description  Import band.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.
 // @version      2026.09.08.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
-// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
-// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js
-// @match        https://bfan.link/*
-// @match        https://*.bfan.link/*
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bandlink_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bandlink_importer.user.js
+// @match        https://band.link/*
+// @match        https://*.band.link/*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        GM_getValue
@@ -35,6 +35,8 @@
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'si', 'src', 'tag']);
+    const IGNORED_SERVICES = new Set(['junodownload']);
+    const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
     const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
     const URL_RELATIONSHIP_TYPES = {
@@ -52,6 +54,14 @@
       if (normalized === 'amazonmusic') return 'amazon';
       if (normalized === 'ytmusic') return 'youtubemusic';
       return normalized;
+    }
+    function isIgnoredService(service) {
+      return IGNORED_SERVICES.has(normalizeServiceName(service));
+    }
+
+    /** Avoid attaching retailer pages for a physical edition to a matched digital release. */
+    function isPhysicalMediaLink(service, action) {
+      return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
     }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
@@ -742,72 +752,30 @@
       await checkMusicBrainz(server);
     }
 
-    function record(value) {
-      return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined;
-    }
-
-    /** Read release-provider destinations from bfan.link's Next.js hydration payload. */
-    function extractBfanServiceData(payload) {
-      const root = record(payload);
-      const props = record(root?.['props']);
-      const pageProps = record(props?.['pageProps']);
-      const backlink = record(pageProps?.['backlinkStaticData']);
-      const stores = record(backlink?.['stores']);
-      if (!backlink || !stores) return [];
-      const mode = backlink['mode'] === 'prerelease' ? 'prereleaseLandingCTAs' : 'postreleaseLandingCTAs';
-      const ctas = record(backlink[mode]);
-      const options = record(ctas?.['options']);
-      const displayOrder = Array.isArray(ctas?.['displayOrder']) ? ctas['displayOrder'].filter(value => typeof value === 'string') : Object.keys(stores);
-      const links = [];
-      for (const storeName of displayOrder) {
-        const store = record(stores[storeName]);
-        const urls = record(store?.['urls']);
-        const option = record(options?.[storeName]);
-        const sourceUrl = urls?.['default'];
-        if (typeof sourceUrl !== 'string' || !sourceUrl || option?.['isDisplayed'] === false) continue;
-        const service = normalizeServiceName(storeName);
-        if (!service) continue;
-        links.push({
-          service,
-          label: typeof store?.['displayName'] === 'string' ? store['displayName'] : storeName,
-          action: typeof option?.['label'] === 'string' ? option['label'] : '',
-          sourceUrl
-        });
-      }
-      return links;
-    }
-
-    function readServiceData() {
-      const nextData = document.querySelector('script#__NEXT_DATA__')?.textContent;
-      if (!nextData) return [];
-      try {
-        return extractBfanServiceData(JSON.parse(nextData));
-      } catch {
-        return [];
-      }
-    }
     function collectServiceElements() {
-      const dataByService = new Map(readServiceData().map(data => [data.service, data]));
+      const counters = new Map();
       const elements = [];
-      for (const element of document.querySelectorAll('[data-testid="call-to-actions"] > [data-testid]')) {
-        const rawService = element.dataset['testid'] ?? '';
-        const service = normalizeServiceName(rawService);
-        const data = dataByService.get(service);
-        if (!data) continue;
+      for (const element of document.querySelectorAll('.mod-music-services a.el-link[href]')) {
+        const label = element.querySelector('.el-link__service-text')?.textContent.trim() || '';
+        const service = normalizeServiceName(label);
+        const action = element.querySelector('.el-link__action')?.textContent.trim() || '';
+        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        const count = (counters.get(service) ?? 0) + 1;
+        counters.set(service, count);
         elements.push({
-          cacheKey: service,
+          cacheKey: count === 1 ? service : `${service}:${count}`,
           element,
           service,
-          label: element.querySelector('img[alt]')?.alt || data.label,
-          action: element.querySelector('button')?.textContent.trim() || data.action,
-          sourceUrl: data.sourceUrl
+          label,
+          action,
+          sourceUrl: element.href
         });
       }
       return elements;
     }
     void runSmartLinkImporter({
-      id: 'bfan',
-      siteName: 'bfan.link',
+      id: 'bandlink',
+      siteName: 'BandLink',
       collectServiceElements,
       resolveDestination: element => element.sourceUrl
     });

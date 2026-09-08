@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Fanlink releases to MusicBrainz
 // @description  Import fanlink.tv smart links with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.08.28.2
+// @version      2026.09.08.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js
@@ -37,7 +37,7 @@
     }
 
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
-    const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'src', 'tag']);
+    const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'si', 'src', 'tag']);
     const IGNORED_SERVICES = new Set(['junodownload']);
     const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
