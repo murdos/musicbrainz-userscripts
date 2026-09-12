@@ -1,14 +1,13 @@
 {
     "name": "Import FFM releases to MusicBrainz",
-    "description": "Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.",
-    "version": "2026.09.08.1",
+    "description": "Deprecated: install the unified Smartlink importer, then remove this script.",
+    "version": "2026.09.13.1",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
     "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js",
     "match": ["https://ffm.to/*", "https://*.ffm.to/*", "https://orcd.co/*", "https://*.orcd.co/*"],
-    "connect": ["*"],
-    "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
+    "discontinued": true,
     "runAt": "document-idle",
     "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
 }

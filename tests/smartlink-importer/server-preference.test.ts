@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { readServerPreference, saveServerPreference } from '../../src/lib/smart-link-importer/server-preference';
+import { readServerPreference, saveServerPreference } from '~/userscripts/smartlink_importer/utils/server-preference';
 
 const PREFERENCE_KEY = 'smartlink-mb-importer:server';
 const PRODUCTION = 'https://musicbrainz.org';
@@ -22,7 +22,7 @@ afterEach(() => {
     vi.unstubAllGlobals();
 });
 
-describe('MusicBrainz server preference', () => {
+describe('Smartlink importer MusicBrainz server preference', () => {
     test('reads the preference from userscript storage', async () => {
         const localStorage = stubLocalStorage(PRODUCTION);
         const getValue = vi.fn(() => Promise.resolve(BETA));

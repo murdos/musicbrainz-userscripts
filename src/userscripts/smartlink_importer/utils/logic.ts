@@ -1,4 +1,5 @@
-export const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
+/** Shared domain logic for the Smartlink importer. */
+const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'] as const;
 
 const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'si', 'src', 'tag']);
 const IGNORED_SERVICES = new Set(['junodownload']);
@@ -29,7 +30,7 @@ export interface ReleaseMatch {
     matchedUrls: string[];
 }
 
-export interface ReleaseUrlRelation {
+interface ReleaseUrlRelation {
     url?: { resource?: string };
 }
 

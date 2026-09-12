@@ -1,7 +1,6 @@
 # MusicBrainz UserScripts
 
 - [Display shortcut for relationships on MusicBrainz](#mb_relationship_shortcuts)
-- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import BandLink releases to MusicBrainz](#bandlink_importer)
 - [Import Bandcamp releases to MusicBrainz](#bandcamp_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Beatport releases to MusicBrainz](#beatport_importer)
 - [Import Boomkat releases to Musicbrainz](#boomkat_importer)
@@ -9,9 +8,7 @@
 - [Import Discogs releases to MusicBrainz](#discogs_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import ElasticStage releases to MusicBrainz](#elasticstage_importer)
 - [Import Encyclopedisque releases to MusicBrainz](#encyclopedisque_importer)
-- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz](#ffm_importer)
 - [Import FMA releases to MusicBrainz](#fma_importer)
-- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Fanlink releases to MusicBrainz](#fanlink_importer)
 - [Import HDtracks releases into MusicBrainz](#hdtracks_importer)
 - [Import Loot releases to MusicBrainz](#loot_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mastermix releases to MusicBrainz](#mastermix_importer)
@@ -21,8 +18,6 @@
 - [Import Qobuz releases to MusicBrainz](#qobuz_importer)
 - [Import Takealot releases to MusicBrainz](#takealot_importer)
 - [Import VGMdb releases into MusicBrainz](#vgmdb_importer)
-- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import album.link releases to MusicBrainz](#albumlink_importer)
-- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz](#bfan_importer)
 - [MusicBrainz: 1200px CAA](#mb_1200px_caa)
 - [MusicBrainz: Add recording edit links to instrument pages](#edit-instrument-recordings-links)
 - [MusicBrainz: Batch-add "performance of" relationships](#batch-add-recording-relationships)
@@ -32,6 +27,7 @@
 - [MusicBrainz: Set recording comments for a release](#set-recording-comments)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Musicbrainz DiscIds Detector](#mb_discids_detector)
 - [Musicbrainz UI enhancements](#mb_ui_enhancements)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Smartlink importer](#smartlink_importer)
 
 ## <a name="mb_relationship_shortcuts"></a> Display shortcut for relationships on MusicBrainz
 
@@ -39,13 +35,6 @@ Display icon shortcut for relationships of release-group, release, recording and
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_relationship_shortcuts.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/mb_relationship_shortcuts.user.js)
-
-## <a name="bandlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import BandLink releases to MusicBrainz
-
-Import band.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bandlink_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bandlink_importer.user.js)
 
 ## <a name="bandcamp_importer"></a> Import Bandcamp releases to MusicBrainz
 
@@ -96,26 +85,12 @@ Easily import Encyclopedisque releases into MusicBrainz
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/encyclopedisque_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js)
 
-## <a name="ffm_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import FFM releases to MusicBrainz
-
-Import Feature.fm smart links from ffm.to and orcd.co with Harmony and add their remaining URL relationships to MusicBrainz.
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/ffm_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ffm_importer.user.js)
-
 ## <a name="fma_importer"></a> Import FMA releases to MusicBrainz
 
 Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/fma_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js)
-
-## <a name="fanlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Fanlink releases to MusicBrainz
-
-Import fanlink.tv smart links with Harmony and add their remaining URL relationships to MusicBrainz.
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/fanlink_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js)
 
 ## <a name="hdtracks_importer"></a> Import HDtracks releases into MusicBrainz
 
@@ -180,20 +155,6 @@ One-click importing of releases from vgmdb.net into MusicBrainz. **⚠️ Curren
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/vgmdb_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js)
 
-## <a name="albumlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import album.link releases to MusicBrainz
-
-Import album.link smart links with Harmony and add their remaining URL relationships to MusicBrainz.
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/albumlink_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/albumlink_importer.user.js)
-
-## <a name="bfan_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import bfan.link releases to MusicBrainz
-
-Import bfan.link smart links with Harmony and add their remaining URL relationships to MusicBrainz. Bfan is Believe Digital's link aggregator service.
-
-[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/bfan_importer.user.js)
-[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/bfan_importer.user.js)
-
 ## <a name="mb_1200px_caa"></a> MusicBrainz: 1200px CAA
 
 Use the 1200px images for the pop‐up/previews on Release cover art pages.
@@ -256,3 +217,19 @@ Various UI enhancements for Musicbrainz
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/mb_ui_enhancements.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js)
+
+## <a name="smartlink_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Smartlink importer
+
+Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
+
+Supported sites:
+
+- `album.link`
+- `band.link`
+- `bfan.link`
+- `fanlink.tv`
+- `ffm.to`
+- `orcd.co`
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/smartlink_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js)
