@@ -1,17 +1,19 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.6
+// @version      2026.9.13
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @match        https://*.bandcamp.com/*
 // @match        https://web.archive.org/web/*
+// @connect      bandcamp.com
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
 // @require      lib/mblinks.js?version=v2026.09.01.5
 // @require      lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
+// @grant        GM.xmlHttpRequest
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
@@ -128,12 +130,65 @@ const buildBandcampAnnotation = current => {
     return annotation.replaceAll('[', '&#91;').replaceAll(']', '&#93;');
 };
 
+const getEmbeddedPlayerData = albumId =>
+    new Promise(resolve => {
+        const handleRequestError = () => {
+            LOGGER.error('Could not load Bandcamp embedded player data');
+            resolve(null);
+        };
+
+        GM.xmlHttpRequest({
+            method: 'GET',
+            url: `https://bandcamp.com/EmbeddedPlayer/album=${albumId}`,
+            timeout: 10_000,
+            onload: response => {
+                if (response.status < 200 || response.status >= 300) {
+                    LOGGER.error(`Could not load Bandcamp embedded player (HTTP ${response.status})`);
+                    resolve(null);
+                    return;
+                }
+
+                try {
+                    const playerDocument = new DOMParser().parseFromString(response.responseText, 'text/html');
+                    const serializedPlayerData = playerDocument.querySelector('[data-player-data]')?.getAttribute('data-player-data');
+                    if (!serializedPlayerData) {
+                        LOGGER.error('Could not find Bandcamp embedded player data');
+                        resolve(null);
+                        return;
+                    }
+                    resolve(JSON.parse(serializedPlayerData));
+                } catch (error) {
+                    LOGGER.error('Could not parse Bandcamp embedded player data', error);
+                    resolve(null);
+                }
+            },
+            onerror: handleRequestError,
+            ontimeout: handleRequestError,
+        });
+    });
+
+const populatePreorderTrackDurations = async bandcampAlbumData => {
+    if (bandcampAlbumData.item_type !== 'album' || !bandcampAlbumData.album_is_preorder) return;
+
+    const playerData = await getEmbeddedPlayerData(bandcampAlbumData.id);
+    if (!Array.isArray(playerData?.tracks)) return;
+
+    const playerTracksById = new Map(playerData.tracks.map(track => [track.id, track]));
+    bandcampAlbumData.trackinfo.forEach((track, index) => {
+        const playerTrack = playerTracksById.get(track.track_id) ?? playerData.tracks[index];
+        if (Number.isFinite(playerTrack?.duration) && playerTrack.duration > 0) {
+            track.duration = playerTrack.duration;
+        }
+    });
+};
+
 const BandcampImport = {
     // Analyze Bandcamp data and return a release object
-    retrieveReleaseInfo: function (isPrivateStream) {
+    retrieveReleaseInfo: async function (isPrivateStream) {
         let bandcampAlbumData = unsafeWindow.TralbumData;
         let bandcampEmbedData = unsafeWindow.EmbedData;
         const bandcampMobileData = unsafeWindow.TralbumJSONLD;
+        await populatePreorderTrackDurations(bandcampAlbumData);
         const { url: releaseUrl, alternateUrls } = resolveBandcampReleaseUrl(bandcampAlbumData.url);
 
         const artist = bandcampAlbumData.artist || bandcampMobileData?.byArtist?.name;
@@ -603,7 +658,7 @@ const initDiscoverPage = () => {
     });
 };
 
-function init() {
+async function init() {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
      * bandcamp pages under third-party domains.
@@ -654,7 +709,7 @@ function init() {
     } else if (hasAlbumData) {
         MBImportStyle();
 
-        let release = BandcampImport.retrieveReleaseInfo(isPrivateStream);
+        let release = await BandcampImport.retrieveReleaseInfo(isPrivateStream);
 
         // add MB artist link
         let root_url = getBandRootUrl();
