@@ -134,6 +134,9 @@ describe('FFM importer logic', () => {
 
     it('maps service actions to MusicBrainz URL relationship types', () => {
         expect(relationshipTypeFor(serviceLink('amazon'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
+        expect(relationshipTypeFor(serviceLink('tidal', 'https://tidal.com/album/534550860', 'Listen'))).toBe(
+            URL_RELATIONSHIP_TYPES.streaming,
+        );
         expect(relationshipTypeFor(serviceLink('youtubemusic'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
         expect(relationshipTypeFor(serviceLink('qobuz', undefined, 'Buy'))).toBe(URL_RELATIONSHIP_TYPES.purchaseForDownload);
