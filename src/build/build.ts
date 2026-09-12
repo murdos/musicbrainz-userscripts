@@ -40,6 +40,8 @@ const MetadataSchema = z.strictObject({
     downloadURL: z.string(),
     updateURL: z.string(),
     match: z.array(z.string()),
+    supportedSites: z.array(z.string()).optional(),
+    discontinued: z.boolean().optional(),
     connect: z.array(z.string()).optional(),
     require: z.array(z.string()).optional(),
     grant: z.array(z.string()).optional(),

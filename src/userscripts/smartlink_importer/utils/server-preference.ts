@@ -1,4 +1,4 @@
-import { getGmApi } from '../userscript-api';
+import { getGmApi } from '~/lib/userscript-api';
 
 const SERVER_PREFERENCE_KEY = 'smartlink-mb-importer:server';
 

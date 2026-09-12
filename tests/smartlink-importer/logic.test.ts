@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-    chooseHarmonyLink,
     canonicalServiceUrlKey,
+    chooseHarmonyLink,
     decodeFfmDestination,
     expandLegacyBoomplayResources,
     extractReleaseUrlResources,
@@ -15,13 +15,13 @@ import {
     relationshipTypeFor,
     URL_RELATIONSHIP_TYPES,
     type ServiceLink,
-} from '../../src/lib/smart-link-importer/logic';
+} from '~/userscripts/smartlink_importer/utils/logic';
 
 function serviceLink(service: string, url = `https://example.com/${service}`, action = 'Play'): ServiceLink {
     return { service, label: service, action, sourceUrl: 'https://api.ffm.to/link', url };
 }
 
-describe('FFM importer logic', () => {
+describe('Smartlink importer shared logic', () => {
     it('decodes the destination from an FFM cd payload', () => {
         const payload = Buffer.from(JSON.stringify({ product: 'smartlink', destUrl: 'https://open.spotify.com/album/abc123' })).toString(
             'base64url',

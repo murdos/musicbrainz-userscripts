@@ -1,0 +1,28 @@
+{
+    "name": "Smartlink importer",
+    "description": "Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.",
+    "version": "2026.09.13.1",
+    "author": "Raman Sinclair",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js",
+    "match": [
+        "https://album.link/*",
+        "https://*.album.link/*",
+        "https://band.link/*",
+        "https://*.band.link/*",
+        "https://bfan.link/*",
+        "https://*.bfan.link/*",
+        "https://fanlink.tv/*",
+        "https://*.fanlink.tv/*",
+        "https://ffm.to/*",
+        "https://*.ffm.to/*",
+        "https://orcd.co/*",
+        "https://*.orcd.co/*"
+    ],
+    "supportedSites": ["album.link", "band.link", "bfan.link", "fanlink.tv", "ffm.to", "orcd.co"],
+    "connect": ["*"],
+    "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
+    "runAt": "document-idle",
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
+}

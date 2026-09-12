@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Import Juno Download releases to MusicBrainz (⚠️ deprecated, no-op)
+// @name         [DISCONTINUED] Import Juno Download releases to MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  [⚠️ script is deprecated] Juno Download importer is deprecated since www.junodownload.com is now defunct. This script is a no-op now and will be removed in the future.
 // @version      2026.7.7.1

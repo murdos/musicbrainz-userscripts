@@ -4,6 +4,7 @@
  * Includes both JavaScript and TypeScript scripts.
  *
  * If the script has the [DISCONTINUED] tag in its name, it is not included in the output.
+ * TypeScript metadata can instead set `discontinued` to true. Its optional `supportedSites` array is rendered below the description.
  *
  * Example of usage:
  *     $> node --strip-types ./tools/generate_README.ts > README.md
@@ -24,6 +25,8 @@ interface ScriptHeader {
     name: [string, ...string[]];
     description?: string[];
     downloadurl?: string[];
+    supportedSites?: string[];
+    discontinued?: boolean;
 }
 
 interface ScriptItem {
@@ -121,12 +124,16 @@ if (fs.statSync(srcUserscripts, { throwIfNoEntry: false })?.isDirectory()) {
             name: string;
             description: string;
             downloadURL: string;
+            supportedSites?: string[];
+            discontinued?: boolean;
         };
         const header: ScriptHeader = {
             name: [meta.name],
             description: [meta.description],
             downloadurl: [meta.downloadURL],
         };
+        if (meta.supportedSites) header.supportedSites = meta.supportedSites;
+        if (meta.discontinued !== undefined) header.discontinued = meta.discontinued;
         itemsByShortname[name] = {
             jsfile: `dist/${name}.user.js`,
             shortname: name,
@@ -145,7 +152,7 @@ function isTypescript(shortname: string): boolean {
 }
 
 let items = Object.values(itemsByShortname);
-items = items.filter(item => !item.header.name[0].includes('[DISCONTINUED]'));
+items = items.filter(item => !item.header.discontinued && !item.header.name[0].includes('[DISCONTINUED]'));
 items.sort((a, b) => {
     const nameA = a.header.name[0];
     const nameB = b.header.name[0];
@@ -174,6 +181,13 @@ for (const item of items) {
 
     if (item.header.description?.[0]) {
         lines.push(item.header.description[0]);
+        lines.push('');
+    }
+
+    if (item.header.supportedSites?.length) {
+        lines.push('Supported sites:');
+        lines.push('');
+        for (const site of item.header.supportedSites) lines.push(`- \`${site}\``);
         lines.push('');
     }
 
