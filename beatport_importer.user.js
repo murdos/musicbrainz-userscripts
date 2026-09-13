@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.09.06.1
+// @version      2026.09.13.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -449,6 +449,7 @@
 
     const MB_SEARCH_MARKS = {
       artist: 'A',
+      recording: 'T',
       release: 'R',
       'release-group': 'G',
       place: 'P',

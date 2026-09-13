@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         Import Mastermix releases to MusicBrainz
-// @description  Import Mastermix releases and show links to matching MusicBrainz releases
+// @name         Import Mirlo releases to MusicBrainz
+// @description  One-click importing of releases from mirlo.space into MusicBrainz
 // @version      2026.09.13.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
-// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
-// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
-// @match        https://mastermixdj.com/*
-// @match        https://www.mastermixdj.com/*
+// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js
+// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js
+// @match        https://mirlo.space/*
+// @grant        none
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
@@ -686,6 +686,72 @@
       _add_css(css_search_it);
     }
 
+    /**
+     * Subscribe to Single Page Application (SPA) navigation events.
+     * Uses pushState/replaceState interception when possible; falls back to URL polling in sandboxed environments
+     * (e.g. Firefox/Greasemonkey) where the page uses a different history object.
+     *
+     * @param onNavigate - Callback function to execute when navigation occurs
+     * @param delay - Delay in milliseconds before calling onNavigate (default: 200ms)
+     * @param pollInterval - If set, polls location.href for changes; use when pushState interception doesn't work (default: 400ms, 0 to disable)
+     * @returns Cleanup function to unsubscribe from navigation events
+     */
+    function subscribeToSPANavigation({
+      onNavigate,
+      delay = 200,
+      pollInterval = 400
+    }) {
+      let currentUrl = window.location.href;
+      const originalPushState = history.pushState.bind(history);
+      const originalReplaceState = history.replaceState.bind(history);
+      const scheduleOnNavigate = () => {
+        const newUrl = window.location.href;
+        if (newUrl !== currentUrl) {
+          currentUrl = newUrl;
+          setTimeout(() => {
+            void onNavigate();
+          }, delay);
+        }
+      };
+      let pushStatePatched = false;
+      let replaceStatePatched = false;
+      try {
+        history.pushState = function (...args) {
+          originalPushState.apply(history, args);
+          scheduleOnNavigate();
+        };
+        pushStatePatched = true;
+      } catch {
+        // pushState is read-only in some sandboxed environments
+      }
+      try {
+        history.replaceState = function (...args) {
+          originalReplaceState.apply(history, args);
+          scheduleOnNavigate();
+        };
+        replaceStatePatched = true;
+      } catch {
+        // replaceState is read-only in some sandboxed environments
+      }
+      let pollTimer;
+      if (pollInterval > 0) {
+        pollTimer = setInterval(scheduleOnNavigate, pollInterval);
+      }
+      const popstateHandler = () => {
+        currentUrl = window.location.href;
+        setTimeout(() => {
+          void onNavigate();
+        }, delay);
+      };
+      window.addEventListener('popstate', popstateHandler);
+      return () => {
+        if (pollTimer) clearInterval(pollTimer);
+        if (pushStatePatched) history.pushState = originalPushState;
+        if (replaceStatePatched) history.replaceState = originalReplaceState;
+        window.removeEventListener('popstate', popstateHandler);
+      };
+    }
+
     // Class MBLinks : query MusicBrainz for urls and display links for matching urls
     // The main method is searchAndDisplayMbLinks()
 
@@ -1166,331 +1232,631 @@
       return typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number';
     }
 
-    function normalizeProductUrl(url) {
-      const parsed = new URL(url, window.location.origin);
-      parsed.search = '';
-      parsed.hash = '';
-      return parsed.href;
+    const LOOKUP_ATTRIBUTE = 'data-mb-mirlo-lookup';
+    const RELEASE_PATH = /^\/([^/]+)\/release\/([^/]+)\/?$/;
+    const TRACK_PATH = /^\/([^/]+)\/release\/([^/]+)\/tracks\/(\d+)\/?$/;
+    const HOMEPAGE_SECTION_HEADINGS = new Set(['Recent releases', 'Recent purchases']);
+    const RELEASE_CARD_LINK_SELECTOR = ':is(h2, h3, h4) > a[href]';
+    let entityMatchHandler;
+    let scheduleLookups;
+    const labelRosterTypes = new Map();
+    const loadingLabelRosters = new Set();
+    function canonicalUrl(pathname) {
+      return `${window.location.origin}${pathname.replace(/\/$/, '')}`;
     }
-    function createReleaseSearchLink(title) {
-      const indicator = MBImport.createEntitySearchLink('release', title);
-      indicator.classList.add('mastermix-mb-indicator');
-      indicator.addEventListener('click', event => {
-        event.stopPropagation();
-      });
-      return indicator;
+    function pathnameFor(link) {
+      try {
+        const url = new URL(link.href, window.location.origin);
+        return url.origin === window.location.origin ? url.pathname : undefined;
+      } catch {
+        return undefined;
+      }
     }
-    function addReleaseLookup(queries, {
-      url,
-      title,
-      target
-    }) {
-      const indicator = createReleaseSearchLink(title);
-      target.prepend(indicator);
+    function createLookup(queries, type, url, name, target, placement = 'prepend') {
+      if (target.hasAttribute(LOOKUP_ATTRIBUTE)) return;
+      target.setAttribute(LOOKUP_ATTRIBUTE, type);
+      const indicator = MBImport.createEntitySearchLink(type, name);
+      indicator.classList.add('mb-mirlo-link');
+      indicator.addEventListener('click', event => event.stopPropagation());
+      if (placement === 'before') target.before(indicator);else target.prepend(indicator);
       let foundMatch = false;
-      queries.push({
+      const matchedMbids = new Set();
+      let matchNotificationScheduled = false;
+      queries[type].push({
         url,
-        mb_type: 'release',
-        key: `release:${url}`,
+        mb_type: type,
+        key: `${type}:${url}`,
         insert_func: link => {
+          if (!indicator.isConnected) return;
           if (!foundMatch) {
             indicator.replaceChildren();
             indicator.classList.remove('mb_searchit');
             foundMatch = true;
           }
           indicator.insertAdjacentHTML('beforeend', link.trim());
-        }
-      });
-    }
-
-    function collectElements(root, selector) {
-      const elements = Array.from(root.querySelectorAll(selector));
-      if (root instanceof Element && root.matches(selector)) elements.unshift(root);
-      return elements;
-    }
-    function addSingleResultLookups(context, roots, queries) {
-      roots.flatMap(root => collectElements(root, 'td:nth-child(3)')).forEach(albumCell => {
-        if (!(albumCell instanceof HTMLTableCellElement) || !albumCell.closest('#singles tbody') || context.processedTargets.has(albumCell)) return;
-        const albumLink = albumCell.querySelector(':scope > a[href*="/product/"]');
-        const title = albumLink?.textContent.trim();
-        if (!albumLink || !title) return;
-        context.processedTargets.add(albumCell);
-        albumCell.classList.add('mastermix-search-single-album');
-        addReleaseLookup(queries, {
-          url: normalizeProductUrl(albumLink.href),
-          title,
-          target: albumCell
-        });
-      });
-    }
-    function addAlbumResultLookups(context, roots, queries) {
-      roots.flatMap(root => collectElements(root, '.text-container > h3')).forEach(titleElement => {
-        if (!(titleElement instanceof HTMLElement) || !titleElement.closest('#js-list-albums') || context.processedTargets.has(titleElement)) return;
-        const productLink = titleElement.closest('a[href*="/product/"]');
-        const title = titleElement.textContent.trim();
-        if (!productLink || !title) return;
-        context.processedTargets.add(titleElement);
-        titleElement.classList.add('mastermix-search-album-title');
-        addReleaseLookup(queries, {
-          url: normalizeProductUrl(productLink.href),
-          title,
-          target: titleElement
-        });
-      });
-    }
-    function addSearchResultLookups(context, roots) {
-      const queries = [];
-      addSingleResultLookups(context, roots, queries);
-      addAlbumResultLookups(context, roots, queries);
-      if (queries.length > 0) context.mblinks.searchAndDisplayMbLinks(queries);
-    }
-    function handleResultMutations(context, mutations) {
-      const addedElements = mutations.flatMap(mutation => Array.from(mutation.addedNodes).filter(node => node instanceof Element));
-      if (addedElements.length > 0) addSearchResultLookups(context, addedElements);
-    }
-    function observeDynamicResults(context) {
-      const resultContainers = document.querySelectorAll('#singles tbody, #js-list-singles, #js-list-albums');
-      if (resultContainers.length === 0) return;
-      const observer = new MutationObserver(handleResultMutations.bind(undefined, context));
-      resultContainers.forEach(container => {
-        observer.observe(container, {
-          childList: true,
-          subtree: true
-        });
-      });
-    }
-    function initSearchResultLookups(mblinks) {
-      const context = {
-        mblinks,
-        processedTargets: new WeakSet()
-      };
-      addSearchResultLookups(context, [document]);
-      observeDynamicResults(context);
-    }
-
-    const LOGGER = new Logger('MusicBrainz mastermix_importer', LogLevel.INFO);
-    const MASTERMIX_MBID = '8e0090e8-9081-4797-a386-990040f0accf'; // Music Factory label
-    const MASTERMIX_LABEL = 'Music Factory';
-    const PRODUCT_URL_PATTERN = /^\/product\/[^/]+\/?$/;
-    function getCurrentProductUrl() {
-      const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href;
-      return normalizeProductUrl(canonicalUrl || window.location.href);
-    }
-    function addReleaseLookups(mblinks) {
-      MBSearchItStyle();
-      const queries = [];
-      document.querySelectorAll('article.article--album').forEach(article => {
-        const productLink = article.querySelector(':scope > a[href*="/product/"]');
-        const titleElement = productLink?.querySelector('h2');
-        const title = titleElement?.textContent.trim();
-        if (!productLink || !titleElement || !title) return;
-        const titleText = document.createElement('span');
-        titleText.className = 'mastermix-card-title-text';
-        titleText.textContent = title;
-        titleElement.replaceChildren(titleText);
-        titleElement.classList.add('mastermix-card-title');
-        addReleaseLookup(queries, {
-          url: normalizeProductUrl(productLink.href),
-          title,
-          target: titleElement
-        });
-      });
-      if (PRODUCT_URL_PATTERN.test(window.location.pathname)) {
-        const title = document.querySelector('h1.product_title');
-        if (title?.textContent.trim()) {
-          addReleaseLookup(queries, {
-            url: getCurrentProductUrl(),
-            title: title.textContent.trim(),
-            target: title
+          const mbid = link.match(new RegExp(`/${type}/([0-9a-f-]{36})`, 'i'))?.[1];
+          if (!mbid) return;
+          matchedMbids.add(mbid);
+          if (matchNotificationScheduled) return;
+          matchNotificationScheduled = true;
+          queueMicrotask(() => {
+            matchNotificationScheduled = false;
+            if (matchedMbids.size === 1) entityMatchHandler?.(type, url, mbid);
           });
         }
-      }
-      if (queries.length > 0) {
-        mblinks.searchAndDisplayMbLinks(queries);
-      }
-    }
-    function getProductId() {
-      const product = document.querySelector('.product[id^="product-"]');
-      return product?.id.match(/^product-(\d+)$/)?.[1];
-    }
-    async function getPublicationDate() {
-      const productId = getProductId();
-      if (!productId) return undefined;
-      try {
-        const response = await fetch(`/wp-json/wp/v2/product/${productId}`, {
-          headers: {
-            Accept: 'application/json'
-          }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        const data = await response.json();
-        const match = data.date?.match(/^(\d{4})-(\d{2})-(\d{2})T/);
-        if (!match) return undefined;
-        return {
-          year: parseInt(match[1], 10),
-          month: parseInt(match[2], 10),
-          day: parseInt(match[3], 10)
-        };
-      } catch (error) {
-        LOGGER.error('Could not retrieve the product publication date', error);
-        return undefined;
-      }
-    }
-    function getReleaseArtistCredit(tracks) {
-      const artists = tracks.map(track => track.artist_credit[0]?.artist_name).filter(artist => typeof artist === 'string');
-      const uniqueArtists = [...new Set(artists)];
-      return uniqueArtists.length === 1 && uniqueArtists[0] !== 'Various Artists' ? MBImport.makeArtistCredits(uniqueArtists) : [MBImport.specialArtist('various_artists')];
-    }
-    function getTrackArtistCredit(artist) {
-      return artist === 'Mastermix' ? [MBImport.specialArtist('various_artists')] : MBImport.makeArtistCredits([artist]);
-    }
-    function getAnnotation() {
-      const description = document.querySelector('.woocommerce-product-details__short-description .wysiwyg');
-      if (!description) return undefined;
-      const paragraphs = Array.from(description.querySelectorAll('p')).map(paragraph => paragraph.textContent.trim()).filter(Boolean);
-      let annotation = paragraphs.length > 0 ? paragraphs.join('\n\n') : description.textContent.trim();
-      if (annotation) {
-        annotation = `=== Description from Mastermix ===\n\n${annotation}`;
-      }
-      return annotation || undefined;
-    }
-    function parseTracks() {
-      return Array.from(document.querySelectorAll('#mfeg-single-list tbody tr.single-item')).flatMap(row => {
-        const title = row.querySelector('.single-item__title')?.textContent.trim();
-        const artist = row.querySelector('.single-item__artist')?.textContent.trim();
-        const duration = row.querySelector('.single-item__runtime')?.textContent.trim();
-        const number = row.querySelector('.track-number')?.textContent.trim();
-        if (!title || !artist) return [];
-        const durationMs = duration ? MBImport.hmsToMilliSeconds(duration) : undefined;
-        return [{
-          ...(number ? {
-            number
-          } : {}),
-          title,
-          ...(durationMs === undefined ? {} : {
-            duration: durationMs
-          }),
-          artist_credit: getTrackArtistCredit(artist)
-        }];
       });
     }
-    async function parseRelease() {
-      const titleElement = document.querySelector('h1.product_title');
-      const title = Array.from(titleElement?.childNodes ?? []).filter(node => !(node instanceof HTMLElement && node.classList.contains('mastermix-mb-indicator'))).map(node => node.textContent).join('').trim();
-      const tracks = parseTracks();
-      if (!title || tracks.length === 0) return undefined;
-
-      // Publication date is not found in the DOM, so we need to call their API
-      const publicationDate = await getPublicationDate();
-      const sku = document.querySelector('.product_meta .sku')?.textContent.trim();
-      const releaseUrl = getCurrentProductUrl();
-      const annotation = getAnnotation();
+    function addArtistLookup(queries, artistSlug, artistLink) {
+      const artistName = artistLink.textContent.trim() || artistLink.title;
+      if (!artistName) return;
+      createLookup(queries, 'artist', canonicalUrl(`/${artistSlug}`), artistName, artistLink, 'before');
+    }
+    function addLabelLookups(queries, artistSlug, title) {
+      const header = title?.parentElement?.parentElement;
+      if (!header) return;
+      header.querySelectorAll('a[href]').forEach(link => {
+        const pathname = pathnameFor(link)?.replace(/\/$/, '');
+        if (!pathname || pathname === `/${artistSlug}` || !/^\/[^/]+$/.test(pathname)) return;
+        const labelName = link.textContent.trim() || link.title;
+        if (labelName) createLookup(queries, 'label', canonicalUrl(pathname), labelName, link, 'before');
+      });
+    }
+    function addReleasePageLookups(queries, artistSlug, releaseSlug) {
+      const releaseUrl = canonicalUrl(`/${artistSlug}/release/${releaseSlug}`);
+      const title = document.querySelector('#main-content h1');
+      if (title?.textContent.trim()) createLookup(queries, 'release', releaseUrl, title.textContent.trim(), title);
+      addLabelLookups(queries, artistSlug, title);
+      document.querySelectorAll('#main-content a[href]').forEach(link => {
+        if (pathnameFor(link)?.replace(/\/$/, '') === `/${artistSlug}`) addArtistLookup(queries, artistSlug, link);
+      });
+      document.querySelectorAll('#main-content li[id]').forEach(row => {
+        if (!/^\d+$/.test(row.id) || !row.querySelector('button[aria-label="Track options"]')) return;
+        const details = row.children.item(1);
+        const trackTitle = details?.children.item(0);
+        const name = trackTitle?.textContent.trim();
+        if (!trackTitle || !name) return;
+        createLookup(queries, 'recording', `${releaseUrl}/tracks/${row.id}`, name, trackTitle);
+      });
+    }
+    function addTrackPageLookups(queries, artistSlug, releaseSlug, trackId) {
+      const releasePath = `/${artistSlug}/release/${releaseSlug}`;
+      const releaseUrl = canonicalUrl(releasePath);
+      const title = document.querySelector('#main-content h1');
+      if (title?.textContent.trim()) {
+        createLookup(queries, 'recording', `${releaseUrl}/tracks/${trackId}`, title.textContent.trim(), title);
+      }
+      addLabelLookups(queries, artistSlug, title);
+      document.querySelectorAll('#main-content a[href]').forEach(link => {
+        const pathname = pathnameFor(link)?.replace(/\/$/, '');
+        if (pathname === `/${artistSlug}`) addArtistLookup(queries, artistSlug, link);
+        if (pathname === releasePath) {
+          const releaseName = link.textContent.trim() || link.title;
+          if (releaseName) createLookup(queries, 'release', releaseUrl, releaseName, link, 'before');
+        }
+      });
+    }
+    function addArtistPageLookups(queries, artistSlug) {
+      const releasePathPrefix = `/${artistSlug}/release/`;
+      const releases = [...document.querySelectorAll('#main-content h2 > a[href]')].filter(link => pathnameFor(link)?.startsWith(releasePathPrefix));
+      if (releases.length === 0) return;
+      const artistTitle = document.querySelector('#main-content h1');
+      if (artistTitle?.textContent.trim()) {
+        createLookup(queries, 'artist', canonicalUrl(`/${artistSlug}`), artistTitle.textContent.trim(), artistTitle);
+      }
+      releases.forEach(link => {
+        const pathname = pathnameFor(link);
+        const name = link.textContent.trim() || link.title;
+        if (pathname && name) createLookup(queries, 'release', canonicalUrl(pathname), name, link.parentElement ?? link);
+      });
+    }
+    function homepageSectionFor(heading) {
+      let section = heading.parentElement;
+      while (section && section !== document.body) {
+        if (section.querySelector(`li ${RELEASE_CARD_LINK_SELECTOR}`)) return section;
+        section = section.parentElement;
+      }
+      return undefined;
+    }
+    function addReleaseCardLookups(queries, container) {
+      container.querySelectorAll('li').forEach(card => {
+        const releaseLink = card.querySelector(RELEASE_CARD_LINK_SELECTOR);
+        const releasePath = releaseLink ? pathnameFor(releaseLink) : undefined;
+        const releaseMatch = releasePath ? RELEASE_PATH.exec(releasePath) : null;
+        const releaseName = releaseLink?.textContent.trim() || releaseLink?.title;
+        if (!releaseLink || !releasePath || !releaseMatch?.[1] || !releaseName) return;
+        createLookup(queries, 'release', canonicalUrl(releasePath), releaseName, releaseLink.parentElement ?? releaseLink);
+        const artistPath = `/${releaseMatch[1]}`;
+        const artistLink = [...card.querySelectorAll('a[href]')].find(link => pathnameFor(link)?.replace(/\/$/, '') === artistPath);
+        if (artistLink) {
+          artistLink.parentElement?.classList.add('mb-mirlo-card-entity');
+          addArtistLookup(queries, releaseMatch[1], artistLink);
+        }
+      });
+    }
+    function addTrackCardLookups(queries, container) {
+      container.querySelectorAll('li').forEach(card => {
+        const trackLink = card.querySelector(RELEASE_CARD_LINK_SELECTOR);
+        const trackPath = trackLink ? pathnameFor(trackLink) : undefined;
+        const trackMatch = trackPath ? TRACK_PATH.exec(trackPath) : null;
+        const trackName = trackLink?.textContent.trim() || trackLink?.title;
+        if (!trackLink || !trackPath || !trackMatch?.[1] || !trackName) return;
+        createLookup(queries, 'recording', canonicalUrl(trackPath), trackName, trackLink.parentElement ?? trackLink);
+        const artistPath = `/${trackMatch[1]}`;
+        const artistLink = [...card.querySelectorAll('a[href]')].find(link => pathnameFor(link)?.replace(/\/$/, '') === artistPath);
+        if (artistLink) {
+          artistLink.parentElement?.classList.add('mb-mirlo-card-entity');
+          addArtistLookup(queries, trackMatch[1], artistLink);
+        }
+      });
+    }
+    function addHomepageLookups(queries) {
+      document.querySelectorAll('#main-content h3').forEach(heading => {
+        if (!HOMEPAGE_SECTION_HEADINGS.has(heading.textContent.trim())) return;
+        const section = homepageSectionFor(heading);
+        if (section) addReleaseCardLookups(queries, section);
+      });
+    }
+    function addReleasesPageLookups(queries) {
+      const mainContent = document.querySelector('#main-content');
+      if (mainContent) addReleaseCardLookups(queries, mainContent);
+    }
+    function resultContainerAfter(heading, resultSelector) {
+      let current = heading;
+      while (current && current.parentElement !== document.body) {
+        const resultContainer = current.nextElementSibling;
+        if (resultContainer?.querySelector(resultSelector)) return resultContainer;
+        current = current.parentElement;
+      }
+      return undefined;
+    }
+    function addProfileCardLookups(queries, typeForPath, container) {
+      const links = [...container.querySelectorAll('a[href]')];
+      links.forEach(link => {
+        const pathname = pathnameFor(link)?.replace(/\/$/, '');
+        const name = link.textContent.trim();
+        if (!pathname || !name || !/^\/[^/]+$/.test(pathname)) return;
+        const hasMatchingImageLink = links.some(candidate => candidate !== link && pathnameFor(candidate)?.replace(/\/$/, '') === pathname && candidate.querySelector('img'));
+        if (!hasMatchingImageLink) return;
+        const type = typeof typeForPath === 'function' ? typeForPath(pathname) : typeForPath;
+        if (!type) return;
+        link.parentElement?.classList.add('mb-mirlo-card-entity');
+        createLookup(queries, type, canonicalUrl(pathname), name, link, 'before');
+      });
+    }
+    function addSearchPageLookups(queries) {
+      document.querySelectorAll('#main-content h2').forEach(heading => {
+        const headingText = heading.textContent.trim();
+        if (/^Releases(?: for\b|$)/.test(headingText)) {
+          const container = resultContainerAfter(heading, `li ${RELEASE_CARD_LINK_SELECTOR}`);
+          if (container) addReleaseCardLookups(queries, container);
+        } else if (/^Tracks(?: for\b|$)/.test(headingText)) {
+          const container = resultContainerAfter(heading, `li ${RELEASE_CARD_LINK_SELECTOR}`);
+          if (container) addTrackCardLookups(queries, container);
+        } else if (/^Artists(?: for\b|$)/.test(headingText)) {
+          const container = resultContainerAfter(heading, 'a[href] img');
+          if (container) addProfileCardLookups(queries, 'artist', container);
+        } else if (/^Labels(?: for\b|$)/.test(headingText)) {
+          const container = resultContainerAfter(heading, 'a[href] img');
+          if (container) addProfileCardLookups(queries, 'label', container);
+        }
+      });
+    }
+    function addArtistsPageLookups(queries) {
+      const mainContent = document.querySelector('#main-content');
+      if (!mainContent) return;
+      const type = new URLSearchParams(window.location.search).get('isLabel') === 'true' ? 'label' : 'artist';
+      addProfileCardLookups(queries, type, mainContent);
+    }
+    function labelPageRoute() {
+      const match = /^\/([^/]+)(?:\/([^/]+))?\/?$/.exec(window.location.pathname);
+      if (!match?.[1]) return undefined;
+      const title = document.querySelector('#main-content h1');
+      const isLabel = [...(title?.parentElement?.querySelectorAll('span') ?? [])].some(span => span.textContent.trim() === 'Label');
+      if (!title || !isLabel) return undefined;
       return {
-        title,
-        artist_credit: getReleaseArtistCredit(tracks),
+        labelSlug: match[1],
+        ...(match[2] ? {
+          tab: match[2]
+        } : {})
+      };
+    }
+    function loadLabelRoster(labelSlug) {
+      if (labelRosterTypes.has(labelSlug) || loadingLabelRosters.has(labelSlug)) return;
+      loadingLabelRosters.add(labelSlug);
+      const endpoint = new URL(`/v1/labels/${encodeURIComponent(labelSlug)}`, window.location.origin);
+      void fetch(endpoint, {
+        headers: {
+          Accept: 'application/json'
+        }
+      }).then(response => {
+        if (!response.ok) throw new Error(`Mirlo API returned HTTP ${response.status}`);
+        return response.json();
+      }).then(data => {
+        const result = data && typeof data === 'object' ? data['result'] : undefined;
+        const roster = result && typeof result === 'object' ? result['artistLabels'] : undefined;
+        const types = new Map();
+        if (Array.isArray(roster)) {
+          roster.forEach(membership => {
+            if (!membership || typeof membership !== 'object') return;
+            const artist = membership['artist'];
+            if (!artist || typeof artist !== 'object') return;
+            const profile = artist;
+            if (typeof profile['urlSlug'] !== 'string') return;
+            types.set(`/${profile['urlSlug']}`, profile['isLabelProfile'] === true ? 'label' : 'artist');
+          });
+        }
+        labelRosterTypes.set(labelSlug, types);
+        scheduleLookups?.();
+      }).catch(() => {}).finally(() => loadingLabelRosters.delete(labelSlug));
+    }
+    function addLabelPageLookups(queries, {
+      labelSlug,
+      tab
+    }) {
+      const title = document.querySelector('#main-content h1');
+      const labelName = title?.textContent.trim();
+      if (title && labelName) createLookup(queries, 'label', canonicalUrl(`/${labelSlug}`), labelName, title);
+      const mainContent = document.querySelector('#main-content');
+      if (!mainContent) return;
+      if (tab === 'releases') {
+        addReleaseCardLookups(queries, mainContent);
+      } else if (tab === 'roster') {
+        const rosterTypes = labelRosterTypes.get(labelSlug);
+        if (rosterTypes) addProfileCardLookups(queries, pathname => rosterTypes.get(pathname), mainContent);else loadLabelRoster(labelSlug);
+      }
+    }
+    function addMirloLookups(mblinks) {
+      const queries = {
+        artist: [],
+        label: [],
+        recording: [],
+        release: []
+      };
+      const track = TRACK_PATH.exec(window.location.pathname);
+      const release = RELEASE_PATH.exec(window.location.pathname);
+      const labelPage = labelPageRoute();
+      if (window.location.pathname === '/') addHomepageLookups(queries);else if (window.location.pathname.replace(/\/$/, '') === '/releases') addReleasesPageLookups(queries);else if (window.location.pathname.replace(/\/$/, '') === '/search') addSearchPageLookups(queries);else if (window.location.pathname.replace(/\/$/, '') === '/artists') addArtistsPageLookups(queries);else if (track?.[1] && track[2] && track[3]) addTrackPageLookups(queries, track[1], track[2], track[3]);else if (release?.[1] && release[2]) addReleasePageLookups(queries, release[1], release[2]);else if (labelPage) addLabelPageLookups(queries, labelPage);else {
+        const artist = /^\/([^/]+)\/?$/.exec(window.location.pathname);
+        if (artist?.[1]) addArtistPageLookups(queries, artist[1]);
+      }
+      Object.values(queries).forEach(typeQueries => {
+        if (typeQueries.length > 0) mblinks.searchAndDisplayMbLinks(typeQueries);
+      });
+    }
+    function initMirloLinking(onEntityMatch) {
+      entityMatchHandler = onEntityMatch;
+      MBSearchItStyle();
+      const mblinks = new MBLinks('MIRLO_MBLINKS_CACHE', 1);
+      let scheduled = false;
+      scheduleLookups = () => {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+          scheduled = false;
+          addMirloLookups(mblinks);
+        });
+      };
+      scheduleLookups();
+      new MutationObserver(scheduleLookups).observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      return mblinks;
+    }
+
+    function parseDate(value) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? '');
+      if (!match) return {};
+      return {
+        year: Number(match[1]),
+        month: Number(match[2]),
+        day: Number(match[3])
+      };
+    }
+    function mapReleaseType(type) {
+      switch (type?.trim().toLocaleLowerCase()) {
+        case 'album':
+        case 'lp':
+          return 'album';
+        case 'ep':
+        case 'e.p.':
+          return 'EP';
+        case 'single':
+          return 'single';
+        default:
+          return '';
+      }
+    }
+    function trackArtistNames(track, fallbackArtist) {
+      const artists = [...(track.trackArtists ?? [])].sort((left, right) => (left.order ?? 0) - (right.order ?? 0)).filter(artist => artist.artistName?.trim()).map(artist => ({
+        name: artist.artistName.trim(),
+        isCoAuthor: artist.isCoAuthor
+      }));
+      const coAuthors = artists.filter(artist => artist.isCoAuthor);
+      return (coAuthors.length > 0 ? coAuthors : artists).map(artist => artist.name).concat(artists.length === 0 ? [fallbackArtist] : []);
+    }
+    function durationInMilliseconds(track) {
+      const seconds = track.audio?.duration;
+      return typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 0 ? Math.round(seconds * 1000) : undefined;
+    }
+    function commonLicenseUrl(tracks) {
+      if (tracks.length === 0) return undefined;
+      const links = tracks.map(track => track.license?.link?.trim()).filter(link => Boolean(link));
+      if (links.length !== tracks.length || new Set(links).size !== 1) return undefined;
+      return links[0];
+    }
+    function buildAnnotation(trackGroup) {
+      const genres = [...new Set((trackGroup.tags ?? []).map(tag => tag.trim()).filter(Boolean))].join(', ');
+      const sections = [['Credits', trackGroup.credits], ['About', trackGroup.about], ['Genres', genres]].flatMap(([heading, content]) => {
+        const trimmedContent = content?.trim().replaceAll('\r', '') ?? '';
+        return trimmedContent ? [`=== ${heading} from Mirlo ===`, trimmedContent] : [];
+      });
+      if (sections.length === 0) return undefined;
+      return sections.join('\n\n').replaceAll('[', '&#91;').replaceAll(']', '&#93;');
+    }
+    function parseMirloRelease(releaseUrl, trackGroup) {
+      const sourceTracks = [...trackGroup.tracks].sort((left, right) => left.order - right.order);
+      const tracks = sourceTracks.map(track => {
+        const mbTrack = {
+          artist_credit: makeArtistCredits(trackArtistNames(track, trackGroup.artist.name)),
+          title: track.title,
+          number: track.order
+        };
+        const duration = durationInMilliseconds(track);
+        if (duration !== undefined) mbTrack.duration = duration;
+        return mbTrack;
+      });
+      const durations = tracks.map(track => typeof track.duration === 'number' ? track.duration : Number.NaN);
+      const completeDuration = durations.every(Number.isFinite) ? durations.reduce((total, duration) => total + duration, 0) : Number.NaN;
+      const urls = trackGroup.isGettable ? [{
+        url: releaseUrl,
+        link_type: URL_TYPES.purchase_for_download
+      }] : [];
+      const licenseUrl = commonLicenseUrl(sourceTracks);
+      if (licenseUrl) urls.push({
+        url: licenseUrl,
+        link_type: URL_TYPES.license
+      });
+      const explicitType = mapReleaseType(trackGroup.type);
+      const annotation = buildAnnotation(trackGroup);
+      const release = {
+        artist_credit: makeArtistCredits([trackGroup.artist.name]),
+        title: trackGroup.title,
+        ...parseDate(trackGroup.releaseDate ?? trackGroup.publishedAt),
         ...(annotation ? {
           annotation
         } : {}),
-        type: 'album',
-        secondary_types: ['compilation', 'dj-mix'],
-        status: 'official',
-        language: 'eng',
-        script: 'Latn',
         packaging: 'None',
         country: 'XW',
-        ...(publicationDate ?? {}),
-        labels: [{
-          mbid: MASTERMIX_MBID,
-          name: MASTERMIX_LABEL,
-          ...(sku ? {
-            catno: sku
-          } : {})
-        }],
-        barcode: '',
-        urls: [{
-          url: releaseUrl,
-          link_type: MBImport.URL_TYPES.purchase_for_download
-        }],
+        status: 'official',
+        type: explicitType || guessReleaseType(trackGroup.title, tracks.length, completeDuration, tracks.map(track => track.title)),
+        urls,
         discs: [{
           format: 'Digital Media',
           tracks
         }]
       };
+      return {
+        release,
+        isrcs: sourceTracks.map(track => track.isrc?.trim() || null)
+      };
     }
-    async function addImportButtons() {
-      if (!PRODUCT_URL_PATTERN.test(window.location.pathname)) return;
-      const release = await parseRelease();
-      if (!release) {
-        LOGGER.error('Could not parse release data from the product page');
-        return;
-      }
-      const releaseUrl = getCurrentProductUrl();
-      const editNote = MBImport.makeEditNote(releaseUrl, 'Mastermix');
-      const parameters = MBImport.buildFormParameters(release, editNote);
-      const buttons = document.createElement('div');
-      buttons.id = 'mb_buttons';
-      buttons.className = 'mastermix-import-buttons';
-      buttons.innerHTML = MBImport.buildFormHTML(parameters) + MBImport.buildSearchButton(release);
-      const productMeta = document.querySelector('.product_meta');
-      if (!productMeta) {
-        LOGGER.error('Could not find the product metadata container');
-        return;
-      }
-      productMeta.insertAdjacentElement('afterend', buttons);
+
+    const LOGGER = new Logger('mirlo_importer', LogLevel.INFO);
+    const CONTAINER_ID = 'musicbrainz-mirlo-import';
+    const STYLE_ID = 'musicbrainz-mirlo-import-style';
+    let currentRunId = 0;
+    let mirloLinks;
+    function releaseRoute() {
+      const match = /^\/([^/]+)\/release\/([^/]+)\/?$/.exec(window.location.pathname);
+      if (!match?.[1] || !match[2]) return undefined;
+      return {
+        artistSlug: decodeURIComponent(match[1]),
+        releaseSlug: decodeURIComponent(match[2])
+      };
     }
-    function addStyles() {
-      MBImportStyle();
-      document.head.insertAdjacentHTML('beforeend', `<style>
-            .article--album a h2.mastermix-card-title {
-                display: flex;
-                align-items: center;
-            }
-            .mastermix-card-title-text {
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            h1.product_title {
-                display: flex;
-                align-items: center;
-            }
-            .mastermix-search-album-title {
-                display: flex;
-                align-items: center;
-            }
-            span.mastermix-mb-indicator {
-                display: inline-flex;
-                align-items: center;
-                flex: 0 0 auto;
-                min-height: 16px;
-                margin-right: 4px;
-                line-height: 16px;
-                vertical-align: middle;
-            }
-            .mastermix-mb-indicator a {
-                display: inline-flex;
-                align-items: center;
-                height: 16px;
-                line-height: 16px;
-            }
-            .mastermix-mb-indicator img { display: block; }
-            #singles td .mastermix-mb-indicator img {
-                width: 16px;
-                height: 16px;
-                max-width: 16px;
-            }
-            .mastermix-import-buttons { margin-top: 1rem; flex-wrap: wrap; }
-        </style>`);
+    function canonicalReleaseUrl() {
+      return `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
+    }
+    function canonicalArtistUrl() {
+      const artistSlug = /^\/([^/]+)/.exec(window.location.pathname)?.[1];
+      return artistSlug ? `${window.location.origin}/${artistSlug}` : undefined;
+    }
+    function ensureStyles() {
+      if (document.getElementById(STYLE_ID)) return;
+      const style = document.createElement('style');
+      style.id = STYLE_ID;
+      style.textContent = `
+        #${CONTAINER_ID} {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin-block-start: 10px;
+            color: inherit;
+            font: 12px Arial, sans-serif;
+        }
+        #${CONTAINER_ID} .mb-mirlo-title { font-weight: bold; }
+        #${CONTAINER_ID} .mb-mirlo-status,
+        #${CONTAINER_ID} .mb-mirlo-meta { color: var(--mi-secondary-text-color, #888); }
+        #${CONTAINER_ID} .mb-mirlo-status.mb-mirlo-error { color: #a33; }
+        #${CONTAINER_ID} .mb-mirlo-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+        #${CONTAINER_ID} .mb-mirlo-buttons form { margin: 0; }
+        .mb-mirlo-link.mb_valign {
+            margin-inline-end: 4px;
+            vertical-align: middle;
+        }
+        .mb-mirlo-link a.mb_search_link { color: #888; }
+        .mb-mirlo-link.mb_searchit a.mb_search_link:hover { color: darkblue; }
+        .mb-mirlo-card-entity {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            min-width: 0;
+        }
+        .mb-mirlo-card-entity > .mb-mirlo-link { flex: none; }
+        .mb-mirlo-card-entity > a { min-width: 0; }
+        #${CONTAINER_ID}.mb-mirlo-floating {
+            position: absolute;
+            top: 76px;
+            right: 16px;
+            z-index: 2147483646;
+            max-width: min(360px, calc(100vw - 32px));
+            padding: 10px 12px;
+            border: 1px solid rgba(120, 120, 120, 0.6);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            color: #222;
+        }
+    `;
+      document.head.appendChild(style);
+    }
+    function findMountPoint(releaseTitle) {
+      const headings = document.querySelectorAll('#main-content h1');
+      const heading = [...headings].find(candidate => {
+        if (!releaseTitle) return true;
+        const copy = candidate.cloneNode(true);
+        copy.querySelectorAll('.mb-mirlo-link').forEach(link => link.remove());
+        return copy.textContent.trim() === releaseTitle;
+      });
+      return heading?.parentElement?.parentElement ?? undefined;
+    }
+    const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+    async function waitForMountPoint(releaseTitle, runId) {
+      for (let attempt = 0; attempt < 40 && runId === currentRunId; attempt++) {
+        const mountPoint = findMountPoint(releaseTitle);
+        if (mountPoint) return mountPoint;
+        await wait(100);
+      }
+      return undefined;
+    }
+    function createContainer(mountPoint) {
+      document.getElementById(CONTAINER_ID)?.remove();
+      const container = document.createElement('aside');
+      container.id = CONTAINER_ID;
+      container.setAttribute('aria-live', 'polite');
+      container.innerHTML = '<div class="mb-mirlo-title">MusicBrainz</div><div class="mb-mirlo-status">Loading Mirlo release data…</div>';
+      if (mountPoint) {
+        mountPoint.appendChild(container);
+      } else {
+        container.classList.add('mb-mirlo-floating');
+        document.body.appendChild(container);
+      }
+      return container;
+    }
+    function renderError(container, message) {
+      const status = container.querySelector('.mb-mirlo-status');
+      if (status) {
+        status.classList.add('mb-mirlo-error');
+        status.textContent = message;
+      }
+    }
+    function isTrackGroupResponse(value) {
+      if (!value || typeof value !== 'object') return false;
+      const result = value['result'];
+      if (!result || typeof result !== 'object') return false;
+      const release = result;
+      const artist = release['artist'];
+      return typeof release['title'] === 'string' && Array.isArray(release['tracks']) && typeof artist === 'object' && artist !== null && typeof artist['name'] === 'string';
+    }
+    async function fetchTrackGroup(artistSlug, releaseSlug) {
+      const endpoint = new URL(`/v1/trackGroups/${encodeURIComponent(releaseSlug)}/`, window.location.origin);
+      endpoint.searchParams.set('artistId', artistSlug);
+      const response = await fetch(endpoint, {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+      if (!response.ok) throw new Error(`Mirlo API returned HTTP ${response.status}`);
+      const data = await response.json();
+      if (!isTrackGroupResponse(data)) throw new Error('Mirlo API returned an unexpected response');
+      return data;
+    }
+    function magicISRCForm(isrcs, editNote) {
+      if (!isrcs.some(Boolean)) return undefined;
+      const form = document.createElement('form');
+      form.className = 'musicbrainz_import';
+      form.innerHTML = '<button type="submit" title="Submit ISRCs to MusicBrainz with MagicISRC">Submit ISRCs</button>';
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const query = new URLSearchParams({
+          'edit-note': editNote
+        });
+        isrcs.forEach((isrc, index) => query.set(`isrc${index + 1}`, isrc ?? ''));
+        window.open(`https://magicisrc.kepstin.ca?${query.toString()}`, '_blank', 'noopener');
+      });
+      return form;
+    }
+    function populateArtistMbid(mbid) {
+      const form = document.querySelector(`#${CONTAINER_ID} form.musicbrainz_import_add`);
+      const releaseArtist = form?.querySelector('input[name="artist_credit.names.0.artist.name"]');
+      if (!form || !releaseArtist) return;
+      form.querySelectorAll('input[name$=".artist.name"]').forEach(artistNameInput => {
+        if (artistNameInput.value !== releaseArtist.value) return;
+        const mbidParameterName = artistNameInput.name.replace(/\.artist\.name$/, '.mbid');
+        const existingInput = [...form.elements].find(element => element instanceof HTMLInputElement && element.name === mbidParameterName);
+        const mbidInput = existingInput ?? document.createElement('input');
+        mbidInput.type = 'hidden';
+        mbidInput.name = mbidParameterName;
+        mbidInput.value = mbid;
+        if (!existingInput) form.appendChild(mbidInput);
+      });
+    }
+    function handleEntityMatch(type, url, mbid) {
+      if (type === 'artist' && url === canonicalArtistUrl()) populateArtistMbid(mbid);
+    }
+    async function processPage() {
+      const runId = ++currentRunId;
+      document.getElementById(CONTAINER_ID)?.remove();
+      const route = releaseRoute();
+      if (!route) return;
+      try {
+        const data = await fetchTrackGroup(route.artistSlug, route.releaseSlug);
+        if (runId !== currentRunId) return;
+        const mountPoint = await waitForMountPoint(data.result.title, runId);
+        if (runId !== currentRunId) return;
+        if (!mountPoint) LOGGER.error('Could not find the Mirlo release heading; using the floating fallback');
+        const container = createContainer(mountPoint);
+        const releaseUrl = canonicalReleaseUrl();
+        const {
+          release,
+          isrcs
+        } = parseMirloRelease(releaseUrl, data.result);
+        const editNote = MBImport.makeEditNote(releaseUrl, 'Mirlo');
+        const buttons = document.createElement('div');
+        buttons.className = 'mb-mirlo-buttons';
+        buttons.innerHTML = MBImport.buildFormHTML(MBImport.buildFormParameters(release, editNote)) + MBImport.buildSearchButton(release);
+        const isrcForm = magicISRCForm(isrcs, editNote);
+        if (isrcForm) buttons.appendChild(isrcForm);
+        container.replaceChildren();
+        const title = document.createElement('div');
+        title.className = 'mb-mirlo-title';
+        title.textContent = 'MusicBrainz';
+        const meta = document.createElement('div');
+        meta.className = 'mb-mirlo-meta';
+        meta.textContent = `${release.discs[0]?.tracks.length ?? 0} tracks · Digital Media`;
+        container.append(title, meta, buttons);
+        const artistUrl = canonicalArtistUrl();
+        const artistMbid = artistUrl ? mirloLinks?.resolveMBID(`artist:${artistUrl}`) : undefined;
+        if (artistMbid) populateArtistMbid(artistMbid);
+      } catch (error) {
+        if (runId !== currentRunId) return;
+        LOGGER.error('Failed to import Mirlo release:', error);
+        const mountPoint = findMountPoint();
+        renderError(createContainer(mountPoint), error instanceof Error ? error.message : 'Could not load this Mirlo release.');
+      }
     }
     function init() {
-      addStyles();
-      const mblinks = new MBLinks('MASTERMIX_MBLINKS_CACHE', 1);
-      addReleaseLookups(mblinks);
-      initSearchResultLookups(mblinks);
-      void addImportButtons();
+      MBImportStyle();
+      ensureStyles();
+      mirloLinks = initMirloLinking(handleEntityMatch);
+      void processPage();
+      subscribeToSPANavigation({
+        onNavigate: processPage
+      });
     }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
