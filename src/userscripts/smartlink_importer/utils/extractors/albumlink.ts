@@ -1,4 +1,4 @@
-import { isIgnoredService, isPhysicalMediaLink, normalizeServiceName } from '~/userscripts/smartlink_importer/utils/logic';
+import { normalizeServiceName, skipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/logic';
 import { record } from '~/userscripts/smartlink_importer/utils/misc/record';
 import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/types';
 
@@ -56,7 +56,7 @@ export function collectAlbumLinkServiceElements(): ServiceElement[] {
         const label = serviceLabelFromAriaLabel(ariaLabel) || element.textContent.trim();
         const service = normalizeServiceName(label);
         const action = actionFromAriaLabel(ariaLabel);
-        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        if (!service || !element.href) continue;
         elements.push({
             cacheKey: nextCacheKey(counters, service),
             element,
@@ -64,6 +64,7 @@ export function collectAlbumLinkServiceElements(): ServiceElement[] {
             label,
             action,
             sourceUrl: element.href,
+            skipReason: skipReasonForServiceLink(service, action, element.href),
         });
     }
     return elements;

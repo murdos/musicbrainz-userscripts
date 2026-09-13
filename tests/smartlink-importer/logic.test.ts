@@ -11,9 +11,11 @@ import {
     findReleaseMatches,
     isIgnoredService,
     isPhysicalMediaLink,
+    isSearchFallbackServiceUrl,
     isTrackOnlyServiceUrl,
     normalizeServiceUrl,
     relationshipTypeFor,
+    skipReasonForServiceLink,
     URL_RELATIONSHIP_TYPES,
     type ServiceLink,
 } from '~/userscripts/smartlink_importer/utils/logic';
@@ -133,6 +135,14 @@ describe('Smartlink importer shared logic', () => {
         expect(isPhysicalMediaLink('tidal', 'Play (Hi-Res)')).toBe(false);
     });
 
+    it('identifies provider search fallbacks', () => {
+        expect(isSearchFallbackServiceUrl('https://listen.tidal.com/search?q=Artist%20Title')).toBe(true);
+        expect(isSearchFallbackServiceUrl('https://soundcloud.com/search/sounds?q=Artist%20Title')).toBe(true);
+        expect(isSearchFallbackServiceUrl('https://music.amazon.com/search/Artist%20Title')).toBe(true);
+        expect(isSearchFallbackServiceUrl('https://www.pandora.com/search/Artist%20Title/tracks')).toBe(true);
+        expect(isSearchFallbackServiceUrl('https://open.spotify.com/album/example')).toBe(false);
+    });
+
     it.each([
         ['spotify', 'https://open.spotify.com/track/example'],
         ['deezer', 'https://www.deezer.com/track/example'],
@@ -153,6 +163,14 @@ describe('Smartlink importer shared logic', () => {
         ['soundcloud', 'https://soundcloud.com/artist/sets/example-release'],
     ])('retains %s release URLs', (service, url) => {
         expect(isTrackOnlyServiceUrl(url, service)).toBe(false);
+    });
+
+    it('provides a shared reason for links that should be skipped', () => {
+        expect(skipReasonForServiceLink('junodownload', 'Buy', 'https://example.com/release')).toBe('Ignored service');
+        expect(skipReasonForServiceLink('unknown-store', 'Buy Vinyl', 'https://example.com/release')).toBe('Physical-media link');
+        expect(skipReasonForServiceLink('tidal', 'Play', 'https://tidal.com/search?q=example')).toBe('Search fallback');
+        expect(skipReasonForServiceLink('spotify', 'Play', 'https://open.spotify.com/track/example')).toBe('Track-only link');
+        expect(skipReasonForServiceLink('spotify', 'Play', 'https://open.spotify.com/album/example')).toBeUndefined();
     });
 
     it('maps service actions to MusicBrainz URL relationship types', () => {

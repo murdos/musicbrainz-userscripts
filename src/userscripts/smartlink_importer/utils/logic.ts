@@ -86,6 +86,14 @@ export function isPhysicalMediaLink(service: string, action: string): boolean {
     return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
 }
 
+export function isSearchFallbackServiceUrl(rawUrl: string): boolean {
+    try {
+        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
+    } catch {
+        return false;
+    }
+}
+
 /** Identify provider entities that represent a track rather than a release. */
 export function isTrackOnlyServiceUrl(rawUrl: string, rawService: string): boolean {
     const service = normalizeServiceName(rawService);
@@ -109,6 +117,15 @@ export function isTrackOnlyServiceUrl(rawUrl: string, rawService: string): boole
         return false;
     }
     return false;
+}
+
+/** Explain why a provider link is not applicable to a MusicBrainz release. */
+export function skipReasonForServiceLink(service: string, action: string, sourceUrl: string): string | undefined {
+    if (isIgnoredService(service)) return 'Ignored service';
+    if (isPhysicalMediaLink(service, action)) return 'Physical-media link';
+    if (isSearchFallbackServiceUrl(sourceUrl)) return 'Search fallback';
+    if (isTrackOnlyServiceUrl(sourceUrl, service)) return 'Track-only link';
+    return undefined;
 }
 
 function removeTrackingParameters(url: URL): void {

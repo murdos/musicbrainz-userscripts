@@ -1,4 +1,4 @@
-import { normalizeServiceName } from '~/userscripts/smartlink_importer/utils/logic';
+import { normalizeServiceName, skipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/logic';
 import { record } from '~/userscripts/smartlink_importer/utils/misc/record';
 import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/types';
 
@@ -63,13 +63,15 @@ export function collectBfanServiceElements(): ServiceElement[] {
         const service = normalizeServiceName(rawService);
         const data = dataByService.get(service);
         if (!data) continue;
+        const action = element.querySelector<HTMLButtonElement>('button')?.textContent.trim() || data.action;
         elements.push({
             cacheKey: service,
             element,
             service,
             label: element.querySelector<HTMLImageElement>('img[alt]')?.alt || data.label,
-            action: element.querySelector<HTMLButtonElement>('button')?.textContent.trim() || data.action,
+            action,
             sourceUrl: data.sourceUrl,
+            skipReason: skipReasonForServiceLink(service, action, data.sourceUrl),
         });
     }
     return elements;

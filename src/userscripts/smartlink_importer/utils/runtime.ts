@@ -8,10 +8,10 @@ import {
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
     findReleaseMatches,
-    isTrackOnlyServiceUrl,
     normalizeServiceName,
     normalizeServiceUrl,
     relationshipTypeFor,
+    skipReasonForServiceLink,
     type ReleaseMatch,
     type ServiceLink,
 } from './logic';
@@ -23,6 +23,22 @@ const HYDRATION_SETTLE_MS = 1_000;
 
 interface PageCache {
     links: Record<string, ServiceLink>;
+}
+
+function clearSkippedMark(element: HTMLElement): void {
+    element.classList.remove('smartlink-mb-skipped');
+    element.querySelector(':scope > .smartlink-mb-skipped-badge')?.remove();
+}
+
+function markSkipped(element: HTMLElement, reason: string): void {
+    clearSkippedMark(element);
+    element.classList.add('smartlink-mb-skipped');
+    const badge = document.createElement('span');
+    badge.className = 'smartlink-mb-skipped-badge';
+    badge.textContent = '\u00d7';
+    badge.title = `Skipped: ${reason}`;
+    badge.setAttribute('aria-label', badge.title);
+    element.appendChild(badge);
 }
 
 function pageCacheKey(config: SmartLinkImporterConfig): string {
@@ -90,10 +106,19 @@ function waitForServiceElements(config: SmartLinkImporterConfig): Promise<Servic
 async function resolveServiceLinks(config: SmartLinkImporterConfig, elements: ServiceElement[], cache: PageCache): Promise<ServiceLink[]> {
     const resolved = await Promise.all(
         elements.map(async element => {
+            clearSkippedMark(element.element);
+            if (element.skipReason) {
+                markSkipped(element.element, element.skipReason);
+                delete cache.links[element.cacheKey];
+                return undefined;
+            }
+
             const cached = cache.links[element.cacheKey];
             if (cached?.sourceUrl === element.sourceUrl) {
                 const refreshed = { ...cached, label: element.label, action: element.action };
-                if (isTrackOnlyServiceUrl(refreshed.url, refreshed.service)) {
+                const skipReason = skipReasonForServiceLink(refreshed.service, refreshed.action, refreshed.url);
+                if (skipReason) {
+                    markSkipped(element.element, skipReason);
                     delete cache.links[element.cacheKey];
                     return undefined;
                 }
@@ -110,7 +135,9 @@ async function resolveServiceLinks(config: SmartLinkImporterConfig, elements: Se
                     sourceUrl: element.sourceUrl,
                     url: normalizeServiceUrl(destination, element.service),
                 };
-                if (isTrackOnlyServiceUrl(link.url, link.service)) {
+                const skipReason = skipReasonForServiceLink(link.service, link.action, link.url);
+                if (skipReason) {
+                    markSkipped(element.element, skipReason);
                     delete cache.links[element.cacheKey];
                     return undefined;
                 }
@@ -227,7 +254,11 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
     }
 
     const links = await resolveServiceLinks(config, elements, cache);
-    panel.status.textContent = `Resolved ${links.length} of ${elements.length} provider links. Checking MusicBrainz…`;
+    if (links.length === 0) {
+        panel.status.textContent = `No applicable ${config.siteName} release links were found on this page.`;
+        return;
+    }
+    panel.status.textContent = `Resolved ${links.length} applicable provider link${links.length === 1 ? '' : 's'}. Checking MusicBrainz…`;
     configureHarmonyButton(panel, links);
 
     let lookupGeneration = 0;
