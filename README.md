@@ -13,6 +13,7 @@
 - [Import Loot releases to MusicBrainz](#loot_importer)
 - [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mastermix releases to MusicBrainz](#mastermix_importer)
 - [Import Metal Archives releases into MusicBrainz](#metalarchives_importer)
+- [<img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mirlo releases to MusicBrainz](#mirlo_importer)
 - [Import Naxos Music Library 3 releases to MusicBrainz](#naxos_library3_importer)
 - [Import Naxos Music Library releases to MusicBrainz](#naxos_library_importer)
 - [Import Qobuz releases to MusicBrainz](#qobuz_importer)
@@ -119,6 +120,13 @@ Add a button on Metal Archives release pages allowing to open MusicBrainz releas
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/master/metalarchives_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.github.com/murdos/musicbrainz-userscripts/master/metalarchives_importer.user.js)
+
+## <a name="mirlo_importer"></a> <img src="assets/icons/typescript.svg" alt="TypeScript" width="16" height="16"> Import Mirlo releases to MusicBrainz
+
+One-click importing of releases from mirlo.space into MusicBrainz
+
+[![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/mirlo_importer.user.js)
+[![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js)
 
 ## <a name="naxos_library3_importer"></a> Import Naxos Music Library 3 releases to MusicBrainz
 

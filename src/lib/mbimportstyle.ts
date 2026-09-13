@@ -59,6 +59,10 @@ export function MBSearchItStyle(): void {
      font-size: 11px;
      text-align: center;
    }
+   .mb_valign.mb_searchit {
+     font-weight: bold;
+     line-height: 16px;
+   }
    a.mb_search_link {
      color: #888;
      text-decoration: none;
