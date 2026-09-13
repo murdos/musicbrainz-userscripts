@@ -1,4 +1,4 @@
-import { isIgnoredService, isTrackOnlyServiceUrl, normalizeServiceName } from '~/userscripts/smartlink_importer/utils/logic';
+import { normalizeServiceName, skipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/logic';
 import { record } from '~/userscripts/smartlink_importer/utils/misc/record';
 import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/types';
 
@@ -24,15 +24,6 @@ const PROVIDERS_BY_DOMAIN: Readonly<Record<string, readonly [service: string, la
     'tidal.com': ['tidal', 'Tidal'],
     'youtube.com': ['youtube', 'YouTube'],
 };
-
-/** PromoLinks uses provider search pages when it cannot find an exact destination. */
-export function isPromoLinksSearchFallback(rawUrl: string): boolean {
-    try {
-        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
-    } catch {
-        return false;
-    }
-}
 
 function providerForUrl(rawUrl: string): readonly [service: string, label: string] | undefined {
     try {
@@ -70,13 +61,11 @@ export function extractPromoLinksServiceData(payload: unknown): PromoLinksServic
 
     const links: PromoLinksServiceData[] = [];
     for (const sourceUrl of sameAs) {
-        if (typeof sourceUrl !== 'string' || isPromoLinksSearchFallback(sourceUrl)) continue;
+        if (typeof sourceUrl !== 'string') continue;
         const provider = providerForUrl(sourceUrl);
         if (!provider) continue;
         const [service, label] = provider;
-        if (!isIgnoredService(service) && !isTrackOnlyServiceUrl(sourceUrl, service)) {
-            links.push({ service: normalizeServiceName(service), label, sourceUrl });
-        }
+        links.push({ service: normalizeServiceName(service), label, sourceUrl });
     }
     return links;
 }
@@ -122,6 +111,7 @@ export function collectPromoLinksServiceElements(): ServiceElement[] {
             label: data.label,
             action: '',
             sourceUrl: data.sourceUrl,
+            skipReason: skipReasonForServiceLink(data.service, '', data.sourceUrl),
         });
     }
     return elements;

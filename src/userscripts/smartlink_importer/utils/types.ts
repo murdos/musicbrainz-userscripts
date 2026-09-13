@@ -5,6 +5,7 @@ export interface ServiceElement {
     label: string;
     action: string;
     sourceUrl: string;
+    skipReason?: string | undefined;
 }
 
 export interface SmartLinkImporterConfig {

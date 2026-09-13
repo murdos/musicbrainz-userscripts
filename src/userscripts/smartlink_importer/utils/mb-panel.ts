@@ -81,9 +81,12 @@ function addStyles(config: SmartLinkImporterConfig): void {
         #${importerPanelId} .smartlink-mb-button:hover:not(:disabled) { background: #fff; }
         #${importerPanelId} .smartlink-mb-button:disabled { cursor: default; opacity: 0.55; }
         #${importerPanelId} .smartlink-mb-button img { flex: none; }
-        .smartlink-mb-present { position: relative; outline: 3px solid #32a852 !important; }
-        .smartlink-mb-present::after {
-            content: '\u2713';
+        .smartlink-mb-present,
+        .smartlink-mb-skipped { position: relative; }
+        .smartlink-mb-present { outline: 3px solid #32a852 !important; }
+        .smartlink-mb-skipped { outline: 3px solid #888 !important; filter: grayscale(1); opacity: 0.65; }
+        .smartlink-mb-present::after,
+        .smartlink-mb-skipped-badge {
             position: absolute;
             top: -7px;
             right: -7px;
@@ -96,6 +99,8 @@ function addStyles(config: SmartLinkImporterConfig): void {
             text-align: center;
             z-index: 2;
         }
+        .smartlink-mb-present::after { content: '\u2713'; }
+        .smartlink-mb-skipped-badge { background: #777; }
     `;
     document.head.appendChild(style);
 }

@@ -1,4 +1,4 @@
-import { isIgnoredService, isPhysicalMediaLink, normalizeServiceName } from '~/userscripts/smartlink_importer/utils/logic';
+import { normalizeServiceName, skipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/logic';
 import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/types';
 
 import { nextCacheKey } from './common';
@@ -10,7 +10,7 @@ export function collectFfmServiceElements(): ServiceElement[] {
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
         const action = element.querySelector<HTMLElement>('.service-text, .music-service-cta-text__overflow')?.textContent.trim() || '';
-        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        if (!service || !element.href) continue;
         elements.push({
             cacheKey: nextCacheKey(counters, service),
             element,
@@ -21,6 +21,7 @@ export function collectFfmServiceElements(): ServiceElement[] {
                 rawService,
             action,
             sourceUrl: element.href,
+            skipReason: skipReasonForServiceLink(service, action, element.href),
         });
     }
     return elements;

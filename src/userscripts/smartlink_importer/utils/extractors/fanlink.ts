@@ -1,4 +1,4 @@
-import { isIgnoredService, isPhysicalMediaLink, normalizeServiceName } from '~/userscripts/smartlink_importer/utils/logic';
+import { normalizeServiceName, skipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/logic';
 import { record } from '~/userscripts/smartlink_importer/utils/misc/record';
 import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/types';
 
@@ -85,7 +85,7 @@ export function collectFanlinkServiceElements(): ServiceElement[] {
         const service = serviceFromElement(element);
         const data = dataByService.get(service)?.shift();
         const action = element.querySelector<HTMLElement>('.link-option-row-action')?.textContent.trim() || '';
-        if (!data || isIgnoredService(service) || isPhysicalMediaLink(service, action)) continue;
+        if (!data) continue;
         elements.push({
             cacheKey: nextCacheKey(counters, service),
             element,
@@ -93,6 +93,7 @@ export function collectFanlinkServiceElements(): ServiceElement[] {
             label: element.querySelector<HTMLImageElement>('img[alt]')?.alt || data.label,
             action,
             sourceUrl: data.sourceUrl,
+            skipReason: skipReasonForServiceLink(service, action, data.sourceUrl),
         });
     }
     return elements;

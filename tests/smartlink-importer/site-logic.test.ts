@@ -8,7 +8,7 @@ import {
 } from '~/userscripts/smartlink_importer/utils/extractors/albumlink';
 import { extractBfanServiceData } from '~/userscripts/smartlink_importer/utils/extractors/bfan';
 import { extractFanlinkServiceData, extractFanlinkServiceDataFromScript } from '~/userscripts/smartlink_importer/utils/extractors/fanlink';
-import { extractPromoLinksServiceData, isPromoLinksSearchFallback } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
+import { extractPromoLinksServiceData } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
 import { smartLinkSiteForHostname } from '~/userscripts/smartlink_importer/utils/site-routing';
 
 describe('Smartlink importer site adapters', () => {
@@ -91,16 +91,7 @@ describe('Smartlink importer site adapters', () => {
         expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
     });
 
-    it('identifies PromoLinks search fallbacks while retaining exact provider URLs', () => {
-        expect(isPromoLinksSearchFallback('https://listen.tidal.com/search?q=Artist%20Title')).toBe(true);
-        expect(isPromoLinksSearchFallback('https://soundcloud.com/search/sounds?q=Artist%20Title')).toBe(true);
-        expect(isPromoLinksSearchFallback('https://music.amazon.com/search/Artist%20Title')).toBe(true);
-        expect(isPromoLinksSearchFallback('https://www.pandora.com/search/Artist%20Title/tracks')).toBe(true);
-        expect(isPromoLinksSearchFallback('https://open.spotify.com/album/example')).toBe(false);
-        expect(isPromoLinksSearchFallback('https://slowechospace.bandcamp.com/album/from-dust')).toBe(false);
-    });
-
-    it('extracts release providers from PromoLinks JSON-LD and excludes track-only and search URLs', () => {
+    it('extracts PromoLinks providers from MusicRelease JSON-LD for later applicability checks', () => {
         const payload = {
             '@context': 'https://schema.org',
             '@type': 'MusicRelease',
@@ -117,6 +108,7 @@ describe('Smartlink importer site adapters', () => {
         };
 
         expect(extractPromoLinksServiceData(payload)).toEqual([
+            { service: 'spotify', label: 'Spotify', sourceUrl: 'https://open.spotify.com/track/example' },
             { service: 'spotify', label: 'Spotify', sourceUrl: 'https://open.spotify.com/album/release-example' },
             {
                 service: 'bandcamp',
@@ -128,11 +120,14 @@ describe('Smartlink importer site adapters', () => {
                 label: 'Apple Music',
                 sourceUrl: 'https://music.apple.com/us/album/from-dust/123?i=456&uo=4',
             },
+            { service: 'youtubemusic', label: 'YouTube Music', sourceUrl: 'https://music.youtube.com/watch?v=example' },
             {
                 service: 'youtube',
                 label: 'YouTube',
                 sourceUrl: 'https://www.youtube.com/watch?v=example&list=release-playlist',
             },
+            { service: 'deezer', label: 'Deezer', sourceUrl: 'https://www.deezer.com/track/example' },
+            { service: 'tidal', label: 'Tidal', sourceUrl: 'https://listen.tidal.com/search?q=Artist%20Title' },
         ]);
     });
 
