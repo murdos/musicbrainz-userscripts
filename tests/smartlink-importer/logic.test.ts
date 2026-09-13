@@ -226,7 +226,10 @@ describe('Smartlink importer shared logic', () => {
             urls: [
                 {
                     resource: 'https://example.com/spotify',
-                    relations: [{ release: { id: releaseA } }, { release: { id: releaseB } }],
+                    relations: [
+                        { release: { id: releaseA, title: 'Release A', date: '2025-01-02', country: 'XW' } },
+                        { release: { id: releaseB, title: 'Release B', disambiguation: 'digital edition' } },
+                    ],
                 },
                 {
                     resource: 'https://example.com/deezer',
@@ -237,10 +240,18 @@ describe('Smartlink importer shared logic', () => {
         expect(findReleaseMatches(response)).toEqual([
             {
                 releaseId: releaseA,
+                title: 'Release A',
+                disambiguation: undefined,
+                date: '2025-01-02',
+                country: 'XW',
                 matchedUrls: ['https://example.com/spotify', 'https://example.com/deezer'],
             },
             {
                 releaseId: releaseB,
+                title: 'Release B',
+                disambiguation: 'digital edition',
+                date: undefined,
+                country: undefined,
                 matchedUrls: ['https://example.com/spotify'],
             },
         ]);

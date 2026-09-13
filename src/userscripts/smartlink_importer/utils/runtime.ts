@@ -237,6 +237,55 @@ function configureHarmonyButton(panel: ImportPanel, links: ServiceLink[]): void 
     panel.harmonyButton.hidden = false;
 }
 
+function displayUrl(rawUrl: string): string {
+    try {
+        const url = new URL(rawUrl);
+        return `${url.hostname}${url.pathname}${url.search}`;
+    } catch {
+        return rawUrl;
+    }
+}
+
+function showAmbiguousMatches(panel: ImportPanel, server: MusicBrainzServer, links: ServiceLink[], matches: ReleaseMatch[]): void {
+    const items = matches.map(match => {
+        const item = document.createElement('li');
+        item.className = 'smartlink-mb-match';
+
+        const release = document.createElement('a');
+        release.className = 'smartlink-mb-match-release';
+        release.href = `${server}/release/${match.releaseId}`;
+        release.target = '_blank';
+        release.textContent = match.title || `Release ${match.releaseId}`;
+        item.appendChild(release);
+
+        const metadata = [match.disambiguation, match.date, match.country].filter(value => value);
+        if (metadata.length > 0) {
+            const details = document.createElement('span');
+            details.className = 'smartlink-mb-match-meta';
+            details.textContent = ` — ${metadata.join(' · ')}`;
+            item.appendChild(details);
+        }
+
+        const matchedLinks = links.filter(link => findCanonicallyMatchedLinkUrls([link], match.matchedUrls).length > 0);
+        const urls = matchedLinks.length > 0 ? matchedLinks : match.matchedUrls.map(url => ({ label: '', url }));
+        const list = document.createElement('ul');
+        list.className = 'smartlink-mb-match-links';
+        for (const link of urls.filter((candidate, index, all) => all.findIndex(other => other.url === candidate.url) === index)) {
+            const listItem = document.createElement('li');
+            const anchor = document.createElement('a');
+            anchor.href = link.url;
+            anchor.target = '_blank';
+            anchor.textContent = link.label ? `${link.label} — ${displayUrl(link.url)}` : displayUrl(link.url);
+            listItem.appendChild(anchor);
+            list.appendChild(listItem);
+        }
+        item.appendChild(list);
+        return item;
+    });
+    panel.matches.replaceChildren(...items);
+    panel.matches.hidden = false;
+}
+
 export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Promise<void> {
     const mbPanelId = panelId(config);
     if (document.getElementById(mbPanelId)) return;
@@ -272,6 +321,8 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
         panel.progress.hidden = false;
         panel.retryButton.hidden = true;
         panel.status.textContent = `Resolved ${links.length} provider links. Checking MusicBrainz…`;
+        panel.matches.replaceChildren();
+        panel.matches.hidden = true;
         panel.release.hidden = true;
         panel.missingLinksButton.hidden = true;
         configureHarmonyButton(panel, links);
@@ -288,6 +339,7 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
             if (discoveredMatches.length > 1) {
                 panel.harmonyButton.hidden = true;
                 panel.status.textContent = `Ambiguous MusicBrainz match: these provider links belong to ${discoveredMatches.length} releases. No links can be added.`;
+                showAmbiguousMatches(panel, selectedServer, links, discoveredMatches);
                 return;
             }
             const match = await includeReleaseRelationships(links, selectedServer, discoveredMatch);

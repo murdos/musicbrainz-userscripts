@@ -27,6 +27,10 @@ export interface ServiceLink {
 
 export interface ReleaseMatch {
     releaseId: string;
+    title?: string | undefined;
+    disambiguation?: string | undefined;
+    date?: string | undefined;
+    country?: string | undefined;
     matchedUrls: string[];
 }
 
@@ -336,17 +340,33 @@ export function relationshipTypeFor(link: ServiceLink): number {
     return URL_RELATIONSHIP_TYPES.otherDatabases;
 }
 
-function readReleaseIds(relations: unknown): string[] {
+interface MatchedRelease {
+    id: string;
+    title?: string | undefined;
+    disambiguation?: string | undefined;
+    date?: string | undefined;
+    country?: string | undefined;
+}
+
+function readMatchedReleases(relations: unknown): MatchedRelease[] {
     if (!Array.isArray(relations)) return [];
-    const ids: string[] = [];
+    const releases: MatchedRelease[] = [];
     for (const relation of relations) {
         if (!relation || typeof relation !== 'object') continue;
         const release = (relation as Record<string, unknown>)['release'];
         if (!release || typeof release !== 'object') continue;
-        const id = (release as Record<string, unknown>)['id'];
-        if (typeof id === 'string') ids.push(id);
+        const record = release as Record<string, unknown>;
+        const id = record['id'];
+        if (typeof id !== 'string') continue;
+        releases.push({
+            id,
+            title: typeof record['title'] === 'string' ? record['title'] : undefined,
+            disambiguation: typeof record['disambiguation'] === 'string' ? record['disambiguation'] : undefined,
+            date: typeof record['date'] === 'string' ? record['date'] : undefined,
+            country: typeof record['country'] === 'string' ? record['country'] : undefined,
+        });
     }
-    return ids;
+    return releases;
 }
 
 /** Collect every release matched by any of the queried provider URLs. */
@@ -354,19 +374,20 @@ export function findReleaseMatches(response: unknown): ReleaseMatch[] {
     if (!response || typeof response !== 'object') return [];
     const record = response as Record<string, unknown>;
     const urlEntries = Array.isArray(record['urls']) ? record['urls'] : [record];
-    const matches = new Map<string, Set<string>>();
+    const matches = new Map<string, ReleaseMatch>();
 
     for (const entry of urlEntries) {
         if (!entry || typeof entry !== 'object') continue;
         const urlRecord = entry as Record<string, unknown>;
         const resource = urlRecord['resource'];
         if (typeof resource !== 'string') continue;
-        for (const releaseId of readReleaseIds(urlRecord['relations'])) {
-            const resources = matches.get(releaseId) ?? new Set<string>();
-            resources.add(resource);
-            matches.set(releaseId, resources);
+        for (const release of readMatchedReleases(urlRecord['relations'])) {
+            const { id: _id, ...releaseDetails } = release;
+            const match = matches.get(release.id) ?? { releaseId: release.id, ...releaseDetails, matchedUrls: [] };
+            if (!match.matchedUrls.includes(resource)) match.matchedUrls.push(resource);
+            matches.set(release.id, match);
         }
     }
 
-    return [...matches].map(([releaseId, resources]) => ({ releaseId, matchedUrls: [...resources] }));
+    return [...matches.values()];
 }
