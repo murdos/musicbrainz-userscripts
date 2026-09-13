@@ -45,6 +45,12 @@ The PromoLinks adapter supports branded subdomains. Provider destinations are re
 
 Test link: [slowecho.promolinks.me/from-dust](https://slowecho.promolinks.me/from-dust)
 
+### song.link
+
+Provider destinations are read directly from song.link’s rendered service links. Because song.link pages often represent tracks, the source provider’s parent album ID is read from the page’s Next.js data and used to construct its release URL. Other track-only destinations are ignored.
+
+Test link: [song.link/Ttu](https://song.link/Ttu)
+
 ## How it works
 
 1. The importer collects the page’s music-service links and resolves their final destinations. Track-only URLs and physical-media retailer links for CDs, vinyl, or cassettes are excluded because they do not identify the same digital release.

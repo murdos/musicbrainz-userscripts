@@ -4,6 +4,7 @@ import { createBfanConfig } from '~/userscripts/smartlink_importer/utils/configs
 import { createFanlinkConfig } from '~/userscripts/smartlink_importer/utils/configs/fanlink';
 import { createFfmConfig } from '~/userscripts/smartlink_importer/utils/configs/ffm';
 import { createPromoLinksConfig } from '~/userscripts/smartlink_importer/utils/configs/promolinks';
+import { createSonglinkConfig } from '~/userscripts/smartlink_importer/utils/configs/songlink';
 import { runSmartLinkImporter } from '~/userscripts/smartlink_importer/utils/runtime';
 import { smartLinkSiteForHostname, type SmartLinkSite } from '~/userscripts/smartlink_importer/utils/site-routing';
 import type { SmartLinkImporterConfig } from '~/userscripts/smartlink_importer/utils/types';
@@ -15,6 +16,7 @@ const configFactories: Record<SmartLinkSite, () => SmartLinkImporterConfig | und
     fanlink: createFanlinkConfig,
     ffm: createFfmConfig,
     promolinks: createPromoLinksConfig,
+    songlink: createSonglinkConfig,
 };
 
 const site = smartLinkSiteForHostname(window.location.hostname);

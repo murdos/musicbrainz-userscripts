@@ -9,6 +9,7 @@ import {
 import { extractBfanServiceData } from '~/userscripts/smartlink_importer/utils/extractors/bfan';
 import { extractFanlinkServiceData, extractFanlinkServiceDataFromScript } from '~/userscripts/smartlink_importer/utils/extractors/fanlink';
 import { extractPromoLinksServiceData } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
+import { extractSonglinkSourceRelease, parseSonglinkAriaLabel } from '~/userscripts/smartlink_importer/utils/extractors/songlink';
 import { smartLinkSiteForHostname } from '~/userscripts/smartlink_importer/utils/site-routing';
 
 describe('Smartlink importer site adapters', () => {
@@ -81,6 +82,8 @@ describe('Smartlink importer site adapters', () => {
         ['orcd.co', 'ffm'],
         ['promolinks.me', 'promolinks'],
         ['slowecho.promolinks.me', 'promolinks'],
+        ['song.link', 'songlink'],
+        ['listen.song.link', 'songlink'],
     ] as const)('routes %s to its site adapter', (hostname, adapter) => {
         expect(smartLinkSiteForHostname(hostname)).toBe(adapter);
     });
@@ -89,6 +92,42 @@ describe('Smartlink importer site adapters', () => {
         expect(smartLinkSiteForHostname('notalbum.link.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('evilffm.to.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
+        expect(smartLinkSiteForHostname('song.link.example')).toBeUndefined();
+    });
+
+    it('reads Songlink provider names and actions from rendered link labels', () => {
+        expect(parseSonglinkAriaLabel('Listen to The tone used by My second guess on Apple Music')).toEqual({
+            label: 'Apple Music',
+            action: 'Listen',
+        });
+        expect(parseSonglinkAriaLabel('Purchase and download The tone used by My second guess on Bandcamp')).toEqual({
+            label: 'Bandcamp',
+            action: 'Purchase and download',
+        });
+        expect(parseSonglinkAriaLabel('', ' TIDAL ')).toEqual({ label: 'TIDAL', action: '' });
+    });
+
+    it('builds the source provider’s album URL from Songlink track metadata', () => {
+        const payload = {
+            props: {
+                pageProps: {
+                    pageData: {
+                        entityData: {
+                            provider: 'spotify',
+                            type: 'song',
+                            id: '3ATFXOSiY7xsOwwS3ymNzf',
+                            albumId: '4h6YzqwjL7RNhHGIld2rhS',
+                        },
+                    },
+                },
+            },
+        };
+
+        expect(extractSonglinkSourceRelease(payload)).toEqual({
+            service: 'spotify',
+            url: 'https://open.spotify.com/album/4h6YzqwjL7RNhHGIld2rhS',
+        });
+        expect(extractSonglinkSourceRelease({ props: { pageProps: { pageData: { entityData: { type: 'album' } } } } })).toBeUndefined();
     });
 
     it('extracts PromoLinks providers from MusicRelease JSON-LD for later applicability checks', () => {

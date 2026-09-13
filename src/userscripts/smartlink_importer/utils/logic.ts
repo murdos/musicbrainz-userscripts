@@ -105,14 +105,11 @@ export function isTrackOnlyServiceUrl(rawUrl: string, rawService: string): boole
         const trackSegments = new Set(['episode', 'song', 'songs', 'track', 'tracks']);
 
         if (service === 'youtube' || service === 'youtubemusic') {
-            return pathParts.at(-1) === 'watch' && !url.searchParams.has('list');
+            return (hostnameMatches(url, 'youtu.be') || pathParts.at(-1) === 'watch') && !url.searchParams.has('list');
         }
         if (service === 'soundcloud') return pathParts.length >= 2 && !pathParts.includes('sets');
-        if (
-            ['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'pandora', 'qobuz', 'spotify', 'tidal'].includes(
-                service,
-            )
-        ) {
+        if (service === 'pandora') return /\/(?:TR:|track\/)/i.test(url.pathname);
+        if (['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'qobuz', 'spotify', 'tidal'].includes(service)) {
             return pathParts.some(part => trackSegments.has(part));
         }
     } catch {
@@ -167,6 +164,8 @@ export function normalizeServiceUrl(rawUrl: string, rawService: string): string 
         url.hostname = 'www.boomplay.com';
         url.search = '';
     } else if (service === 'qobuz') {
+        url.search = '';
+    } else if (service === 'amazon' && url.hostname.startsWith('music.amazon.') && /\/albums\//i.test(url.pathname)) {
         url.search = '';
     } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');

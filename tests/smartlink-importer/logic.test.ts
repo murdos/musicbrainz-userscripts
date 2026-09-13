@@ -58,6 +58,9 @@ describe('Smartlink importer shared logic', () => {
         expect(normalizeServiceUrl('https://example.com/release?si=share-id&utm_source=clipboard', 'other')).toBe(
             'https://example.com/release',
         );
+        expect(normalizeServiceUrl('https://music.amazon.com/albums/B0H5WFWC1L?trackAsin=B0H5W9VBSZ', 'amazonMusic')).toBe(
+            'https://music.amazon.com/albums/B0H5WFWC1L',
+        );
     });
 
     it('matches regional Apple URLs by album ID', () => {
@@ -153,7 +156,9 @@ describe('Smartlink importer shared logic', () => {
         ['bandcamp', 'https://artist.bandcamp.com/track/example'],
         ['tidal', 'https://tidal.com/track/example'],
         ['youtube', 'https://www.youtube.com/watch?v=example'],
+        ['youtube', 'https://youtu.be/example'],
         ['youtubemusic', 'https://music.youtube.com/watch?v=TV8SXzJcBF0'],
+        ['pandora', 'https://www.pandora.com/TR:207636456'],
         ['soundcloud', 'https://soundcloud.com/artist/example-track'],
     ])('identifies %s track-only URLs', (service, url) => {
         expect(isTrackOnlyServiceUrl(url, service)).toBe(true);
