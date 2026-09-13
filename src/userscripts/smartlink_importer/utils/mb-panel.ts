@@ -6,6 +6,7 @@ export interface ImportPanel {
     status: HTMLElement;
     progress: HTMLElement;
     retryButton: HTMLButtonElement;
+    matches: HTMLElement;
     release: HTMLAnchorElement;
     server: HTMLSelectElement;
     harmonyButton: HTMLAnchorElement;
@@ -70,6 +71,16 @@ function addStyles(config: SmartLinkImporterConfig): void {
             min-height: 18px;
         }
         #${importerPanelId} .smartlink-mb-status { color: #555; }
+        #${importerPanelId} .smartlink-mb-matches {
+            margin: 8px 0;
+            padding: 0;
+            list-style: none;
+        }
+        #${importerPanelId} .smartlink-mb-match + .smartlink-mb-match { margin-top: 8px; }
+        #${importerPanelId} .smartlink-mb-match-release { font-weight: bold; }
+        #${importerPanelId} .smartlink-mb-match-meta { color: #666; }
+        #${importerPanelId} .smartlink-mb-match-links { margin: 2px 0 0; padding-left: 20px; }
+        #${importerPanelId} .smartlink-mb-match-links a { overflow-wrap: anywhere; }
         #${importerPanelId} .smartlink-mb-progress {
             flex: none;
             width: 12px;
@@ -163,6 +174,7 @@ export function createPanel(config: SmartLinkImporterConfig, server: MusicBrainz
             <span class="smartlink-mb-status" aria-live="polite">Resolving provider links…</span>
             <button class="smartlink-mb-retry" type="button" title="Retry MusicBrainz lookup" aria-label="Retry MusicBrainz lookup" hidden>↻</button>
         </div>
+        <ol class="smartlink-mb-matches" hidden></ol>
         <div class="smartlink-mb-controls">
             <label>MusicBrainz server <select class="smartlink-mb-server"></select></label>
             <a class="smartlink-mb-release" target="_blank" hidden></a>
@@ -195,6 +207,7 @@ export function createPanel(config: SmartLinkImporterConfig, server: MusicBrainz
         status: root.querySelector<HTMLElement>('.smartlink-mb-status')!,
         progress: root.querySelector<HTMLElement>('.smartlink-mb-progress')!,
         retryButton: root.querySelector<HTMLButtonElement>('.smartlink-mb-retry')!,
+        matches: root.querySelector<HTMLElement>('.smartlink-mb-matches')!,
         release: root.querySelector<HTMLAnchorElement>('.smartlink-mb-release')!,
         server: serverSelect,
         harmonyButton: root.querySelector<HTMLAnchorElement>('.smartlink-mb-harmony')!,
