@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.13.1
+// @version      2026.9.13.2
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -722,14 +722,15 @@ const initTrackLinks = mblinks => {
             const trackData = unsafeWindow.TralbumData.trackinfo[Number.isFinite(trackNumber) ? trackNumber - 1 : index];
             const trackUrl = normalizeBandcampUrl(trackLink?.getAttribute('href') ?? trackData?.title_link);
             const trackTitle = titleElement?.textContent.trim() ?? trackData?.title;
-            if (!playCell || !trackUrl || !trackTitle) return;
+            if (!playCell) return;
 
             const linkCell = document.createElement('td');
             linkCell.className = 'bci-recording-link-col';
-            linkCell.dataset.bciRecordingUrl = trackUrl;
-            renderCellContents(linkCell, trackUrl, trackTitle);
+            if (trackUrl) linkCell.dataset.bciRecordingUrl = trackUrl;
+            if (trackTitle) renderCellContents(linkCell, trackUrl, trackTitle);
             playCell.before(linkCell);
 
+            if (!trackUrl || !trackTitle) return;
             if (queriedUrls.has(trackUrl)) return;
             queriedUrls.add(trackUrl);
             urlsData.push({
