@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.7
+// @version      2026.09.13.8
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -322,17 +322,25 @@
       }
       return URL_RELATIONSHIP_TYPES.otherDatabases;
     }
-    function readReleaseIds(relations) {
+    function readMatchedReleases(relations) {
       if (!Array.isArray(relations)) return [];
-      const ids = [];
+      const releases = [];
       for (const relation of relations) {
         if (!relation || typeof relation !== 'object') continue;
         const release = relation['release'];
         if (!release || typeof release !== 'object') continue;
-        const id = release['id'];
-        if (typeof id === 'string') ids.push(id);
+        const record = release;
+        const id = record['id'];
+        if (typeof id !== 'string') continue;
+        releases.push({
+          id,
+          title: typeof record['title'] === 'string' ? record['title'] : undefined,
+          disambiguation: typeof record['disambiguation'] === 'string' ? record['disambiguation'] : undefined,
+          date: typeof record['date'] === 'string' ? record['date'] : undefined,
+          country: typeof record['country'] === 'string' ? record['country'] : undefined
+        });
       }
-      return ids;
+      return releases;
     }
 
     /** Collect every release matched by any of the queried provider URLs. */
@@ -346,16 +354,21 @@
         const urlRecord = entry;
         const resource = urlRecord['resource'];
         if (typeof resource !== 'string') continue;
-        for (const releaseId of readReleaseIds(urlRecord['relations'])) {
-          const resources = matches.get(releaseId) ?? new Set();
-          resources.add(resource);
-          matches.set(releaseId, resources);
+        for (const release of readMatchedReleases(urlRecord['relations'])) {
+          const {
+            id: _id,
+            ...releaseDetails
+          } = release;
+          const match = matches.get(release.id) ?? {
+            releaseId: release.id,
+            ...releaseDetails,
+            matchedUrls: []
+          };
+          if (!match.matchedUrls.includes(resource)) match.matchedUrls.push(resource);
+          matches.set(release.id, match);
         }
       }
-      return [...matches].map(([releaseId, resources]) => ({
-        releaseId,
-        matchedUrls: [...resources]
-      }));
+      return [...matches.values()];
     }
 
     /** Return an object record when the value is a non-array object. */
@@ -1026,6 +1039,16 @@
             min-height: 18px;
         }
         #${importerPanelId} .smartlink-mb-status { color: #555; }
+        #${importerPanelId} .smartlink-mb-matches {
+            margin: 8px 0;
+            padding: 0;
+            list-style: none;
+        }
+        #${importerPanelId} .smartlink-mb-match + .smartlink-mb-match { margin-top: 8px; }
+        #${importerPanelId} .smartlink-mb-match-release { font-weight: bold; }
+        #${importerPanelId} .smartlink-mb-match-meta { color: #666; }
+        #${importerPanelId} .smartlink-mb-match-links { margin: 2px 0 0; padding-left: 20px; }
+        #${importerPanelId} .smartlink-mb-match-links a { overflow-wrap: anywhere; }
         #${importerPanelId} .smartlink-mb-progress {
             flex: none;
             width: 12px;
@@ -1115,6 +1138,7 @@
             <span class="smartlink-mb-status" aria-live="polite">Resolving provider links…</span>
             <button class="smartlink-mb-retry" type="button" title="Retry MusicBrainz lookup" aria-label="Retry MusicBrainz lookup" hidden>↻</button>
         </div>
+        <ol class="smartlink-mb-matches" hidden></ol>
         <div class="smartlink-mb-controls">
             <label>MusicBrainz server <select class="smartlink-mb-server"></select></label>
             <a class="smartlink-mb-release" target="_blank" hidden></a>
@@ -1144,6 +1168,7 @@
         status: root.querySelector('.smartlink-mb-status'),
         progress: root.querySelector('.smartlink-mb-progress'),
         retryButton: root.querySelector('.smartlink-mb-retry'),
+        matches: root.querySelector('.smartlink-mb-matches'),
         release: root.querySelector('.smartlink-mb-release'),
         server: serverSelect,
         harmonyButton: root.querySelector('.smartlink-mb-harmony'),
@@ -1375,6 +1400,53 @@
       panel.harmonyButton.title = `Import using ${harmonyLink.label}`;
       panel.harmonyButton.hidden = false;
     }
+    function displayUrl(rawUrl) {
+      try {
+        const url = new URL(rawUrl);
+        return `${url.hostname}${url.pathname}${url.search}`;
+      } catch {
+        return rawUrl;
+      }
+    }
+    function showAmbiguousMatches(panel, server, links, matches) {
+      const items = matches.map(match => {
+        const item = document.createElement('li');
+        item.className = 'smartlink-mb-match';
+        const release = document.createElement('a');
+        release.className = 'smartlink-mb-match-release';
+        release.href = `${server}/release/${match.releaseId}`;
+        release.target = '_blank';
+        release.textContent = match.title || `Release ${match.releaseId}`;
+        item.appendChild(release);
+        const metadata = [match.disambiguation, match.date, match.country].filter(value => value);
+        if (metadata.length > 0) {
+          const details = document.createElement('span');
+          details.className = 'smartlink-mb-match-meta';
+          details.textContent = ` — ${metadata.join(' · ')}`;
+          item.appendChild(details);
+        }
+        const matchedLinks = links.filter(link => findCanonicallyMatchedLinkUrls([link], match.matchedUrls).length > 0);
+        const urls = matchedLinks.length > 0 ? matchedLinks : match.matchedUrls.map(url => ({
+          label: '',
+          url
+        }));
+        const list = document.createElement('ul');
+        list.className = 'smartlink-mb-match-links';
+        for (const link of urls.filter((candidate, index, all) => all.findIndex(other => other.url === candidate.url) === index)) {
+          const listItem = document.createElement('li');
+          const anchor = document.createElement('a');
+          anchor.href = link.url;
+          anchor.target = '_blank';
+          anchor.textContent = link.label ? `${link.label} — ${displayUrl(link.url)}` : displayUrl(link.url);
+          listItem.appendChild(anchor);
+          list.appendChild(listItem);
+        }
+        item.appendChild(list);
+        return item;
+      });
+      panel.matches.replaceChildren(...items);
+      panel.matches.hidden = false;
+    }
     async function runSmartLinkImporter(config) {
       const mbPanelId = panelId(config);
       if (document.getElementById(mbPanelId)) return;
@@ -1405,6 +1477,8 @@
         panel.progress.hidden = false;
         panel.retryButton.hidden = true;
         panel.status.textContent = `Resolved ${links.length} provider links. Checking MusicBrainz…`;
+        panel.matches.replaceChildren();
+        panel.matches.hidden = true;
         panel.release.hidden = true;
         panel.missingLinksButton.hidden = true;
         configureHarmonyButton(panel, links);
@@ -1420,6 +1494,7 @@
           if (discoveredMatches.length > 1) {
             panel.harmonyButton.hidden = true;
             panel.status.textContent = `Ambiguous MusicBrainz match: these provider links belong to ${discoveredMatches.length} releases. No links can be added.`;
+            showAmbiguousMatches(panel, selectedServer, links, discoveredMatches);
             return;
           }
           const match = await includeReleaseRelationships(links, selectedServer, discoveredMatch);
