@@ -238,6 +238,8 @@ Supported sites:
 - `fanlink.tv`
 - `ffm.to`
 - `orcd.co`
+- `promolinks.me`
+- `song.link`
 
 [![Source](assets/buttons/button-source.svg)](https://github.com/murdos/musicbrainz-userscripts/blob/dist/smartlink_importer.user.js)
 [![Install](assets/buttons/button-install.svg)](https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js)
