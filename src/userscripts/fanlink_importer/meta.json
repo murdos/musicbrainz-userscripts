@@ -1,7 +1,7 @@
 {
     "name": "Import Fanlink releases to MusicBrainz",
     "description": "Deprecated: install the unified Smartlink importer, then remove this script.",
-    "version": "2026.09.12.1",
+    "version": "2026.09.13.1",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/fanlink_importer.user.js",
