@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.5
+// @version      2026.09.13.6
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -93,7 +93,9 @@
     }
     function isSearchFallbackServiceUrl(rawUrl) {
       try {
-        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
+        const url = new URL(rawUrl);
+        const pathParts = url.pathname.toLowerCase().split('/').filter(Boolean);
+        return pathParts.includes('search') || hostnameMatches(url, 'youtube.com') && pathParts.at(-1) === 'results';
       } catch {
         return false;
       }
