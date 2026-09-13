@@ -39,9 +39,15 @@ Test links:
 - [ffm.to/buried-memories](https://ffm.to/buried-memories)
 - [orcd.co/salvaging-the-future](https://orcd.co/salvaging-the-future)
 
+### PromoLinks.me
+
+The PromoLinks adapter supports branded subdomains. Provider destinations are read from the page’s `MusicRelease` JSON-LD metadata; provider search fallbacks and track-only URLs are ignored.
+
+Test link: [slowecho.promolinks.me/from-dust](https://slowecho.promolinks.me/from-dust)
+
 ## How it works
 
-1. The importer collects the page’s music-service links and resolves their final destinations. Physical-media retailer links for CDs, vinyl, or cassettes are excluded because they may describe a different MusicBrainz release from the digital provider links.
+1. The importer collects the page’s music-service links and resolves their final destinations. Track-only URLs and physical-media retailer links for CDs, vinyl, or cassettes are excluded because they do not identify the same digital release.
 2. It asks the MusicBrainz URL web service which releases are related to those destinations.
 3. It continues only when exactly one release is found. If no release is found, Harmony remains available for a new import. If the provider URLs point to multiple releases, the importer reports the ambiguity and disables its actions.
 4. For a single match, it fetches the release’s URL relationships, compares them with every smart-link destination, and highlights the links already present. Canonical comparison handles region-specific URLs that MusicBrainz search cannot currently match, such as Apple Music URLs for different storefronts ([SEARCH-748](https://tickets.metabrainz.org/browse/SEARCH-748)).

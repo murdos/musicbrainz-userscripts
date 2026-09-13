@@ -8,6 +8,7 @@ import {
 } from '~/userscripts/smartlink_importer/utils/extractors/albumlink';
 import { extractBfanServiceData } from '~/userscripts/smartlink_importer/utils/extractors/bfan';
 import { extractFanlinkServiceData, extractFanlinkServiceDataFromScript } from '~/userscripts/smartlink_importer/utils/extractors/fanlink';
+import { extractPromoLinksServiceData, isPromoLinksSearchFallback } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
 import { smartLinkSiteForHostname } from '~/userscripts/smartlink_importer/utils/site-routing';
 
 describe('Smartlink importer site adapters', () => {
@@ -78,6 +79,8 @@ describe('Smartlink importer site adapters', () => {
         ['ffm.to', 'ffm'],
         ['label-caster.ffm.to', 'ffm'],
         ['orcd.co', 'ffm'],
+        ['promolinks.me', 'promolinks'],
+        ['slowecho.promolinks.me', 'promolinks'],
     ] as const)('routes %s to its site adapter', (hostname, adapter) => {
         expect(smartLinkSiteForHostname(hostname)).toBe(adapter);
     });
@@ -85,6 +88,65 @@ describe('Smartlink importer site adapters', () => {
     it('does not route lookalike hostnames', () => {
         expect(smartLinkSiteForHostname('notalbum.link.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('evilffm.to.example')).toBeUndefined();
+        expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
+    });
+
+    it('identifies PromoLinks search fallbacks while retaining exact provider URLs', () => {
+        expect(isPromoLinksSearchFallback('https://listen.tidal.com/search?q=Artist%20Title')).toBe(true);
+        expect(isPromoLinksSearchFallback('https://soundcloud.com/search/sounds?q=Artist%20Title')).toBe(true);
+        expect(isPromoLinksSearchFallback('https://music.amazon.com/search/Artist%20Title')).toBe(true);
+        expect(isPromoLinksSearchFallback('https://www.pandora.com/search/Artist%20Title/tracks')).toBe(true);
+        expect(isPromoLinksSearchFallback('https://open.spotify.com/album/example')).toBe(false);
+        expect(isPromoLinksSearchFallback('https://slowechospace.bandcamp.com/album/from-dust')).toBe(false);
+    });
+
+    it('extracts release providers from PromoLinks JSON-LD and excludes track-only and search URLs', () => {
+        const payload = {
+            '@context': 'https://schema.org',
+            '@type': 'MusicRelease',
+            sameAs: [
+                'https://open.spotify.com/track/example',
+                'https://open.spotify.com/album/release-example',
+                'https://slowechospace.bandcamp.com/album/from-dust',
+                'https://music.apple.com/us/album/from-dust/123?i=456&uo=4',
+                'https://music.youtube.com/watch?v=example',
+                'https://www.youtube.com/watch?v=example&list=release-playlist',
+                'https://www.deezer.com/track/example',
+                'https://listen.tidal.com/search?q=Artist%20Title',
+            ],
+        };
+
+        expect(extractPromoLinksServiceData(payload)).toEqual([
+            { service: 'spotify', label: 'Spotify', sourceUrl: 'https://open.spotify.com/album/release-example' },
+            {
+                service: 'bandcamp',
+                label: 'Bandcamp',
+                sourceUrl: 'https://slowechospace.bandcamp.com/album/from-dust',
+            },
+            {
+                service: 'apple',
+                label: 'Apple Music',
+                sourceUrl: 'https://music.apple.com/us/album/from-dust/123?i=456&uo=4',
+            },
+            {
+                service: 'youtube',
+                label: 'YouTube',
+                sourceUrl: 'https://www.youtube.com/watch?v=example&list=release-playlist',
+            },
+        ]);
+    });
+
+    it('finds PromoLinks MusicRelease data inside a JSON-LD graph', () => {
+        expect(
+            extractPromoLinksServiceData({
+                '@graph': [
+                    { '@type': 'Organization', sameAs: ['https://open.spotify.com/user/not-a-release'] },
+                    { '@type': ['CreativeWork', 'MusicRelease'], sameAs: ['https://www.deezer.com/album/example'] },
+                ],
+            }),
+        ).toEqual([{ service: 'deezer', label: 'Deezer', sourceUrl: 'https://www.deezer.com/album/example' }]);
+        expect(extractPromoLinksServiceData(null)).toEqual([]);
+        expect(extractPromoLinksServiceData({ '@type': 'Organization' })).toEqual([]);
     });
 
     it('extracts displayed bfan.link URLs in CTA order and skips empty search fallbacks', () => {

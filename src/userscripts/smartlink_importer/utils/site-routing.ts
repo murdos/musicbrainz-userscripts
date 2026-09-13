@@ -1,4 +1,4 @@
-export type SmartLinkSite = 'albumlink' | 'bandlink' | 'bfan' | 'fanlink' | 'ffm';
+export type SmartLinkSite = 'albumlink' | 'bandlink' | 'bfan' | 'fanlink' | 'ffm' | 'promolinks';
 
 const DOMAINS_BY_SITE: Readonly<Record<SmartLinkSite, readonly string[]>> = {
     albumlink: ['album.link'],
@@ -6,6 +6,7 @@ const DOMAINS_BY_SITE: Readonly<Record<SmartLinkSite, readonly string[]>> = {
     bfan: ['bfan.link'],
     fanlink: ['fanlink.tv'],
     ffm: ['ffm.to', 'orcd.co'],
+    promolinks: ['promolinks.me'],
 };
 
 export function smartLinkSiteForHostname(hostname: string): SmartLinkSite | undefined {
