@@ -41,7 +41,7 @@ Test links:
 
 ### PromoLinks.me
 
-The PromoLinks adapter supports branded subdomains. Provider destinations are read from the page’s `MusicRelease` JSON-LD metadata; provider search fallbacks and track-only URLs are ignored.
+The PromoLinks adapter supports branded subdomains. Provider destinations are read from the page’s `MusicRelease` or `MusicAlbum` JSON-LD metadata; provider search fallbacks and track-only URLs are ignored.
 
 Test link: [slowecho.promolinks.me/from-dust](https://slowecho.promolinks.me/from-dust)
 

@@ -183,6 +183,32 @@ describe('Smartlink importer site adapters', () => {
         expect(extractPromoLinksServiceData({ '@type': 'Organization' })).toEqual([]);
     });
 
+    it('extracts PromoLinks providers from MusicAlbum JSON-LD', () => {
+        expect(
+            extractPromoLinksServiceData({
+                '@context': 'https://schema.org',
+                '@type': 'MusicAlbum',
+                sameAs: [
+                    'https://open.spotify.com/album/0OcobWxBbatAcL1aazq07e',
+                    'https://firstsnowoftheyear.bandcamp.com/album/the-sun-rose-a-breeze',
+                    'https://listen.tidal.com/album/495828845',
+                ],
+            }),
+        ).toEqual([
+            {
+                service: 'spotify',
+                label: 'Spotify',
+                sourceUrl: 'https://open.spotify.com/album/0OcobWxBbatAcL1aazq07e',
+            },
+            {
+                service: 'bandcamp',
+                label: 'Bandcamp',
+                sourceUrl: 'https://firstsnowoftheyear.bandcamp.com/album/the-sun-rose-a-breeze',
+            },
+            { service: 'tidal', label: 'Tidal', sourceUrl: 'https://listen.tidal.com/album/495828845' },
+        ]);
+    });
+
     it('extracts displayed bfan.link URLs in CTA order and skips empty search fallbacks', () => {
         const payload = {
             props: {

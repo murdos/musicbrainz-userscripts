@@ -38,17 +38,17 @@ function providerForUrl(rawUrl: string): readonly [service: string, label: strin
     return undefined;
 }
 
-function findMusicRelease(value: unknown): Record<string, unknown> | undefined {
+function findReleaseMetadata(value: unknown): Record<string, unknown> | undefined {
     const object = record(value);
     if (!object) return undefined;
 
     const types = Array.isArray(object['@type']) ? object['@type'] : [object['@type']];
-    if (types.includes('MusicRelease')) return object;
+    if (types.includes('MusicRelease') || types.includes('MusicAlbum')) return object;
 
     const graph = object['@graph'];
     if (!Array.isArray(graph)) return undefined;
     for (const node of graph) {
-        const release = findMusicRelease(node);
+        const release = findReleaseMetadata(node);
         if (release) return release;
     }
     return undefined;
@@ -56,7 +56,7 @@ function findMusicRelease(value: unknown): Record<string, unknown> | undefined {
 
 /** Read exact provider destinations from PromoLinks’ schema.org metadata. */
 export function extractPromoLinksServiceData(payload: unknown): PromoLinksServiceData[] {
-    const sameAs = findMusicRelease(payload)?.['sameAs'];
+    const sameAs = findReleaseMetadata(payload)?.['sameAs'];
     if (!Array.isArray(sameAs)) return [];
 
     const links: PromoLinksServiceData[] = [];
