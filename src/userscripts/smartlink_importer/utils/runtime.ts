@@ -249,12 +249,16 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
 
     const panel = createPanel(config, server);
     if (elements.length === 0) {
+        panel.progress.hidden = true;
+        panel.root.removeAttribute('aria-busy');
         panel.status.textContent = `No ${config.siteName} provider links were found on this page.`;
         return;
     }
 
     const links = await resolveServiceLinks(config, elements, cache);
     if (links.length === 0) {
+        panel.progress.hidden = true;
+        panel.root.removeAttribute('aria-busy');
         panel.status.textContent = `No applicable ${config.siteName} release links were found on this page.`;
         return;
     }
@@ -264,6 +268,9 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
     let lookupGeneration = 0;
     const checkMusicBrainz = async (selectedServer: MusicBrainzServer): Promise<void> => {
         const generation = ++lookupGeneration;
+        panel.root.setAttribute('aria-busy', 'true');
+        panel.progress.hidden = false;
+        panel.retryButton.hidden = true;
         panel.status.textContent = `Resolved ${links.length} provider links. Checking MusicBrainz…`;
         panel.release.hidden = true;
         panel.missingLinksButton.hidden = true;
@@ -303,10 +310,19 @@ export async function runSmartLinkImporter(config: SmartLinkImporterConfig): Pro
         } catch (error) {
             if (generation !== lookupGeneration) return;
             console.error(`${config.siteName} importer: MusicBrainz lookup failed`, error);
-            panel.status.textContent = 'MusicBrainz lookup failed. Reload the page to try again.';
+            panel.status.textContent = 'MusicBrainz lookup failed.';
+            panel.retryButton.hidden = false;
+        } finally {
+            if (generation === lookupGeneration) {
+                panel.progress.hidden = true;
+                panel.root.removeAttribute('aria-busy');
+            }
         }
     };
 
+    panel.retryButton.addEventListener('click', () => {
+        void checkMusicBrainz(panel.server.value as MusicBrainzServer);
+    });
     panel.server.addEventListener('change', () => {
         const selectedServer = panel.server.value as MusicBrainzServer;
         void saveServerPreference(selectedServer);

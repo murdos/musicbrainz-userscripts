@@ -4,6 +4,8 @@ import type { SmartLinkImporterConfig } from './types';
 export interface ImportPanel {
     root: HTMLElement;
     status: HTMLElement;
+    progress: HTMLElement;
+    retryButton: HTMLButtonElement;
     release: HTMLAnchorElement;
     server: HTMLSelectElement;
     harmonyButton: HTMLAnchorElement;
@@ -61,7 +63,41 @@ function addStyles(config: SmartLinkImporterConfig): void {
         #${importerPanelId} .smartlink-mb-heading { font-weight: bold; margin-bottom: 8px; }
         #${importerPanelId} [hidden] { display: none !important; }
         #${importerPanelId} .smartlink-mb-controls { margin: 8px 0; }
+        #${importerPanelId} .smartlink-mb-status-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 18px;
+        }
         #${importerPanelId} .smartlink-mb-status { color: #555; }
+        #${importerPanelId} .smartlink-mb-progress {
+            flex: none;
+            width: 12px;
+            height: 12px;
+            box-sizing: border-box;
+            border: 2px solid #bbb;
+            border-top-color: #0875bd;
+            border-radius: 50%;
+            animation: smartlink-mb-spin 0.75s linear infinite;
+        }
+        #${importerPanelId} .smartlink-mb-retry {
+            flex: none;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            background: #f4f4f4;
+            color: #333;
+            cursor: pointer;
+            font: bold 18px/20px Arial, sans-serif;
+        }
+        #${importerPanelId} .smartlink-mb-retry:hover { background: #fff; }
+        #${importerPanelId} .smartlink-mb-retry:focus-visible { outline: 2px solid #0875bd; outline-offset: 2px; }
+        @keyframes smartlink-mb-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            #${importerPanelId} .smartlink-mb-progress { animation: none; }
+        }
         #${importerPanelId} .smartlink-mb-release { color: #0875bd; font-weight: bold; }
         #${importerPanelId} .smartlink-mb-button {
             display: inline-flex;
@@ -116,12 +152,17 @@ export function createPanel(config: SmartLinkImporterConfig, server: MusicBrainz
 
     const root = document.createElement('section');
     root.id = panelId(config);
+    root.setAttribute('aria-busy', 'true');
     root.innerHTML = `
         <div class="smartlink-mb-heading">
             <img src="https://musicbrainz.org/static/images/entity/release.svg" width="18" height="18" alt="" />
             MusicBrainz release importer
         </div>
-        <div class="smartlink-mb-status">Resolving provider links…</div>
+        <div class="smartlink-mb-status-row">
+            <span class="smartlink-mb-progress" role="progressbar" aria-label="Working"></span>
+            <span class="smartlink-mb-status" aria-live="polite">Resolving provider links…</span>
+            <button class="smartlink-mb-retry" type="button" title="Retry MusicBrainz lookup" aria-label="Retry MusicBrainz lookup" hidden>↻</button>
+        </div>
         <div class="smartlink-mb-controls">
             <label>MusicBrainz server <select class="smartlink-mb-server"></select></label>
             <a class="smartlink-mb-release" target="_blank" hidden></a>
@@ -152,6 +193,8 @@ export function createPanel(config: SmartLinkImporterConfig, server: MusicBrainz
     return {
         root,
         status: root.querySelector<HTMLElement>('.smartlink-mb-status')!,
+        progress: root.querySelector<HTMLElement>('.smartlink-mb-progress')!,
+        retryButton: root.querySelector<HTMLButtonElement>('.smartlink-mb-retry')!,
         release: root.querySelector<HTMLAnchorElement>('.smartlink-mb-release')!,
         server: serverSelect,
         harmonyButton: root.querySelector<HTMLAnchorElement>('.smartlink-mb-harmony')!,
