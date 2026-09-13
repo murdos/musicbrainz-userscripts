@@ -2,6 +2,7 @@ import { exactSearchUrlFor, searchUrlFor } from './searchUrlFor';
 
 const MB_SEARCH_MARKS: Record<string, string> = {
     artist: 'A',
+    recording: 'T',
     release: 'R',
     'release-group': 'G',
     place: 'P',
