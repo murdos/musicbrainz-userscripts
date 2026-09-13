@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.8
+// @version      2026.09.13.9
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -754,15 +754,15 @@
       }
       return undefined;
     }
-    function findMusicRelease(value) {
+    function findReleaseMetadata(value) {
       const object = record(value);
       if (!object) return undefined;
       const types = Array.isArray(object['@type']) ? object['@type'] : [object['@type']];
-      if (types.includes('MusicRelease')) return object;
+      if (types.includes('MusicRelease') || types.includes('MusicAlbum')) return object;
       const graph = object['@graph'];
       if (!Array.isArray(graph)) return undefined;
       for (const node of graph) {
-        const release = findMusicRelease(node);
+        const release = findReleaseMetadata(node);
         if (release) return release;
       }
       return undefined;
@@ -770,7 +770,7 @@
 
     /** Read exact provider destinations from PromoLinks’ schema.org metadata. */
     function extractPromoLinksServiceData(payload) {
-      const sameAs = findMusicRelease(payload)?.['sameAs'];
+      const sameAs = findReleaseMetadata(payload)?.['sameAs'];
       if (!Array.isArray(sameAs)) return [];
       const links = [];
       for (const sourceUrl of sameAs) {
