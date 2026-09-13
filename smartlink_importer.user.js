@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.6
+// @version      2026.09.13.7
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -20,6 +20,8 @@
 // @match        https://*.orcd.co/*
 // @match        https://promolinks.me/*
 // @match        https://*.promolinks.me/*
+// @match        https://song.link/*
+// @match        https://*.song.link/*
 // @connect      *
 // @grant        GM.getValue
 // @grant        GM.setValue
@@ -109,10 +111,11 @@
         const pathParts = url.pathname.toLowerCase().split('/').filter(Boolean);
         const trackSegments = new Set(['episode', 'song', 'songs', 'track', 'tracks']);
         if (service === 'youtube' || service === 'youtubemusic') {
-          return pathParts.at(-1) === 'watch' && !url.searchParams.has('list');
+          return (hostnameMatches(url, 'youtu.be') || pathParts.at(-1) === 'watch') && !url.searchParams.has('list');
         }
         if (service === 'soundcloud') return pathParts.length >= 2 && !pathParts.includes('sets');
-        if (['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'pandora', 'qobuz', 'spotify', 'tidal'].includes(service)) {
+        if (service === 'pandora') return /\/(?:TR:|track\/)/i.test(url.pathname);
+        if (['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'qobuz', 'spotify', 'tidal'].includes(service)) {
           return pathParts.some(part => trackSegments.has(part));
         }
       } catch {
@@ -163,6 +166,8 @@
         url.hostname = 'www.boomplay.com';
         url.search = '';
       } else if (service === 'qobuz') {
+        url.search = '';
+      } else if (service === 'amazon' && url.hostname.startsWith('music.amazon.') && /\/albums\//i.test(url.pathname)) {
         url.search = '';
       } else if (service === 'youtube' || service === 'youtubemusic') {
         const list = url.searchParams.get('list');
@@ -821,6 +826,101 @@
       };
     }
 
+    /** Build the parent release URL exposed for Songlink’s source track. */
+    function extractSonglinkSourceRelease(payload) {
+      const root = record(payload);
+      const props = record(root?.['props']);
+      const pageProps = record(props?.['pageProps']);
+      const pageData = record(pageProps?.['pageData']);
+      const entityData = record(pageData?.['entityData']);
+      if (entityData?.['type'] !== 'song' && entityData?.['type'] !== 'track') return undefined;
+      const rawProvider = entityData['provider'];
+      const rawAlbumId = entityData['albumId'];
+      if (typeof rawProvider !== 'string' || typeof rawAlbumId !== 'string' && typeof rawAlbumId !== 'number') return undefined;
+      const service = normalizeServiceName(rawProvider);
+      const albumId = encodeURIComponent(String(rawAlbumId));
+      if (service === 'spotify') return {
+        service,
+        url: `https://open.spotify.com/album/${albumId}`
+      };
+      if (service === 'tidal') return {
+        service,
+        url: `https://tidal.com/album/${albumId}`
+      };
+      if (service === 'deezer') return {
+        service,
+        url: `https://www.deezer.com/album/${albumId}`
+      };
+      if (service === 'amazon') return {
+        service,
+        url: `https://music.amazon.com/albums/${albumId}`
+      };
+      return undefined;
+    }
+
+    /** Read the CTA and provider name from Songlink’s accessible link label. */
+    function parseSonglinkAriaLabel(ariaLabel, fallbackLabel = '') {
+      const providerSeparator = ariaLabel.lastIndexOf(' on ');
+      if (providerSeparator < 0) return {
+        label: fallbackLabel.trim(),
+        action: ''
+      };
+      const description = ariaLabel.slice(0, providerSeparator).trim();
+      const label = ariaLabel.slice(providerSeparator + 4).trim() || fallbackLabel.trim();
+      let action = description;
+      if (description.startsWith('Listen to ')) action = 'Listen';else if (description.startsWith('Purchase and download ')) action = 'Purchase and download';else {
+        const titleSeparator = description.indexOf(' to ');
+        if (titleSeparator >= 0) action = description.slice(0, titleSeparator).trim();
+      }
+      return {
+        label,
+        action
+      };
+    }
+    function readSourceRelease() {
+      const nextData = document.querySelector('script#__NEXT_DATA__')?.textContent;
+      if (!nextData) return undefined;
+      try {
+        return extractSonglinkSourceRelease(JSON.parse(nextData));
+      } catch {
+        return undefined;
+      }
+    }
+    function collectSonglinkServiceElements() {
+      const sourceRelease = readSourceRelease();
+      const counters = new Map();
+      const elements = [];
+      for (const element of document.querySelectorAll('a[data-test-id="link"][href]')) {
+        const fallbackLabel = element.querySelector('div:last-child')?.textContent.trim() ?? '';
+        const {
+          label,
+          action
+        } = parseSonglinkAriaLabel(element.getAttribute('aria-label') ?? '', fallbackLabel);
+        const service = normalizeServiceName(label);
+        const sourceUrl = sourceRelease?.service === service ? sourceRelease.url : element.href;
+        if (!service || !sourceUrl) continue;
+        elements.push({
+          cacheKey: nextCacheKey(counters, service),
+          element,
+          service,
+          label,
+          action,
+          sourceUrl,
+          skipReason: skipReasonForServiceLink(service, action, sourceUrl)
+        });
+      }
+      return elements;
+    }
+
+    function createSonglinkConfig() {
+      return {
+        id: 'songlink',
+        siteName: 'Songlink',
+        collectServiceElements: collectSonglinkServiceElements,
+        resolveDestination: element => element.sourceUrl
+      };
+    }
+
     const SERVER_PREFERENCE_KEY = 'smartlink-mb-importer:server';
     const MUSICBRAINZ_SERVERS = ['https://musicbrainz.org', 'https://beta.musicbrainz.org', 'https://musicbrainz.eu'];
     function isMusicBrainzServer(value) {
@@ -1369,7 +1469,8 @@
       bfan: ['bfan.link'],
       fanlink: ['fanlink.tv'],
       ffm: ['ffm.to', 'orcd.co'],
-      promolinks: ['promolinks.me']
+      promolinks: ['promolinks.me'],
+      songlink: ['song.link']
     };
     function smartLinkSiteForHostname(hostname) {
       const normalized = hostname.toLowerCase().replace(/\.$/, '');
@@ -1385,7 +1486,8 @@
       bfan: createBfanConfig,
       fanlink: createFanlinkConfig,
       ffm: createFfmConfig,
-      promolinks: createPromoLinksConfig
+      promolinks: createPromoLinksConfig,
+      songlink: createSonglinkConfig
     };
     const site = smartLinkSiteForHostname(window.location.hostname);
     const config = site ? configFactories[site]() : undefined;
