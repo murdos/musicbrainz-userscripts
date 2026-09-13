@@ -88,7 +88,9 @@ export function isPhysicalMediaLink(service: string, action: string): boolean {
 
 export function isSearchFallbackServiceUrl(rawUrl: string): boolean {
     try {
-        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
+        const url = new URL(rawUrl);
+        const pathParts = url.pathname.toLowerCase().split('/').filter(Boolean);
+        return pathParts.includes('search') || (hostnameMatches(url, 'youtube.com') && pathParts.at(-1) === 'results');
     } catch {
         return false;
     }
