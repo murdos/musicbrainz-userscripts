@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.13
+// @version      2026.9.13.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -658,6 +658,115 @@ const initDiscoverPage = () => {
     });
 };
 
+/**
+ * Add MusicBrainz recording links to the tracks in a Bandcamp release table.
+ * An unresolved track keeps the compact recording-search link in its own column.
+ */
+const initTrackLinks = mblinks => {
+    MBSearchItStyle();
+    const style = document.createElement('style');
+    style.id = 'bci-recording-link-style';
+    style.textContent = `
+        #track_table td.bci-recording-link-col {
+            width: 16px;
+            padding: 4px 4px 0 0;
+            vertical-align: top;
+            white-space: nowrap;
+        }
+    `;
+    document.head.append(style);
+    const queriedUrls = new Set();
+    const resolvedLinks = new Map();
+
+    const createSearchIndicator = trackTitle => {
+        const indicator = document.createElement('span');
+        indicator.className = 'mb_valign mb_searchit';
+        const searchLink = document.createElement('a');
+        searchLink.className = 'mb_search_link';
+        searchLink.target = '_blank';
+        searchLink.title = 'Search this recording on MusicBrainz (open in a new tab)';
+        searchLink.href = MBImport.searchUrlFor('recording', trackTitle);
+        searchLink.innerHTML = '<small>T</small>?';
+        indicator.append(searchLink);
+        return indicator;
+    };
+
+    const renderCellContents = (linkCell, trackUrl, trackTitle) => {
+        const links = resolvedLinks.get(trackUrl);
+        linkCell.replaceChildren();
+        if (links?.length) {
+            links.forEach(link => linkCell.insertAdjacentHTML('beforeend', link));
+        } else {
+            linkCell.append(createSearchIndicator(trackTitle));
+        }
+    };
+
+    const renderTrackLinks = () => {
+        const trackTable = document.querySelector('table#track_table');
+        if (!trackTable) return;
+
+        trackTable.querySelectorAll('[colspan]:not([data-bci-recording-colspan])').forEach(element => {
+            element.setAttribute('data-bci-recording-colspan', '');
+            const colspan = Number.parseInt(element.getAttribute('colspan'), 10);
+            if (Number.isFinite(colspan)) element.setAttribute('colspan', colspan + 1);
+        });
+
+        const urlsData = [];
+        trackTable.querySelectorAll('tr.track_row_view').forEach((row, index) => {
+            if (row.querySelector('.bci-recording-link-col')) return;
+
+            const playCell = row.querySelector('td.play-col');
+            const titleElement = row.querySelector('.track-title');
+            const trackLink = titleElement?.closest('a[href]') ?? row.querySelector('a[href*="/track/"]');
+            const trackNumber = Number.parseInt(row.getAttribute('rel')?.match(/tracknum=(\d+)/)?.[1], 10);
+            const trackData = unsafeWindow.TralbumData.trackinfo[Number.isFinite(trackNumber) ? trackNumber - 1 : index];
+            const trackUrl = normalizeBandcampUrl(trackLink?.getAttribute('href') ?? trackData?.title_link);
+            const trackTitle = titleElement?.textContent.trim() ?? trackData?.title;
+            if (!playCell || !trackUrl || !trackTitle) return;
+
+            const linkCell = document.createElement('td');
+            linkCell.className = 'bci-recording-link-col';
+            linkCell.dataset.bciRecordingUrl = trackUrl;
+            renderCellContents(linkCell, trackUrl, trackTitle);
+            playCell.before(linkCell);
+
+            if (queriedUrls.has(trackUrl)) return;
+            queriedUrls.add(trackUrl);
+            urlsData.push({
+                url: trackUrl,
+                mb_type: 'recording',
+                key: `recording:${trackUrl}`,
+                insert_func: link => {
+                    const links = resolvedLinks.get(trackUrl) ?? [];
+                    const normalizedLink = link.trim();
+                    if (!links.includes(normalizedLink)) links.push(normalizedLink);
+                    resolvedLinks.set(trackUrl, links);
+                    document.querySelectorAll('.bci-recording-link-col').forEach(currentCell => {
+                        if (currentCell.dataset.bciRecordingUrl === trackUrl) {
+                            renderCellContents(currentCell, trackUrl, trackTitle);
+                        }
+                    });
+                },
+            });
+        });
+
+        if (urlsData.length > 0) mblinks.searchAndDisplayMbLinks(urlsData);
+    };
+
+    let renderScheduled = false;
+    const scheduleRender = () => {
+        if (renderScheduled) return;
+        renderScheduled = true;
+        requestAnimationFrame(() => {
+            renderScheduled = false;
+            renderTrackLinks();
+        });
+    };
+
+    renderTrackLinks();
+    new MutationObserver(scheduleRender).observe(document.body, { childList: true, subtree: true });
+};
+
 async function init() {
     /* keep the following line as first, it is required to skip
      * pages which aren't actually a bandcamp page, since we support
@@ -947,6 +1056,9 @@ async function init() {
         mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, `artist:${cleanURL}`, onSearchComplete);
         mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, `label:${cleanURL}`, onSearchComplete);
     }
+
+    // Recording relationships are the least important lookups, so queue them last.
+    if (hasAlbumData && !isPrivateStream) initTrackLinks(mblinks);
 }
 
 const run = () => {
