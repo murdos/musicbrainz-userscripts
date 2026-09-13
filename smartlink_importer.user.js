@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Smartlink importer
+// @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.1
+// @version      2026.09.13.3
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -18,6 +18,8 @@
 // @match        https://*.ffm.to/*
 // @match        https://orcd.co/*
 // @match        https://*.orcd.co/*
+// @match        https://promolinks.me/*
+// @match        https://*.promolinks.me/*
 // @connect      *
 // @grant        GM.getValue
 // @grant        GM.setValue
@@ -88,6 +90,26 @@
     /** Avoid attaching retailer pages for a physical edition to a matched digital release. */
     function isPhysicalMediaLink(service, action) {
       return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
+    }
+
+    /** Identify provider entities that represent a track rather than a release. */
+    function isTrackOnlyServiceUrl(rawUrl, rawService) {
+      const service = normalizeServiceName(rawService);
+      try {
+        const url = new URL(rawUrl);
+        const pathParts = url.pathname.toLowerCase().split('/').filter(Boolean);
+        const trackSegments = new Set(['episode', 'song', 'songs', 'track', 'tracks']);
+        if (service === 'youtube' || service === 'youtubemusic') {
+          return pathParts.at(-1) === 'watch' && !url.searchParams.has('list');
+        }
+        if (service === 'soundcloud') return pathParts.length >= 2 && !pathParts.includes('sets');
+        if (['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'pandora', 'qobuz', 'spotify', 'tidal'].includes(service)) {
+          return pathParts.some(part => trackSegments.has(part));
+        }
+      } catch {
+        return false;
+      }
+      return false;
     }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
@@ -467,7 +489,7 @@
       }
       return links;
     }
-    function readServiceData$1() {
+    function readServiceData$2() {
       const nextData = document.querySelector('script#__NEXT_DATA__')?.textContent;
       if (!nextData) return [];
       try {
@@ -477,7 +499,7 @@
       }
     }
     function collectBfanServiceElements() {
-      const dataByService = new Map(readServiceData$1().map(data => [data.service, data]));
+      const dataByService = new Map(readServiceData$2().map(data => [data.service, data]));
       const elements = [];
       for (const element of document.querySelectorAll('[data-testid="call-to-actions"] > [data-testid]')) {
         const rawService = element.dataset['testid'] ?? '';
@@ -540,7 +562,7 @@
         return [];
       }
     }
-    function readServiceData() {
+    function readServiceData$1() {
       for (const script of document.scripts) {
         const links = extractFanlinkServiceDataFromScript(script.textContent);
         if (links.length > 0) return links;
@@ -558,7 +580,7 @@
     }
     function collectFanlinkServiceElements() {
       const dataByService = new Map();
-      for (const data of readServiceData()) {
+      for (const data of readServiceData$1()) {
         const services = dataByService.get(data.service) ?? [];
         services.push(data);
         dataByService.set(data.service, services);
@@ -661,6 +683,127 @@
           const musicServices = document.querySelector('.music-services-section');
           if (musicServices?.parentElement) musicServices.parentElement.insertBefore(panel, musicServices);else document.body.appendChild(panel);
         }
+      };
+    }
+
+    const PROVIDERS_BY_DOMAIN = {
+      'amazon.com': ['amazon', 'Amazon Music'],
+      'apple.com': ['apple', 'Apple Music'],
+      'bandcamp.com': ['bandcamp', 'Bandcamp'],
+      'boomplay.com': ['boomplay', 'Boomplay'],
+      'deezer.com': ['deezer', 'Deezer'],
+      'kkbox.com': ['kkbox', 'KKBOX'],
+      'pandora.com': ['pandora', 'Pandora'],
+      'qobuz.com': ['qobuz', 'Qobuz'],
+      'soundcloud.com': ['soundcloud', 'SoundCloud'],
+      'spotify.com': ['spotify', 'Spotify'],
+      'tidal.com': ['tidal', 'Tidal'],
+      'youtube.com': ['youtube', 'YouTube']
+    };
+
+    /** PromoLinks uses provider search pages when it cannot find an exact destination. */
+    function isPromoLinksSearchFallback(rawUrl) {
+      try {
+        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
+      } catch {
+        return false;
+      }
+    }
+    function providerForUrl(rawUrl) {
+      try {
+        const url = new URL(rawUrl);
+        if (url.hostname === 'music.youtube.com') return ['youtubemusic', 'YouTube Music'];
+        for (const [domain, provider] of Object.entries(PROVIDERS_BY_DOMAIN)) {
+          if (url.hostname === domain || url.hostname.endsWith(`.${domain}`)) return provider;
+        }
+      } catch {
+        // Ignore malformed structured data.
+      }
+      return undefined;
+    }
+    function findMusicRelease(value) {
+      const object = record(value);
+      if (!object) return undefined;
+      const types = Array.isArray(object['@type']) ? object['@type'] : [object['@type']];
+      if (types.includes('MusicRelease')) return object;
+      const graph = object['@graph'];
+      if (!Array.isArray(graph)) return undefined;
+      for (const node of graph) {
+        const release = findMusicRelease(node);
+        if (release) return release;
+      }
+      return undefined;
+    }
+
+    /** Read exact provider destinations from PromoLinks’ schema.org metadata. */
+    function extractPromoLinksServiceData(payload) {
+      const sameAs = findMusicRelease(payload)?.['sameAs'];
+      if (!Array.isArray(sameAs)) return [];
+      const links = [];
+      for (const sourceUrl of sameAs) {
+        if (typeof sourceUrl !== 'string' || isPromoLinksSearchFallback(sourceUrl)) continue;
+        const provider = providerForUrl(sourceUrl);
+        if (!provider) continue;
+        const [service, label] = provider;
+        if (!isIgnoredService(service) && !isTrackOnlyServiceUrl(sourceUrl, service)) {
+          links.push({
+            service: normalizeServiceName(service),
+            label,
+            sourceUrl
+          });
+        }
+      }
+      return links;
+    }
+    function readServiceData() {
+      for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+        try {
+          const links = extractPromoLinksServiceData(JSON.parse(script.textContent));
+          if (links.length > 0) return links;
+        } catch {
+          // Continue past unrelated or malformed JSON-LD blocks.
+        }
+      }
+      return [];
+    }
+    function normalizedHref(rawUrl) {
+      try {
+        return new URL(rawUrl, window.location.href).href;
+      } catch {
+        return rawUrl;
+      }
+    }
+    function collectPromoLinksServiceElements() {
+      const anchorsByUrl = new Map();
+      for (const element of document.querySelectorAll('a[href]')) {
+        const href = normalizedHref(element.href);
+        const anchors = anchorsByUrl.get(href) ?? [];
+        anchors.push(element);
+        anchorsByUrl.set(href, anchors);
+      }
+      const counters = new Map();
+      const elements = [];
+      for (const data of readServiceData()) {
+        const element = anchorsByUrl.get(normalizedHref(data.sourceUrl))?.shift();
+        if (!element) continue;
+        elements.push({
+          cacheKey: nextCacheKey(counters, data.service),
+          element,
+          service: data.service,
+          label: data.label,
+          action: '',
+          sourceUrl: data.sourceUrl
+        });
+      }
+      return elements;
+    }
+
+    function createPromoLinksConfig() {
+      return {
+        id: 'promolinks',
+        siteName: 'PromoLinks.me',
+        collectServiceElements: collectPromoLinksServiceElements,
+        resolveDestination: element => element.sourceUrl
       };
     }
 
@@ -938,6 +1081,10 @@
             label: element.label,
             action: element.action
           };
+          if (isTrackOnlyServiceUrl(refreshed.url, refreshed.service)) {
+            delete cache.links[element.cacheKey];
+            return undefined;
+          }
           cache.links[element.cacheKey] = refreshed;
           return refreshed;
         }
@@ -950,6 +1097,10 @@
             sourceUrl: element.sourceUrl,
             url: normalizeServiceUrl(destination, element.service)
           };
+          if (isTrackOnlyServiceUrl(link.url, link.service)) {
+            delete cache.links[element.cacheKey];
+            return undefined;
+          }
           cache.links[element.cacheKey] = link;
           return link;
         } catch (error) {
@@ -1113,7 +1264,8 @@
       bandlink: ['band.link'],
       bfan: ['bfan.link'],
       fanlink: ['fanlink.tv'],
-      ffm: ['ffm.to', 'orcd.co']
+      ffm: ['ffm.to', 'orcd.co'],
+      promolinks: ['promolinks.me']
     };
     function smartLinkSiteForHostname(hostname) {
       const normalized = hostname.toLowerCase().replace(/\.$/, '');
@@ -1128,7 +1280,8 @@
       bandlink: createBandLinkConfig,
       bfan: createBfanConfig,
       fanlink: createFanlinkConfig,
-      ffm: createFfmConfig
+      ffm: createFfmConfig,
+      promolinks: createPromoLinksConfig
     };
     const site = smartLinkSiteForHostname(window.location.hostname);
     const config = site ? configFactories[site]() : undefined;
