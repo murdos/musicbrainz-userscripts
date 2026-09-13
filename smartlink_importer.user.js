@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.3
+// @version      2026.09.13.4
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -91,6 +91,13 @@
     function isPhysicalMediaLink(service, action) {
       return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
     }
+    function isSearchFallbackServiceUrl(rawUrl) {
+      try {
+        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
+      } catch {
+        return false;
+      }
+    }
 
     /** Identify provider entities that represent a track rather than a release. */
     function isTrackOnlyServiceUrl(rawUrl, rawService) {
@@ -110,6 +117,15 @@
         return false;
       }
       return false;
+    }
+
+    /** Explain why a provider link is not applicable to a MusicBrainz release. */
+    function skipReasonForServiceLink(service, action, sourceUrl) {
+      if (isIgnoredService(service)) return 'Ignored service';
+      if (isPhysicalMediaLink(service, action)) return 'Physical-media link';
+      if (isSearchFallbackServiceUrl(sourceUrl)) return 'Search fallback';
+      if (isTrackOnlyServiceUrl(sourceUrl, service)) return 'Track-only link';
+      return undefined;
     }
     function removeTrackingParameters(url) {
       for (const name of [...url.searchParams.keys()]) {
@@ -394,14 +410,15 @@
         const label = serviceLabelFromAriaLabel(ariaLabel) || element.textContent.trim();
         const service = normalizeServiceName(label);
         const action = actionFromAriaLabel(ariaLabel);
-        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        if (!service || !element.href) continue;
         elements.push({
           cacheKey: nextCacheKey(counters, service),
           element,
           service,
           label,
           action,
-          sourceUrl: element.href
+          sourceUrl: element.href,
+          skipReason: skipReasonForServiceLink(service, action, element.href)
         });
       }
       return elements;
@@ -437,14 +454,15 @@
         const label = element.querySelector('.el-link__service-text')?.textContent.trim() || '';
         const service = normalizeServiceName(label);
         const action = element.querySelector('.el-link__action')?.textContent.trim() || '';
-        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        if (!service || !element.href) continue;
         elements.push({
           cacheKey: nextCacheKey(counters, service),
           element,
           service,
           label,
           action,
-          sourceUrl: element.href
+          sourceUrl: element.href,
+          skipReason: skipReasonForServiceLink(service, action, element.href)
         });
       }
       return elements;
@@ -506,13 +524,15 @@
         const service = normalizeServiceName(rawService);
         const data = dataByService.get(service);
         if (!data) continue;
+        const action = element.querySelector('button')?.textContent.trim() || data.action;
         elements.push({
           cacheKey: service,
           element,
           service,
           label: element.querySelector('img[alt]')?.alt || data.label,
-          action: element.querySelector('button')?.textContent.trim() || data.action,
-          sourceUrl: data.sourceUrl
+          action,
+          sourceUrl: data.sourceUrl,
+          skipReason: skipReasonForServiceLink(service, action, data.sourceUrl)
         });
       }
       return elements;
@@ -591,14 +611,15 @@
         const service = serviceFromElement(element);
         const data = dataByService.get(service)?.shift();
         const action = element.querySelector('.link-option-row-action')?.textContent.trim() || '';
-        if (!data || isIgnoredService(service) || isPhysicalMediaLink(service, action)) continue;
+        if (!data) continue;
         elements.push({
           cacheKey: nextCacheKey(counters, service),
           element,
           service,
           label: element.querySelector('img[alt]')?.alt || data.label,
           action,
-          sourceUrl: data.sourceUrl
+          sourceUrl: data.sourceUrl,
+          skipReason: skipReasonForServiceLink(service, action, data.sourceUrl)
         });
       }
       return elements;
@@ -660,14 +681,15 @@
         const rawService = element.getAttribute('service') ?? '';
         const service = normalizeServiceName(rawService);
         const action = element.querySelector('.service-text, .music-service-cta-text__overflow')?.textContent.trim() || '';
-        if (!service || isIgnoredService(service) || isPhysicalMediaLink(service, action) || !element.href) continue;
+        if (!service || !element.href) continue;
         elements.push({
           cacheKey: nextCacheKey(counters, service),
           element,
           service,
           label: element.querySelector('.service-title')?.textContent.trim() || element.querySelector('img[alt]')?.alt || rawService,
           action,
-          sourceUrl: element.href
+          sourceUrl: element.href,
+          skipReason: skipReasonForServiceLink(service, action, element.href)
         });
       }
       return elements;
@@ -700,15 +722,6 @@
       'tidal.com': ['tidal', 'Tidal'],
       'youtube.com': ['youtube', 'YouTube']
     };
-
-    /** PromoLinks uses provider search pages when it cannot find an exact destination. */
-    function isPromoLinksSearchFallback(rawUrl) {
-      try {
-        return new URL(rawUrl).pathname.toLowerCase().split('/').includes('search');
-      } catch {
-        return false;
-      }
-    }
     function providerForUrl(rawUrl) {
       try {
         const url = new URL(rawUrl);
@@ -741,17 +754,15 @@
       if (!Array.isArray(sameAs)) return [];
       const links = [];
       for (const sourceUrl of sameAs) {
-        if (typeof sourceUrl !== 'string' || isPromoLinksSearchFallback(sourceUrl)) continue;
+        if (typeof sourceUrl !== 'string') continue;
         const provider = providerForUrl(sourceUrl);
         if (!provider) continue;
         const [service, label] = provider;
-        if (!isIgnoredService(service) && !isTrackOnlyServiceUrl(sourceUrl, service)) {
-          links.push({
-            service: normalizeServiceName(service),
-            label,
-            sourceUrl
-          });
-        }
+        links.push({
+          service: normalizeServiceName(service),
+          label,
+          sourceUrl
+        });
       }
       return links;
     }
@@ -792,7 +803,8 @@
           service: data.service,
           label: data.label,
           action: '',
-          sourceUrl: data.sourceUrl
+          sourceUrl: data.sourceUrl,
+          skipReason: skipReasonForServiceLink(data.service, '', data.sourceUrl)
         });
       }
       return elements;
@@ -925,9 +937,12 @@
         #${importerPanelId} .smartlink-mb-button:hover:not(:disabled) { background: #fff; }
         #${importerPanelId} .smartlink-mb-button:disabled { cursor: default; opacity: 0.55; }
         #${importerPanelId} .smartlink-mb-button img { flex: none; }
-        .smartlink-mb-present { position: relative; outline: 3px solid #32a852 !important; }
-        .smartlink-mb-present::after {
-            content: '\u2713';
+        .smartlink-mb-present,
+        .smartlink-mb-skipped { position: relative; }
+        .smartlink-mb-present { outline: 3px solid #32a852 !important; }
+        .smartlink-mb-skipped { outline: 3px solid #888 !important; filter: grayscale(1); opacity: 0.65; }
+        .smartlink-mb-present::after,
+        .smartlink-mb-skipped-badge {
             position: absolute;
             top: -7px;
             right: -7px;
@@ -940,6 +955,8 @@
             text-align: center;
             z-index: 2;
         }
+        .smartlink-mb-present::after { content: '\u2713'; }
+        .smartlink-mb-skipped-badge { background: #777; }
     `;
       document.head.appendChild(style);
     }
@@ -1012,6 +1029,20 @@
     }
 
     const HYDRATION_SETTLE_MS = 1_000;
+    function clearSkippedMark(element) {
+      element.classList.remove('smartlink-mb-skipped');
+      element.querySelector(':scope > .smartlink-mb-skipped-badge')?.remove();
+    }
+    function markSkipped(element, reason) {
+      clearSkippedMark(element);
+      element.classList.add('smartlink-mb-skipped');
+      const badge = document.createElement('span');
+      badge.className = 'smartlink-mb-skipped-badge';
+      badge.textContent = '\u00d7';
+      badge.title = `Skipped: ${reason}`;
+      badge.setAttribute('aria-label', badge.title);
+      element.appendChild(badge);
+    }
     function pageCacheKey(config) {
       return `${config.id}-mb-importer:v1:${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
     }
@@ -1074,6 +1105,12 @@
     }
     async function resolveServiceLinks(config, elements, cache) {
       const resolved = await Promise.all(elements.map(async element => {
+        clearSkippedMark(element.element);
+        if (element.skipReason) {
+          markSkipped(element.element, element.skipReason);
+          delete cache.links[element.cacheKey];
+          return undefined;
+        }
         const cached = cache.links[element.cacheKey];
         if (cached?.sourceUrl === element.sourceUrl) {
           const refreshed = {
@@ -1081,7 +1118,9 @@
             label: element.label,
             action: element.action
           };
-          if (isTrackOnlyServiceUrl(refreshed.url, refreshed.service)) {
+          const skipReason = skipReasonForServiceLink(refreshed.service, refreshed.action, refreshed.url);
+          if (skipReason) {
+            markSkipped(element.element, skipReason);
             delete cache.links[element.cacheKey];
             return undefined;
           }
@@ -1097,7 +1136,9 @@
             sourceUrl: element.sourceUrl,
             url: normalizeServiceUrl(destination, element.service)
           };
-          if (isTrackOnlyServiceUrl(link.url, link.service)) {
+          const skipReason = skipReasonForServiceLink(link.service, link.action, link.url);
+          if (skipReason) {
+            markSkipped(element.element, skipReason);
             delete cache.links[element.cacheKey];
             return undefined;
           }
@@ -1204,7 +1245,11 @@
         return;
       }
       const links = await resolveServiceLinks(config, elements, cache);
-      panel.status.textContent = `Resolved ${links.length} of ${elements.length} provider links. Checking MusicBrainz…`;
+      if (links.length === 0) {
+        panel.status.textContent = `No applicable ${config.siteName} release links were found on this page.`;
+        return;
+      }
+      panel.status.textContent = `Resolved ${links.length} applicable provider link${links.length === 1 ? '' : 's'}. Checking MusicBrainz…`;
       configureHarmonyButton(panel, links);
       let lookupGeneration = 0;
       const checkMusicBrainz = async selectedServer => {
