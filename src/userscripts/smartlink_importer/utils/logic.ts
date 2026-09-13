@@ -86,6 +86,31 @@ export function isPhysicalMediaLink(service: string, action: string): boolean {
     return PHYSICAL_MEDIA_SERVICES.has(normalizeServiceName(service)) || /\b(?:cd|vinyl|cassette)\b/i.test(action);
 }
 
+/** Identify provider entities that represent a track rather than a release. */
+export function isTrackOnlyServiceUrl(rawUrl: string, rawService: string): boolean {
+    const service = normalizeServiceName(rawService);
+    try {
+        const url = new URL(rawUrl);
+        const pathParts = url.pathname.toLowerCase().split('/').filter(Boolean);
+        const trackSegments = new Set(['episode', 'song', 'songs', 'track', 'tracks']);
+
+        if (service === 'youtube' || service === 'youtubemusic') {
+            return pathParts.at(-1) === 'watch' && !url.searchParams.has('list');
+        }
+        if (service === 'soundcloud') return pathParts.length >= 2 && !pathParts.includes('sets');
+        if (
+            ['amazon', 'apple', 'bandcamp', 'boomplay', 'deezer', 'itunes', 'kkbox', 'pandora', 'qobuz', 'spotify', 'tidal'].includes(
+                service,
+            )
+        ) {
+            return pathParts.some(part => trackSegments.has(part));
+        }
+    } catch {
+        return false;
+    }
+    return false;
+}
+
 function removeTrackingParameters(url: URL): void {
     for (const name of [...url.searchParams.keys()]) {
         if (name.toLowerCase().startsWith('utm_') || TRACKING_PARAMETER_NAMES.has(name.toLowerCase())) {

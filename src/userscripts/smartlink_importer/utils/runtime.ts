@@ -8,6 +8,7 @@ import {
     findCanonicallyMatchedLinkUrls,
     findMissingLinks,
     findReleaseMatches,
+    isTrackOnlyServiceUrl,
     normalizeServiceName,
     normalizeServiceUrl,
     relationshipTypeFor,
@@ -92,6 +93,10 @@ async function resolveServiceLinks(config: SmartLinkImporterConfig, elements: Se
             const cached = cache.links[element.cacheKey];
             if (cached?.sourceUrl === element.sourceUrl) {
                 const refreshed = { ...cached, label: element.label, action: element.action };
+                if (isTrackOnlyServiceUrl(refreshed.url, refreshed.service)) {
+                    delete cache.links[element.cacheKey];
+                    return undefined;
+                }
                 cache.links[element.cacheKey] = refreshed;
                 return refreshed;
             }
@@ -105,6 +110,10 @@ async function resolveServiceLinks(config: SmartLinkImporterConfig, elements: Se
                     sourceUrl: element.sourceUrl,
                     url: normalizeServiceUrl(destination, element.service),
                 };
+                if (isTrackOnlyServiceUrl(link.url, link.service)) {
+                    delete cache.links[element.cacheKey];
+                    return undefined;
+                }
                 cache.links[element.cacheKey] = link;
                 return link;
             } catch (error) {

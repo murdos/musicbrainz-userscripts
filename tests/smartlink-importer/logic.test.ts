@@ -11,6 +11,7 @@ import {
     findReleaseMatches,
     isIgnoredService,
     isPhysicalMediaLink,
+    isTrackOnlyServiceUrl,
     normalizeServiceUrl,
     relationshipTypeFor,
     URL_RELATIONSHIP_TYPES,
@@ -130,6 +131,28 @@ describe('Smartlink importer shared logic', () => {
         expect(isPhysicalMediaLink('unknown-store', 'Buy Vinyl')).toBe(true);
         expect(isPhysicalMediaLink('bandcamp', 'Buy Now')).toBe(false);
         expect(isPhysicalMediaLink('tidal', 'Play (Hi-Res)')).toBe(false);
+    });
+
+    it.each([
+        ['spotify', 'https://open.spotify.com/track/example'],
+        ['deezer', 'https://www.deezer.com/track/example'],
+        ['bandcamp', 'https://artist.bandcamp.com/track/example'],
+        ['tidal', 'https://tidal.com/track/example'],
+        ['youtube', 'https://www.youtube.com/watch?v=example'],
+        ['youtubemusic', 'https://music.youtube.com/watch?v=TV8SXzJcBF0'],
+        ['soundcloud', 'https://soundcloud.com/artist/example-track'],
+    ])('identifies %s track-only URLs', (service, url) => {
+        expect(isTrackOnlyServiceUrl(url, service)).toBe(true);
+    });
+
+    it.each([
+        ['spotify', 'https://open.spotify.com/album/example'],
+        ['deezer', 'https://www.deezer.com/album/example'],
+        ['apple', 'https://music.apple.com/us/album/example/123?i=456'],
+        ['youtube', 'https://www.youtube.com/watch?v=example&list=release-playlist'],
+        ['soundcloud', 'https://soundcloud.com/artist/sets/example-release'],
+    ])('retains %s release URLs', (service, url) => {
+        expect(isTrackOnlyServiceUrl(url, service)).toBe(false);
     });
 
     it('maps service actions to MusicBrainz URL relationship types', () => {
