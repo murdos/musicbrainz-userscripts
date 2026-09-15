@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mirlo releases to MusicBrainz
 // @description  One-click importing of releases from mirlo.space into MusicBrainz
-// @version      2026.09.13.1
+// @version      2026.09.15.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js
@@ -830,14 +830,7 @@
       resource,
       relations
     }) {
-      const matching_urls_data = batch.filter(query => {
-        if (!query.url_regex) return query.url === resource;
-        try {
-          return new RegExp(`^(?:${query.url_regex})$`).test(resource);
-        } catch {
-          return false;
-        }
-      });
+      const matching_urls_data = batch.filter(query => queryMatchesResource(query, resource));
       if (matching_urls_data.length === 0) return;
       if (!relations) return;
       matching_urls_data.forEach(reference => {
@@ -880,11 +873,13 @@
         });
       });
     }
-    function searchRelations(url) {
-      if (url.relations) return url.relations;
-      const relationLists = url['relation-list'];
-      if (!relationLists) return undefined;
-      return relationLists.flatMap(relationList => relationList.relations ?? []);
+    function queryMatchesResource(query, resource) {
+      if (!query.url_regex) return query.url === resource;
+      try {
+        return new RegExp(`^(?:${query.url_regex})$`).test(resource);
+      } catch {
+        return false;
+      }
     }
 
     // user_cache_key = textual key used to store cached data in local storage
@@ -1160,7 +1155,8 @@
       }
 
       /**
-       * Search MusicBrainz's indexed URL field with Lucene regular expressions.
+       * Search MusicBrainz's indexed URL field with Lucene regular expressions,
+       * then resolve the discovered resources to load their relationships.
        */
       searchAndDisplayMbLinksByRegex(urls_data) {
         // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
@@ -1198,15 +1194,22 @@
         if (typeof request === 'object') handlers = request.context.handlers;
         handlers.push(function (data) {
           const urls = data.urls ?? [];
+          const discoveredQueries = [];
+          const discoveredResources = new Set();
           urls.forEach(urlData => {
-            processUrlMatch({
-              mblinks,
-              batch,
-              resource: urlData.resource,
-              relations: searchRelations(urlData)
+            if (discoveredResources.has(urlData.resource)) return;
+            discoveredResources.add(urlData.resource);
+            batch.forEach(queryData => {
+              if (!queryMatchesResource(queryData, urlData.resource)) return;
+              discoveredQueries.push({
+                url: urlData.resource,
+                mb_type: queryData.mb_type,
+                insert_func: queryData.insert_func,
+                key: queryData.key || queryData.url
+              });
             });
           });
-          mblinks.saveCache();
+          mblinks.searchAndDisplayMbLinks(discoveredQueries);
           const responseOffset = data.offset ?? offset;
           const nextOffset = responseOffset + urls.length;
           if (typeof data.count === 'number' && urls.length > 0 && nextOffset < data.count) {
