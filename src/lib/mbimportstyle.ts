@@ -77,17 +77,23 @@ export function MBSearchItStyle(): void {
    .mb_lookup_error > * {
      display: none !important;
    }
+   .mb_lookup_loading,
+   .mb_lookup_error {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     padding: 2px;
+   }
    .mb_lookup_loading::before {
      content: '';
-     display: inline-block;
+     display: block;
      width: 11px;
      height: 11px;
      box-sizing: border-box;
      border: 2px solid #d7ca75;
      border-top-color: #ba478f;
      border-radius: 50%;
-     vertical-align: -1px;
-     animation: mb_lookup_spin 0.8s linear infinite;
+     animation: mb_lookup_spin 1.2s linear infinite;
    }
    .mb_lookup_error::before {
      content: '⚠';
