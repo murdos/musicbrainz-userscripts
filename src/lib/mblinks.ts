@@ -88,10 +88,7 @@ interface JsonHttpResponse {
     json: () => Promise<BatchResponse>;
 }
 
-interface RetryError extends Error {
-    status: number;
-    retryDelayMs?: number;
-}
+type ScheduledRequest = () => Promise<void>;
 
 function getRawHeader(rawHeaders: string, name: string): string | null {
     const expectedName = name.toLowerCase();
@@ -278,10 +275,12 @@ function queryMatchesResource(query: MBLinkQuery, resource: string): boolean {
 export class MBLinks {
     supports_local_storage: boolean;
     ajax_requests = new AjaxRequests();
-    private pendingRequests: (() => void)[] = [];
+    private pendingRequests: ScheduledRequest[] = [];
     private requestTimer: ReturnType<typeof setTimeout> | undefined;
+    private requestInFlight = false;
     private nextRequestAt = 0;
     private rateLimitResetAt = 0;
+    private consecutiveRequestFailures = 0;
     cache: Record<string, CacheEntry> = {};
     expirationMinutes: number;
     user_cache_key: string;
@@ -329,61 +328,75 @@ export class MBLinks {
     }
 
     /**
-     * GET JSON with retry on 5xx errors (e.g. 503), using server-provided rate-limit headers when available, with exponential backoff capped at 30 seconds and a five-minute retry budget.
+     * GET JSON with retry on 5xx and status-less network errors, using server-provided rate-limit headers when available, with queue-wide exponential backoff capped at 30 seconds and a five-minute retry budget.
      * @param url - The URL to request.
      * @param successCallback - Called with response data on success.
      * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
      */
     getJSONWithRetry(url: string, successCallback: (data: BatchResponse) => void, alwaysCallback?: (succeeded: boolean) => void): void {
         const retryDeadline = Date.now() + 5 * 60 * 1000;
-        let attempt = 0;
+        const retry = (serverDelayMs = 0): void => {
+            const retryDelayMs = this.recordRequestFailure(serverDelayMs);
+            if (Date.now() + retryDelayMs <= retryDeadline) {
+                setTimeout(() => this.scheduleRequest(doRequest, true), retryDelayMs);
+            } else {
+                alwaysCallback?.(false);
+            }
+        };
 
-        const doRequest = () => {
-            attempt += 1;
-            requestJSON(url)
-                .then(response => {
-                    const retryDelayMs = getRetryDelayMs(response);
-                    if (retryDelayMs !== undefined && (!response.ok || response.getHeader('x-ratelimit-remaining') === '0')) {
-                        this.pauseRequests(retryDelayMs);
+        const doRequest = async (): Promise<void> => {
+            let response: JsonHttpResponse;
+            try {
+                response = await requestJSON(url);
+            } catch {
+                // Extension throttling and ordinary network failures both arrive without an HTTP status.
+                retry();
+                return;
+            }
+
+            const serverDelayMs = getRetryDelayMs(response) ?? 0;
+            if (!response.ok) {
+                if (response.status >= 500 && response.status < 600) {
+                    retry(serverDelayMs);
+                } else if (response.status === 404) {
+                    // The URL endpoint uses 404 to report a resource with no relationships.
+                    this.consecutiveRequestFailures = 0;
+                    try {
+                        successCallback({});
+                        alwaysCallback?.(true);
+                    } catch {
+                        alwaysCallback?.(false);
                     }
-                    if (!response.ok) {
-                        const error = new Error(`HTTP ${response.status}`) as RetryError;
-                        error.status = response.status;
-                        if (retryDelayMs !== undefined) error.retryDelayMs = retryDelayMs;
-                        throw error;
-                    }
-                    return response.json() as Promise<BatchResponse>;
-                })
-                .then(function (data) {
-                    successCallback(data);
-                    if (typeof alwaysCallback === 'function') {
-                        alwaysCallback(true);
-                    }
-                })
-                .catch((error: unknown) => {
-                    const status = isErrorWithStatus(error) ? error.status : 0;
-                    const is5xx = status >= 500 && status < 600;
-                    if (is5xx) {
-                        const serverDelayMs = error instanceof Error ? ((error as RetryError).retryDelayMs ?? 0) : 0;
-                        const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (attempt - 1)));
-                        if (Date.now() + retryDelayMs <= retryDeadline) {
-                            setTimeout(() => {
-                                this.scheduleRequest(doRequest);
-                            }, retryDelayMs);
-                        } else if (typeof alwaysCallback === 'function') {
-                            alwaysCallback(false);
-                        }
-                    } else if (typeof alwaysCallback === 'function') {
-                        alwaysCallback(false);
-                    }
-                });
+                } else {
+                    this.consecutiveRequestFailures = 0;
+                    alwaysCallback?.(false);
+                }
+                return;
+            }
+
+            this.consecutiveRequestFailures = 0;
+            if (response.getHeader('x-ratelimit-remaining') === '0') this.pauseRequests(serverDelayMs);
+            try {
+                successCallback(await response.json());
+                alwaysCallback?.(true);
+            } catch {
+                alwaysCallback?.(false);
+            }
         };
         this.scheduleRequest(doRequest);
     }
 
-    private scheduleRequest(request: () => void): void {
-        this.pendingRequests.push(request);
+    private scheduleRequest(request: ScheduledRequest, priority = false): void {
+        if (priority) this.pendingRequests.unshift(request);
+        else this.pendingRequests.push(request);
         this.runNextRequest();
+    }
+
+    private recordRequestFailure(serverDelayMs: number): number {
+        this.consecutiveRequestFailures += 1;
+        const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (this.consecutiveRequestFailures - 1)));
+        this.pauseRequests(retryDelayMs);
+        return retryDelayMs;
     }
 
     private pauseRequests(delayMs: number): void {
@@ -391,7 +404,7 @@ export class MBLinks {
     }
 
     private runNextRequest(): void {
-        if (this.requestTimer || this.pendingRequests.length === 0) return;
+        if (this.requestTimer || this.requestInFlight || this.pendingRequests.length === 0) return;
 
         const now = Date.now();
         const runAt = Math.max(now, this.nextRequestAt, this.rateLimitResetAt);
@@ -406,8 +419,14 @@ export class MBLinks {
 
         const request = this.pendingRequests.shift()!;
         this.nextRequestAt = now + 1000;
-        request();
-        this.runNextRequest();
+        this.requestInFlight = true;
+        void Promise.resolve()
+            .then(request)
+            .catch(() => undefined)
+            .finally(() => {
+                this.requestInFlight = false;
+                this.runNextRequest();
+            });
     }
 
     initCache(): void {
@@ -737,8 +756,4 @@ export class MBLinks {
             query.complete_func?.({ found: outcome.found, status: outcome.failed ? 'error' : 'success' });
         });
     }
-}
-
-function isErrorWithStatus(error: unknown): error is { status: number } {
-    return typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number';
 }
