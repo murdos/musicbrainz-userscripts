@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mirlo releases to MusicBrainz
 // @description  One-click importing of releases from mirlo.space into MusicBrainz
-// @version      2026.09.15.4
+// @version      2026.09.15.5
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js
@@ -714,17 +714,23 @@
    .mb_lookup_error > * {
      display: none !important;
    }
+   .mb_lookup_loading,
+   .mb_lookup_error {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     padding: 2px;
+   }
    .mb_lookup_loading::before {
      content: '';
-     display: inline-block;
+     display: block;
      width: 11px;
      height: 11px;
      box-sizing: border-box;
      border: 2px solid #d7ca75;
      border-top-color: #ba478f;
      border-radius: 50%;
-     vertical-align: -1px;
-     animation: mb_lookup_spin 0.8s linear infinite;
+     animation: mb_lookup_spin 1.2s linear infinite;
    }
    .mb_lookup_error::before {
      content: '⚠';
