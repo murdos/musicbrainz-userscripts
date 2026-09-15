@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.15.6
+// @version      2026.09.15.7
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -948,8 +948,10 @@
       ajax_requests = new AjaxRequests();
       pendingRequests = [];
       requestTimer;
+      requestInFlight = false;
       nextRequestAt = 0;
       rateLimitResetAt = 0;
+      consecutiveRequestFailures = 0;
       cache = {};
       expirationMinutes;
       user_cache_key;
@@ -993,62 +995,75 @@
       }
 
       /**
-       * GET JSON with retry on 5xx errors (e.g. 503), using server-provided rate-limit headers when available, with exponential backoff capped at 30 seconds and a five-minute retry budget.
+       * GET JSON with retry on 5xx and status-less network errors, using server-provided rate-limit headers when available, with queue-wide exponential backoff capped at 30 seconds and a five-minute retry budget.
        * @param url - The URL to request.
        * @param successCallback - Called with response data on success.
        * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
        */
       getJSONWithRetry(url, successCallback, alwaysCallback) {
         const retryDeadline = Date.now() + 5 * 60 * 1000;
-        let attempt = 0;
-        const doRequest = () => {
-          attempt += 1;
-          requestJSON(url).then(response => {
-            const retryDelayMs = getRetryDelayMs(response);
-            if (retryDelayMs !== undefined && (!response.ok || response.getHeader('x-ratelimit-remaining') === '0')) {
-              this.pauseRequests(retryDelayMs);
-            }
-            if (!response.ok) {
-              const error = new Error(`HTTP ${response.status}`);
-              error.status = response.status;
-              if (retryDelayMs !== undefined) error.retryDelayMs = retryDelayMs;
-              throw error;
-            }
-            return response.json();
-          }).then(function (data) {
-            successCallback(data);
-            if (typeof alwaysCallback === 'function') {
-              alwaysCallback(true);
-            }
-          }).catch(error => {
-            const status = isErrorWithStatus(error) ? error.status : 0;
-            const is5xx = status >= 500 && status < 600;
-            if (is5xx) {
-              const serverDelayMs = error instanceof Error ? error.retryDelayMs ?? 0 : 0;
-              const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (attempt - 1)));
-              if (Date.now() + retryDelayMs <= retryDeadline) {
-                setTimeout(() => {
-                  this.scheduleRequest(doRequest);
-                }, retryDelayMs);
-              } else if (typeof alwaysCallback === 'function') {
-                alwaysCallback(false);
+        const retry = (serverDelayMs = 0) => {
+          const retryDelayMs = this.recordRequestFailure(serverDelayMs);
+          if (Date.now() + retryDelayMs <= retryDeadline) {
+            setTimeout(() => this.scheduleRequest(doRequest, true), retryDelayMs);
+          } else {
+            alwaysCallback?.(false);
+          }
+        };
+        const doRequest = async () => {
+          let response;
+          try {
+            response = await requestJSON(url);
+          } catch {
+            // Extension throttling and ordinary network failures both arrive without an HTTP status.
+            retry();
+            return;
+          }
+          const serverDelayMs = getRetryDelayMs(response) ?? 0;
+          if (!response.ok) {
+            if (response.status >= 500 && response.status < 600) {
+              retry(serverDelayMs);
+            } else if (response.status === 404) {
+              // The URL endpoint uses 404 to report a resource with no relationships.
+              this.consecutiveRequestFailures = 0;
+              try {
+                successCallback({});
+                alwaysCallback?.(true);
+              } catch {
+                alwaysCallback?.(false);
               }
-            } else if (typeof alwaysCallback === 'function') {
-              alwaysCallback(false);
+            } else {
+              this.consecutiveRequestFailures = 0;
+              alwaysCallback?.(false);
             }
-          });
+            return;
+          }
+          this.consecutiveRequestFailures = 0;
+          if (response.getHeader('x-ratelimit-remaining') === '0') this.pauseRequests(serverDelayMs);
+          try {
+            successCallback(await response.json());
+            alwaysCallback?.(true);
+          } catch {
+            alwaysCallback?.(false);
+          }
         };
         this.scheduleRequest(doRequest);
       }
-      scheduleRequest(request) {
-        this.pendingRequests.push(request);
+      scheduleRequest(request, priority = false) {
+        if (priority) this.pendingRequests.unshift(request);else this.pendingRequests.push(request);
         this.runNextRequest();
+      }
+      recordRequestFailure(serverDelayMs) {
+        this.consecutiveRequestFailures += 1;
+        const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (this.consecutiveRequestFailures - 1)));
+        this.pauseRequests(retryDelayMs);
+        return retryDelayMs;
       }
       pauseRequests(delayMs) {
         this.rateLimitResetAt = Math.max(this.rateLimitResetAt, Date.now() + delayMs);
       }
       runNextRequest() {
-        if (this.requestTimer || this.pendingRequests.length === 0) return;
+        if (this.requestTimer || this.requestInFlight || this.pendingRequests.length === 0) return;
         const now = Date.now();
         const runAt = Math.max(now, this.nextRequestAt, this.rateLimitResetAt);
         const delay = runAt - now;
@@ -1061,8 +1076,11 @@
         }
         const request = this.pendingRequests.shift();
         this.nextRequestAt = now + 1000;
-        request();
-        this.runNextRequest();
+        this.requestInFlight = true;
+        void Promise.resolve().then(request).catch(() => undefined).finally(() => {
+          this.requestInFlight = false;
+          this.runNextRequest();
+        });
       }
       initCache() {
         if (!this.supports_local_storage) return;
@@ -1382,9 +1400,6 @@
           });
         });
       }
-    }
-    function isErrorWithStatus(error) {
-      return typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number';
     }
 
     function normalizeProductUrl(url) {
