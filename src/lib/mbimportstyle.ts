@@ -82,7 +82,6 @@ export function MBSearchItStyle(): void {
      display: inline-flex;
      align-items: center;
      justify-content: center;
-     padding: 2px;
    }
    .mb_lookup_loading::before {
      content: '';
