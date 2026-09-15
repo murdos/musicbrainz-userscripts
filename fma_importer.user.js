@@ -1,18 +1,20 @@
 // ==UserScript==
 // @name         Import FMA releases to MusicBrainz
 // @description  Add a button to import https://freemusicarchive.org/ releases to MusicBrainz via API
-// @version      2026.9.6
+// @version      2026.9.15
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/fma_importer.user.js
 // @match        https://freemusicarchive.org/music/*
+// @connect      musicbrainz.org
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.09.01.5
+// @require      lib/mblinks.js?version=v2026.09.15.2
 // @require      lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
-// @grant        none
+// @grant        GM.xmlHttpRequest
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 /*

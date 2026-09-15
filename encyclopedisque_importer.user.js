@@ -1,17 +1,20 @@
 ﻿// ==UserScript==
 // @name         Import Encyclopedisque releases to MusicBrainz
-// @version      2026.9.6
+// @version      2026.9.15
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @description  Easily import Encyclopedisque releases into MusicBrainz
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/encyclopedisque_importer.user.js
 // @match        https://www.encyclopedisque.fr/disque/*.html
 // @match        https://www.encyclopedisque.fr/artiste/*.html
+// @connect      musicbrainz.org
 // @require      lib/mbimport.js
-// @require      lib/mblinks.js?version=v2026.09.01.5
+// @require      lib/mblinks.js?version=v2026.09.15.2
 // @require      lib/logger.js
 // @require      lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
+// @grant        GM.xmlHttpRequest
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 const mbLinks = new MBLinks('ENCYLOPEDISQUE_MBLINKS_CACHE');
