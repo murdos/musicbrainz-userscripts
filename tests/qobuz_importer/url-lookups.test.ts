@@ -177,9 +177,8 @@ describe('MBLinks regex URL search', () => {
             'fetch',
             vi.fn(() =>
                 Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    json: () => Promise.resolve({ resource: 'https://example.com/release', relations: [] }),
+                    ok: false,
+                    status: 404,
                 }),
             ),
         );
@@ -310,6 +309,32 @@ describe('MBLinks regex URL search', () => {
         expect(requestTimes[2]! - requestTimes[1]!).toBeGreaterThanOrEqual(1000);
     });
 
+    it('does not start another request while the current request is still in flight', async () => {
+        let finishFirstRequest!: (response: { ok: boolean; status: number; json: () => Promise<object> }) => void;
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce(
+                () =>
+                    new Promise(resolve => {
+                        finishFirstRequest = resolve;
+                    }),
+            )
+            .mockImplementationOnce(() => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({}) }));
+        vi.stubGlobal('fetch', fetchMock);
+        const mblinks = new MBLinks('MBLINKS_IN_FLIGHT_TEST');
+
+        mblinks.getJSONWithRetry('first', vi.fn());
+        mblinks.getJSONWithRetry('second', vi.fn());
+        await vi.advanceTimersByTimeAsync(10_000);
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+
+        finishFirstRequest({ ok: true, status: 200, json: () => Promise.resolve({}) });
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
     it('keeps retrying 503 responses with exponential backoff', async () => {
         const requestTimes: number[] = [];
         const fetchMock = vi.fn(() => {
@@ -369,10 +394,48 @@ describe('MBLinks regex URL search', () => {
 
         expect(requests.map(request => [request.time - Date.parse('2026-09-15T00:00:00Z'), request.url])).toEqual([
             [0, 'first'],
-            [10_000, 'second'],
-            [11_000, 'first'],
+            [10_000, 'first'],
+            [11_000, 'second'],
         ]);
         expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('retries status-less userscript request failures with queue-wide backoff', async () => {
+        const requests: { time: number; url: string }[] = [];
+        let failedOnce = false;
+        const xmlHttpRequest = vi.fn(
+            (details: {
+                onerror: () => void;
+                onload: (response: {
+                    response: Record<string, unknown>;
+                    responseHeaders: string;
+                    responseText: string;
+                    status: number;
+                }) => void;
+                url: string;
+            }) => {
+                requests.push({ time: Date.now(), url: details.url });
+                if (!failedOnce) {
+                    failedOnce = true;
+                    details.onerror();
+                } else {
+                    details.onload({ status: 200, response: {}, responseText: '', responseHeaders: '' });
+                }
+            },
+        );
+        vi.stubGlobal('GM', { xmlHttpRequest });
+        const mblinks = new MBLinks('MBLINKS_EXTENSION_THROTTLE_TEST');
+        const startedAt = Date.now();
+
+        mblinks.getJSONWithRetry('first', vi.fn());
+        mblinks.getJSONWithRetry('second', vi.fn());
+        await vi.advanceTimersByTimeAsync(2_000);
+
+        expect(requests.map(request => [request.time - startedAt, request.url])).toEqual([
+            [0, 'first'],
+            [1000, 'first'],
+            [2000, 'second'],
+        ]);
     });
 
     it('stops retrying before the five-minute retry budget is exceeded', async () => {
