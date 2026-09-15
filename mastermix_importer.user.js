@@ -1,13 +1,16 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.15.1
+// @version      2026.09.15.3
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
 // @match        https://mastermixdj.com/*
 // @match        https://www.mastermixdj.com/*
+// @connect      musicbrainz.org
+// @grant        GM.xmlHttpRequest
+// @grant        GM_xmlhttpRequest
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
@@ -686,20 +689,80 @@
       _add_css(css_search_it);
     }
 
+    const LEGACY_GM_API_NAMES = {
+      getValue: 'GM_getValue',
+      setValue: 'GM_setValue',
+      xmlHttpRequest: 'GM_xmlhttpRequest'
+    };
+    function getOptionalGlobal(name) {
+      return Reflect.get(globalThis, name);
+    }
+    function getGmApi(name) {
+      const modernGM = getOptionalGlobal('GM');
+      const modernApi = modernGM?.[name];
+      return modernApi ?? getOptionalGlobal(LEGACY_GM_API_NAMES[name]);
+    }
+
     // Class MBLinks : query MusicBrainz for urls and display links for matching urls
     // The main method is searchAndDisplayMbLinks()
 
-    // Example:
-    // document.addEventListener('DOMContentLoaded', function () {
-    //
-    //  const mblinks = new MBLinks('EXAMPLE_MBLINKS_CACHE', undefined, 7*24*60); // force refresh of cached links once a week
-    //
-    //  const album_link = 'http://' + window.location.href.match( /^https?:\/\/(.*\/album\/.+)$/i)[1];
-    //  mblinks.searchAndDisplayMbLinks([{ url: album_link, mb_type: 'release', insert_func: function (link) {
-    //      document.querySelector('div#there').insertAdjacentHTML('afterend', link);
-    //  } }]);
-    // });
-
+    function getRawHeader(rawHeaders, name) {
+      const expectedName = name.toLowerCase();
+      for (const line of rawHeaders.split(/\r?\n/)) {
+        const separator = line.indexOf(':');
+        if (separator >= 0 && line.slice(0, separator).trim().toLowerCase() === expectedName) {
+          return line.slice(separator + 1).trim();
+        }
+      }
+      return null;
+    }
+    function requestJSON(url) {
+      const gmRequest = getGmApi('xmlHttpRequest');
+      if (!gmRequest) {
+        return fetch(url, {
+          headers: {
+            Accept: 'application/json'
+          }
+        }).then(response => ({
+          ok: response.ok,
+          status: response.status,
+          getHeader: name => response.headers?.get(name) ?? null,
+          json: () => response.json()
+        }));
+      }
+      return new Promise((resolve, reject) => {
+        gmRequest({
+          method: 'GET',
+          url,
+          headers: {
+            Accept: 'application/json'
+          },
+          responseType: 'json',
+          onload: response => {
+            resolve({
+              ok: response.status >= 200 && response.status < 300,
+              status: response.status,
+              getHeader: name => getRawHeader(response.responseHeaders, name),
+              json: () => Promise.resolve(response.response ?? JSON.parse(response.responseText))
+            });
+          },
+          onerror: () => reject(new Error('Network request failed'))
+        });
+      });
+    }
+    function getRetryDelayMs(response) {
+      const retryAfter = response.getHeader('retry-after');
+      if (retryAfter) {
+        const seconds = Number(retryAfter);
+        const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(retryAfter) - Date.now();
+        if (Number.isFinite(delay) && delay >= 0) return delay;
+      }
+      const resetSeconds = Number(response.getHeader('x-ratelimit-reset'));
+      if (!Number.isFinite(resetSeconds) || resetSeconds <= 0) return undefined;
+      const serverDate = Date.parse(response.getHeader('date') ?? '');
+      const referenceTime = Number.isFinite(serverDate) ? serverDate : Date.now();
+      return Math.max(0, resetSeconds * 1000 - referenceTime);
+    }
     class AjaxRequests {
       // properties: "key": {handler: function, next: property, context: {}}
       first = '';
@@ -822,7 +885,10 @@
     class MBLinks {
       supports_local_storage;
       ajax_requests = new AjaxRequests();
+      pendingRequests = [];
+      requestTimer;
       nextRequestAt = 0;
+      rateLimitResetAt = 0;
       cache = {};
       expirationMinutes;
       user_cache_key;
@@ -866,8 +932,7 @@
       }
 
       /**
-       * GET JSON with retry on 5xx errors (e.g. 503), using exponential backoff capped at 30 seconds
-       * and a five-minute retry budget.
+       * GET JSON with retry on 5xx errors (e.g. 503), using server-provided rate-limit headers when available, with exponential backoff capped at 30 seconds and a five-minute retry budget.
        * @param url - The URL to request.
        * @param successCallback - Called with response data on success.
        * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
@@ -877,14 +942,15 @@
         let attempt = 0;
         const doRequest = () => {
           attempt += 1;
-          fetch(url, {
-            headers: {
-              Accept: 'application/json'
+          requestJSON(url).then(response => {
+            const retryDelayMs = getRetryDelayMs(response);
+            if (retryDelayMs !== undefined && (!response.ok || response.getHeader('x-ratelimit-remaining') === '0')) {
+              this.pauseRequests(retryDelayMs);
             }
-          }).then(function (response) {
             if (!response.ok) {
               const error = new Error(`HTTP ${response.status}`);
               error.status = response.status;
+              if (retryDelayMs !== undefined) error.retryDelayMs = retryDelayMs;
               throw error;
             }
             return response.json();
@@ -897,7 +963,8 @@
             const status = isErrorWithStatus(error) ? error.status : 0;
             const is5xx = status >= 500 && status < 600;
             if (is5xx) {
-              const retryDelayMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
+              const serverDelayMs = error instanceof Error ? error.retryDelayMs ?? 0 : 0;
+              const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (attempt - 1)));
               if (Date.now() + retryDelayMs <= retryDeadline) {
                 setTimeout(() => {
                   this.scheduleRequest(doRequest);
@@ -913,11 +980,28 @@
         this.scheduleRequest(doRequest);
       }
       scheduleRequest(request) {
+        this.pendingRequests.push(request);
+        this.runNextRequest();
+      }
+      pauseRequests(delayMs) {
+        this.rateLimitResetAt = Math.max(this.rateLimitResetAt, Date.now() + delayMs);
+      }
+      runNextRequest() {
+        if (this.requestTimer || this.pendingRequests.length === 0) return;
         const now = Date.now();
-        const runAt = Math.max(now, this.nextRequestAt);
-        this.nextRequestAt = runAt + 1000;
+        const runAt = Math.max(now, this.nextRequestAt, this.rateLimitResetAt);
         const delay = runAt - now;
-        if (delay === 0) request();else setTimeout(request, delay);
+        if (delay > 0) {
+          this.requestTimer = setTimeout(() => {
+            this.requestTimer = undefined;
+            this.runNextRequest();
+          }, delay);
+          return;
+        }
+        const request = this.pendingRequests.shift();
+        this.nextRequestAt = now + 1000;
+        request();
+        this.runNextRequest();
       }
       initCache() {
         if (!this.supports_local_storage) return;
