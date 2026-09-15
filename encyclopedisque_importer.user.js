@@ -9,9 +9,9 @@
 // @match        https://www.encyclopedisque.fr/artiste/*.html
 // @connect      musicbrainz.org
 // @require      lib/mbimport.js
-// @require      lib/mblinks.js?version=v2026.09.15.3
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/2cbee9d1c5bdc749e0e23354504cf686dbc79dc2/lib/mblinks.js
 // @require      lib/logger.js
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/e07c9bf5850be6cd6a2119f66ea7769afecf1058/lib/mbimportstyle.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/2cbee9d1c5bdc749e0e23354504cf686dbc79dc2/lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
