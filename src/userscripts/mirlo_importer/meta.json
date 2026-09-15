@@ -1,7 +1,7 @@
 {
     "name": "Import Mirlo releases to MusicBrainz",
     "description": "One-click importing of releases from mirlo.space into MusicBrainz",
-    "version": "2026.09.15.6",
+    "version": "2026.09.15.7",
     "author": "Raman Sinclair",
     "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
     "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js",
