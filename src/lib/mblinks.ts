@@ -39,7 +39,6 @@ interface Relation {
 interface UrlResponse {
     resource: string;
     relations?: Relation[];
-    'relation-list'?: { relations?: Relation[] }[];
 }
 
 interface BatchResponse extends Partial<UrlResponse> {
@@ -135,14 +134,7 @@ function processUrlMatch({
     resource: string;
     relations: Relation[] | undefined;
 }): void {
-    const matching_urls_data = batch.filter(query => {
-        if (!query.url_regex) return query.url === resource;
-        try {
-            return new RegExp(`^(?:${query.url_regex})$`).test(resource);
-        } catch {
-            return false;
-        }
-    });
+    const matching_urls_data = batch.filter(query => queryMatchesResource(query, resource));
     if (matching_urls_data.length === 0) return;
 
     if (!relations) return;
@@ -183,11 +175,13 @@ function processUrlMatch({
     });
 }
 
-function searchRelations(url: UrlResponse): Relation[] | undefined {
-    if (url.relations) return url.relations;
-    const relationLists = url['relation-list'];
-    if (!relationLists) return undefined;
-    return relationLists.flatMap(relationList => relationList.relations ?? []);
+function queryMatchesResource(query: MBLinkQuery, resource: string): boolean {
+    if (!query.url_regex) return query.url === resource;
+    try {
+        return new RegExp(`^(?:${query.url_regex})$`).test(resource);
+    } catch {
+        return false;
+    }
 }
 
 // user_cache_key = textual key used to store cached data in local storage
@@ -485,7 +479,8 @@ export class MBLinks {
     }
 
     /**
-     * Search MusicBrainz's indexed URL field with Lucene regular expressions.
+     * Search MusicBrainz's indexed URL field with Lucene regular expressions,
+     * then resolve the discovered resources to load their relationships.
      */
     searchAndDisplayMbLinksByRegex(urls_data: MBLinkQuery[]): void {
         // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
@@ -525,15 +520,22 @@ export class MBLinks {
 
         handlers.push(function (data) {
             const urls = data.urls ?? [];
+            const discoveredQueries: MBLinkQuery[] = [];
+            const discoveredResources = new Set<string>();
             urls.forEach(urlData => {
-                processUrlMatch({
-                    mblinks,
-                    batch,
-                    resource: urlData.resource,
-                    relations: searchRelations(urlData),
+                if (discoveredResources.has(urlData.resource)) return;
+                discoveredResources.add(urlData.resource);
+                batch.forEach(queryData => {
+                    if (!queryMatchesResource(queryData, urlData.resource)) return;
+                    discoveredQueries.push({
+                        url: urlData.resource,
+                        mb_type: queryData.mb_type,
+                        insert_func: queryData.insert_func,
+                        key: queryData.key || queryData.url,
+                    });
                 });
             });
-            mblinks.saveCache();
+            mblinks.searchAndDisplayMbLinks(discoveredQueries);
 
             const responseOffset = data.offset ?? offset;
             const nextOffset = responseOffset + urls.length;
