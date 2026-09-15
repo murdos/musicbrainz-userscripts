@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mastermix releases to MusicBrainz
 // @description  Import Mastermix releases and show links to matching MusicBrainz releases
-// @version      2026.09.15.5
+// @version      2026.09.15.6
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mastermix_importer.user.js
@@ -720,7 +720,6 @@
      display: inline-flex;
      align-items: center;
      justify-content: center;
-     padding: 2px;
    }
    .mb_lookup_loading::before {
      content: '';
