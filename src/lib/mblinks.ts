@@ -12,6 +12,8 @@
 //  } }]);
 // });
 
+import { getGmApi } from './userscript-api';
+
 export interface MBLinkQuery {
     url: string;
     mb_type: string;
@@ -63,6 +65,75 @@ interface AjaxRequest {
     handler: (this: AjaxRequestContext) => void;
     next: string;
     context: AjaxRequestContext;
+}
+
+interface JsonHttpResponse {
+    ok: boolean;
+    status: number;
+    getHeader: (name: string) => string | null;
+    json: () => Promise<BatchResponse>;
+}
+
+interface RetryError extends Error {
+    status: number;
+    retryDelayMs?: number;
+}
+
+function getRawHeader(rawHeaders: string, name: string): string | null {
+    const expectedName = name.toLowerCase();
+    for (const line of rawHeaders.split(/\r?\n/)) {
+        const separator = line.indexOf(':');
+        if (separator >= 0 && line.slice(0, separator).trim().toLowerCase() === expectedName) {
+            return line.slice(separator + 1).trim();
+        }
+    }
+    return null;
+}
+
+function requestJSON(url: string): Promise<JsonHttpResponse> {
+    const gmRequest = getGmApi('xmlHttpRequest');
+    if (!gmRequest) {
+        return fetch(url, { headers: { Accept: 'application/json' } }).then(response => ({
+            ok: response.ok,
+            status: response.status,
+            getHeader: name => response.headers?.get(name) ?? null,
+            json: () => response.json() as Promise<BatchResponse>,
+        }));
+    }
+
+    return new Promise((resolve, reject) => {
+        gmRequest({
+            method: 'GET',
+            url,
+            headers: { Accept: 'application/json' },
+            responseType: 'json',
+            onload: response => {
+                resolve({
+                    ok: response.status >= 200 && response.status < 300,
+                    status: response.status,
+                    getHeader: name => getRawHeader(response.responseHeaders, name),
+                    json: () => Promise.resolve((response.response ?? JSON.parse(response.responseText)) as BatchResponse),
+                });
+            },
+            onerror: () => reject(new Error('Network request failed')),
+        });
+    });
+}
+
+function getRetryDelayMs(response: JsonHttpResponse): number | undefined {
+    const retryAfter = response.getHeader('retry-after');
+    if (retryAfter) {
+        const seconds = Number(retryAfter);
+        const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(retryAfter) - Date.now();
+        if (Number.isFinite(delay) && delay >= 0) return delay;
+    }
+
+    const resetSeconds = Number(response.getHeader('x-ratelimit-reset'));
+    if (!Number.isFinite(resetSeconds) || resetSeconds <= 0) return undefined;
+
+    const serverDate = Date.parse(response.getHeader('date') ?? '');
+    const referenceTime = Number.isFinite(serverDate) ? serverDate : Date.now();
+    return Math.max(0, resetSeconds * 1000 - referenceTime);
 }
 
 class AjaxRequests {
@@ -190,7 +261,10 @@ function queryMatchesResource(query: MBLinkQuery, resource: string): boolean {
 export class MBLinks {
     supports_local_storage: boolean;
     ajax_requests = new AjaxRequests();
+    private pendingRequests: (() => void)[] = [];
+    private requestTimer: ReturnType<typeof setTimeout> | undefined;
     private nextRequestAt = 0;
+    private rateLimitResetAt = 0;
     cache: Record<string, CacheEntry> = {};
     expirationMinutes: number;
     user_cache_key: string;
@@ -238,8 +312,7 @@ export class MBLinks {
     }
 
     /**
-     * GET JSON with retry on 5xx errors (e.g. 503), using exponential backoff capped at 30 seconds
-     * and a five-minute retry budget.
+     * GET JSON with retry on 5xx errors (e.g. 503), using server-provided rate-limit headers when available, with exponential backoff capped at 30 seconds and a five-minute retry budget.
      * @param url - The URL to request.
      * @param successCallback - Called with response data on success.
      * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
@@ -250,11 +323,16 @@ export class MBLinks {
 
         const doRequest = () => {
             attempt += 1;
-            fetch(url, { headers: { Accept: 'application/json' } })
-                .then(function (response) {
+            requestJSON(url)
+                .then(response => {
+                    const retryDelayMs = getRetryDelayMs(response);
+                    if (retryDelayMs !== undefined && (!response.ok || response.getHeader('x-ratelimit-remaining') === '0')) {
+                        this.pauseRequests(retryDelayMs);
+                    }
                     if (!response.ok) {
-                        const error = new Error(`HTTP ${response.status}`) as Error & { status: number };
+                        const error = new Error(`HTTP ${response.status}`) as RetryError;
                         error.status = response.status;
+                        if (retryDelayMs !== undefined) error.retryDelayMs = retryDelayMs;
                         throw error;
                     }
                     return response.json() as Promise<BatchResponse>;
@@ -269,7 +347,8 @@ export class MBLinks {
                     const status = isErrorWithStatus(error) ? error.status : 0;
                     const is5xx = status >= 500 && status < 600;
                     if (is5xx) {
-                        const retryDelayMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
+                        const serverDelayMs = error instanceof Error ? ((error as RetryError).retryDelayMs ?? 0) : 0;
+                        const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (attempt - 1)));
                         if (Date.now() + retryDelayMs <= retryDeadline) {
                             setTimeout(() => {
                                 this.scheduleRequest(doRequest);
@@ -286,12 +365,32 @@ export class MBLinks {
     }
 
     private scheduleRequest(request: () => void): void {
+        this.pendingRequests.push(request);
+        this.runNextRequest();
+    }
+
+    private pauseRequests(delayMs: number): void {
+        this.rateLimitResetAt = Math.max(this.rateLimitResetAt, Date.now() + delayMs);
+    }
+
+    private runNextRequest(): void {
+        if (this.requestTimer || this.pendingRequests.length === 0) return;
+
         const now = Date.now();
-        const runAt = Math.max(now, this.nextRequestAt);
-        this.nextRequestAt = runAt + 1000;
+        const runAt = Math.max(now, this.nextRequestAt, this.rateLimitResetAt);
         const delay = runAt - now;
-        if (delay === 0) request();
-        else setTimeout(request, delay);
+        if (delay > 0) {
+            this.requestTimer = setTimeout(() => {
+                this.requestTimer = undefined;
+                this.runNextRequest();
+            }, delay);
+            return;
+        }
+
+        const request = this.pendingRequests.shift()!;
+        this.nextRequestAt = now + 1000;
+        request();
+        this.runNextRequest();
     }
 
     initCache(): void {

@@ -212,6 +212,52 @@ describe('MBLinks regex URL search', () => {
         ]);
     });
 
+    it('pauses queued requests until the server-provided rate-limit reset', async () => {
+        vi.setSystemTime('2026-09-15T00:00:00Z');
+        const requests: { time: number; url: string }[] = [];
+        const xmlHttpRequest = vi.fn(
+            (details: {
+                onload: (response: {
+                    response: Record<string, unknown>;
+                    responseHeaders: string;
+                    responseText: string;
+                    status: number;
+                }) => void;
+                url: string;
+            }) => {
+                requests.push({ time: Date.now(), url: details.url });
+                const isRateLimitedResponse = requests.length === 1;
+                details.onload({
+                    status: isRateLimitedResponse ? 503 : 200,
+                    response: {},
+                    responseText: '',
+                    responseHeaders: isRateLimitedResponse
+                        ? 'Date: Tue, 15 Sep 2026 00:00:00 GMT\r\nX-RateLimit-Reset: 1789430410\r\nX-RateLimit-Remaining: 12\r\n'
+                        : '',
+                });
+            },
+        );
+        vi.stubGlobal('GM', { xmlHttpRequest });
+        const fetchMock = vi.fn();
+        vi.stubGlobal('fetch', fetchMock);
+        const mblinks = new MBLinks('QOBUZ_RATE_LIMIT_RESET_TEST');
+
+        mblinks.getJSONWithRetry('first', vi.fn());
+        mblinks.getJSONWithRetry('second', vi.fn());
+        await vi.advanceTimersByTimeAsync(9_999);
+
+        expect(requests).toEqual([{ time: Date.parse('2026-09-15T00:00:00Z'), url: 'first' }]);
+
+        await vi.advanceTimersByTimeAsync(1_001);
+
+        expect(requests.map(request => [request.time - Date.parse('2026-09-15T00:00:00Z'), request.url])).toEqual([
+            [0, 'first'],
+            [10_000, 'second'],
+            [11_000, 'first'],
+        ]);
+        expect(fetchMock).not.toHaveBeenCalled();
+    });
+
     it('stops retrying before the five-minute retry budget is exceeded', async () => {
         const fetchMock = vi.fn(() => Promise.resolve({ ok: false, status: 503 }));
         const done = vi.fn();
