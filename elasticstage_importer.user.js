@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import ElasticStage releases to MusicBrainz
 // @description  One-click importing of releases from elasticstage.com release pages into MusicBrainz
-// @version      2026.09.13.1
+// @version      2026.09.15.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/elasticstage_importer.user.js
@@ -480,6 +480,33 @@
       indicator.append(searchLink);
       return indicator;
     }
+    function setEntityLookupState(indicator, state) {
+      indicator.classList.remove('mb_lookup_error', 'mb_lookup_loading');
+      indicator.removeAttribute('aria-label');
+      indicator.removeAttribute('role');
+      indicator.removeAttribute('title');
+      if (state === 'matched') {
+        indicator.classList.remove('mb_searchit');
+        return;
+      }
+      indicator.classList.add('mb_searchit');
+      if (state === 'loading') {
+        indicator.classList.add('mb_lookup_loading');
+        indicator.setAttribute('aria-label', 'Looking up this entity on MusicBrainz');
+        indicator.setAttribute('role', 'status');
+        indicator.title = 'Looking up this entity on MusicBrainz';
+      } else if (state === 'error') {
+        indicator.classList.add('mb_lookup_error');
+        indicator.setAttribute('aria-label', 'MusicBrainz lookup failed');
+        indicator.setAttribute('role', 'img');
+        indicator.title = 'MusicBrainz lookup failed';
+      }
+    }
+    function createEntityLookupIndicator(mbType, entityName, options) {
+      const indicator = createEntitySearchLink(mbType, entityName, options);
+      setEntityLookupState(indicator, 'loading');
+      return indicator;
+    }
 
     // Convert a list of artists to a list of artist credits with joinphrases
     function makeArtistCredits(artists_list) {
@@ -593,6 +620,8 @@
       buildSearchLink,
       buildSearchButton,
       createEntitySearchLink,
+      createEntityLookupIndicator,
+      setEntityLookupState,
       buildFormHTML,
       buildFormParameters,
       makeArtistCredits,
