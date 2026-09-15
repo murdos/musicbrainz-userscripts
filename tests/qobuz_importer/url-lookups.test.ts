@@ -108,54 +108,65 @@ describe('MBLinks regex URL search', () => {
         vi.useRealTimers();
     });
 
-    it('maps relation-list search results back to the logical cache key', async () => {
+    it('resolves discovered resources to obtain relationships missing from search results', async () => {
         const requestedUrls: string[] = [];
-        const fetchMock = vi.fn((input: string) => {
-            requestedUrls.push(input);
-            return Promise.resolve({
-                ok: true,
-                json: () =>
-                    Promise.resolve({
-                        count: 1,
-                        offset: 0,
-                        urls: [
-                            {
-                                resource: 'https://play.qobuz.com/artist/8365719',
-                                'relation-list': [
-                                    {
-                                        relations: [
-                                            {
-                                                artist: { id: '12345678-1234-1234-1234-123456789abc' },
-                                                ended: false,
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                    }),
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce((input: string) => {
+                requestedUrls.push(input);
+                return Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            count: 1,
+                            offset: 0,
+                            urls: [
+                                {
+                                    resource: 'https://www.qobuz.com/us-en/label/supply-room-records/download-streaming-albums/2777001',
+                                },
+                            ],
+                        }),
+                });
+            })
+            .mockImplementationOnce((input: string) => {
+                requestedUrls.push(input);
+                return Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            resource: 'https://www.qobuz.com/us-en/label/supply-room-records/download-streaming-albums/2777001',
+                            relations: [
+                                {
+                                    label: { id: '42d8e9b8-e60e-4588-895a-ee80709bc6cc' },
+                                    ended: false,
+                                },
+                            ],
+                        }),
+                });
             });
-        });
         vi.stubGlobal('fetch', fetchMock);
         const insert = vi.fn();
         const mblinks = new MBLinks('QOBUZ_TEST');
-        const urlRegex = helpers.getQobuzUrlRegex('8365719', 'artist');
+        const urlRegex = helpers.getQobuzUrlRegex('2777001', 'label');
 
         mblinks.searchAndDisplayMbLinksByRegex([
             {
-                url: 'https://www.qobuz.com/interpreter/marcu-rares/8365719',
+                url: 'https://play.qobuz.com/label/2777001',
                 url_regex: urlRegex!,
-                mb_type: 'artist',
+                mb_type: 'label',
                 insert_func: insert,
-                key: 'qobuz:artist:8365719',
+                key: 'qobuz:label:2777001',
             },
         ]);
-        await vi.advanceTimersByTimeAsync(1000);
+        await vi.advanceTimersByTimeAsync(2000);
 
-        expect(fetchMock).toHaveBeenCalledOnce();
+        expect(fetchMock).toHaveBeenCalledTimes(2);
         expect(decodeURIComponent(requestedUrls[0]!)).toContain('query=url:/');
-        expect(insert).toHaveBeenCalledWith(expect.stringContaining('/artist/12345678-1234-1234-1234-123456789abc'));
-        expect(mblinks.resolveMBID('qobuz:artist:8365719')).toBe('12345678-1234-1234-1234-123456789abc');
+        expect(decodeURIComponent(requestedUrls[1]!)).toContain(
+            'resource=https://www.qobuz.com/us-en/label/supply-room-records/download-streaming-albums/2777001&inc=label-rels',
+        );
+        expect(insert).toHaveBeenCalledWith(expect.stringContaining('/label/42d8e9b8-e60e-4588-895a-ee80709bc6cc'));
+        expect(mblinks.resolveMBID('qobuz:label:2777001')).toBe('42d8e9b8-e60e-4588-895a-ee80709bc6cc');
     });
 
     it('keeps retries at least one second apart from other requests', async () => {
