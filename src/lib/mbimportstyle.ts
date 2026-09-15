@@ -73,6 +73,31 @@ export function MBSearchItStyle(): void {
    .mb_searchit a.mb_search_link:hover {
      color: darkblue;
    }
+   .mb_lookup_loading > *,
+   .mb_lookup_error > * {
+     display: none !important;
+   }
+   .mb_lookup_loading::before {
+     content: '';
+     display: inline-block;
+     width: 11px;
+     height: 11px;
+     box-sizing: border-box;
+     border: 2px solid #d7ca75;
+     border-top-color: #ba478f;
+     border-radius: 50%;
+     vertical-align: -1px;
+     animation: mb_lookup_spin 0.8s linear infinite;
+   }
+   .mb_lookup_error::before {
+     content: '⚠';
+     color: #c62828;
+     font-size: 13px;
+     line-height: 16px;
+   }
+   @keyframes mb_lookup_spin {
+     to { transform: rotate(360deg); }
+   }
    .mb_wrapper {
      display: inline-block;
    }

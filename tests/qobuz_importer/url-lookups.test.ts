@@ -146,6 +146,7 @@ describe('MBLinks regex URL search', () => {
             });
         vi.stubGlobal('fetch', fetchMock);
         const insert = vi.fn();
+        const complete = vi.fn();
         const mblinks = new MBLinks('QOBUZ_TEST');
         const urlRegex = helpers.getQobuzUrlRegex('2777001', 'label');
 
@@ -155,6 +156,7 @@ describe('MBLinks regex URL search', () => {
                 url_regex: urlRegex!,
                 mb_type: 'label',
                 insert_func: insert,
+                complete_func: complete,
                 key: 'qobuz:label:2777001',
             },
         ]);
@@ -166,7 +168,122 @@ describe('MBLinks regex URL search', () => {
             'resource=https://www.qobuz.com/us-en/label/supply-room-records/download-streaming-albums/2777001&inc=label-rels',
         );
         expect(insert).toHaveBeenCalledWith(expect.stringContaining('/label/42d8e9b8-e60e-4588-895a-ee80709bc6cc'));
+        expect(complete).toHaveBeenCalledWith({ found: true, status: 'success' });
         expect(mblinks.resolveMBID('qobuz:label:2777001')).toBe('42d8e9b8-e60e-4588-895a-ee80709bc6cc');
+    });
+
+    it('reports a successful lookup with no matching entity', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() =>
+                Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({ resource: 'https://example.com/release', relations: [] }),
+                }),
+            ),
+        );
+        const complete = vi.fn();
+        const mblinks = new MBLinks('NO_MATCH_TEST');
+
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: 'https://example.com/release',
+                mb_type: 'release',
+                insert_func: vi.fn(),
+                complete_func: complete,
+            },
+        ]);
+        await vi.advanceTimersByTimeAsync(1000);
+
+        expect(complete).toHaveBeenCalledWith({ found: false, status: 'success' });
+    });
+
+    it('reports a terminal lookup failure separately from no match', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve({ ok: false, status: 400 })),
+        );
+        const complete = vi.fn();
+        const mblinks = new MBLinks('FAILED_LOOKUP_TEST');
+
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: 'https://example.com/release',
+                mb_type: 'release',
+                insert_func: vi.fn(),
+                complete_func: complete,
+            },
+        ]);
+        await vi.advanceTimersByTimeAsync(1000);
+
+        expect(complete).toHaveBeenCalledWith({ found: false, status: 'error' });
+    });
+
+    it('does not complete a lookup while a failed request is waiting to retry', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce(() => Promise.resolve({ ok: false, status: 503 }))
+            .mockImplementationOnce(() =>
+                Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({ resource: 'https://example.com/release', relations: [] }),
+                }),
+            );
+        vi.stubGlobal('fetch', fetchMock);
+        const complete = vi.fn();
+        const mblinks = new MBLinks('RETRYING_LOOKUP_TEST');
+
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: 'https://example.com/release',
+                mb_type: 'release',
+                insert_func: vi.fn(),
+                complete_func: complete,
+            },
+        ]);
+        await vi.advanceTimersByTimeAsync(1_999);
+
+        expect(complete).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(1);
+
+        expect(complete).toHaveBeenCalledWith({ found: false, status: 'success' });
+    });
+
+    it('reports a failure from the relationship stage of a regex lookup', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce(() =>
+                Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () =>
+                        Promise.resolve({
+                            count: 1,
+                            offset: 0,
+                            urls: [{ resource: 'https://example.com/release' }],
+                        }),
+                }),
+            )
+            .mockImplementationOnce(() => Promise.resolve({ ok: false, status: 400 }));
+        vi.stubGlobal('fetch', fetchMock);
+        const complete = vi.fn();
+        const mblinks = new MBLinks('FAILED_REGEX_LOOKUP_TEST');
+
+        mblinks.searchAndDisplayMbLinksByRegex([
+            {
+                url: 'https://example.com/release',
+                url_regex: String.raw`https:\/\/example\.com\/release`,
+                mb_type: 'release',
+                insert_func: vi.fn(),
+                complete_func: complete,
+            },
+        ]);
+        await vi.advanceTimersByTimeAsync(2000);
+
+        expect(complete).toHaveBeenCalledWith({ found: false, status: 'error' });
     });
 
     it('keeps retries at least one second apart from other requests', async () => {

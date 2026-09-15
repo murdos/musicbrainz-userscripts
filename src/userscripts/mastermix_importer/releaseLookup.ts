@@ -15,7 +15,7 @@ export function normalizeProductUrl(url: string): string {
 }
 
 function createReleaseSearchLink(title: string): HTMLSpanElement {
-    const indicator = MBImport.createEntitySearchLink('release', title);
+    const indicator = MBImport.createEntityLookupIndicator('release', title);
     indicator.classList.add('mastermix-mb-indicator');
     indicator.addEventListener('click', event => {
         event.stopPropagation();
@@ -35,10 +35,13 @@ export function addReleaseLookup(queries: MBLinkQuery[], { url, title, target }:
         insert_func: link => {
             if (!foundMatch) {
                 indicator.replaceChildren();
-                indicator.classList.remove('mb_searchit');
+                MBImport.setEntityLookupState(indicator, 'matched');
                 foundMatch = true;
             }
             indicator.insertAdjacentHTML('beforeend', link.trim());
+        },
+        complete_func: result => {
+            if (!foundMatch) MBImport.setEntityLookupState(indicator, result.status === 'error' ? 'error' : 'search');
         },
     });
 }

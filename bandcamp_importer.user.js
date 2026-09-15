@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.15
+// @version      2026.9.15.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -11,8 +11,8 @@
 // @connect      musicbrainz.org
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.09.15.2
-// @require      lib/mbimportstyle.js
+// @require      lib/mblinks.js?version=v2026.09.15.3
+// @require      lib/mbimportstyle.js?version=v2026.09.15.1
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -679,6 +679,7 @@ const initTrackLinks = mblinks => {
     document.head.append(style);
     const queriedUrls = new Set();
     const resolvedLinks = new Map();
+    const lookupStates = new Map();
 
     const createSearchIndicator = trackTitle => {
         const indicator = document.createElement('span');
@@ -699,7 +700,9 @@ const initTrackLinks = mblinks => {
         if (links?.length) {
             links.forEach(link => linkCell.insertAdjacentHTML('beforeend', link));
         } else {
-            linkCell.append(createSearchIndicator(trackTitle));
+            const indicator = createSearchIndicator(trackTitle);
+            MBSetLookupIndicatorState(indicator, trackUrl ? (lookupStates.get(trackUrl) ?? 'loading') : 'search');
+            linkCell.append(indicator);
         }
     };
 
@@ -735,6 +738,7 @@ const initTrackLinks = mblinks => {
             if (!trackUrl || !trackTitle) return;
             if (queriedUrls.has(trackUrl)) return;
             queriedUrls.add(trackUrl);
+            lookupStates.set(trackUrl, 'loading');
             urlsData.push({
                 url: trackUrl,
                 mb_type: 'recording',
@@ -744,6 +748,15 @@ const initTrackLinks = mblinks => {
                     const normalizedLink = link.trim();
                     if (!links.includes(normalizedLink)) links.push(normalizedLink);
                     resolvedLinks.set(trackUrl, links);
+                    document.querySelectorAll('.bci-recording-link-col').forEach(currentCell => {
+                        if (currentCell.dataset.bciRecordingUrl === trackUrl) {
+                            renderCellContents(currentCell, trackUrl, trackTitle);
+                        }
+                    });
+                },
+                complete_func: result => {
+                    if (resolvedLinks.has(trackUrl)) return;
+                    lookupStates.set(trackUrl, result.status === 'error' ? 'error' : 'search');
                     document.querySelectorAll('.bci-recording-link-col').forEach(currentCell => {
                         if (currentCell.dataset.bciRecordingUrl === trackUrl) {
                             renderCellContents(currentCell, trackUrl, trackTitle);
