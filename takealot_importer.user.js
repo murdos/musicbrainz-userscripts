@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Takealot releases to MusicBrainz
 // @description  Add a button to import https://www.takealot.com/ releases to MusicBrainz via API
-// @version      2026.9.15
+// @version      2026.9.15.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/takealot_importer.user.js
@@ -10,8 +10,8 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.09.15.2
-// @require      lib/mbimportstyle.js
+// @require      lib/mblinks.js?version=v2026.09.15.3
+// @require      lib/mbimportstyle.js?version=v2026.09.15.1
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest

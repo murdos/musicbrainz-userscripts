@@ -32,6 +32,7 @@ export default defineConfig({
                 MBImport: 'readonly',
                 MBLinks: 'readonly',
                 MBSearchItStyle: 'readonly',
+                MBSetLookupIndicatorState: 'readonly',
             },
             rules: {
                 'userscripts/filename-user': ['error', 'always'],

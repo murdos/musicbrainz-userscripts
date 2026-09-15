@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2026.9.15
+// @version      2026.9.15.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -13,8 +13,8 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.09.15.2
-// @require      lib/mbimportstyle.js
+// @require      lib/mblinks.js?version=v2026.09.15.3
+// @require      lib/mbimportstyle.js?version=v2026.09.15.1
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -184,6 +184,7 @@ function insertDiscogsListEntitySearchLink(entityLink, mbType, mark) {
     searchLink.href = MBImport.searchUrlFor(mbType, entityLink.textContent.trim());
     searchLink.innerHTML = `<small>${mark}</small>?`;
     searchIndicator.append(searchLink);
+    MBSetLookupIndicatorState(searchIndicator, 'loading');
     entityLink.before(searchIndicator);
 }
 
@@ -223,6 +224,12 @@ function initDiscogsEntityListPage(pageConfig) {
                             if (!entityLink.isConnected || getDiscogsEntityInfo(entityLink, discogsType)?.key !== entityInfo.key) return;
                             removeDiscogsListEntitySearchLink(entityLink);
                             insertDiscogsListMbLink(entityLink, link);
+                        },
+                        complete_func: result => {
+                            const indicator = entityLink.previousElementSibling;
+                            if (indicator?.getAttribute('data-mb-discogs-list-indicator') === 'search') {
+                                MBSetLookupIndicatorState(indicator, result.status === 'error' ? 'error' : 'search');
+                            }
                         },
                     });
                 });
@@ -322,9 +329,11 @@ function insertMBLinks(current_page_key) {
                             )}"><small>${mark}</small>?</a></span>`,
                         );
                 }
+                const searchIndicator = nosearch ? undefined : $link.closest('span.mb_wrapper').find('.mb_searchit').get(0);
+                if (searchIndicator) MBSetLookupIndicatorState(searchIndicator, 'loading');
                 const insert_normal = function (link) {
                     $link.closest('span.mb_valign').before(`<span class="mb_valign">${link}</span>`);
-                    $link.closest('span.mb_wrapper').find('.mb_searchit').remove();
+                    searchIndicator?.remove();
                 };
 
                 const insert_stop = function (link) {
@@ -337,7 +346,11 @@ function insertMBLinks(current_page_key) {
                     // if a place link was added we stop, we don't want further queries for this 'label'
                     insert_func = insert_stop;
                 }
-                mbLinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey);
+                mbLinks.searchAndDisplayMbLink(discogs_url, mb_type, insert_func, cachekey, result => {
+                    if (searchIndicator?.isConnected) {
+                        MBSetLookupIndicatorState(searchIndicator, result.status === 'error' ? 'error' : 'search');
+                    }
+                });
             }
         });
     }

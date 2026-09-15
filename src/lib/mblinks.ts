@@ -18,9 +18,15 @@ export interface MBLinkQuery {
     url: string;
     mb_type: string;
     insert_func: (link: string) => void;
+    complete_func?: (result: MBLinkQueryResult) => void;
     key?: string;
     /** Lucene-compatible regular expression used to match URL search results. */
     url_regex?: string;
+}
+
+interface MBLinkQueryResult {
+    found: boolean;
+    status: 'error' | 'success';
 }
 
 interface CacheUrl {
@@ -56,6 +62,7 @@ interface LinkInfo {
 }
 
 interface AjaxRequestContext {
+    failureHandlers: (() => void)[];
     handlers: ((data: BatchResponse) => void)[];
     query: string;
     mblinks: MBLinks;
@@ -65,6 +72,13 @@ interface AjaxRequest {
     handler: (this: AjaxRequestContext) => void;
     next: string;
     context: AjaxRequestContext;
+}
+
+interface RegexLookup {
+    batch: MBLinkQuery[];
+    discoveredResources: Set<string>;
+    outcomes: Map<MBLinkQuery, { failed: boolean; found: boolean }>;
+    pending: number;
 }
 
 interface JsonHttpResponse {
@@ -199,11 +213,13 @@ function processUrlMatch({
     batch,
     resource,
     relations,
+    foundQueries,
 }: {
     mblinks: MBLinks;
     batch: MBLinkQuery[];
     resource: string;
     relations: Relation[] | undefined;
+    foundQueries?: Set<MBLinkQuery>;
 }): void {
     const matching_urls_data = batch.filter(query => queryMatchesResource(query, resource));
     if (matching_urls_data.length === 0) return;
@@ -235,6 +251,7 @@ function processUrlMatch({
         const cacheUrls = mblinks.cache[key].urls!;
         const getUrl = (entry: string | CacheUrl) => (typeof entry === 'string' ? entry : entry.url);
         Object.keys(urlData).forEach(mb_url => {
+            foundQueries?.add(reference);
             const ended = urlData[mb_url]!.ended;
             const alreadyCached = cacheUrls.some(e => getUrl(e) === mb_url);
             if (!alreadyCached) {
@@ -317,7 +334,7 @@ export class MBLinks {
      * @param successCallback - Called with response data on success.
      * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
      */
-    getJSONWithRetry(url: string, successCallback: (data: BatchResponse) => void, alwaysCallback?: () => void): void {
+    getJSONWithRetry(url: string, successCallback: (data: BatchResponse) => void, alwaysCallback?: (succeeded: boolean) => void): void {
         const retryDeadline = Date.now() + 5 * 60 * 1000;
         let attempt = 0;
 
@@ -340,7 +357,7 @@ export class MBLinks {
                 .then(function (data) {
                     successCallback(data);
                     if (typeof alwaysCallback === 'function') {
-                        alwaysCallback();
+                        alwaysCallback(true);
                     }
                 })
                 .catch((error: unknown) => {
@@ -354,10 +371,10 @@ export class MBLinks {
                                 this.scheduleRequest(doRequest);
                             }, retryDelayMs);
                         } else if (typeof alwaysCallback === 'function') {
-                            alwaysCallback();
+                            alwaysCallback(false);
                         }
                     } else if (typeof alwaysCallback === 'function') {
-                        alwaysCallback();
+                        alwaysCallback(false);
                     }
                 });
         };
@@ -507,6 +524,7 @@ export class MBLinks {
                     const options = data_type === 'release' ? { ended } : {};
                     data.insert_func(mblinks.createMusicBrainzLink(mb_url, data_type, options));
                 });
+                data.complete_func?.({ found: true, status: 'success' });
             } else {
                 uncached_urls.push(data);
             }
@@ -526,11 +544,14 @@ export class MBLinks {
 
             // Merge with previous context if there's already a pending ajax request
             let handlers: ((data: BatchResponse) => void)[] = [];
+            let failureHandlers: (() => void)[] = [];
             const request = mblinks.ajax_requests[query];
             if (typeof request === 'object') {
                 handlers = request.context.handlers;
+                failureHandlers = request.context.failureHandlers;
             }
             handlers.push(function (data) {
+                const foundQueries = new Set<MBLinkQuery>();
                 if ('urls' in data) {
                     const processedResources: Record<string, boolean> = {};
                     data.urls.forEach(url_data => {
@@ -541,6 +562,7 @@ export class MBLinks {
                             batch,
                             resource: url_data.resource,
                             relations: url_data.relations,
+                            foundQueries,
                         });
                     });
                 } else if ('relations' in data && 'resource' in data) {
@@ -552,9 +574,16 @@ export class MBLinks {
                         batch,
                         resource: data.resource,
                         relations: data.relations,
+                        foundQueries,
                     });
                 }
                 mblinks.saveCache();
+                batch.forEach(queryData => {
+                    queryData.complete_func?.({ found: foundQueries.has(queryData), status: 'success' });
+                });
+            });
+            failureHandlers.push(() => {
+                batch.forEach(queryData => queryData.complete_func?.({ found: false, status: 'error' }));
             });
 
             mblinks.ajax_requests.push(
@@ -562,13 +591,20 @@ export class MBLinks {
                 function () {
                     // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
                     const ctx = this;
-                    ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
-                        ctx.handlers.forEach(handler => {
-                            handler(data);
-                        });
-                    });
+                    ctx.mblinks.getJSONWithRetry(
+                        ctx.query,
+                        function (data) {
+                            ctx.handlers.forEach(handler => {
+                                handler(data);
+                            });
+                        },
+                        function (succeeded) {
+                            if (!succeeded) ctx.failureHandlers.forEach(handler => handler());
+                        },
+                    );
                 },
                 {
+                    failureHandlers,
                     handlers: handlers,
                     query: query,
                     mblinks: mblinks,
@@ -595,6 +631,7 @@ export class MBLinks {
                     const ended = typeof cacheEntry === 'string' ? false : cacheEntry.ended;
                     data.insert_func(mblinks.createMusicBrainzLink(mbUrl, dataType, dataType === 'release' ? { ended } : {}));
                 });
+                data.complete_func?.({ found: true, status: 'success' });
             } else if (data.url_regex) {
                 uncachedQueries.push(data);
             }
@@ -604,18 +641,29 @@ export class MBLinks {
         for (let i = 0; i < uncachedQueries.length; i += batchSize) {
             const batch = uncachedQueries.slice(i, i + batchSize);
             const regex = batch.map(data => `(${data.url_regex})`).join('|');
-            this.enqueueRegexSearchPage(batch, regex, 0);
+            const lookup: RegexLookup = {
+                batch,
+                discoveredResources: new Set(),
+                outcomes: new Map(batch.map(query => [query, { failed: false, found: false }])),
+                pending: 0,
+            };
+            this.enqueueRegexSearchPage(batch, regex, 0, lookup);
         }
     }
 
-    private enqueueRegexSearchPage(batch: MBLinkQuery[], regex: string, offset: number): void {
+    private enqueueRegexSearchPage(batch: MBLinkQuery[], regex: string, offset: number, lookup: RegexLookup): void {
+        lookup.pending += 1;
         // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
         const mblinks = this;
         const search = `url:/(${regex})/`;
         const query = `${mblinks.mb_server}/ws/2/url?query=${encodeURIComponent(search)}&fmt=json&limit=100&offset=${offset}`;
         let handlers: ((data: BatchResponse) => void)[] = [];
+        let failureHandlers: (() => void)[] = [];
         const request = mblinks.ajax_requests[query];
-        if (typeof request === 'object') handlers = request.context.handlers;
+        if (typeof request === 'object') {
+            handlers = request.context.handlers;
+            failureHandlers = request.context.failureHandlers;
+        }
 
         handlers.push(function (data) {
             const urls = data.urls ?? [];
@@ -626,11 +674,21 @@ export class MBLinks {
                 discoveredResources.add(urlData.resource);
                 batch.forEach(queryData => {
                     if (!queryMatchesResource(queryData, urlData.resource)) return;
+                    const resourceKey = `${queryData.key ?? queryData.url}\0${urlData.resource}`;
+                    if (lookup.discoveredResources.has(resourceKey)) return;
+                    lookup.discoveredResources.add(resourceKey);
+                    lookup.pending += 1;
                     discoveredQueries.push({
                         url: urlData.resource,
                         mb_type: queryData.mb_type,
                         insert_func: queryData.insert_func,
                         key: queryData.key || queryData.url,
+                        complete_func: result => {
+                            const outcome = lookup.outcomes.get(queryData)!;
+                            outcome.found ||= result.found;
+                            outcome.failed ||= result.status === 'error';
+                            mblinks.finishRegexOperation(lookup);
+                        },
                     });
                 });
             });
@@ -639,8 +697,15 @@ export class MBLinks {
             const responseOffset = data.offset ?? offset;
             const nextOffset = responseOffset + urls.length;
             if (typeof data.count === 'number' && urls.length > 0 && nextOffset < data.count) {
-                mblinks.enqueueRegexSearchPage(batch, regex, nextOffset);
+                mblinks.enqueueRegexSearchPage(batch, regex, nextOffset, lookup);
             }
+            mblinks.finishRegexOperation(lookup);
+        });
+        failureHandlers.push(() => {
+            lookup.outcomes.forEach(outcome => {
+                outcome.failed = true;
+            });
+            mblinks.finishRegexOperation(lookup);
         });
 
         mblinks.ajax_requests.push(
@@ -648,14 +713,29 @@ export class MBLinks {
             function () {
                 // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
                 const ctx = this;
-                ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
-                    ctx.handlers.forEach(handler => {
-                        handler(data);
-                    });
-                });
+                ctx.mblinks.getJSONWithRetry(
+                    ctx.query,
+                    function (data) {
+                        ctx.handlers.forEach(handler => {
+                            handler(data);
+                        });
+                    },
+                    function (succeeded) {
+                        if (!succeeded) ctx.failureHandlers.forEach(handler => handler());
+                    },
+                );
             },
-            { handlers, query, mblinks },
+            { failureHandlers, handlers, query, mblinks },
         );
+    }
+
+    private finishRegexOperation(lookup: RegexLookup): void {
+        lookup.pending -= 1;
+        if (lookup.pending !== 0) return;
+        lookup.batch.forEach(query => {
+            const outcome = lookup.outcomes.get(query)!;
+            query.complete_func?.({ found: outcome.found, status: outcome.failed ? 'error' : 'success' });
+        });
     }
 }
 

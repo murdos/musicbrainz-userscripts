@@ -40,7 +40,7 @@ function createLookup(
     if (target.hasAttribute(LOOKUP_ATTRIBUTE)) return;
     target.setAttribute(LOOKUP_ATTRIBUTE, type);
 
-    const indicator = MBImport.createEntitySearchLink(type, name);
+    const indicator = MBImport.createEntityLookupIndicator(type, name);
     indicator.classList.add('mb-mirlo-link');
     indicator.addEventListener('click', event => event.stopPropagation());
     if (placement === 'before') target.before(indicator);
@@ -57,7 +57,7 @@ function createLookup(
             if (!indicator.isConnected) return;
             if (!foundMatch) {
                 indicator.replaceChildren();
-                indicator.classList.remove('mb_searchit');
+                MBImport.setEntityLookupState(indicator, 'matched');
                 foundMatch = true;
             }
             indicator.insertAdjacentHTML('beforeend', link.trim());
@@ -71,6 +71,9 @@ function createLookup(
                 matchNotificationScheduled = false;
                 if (matchedMbids.size === 1) entityMatchHandler?.(type, url, mbid);
             });
+        },
+        complete_func: result => {
+            if (!foundMatch) MBImport.setEntityLookupState(indicator, result.status === 'error' ? 'error' : 'search');
         },
     });
 }

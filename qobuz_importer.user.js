@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.15.1
+// @version      2026.9.15.2
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -12,8 +12,8 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
-// @require      lib/mblinks.js?version=v2026.09.15.2
-// @require      lib/mbimportstyle.js
+// @require      lib/mblinks.js?version=v2026.09.15.3
+// @require      lib/mbimportstyle.js?version=v2026.09.15.1
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
@@ -93,7 +93,7 @@ function getQobuzUrlRegex(entityId, mb_type) {
     }
 }
 
-function createQobuzMbLinkQuery(url, mb_type, insert_func) {
+function createQobuzMbLinkQuery(url, mb_type, insert_func, complete_func) {
     const entityId = getQobuzEntityId(url, mb_type);
     const url_regex = entityId && getQobuzUrlRegex(entityId, mb_type);
     if (!entityId || !url_regex) return null;
@@ -102,6 +102,7 @@ function createQobuzMbLinkQuery(url, mb_type, insert_func) {
         url_regex,
         mb_type,
         insert_func,
+        complete_func,
         key: `qobuz:${mb_type}:${entityId}`,
     };
 }
@@ -527,7 +528,16 @@ function createMbSearchLink(mb_type, entityName) {
     const mark = MB_SEARCH_MARKS[mb_type] || '?';
     const entity_name = mb_type.replace(/[_-]/g, ' ');
     const href = mb_type === 'release' ? MBImport.searchUrlFor(mb_type, entityName) : MBImport.exactSearchUrlFor(mb_type, entityName);
-    return `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${href}"><small>${mark}</small>?</a></span>`;
+    return `<span class="mb_valign mb_searchit mb_lookup_loading" role="status" aria-label="Looking up this entity on MusicBrainz" title="Looking up this entity on MusicBrainz"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${href}"><small>${mark}</small>?</a></span>`;
+}
+
+function completeMbLookupsBeforeElements(elements, result) {
+    for (const element of elements) {
+        const indicator = element.previousElementSibling;
+        if (indicator?.classList.contains('mb_searchit')) {
+            MBSetLookupIndicatorState(indicator, result.status === 'error' ? 'error' : 'search');
+        }
+    }
 }
 
 function removeMbSearchLinksBefore(element) {
@@ -647,9 +657,14 @@ function processDiscographyPage({ mblinks }) {
                 insertMbSearchLinkBeforeElement(element, 'artist', element.textContent.trim());
             }
         }
-        const query = createQobuzMbLinkQuery(artist_url, 'artist', function (link) {
-            insertMbLinkBeforeElements(artist_link_elements, link);
-        });
+        const query = createQobuzMbLinkQuery(
+            artist_url,
+            'artist',
+            function (link) {
+                insertMbLinkBeforeElements(artist_link_elements, link);
+            },
+            result => completeMbLookupsBeforeElements(artist_link_elements, result),
+        );
         if (query) artist_urls_data.push(query);
     });
 
@@ -660,9 +675,14 @@ function processDiscographyPage({ mblinks }) {
                 insertMbSearchLinkBeforeElement(element, 'label', element.textContent.trim());
             }
         }
-        const query = createQobuzMbLinkQuery(label_url, 'label', function (link) {
-            insertMbLinkBeforeElements(label_link_elements, link);
-        });
+        const query = createQobuzMbLinkQuery(
+            label_url,
+            'label',
+            function (link) {
+                insertMbLinkBeforeElements(label_link_elements, link);
+            },
+            result => completeMbLookupsBeforeElements(label_link_elements, result),
+        );
         if (query) label_urls_data.push(query);
     });
 
@@ -674,9 +694,14 @@ function processDiscographyPage({ mblinks }) {
                 insertMbSearchLinkBeforeElement(element, 'release', albumName);
             }
         }
-        const query = createQobuzMbLinkQuery(album_url, 'release', function (link) {
-            insertMbLinkBeforeElements(album_link_elements, link);
-        });
+        const query = createQobuzMbLinkQuery(
+            album_url,
+            'release',
+            function (link) {
+                insertMbLinkBeforeElements(album_link_elements, link);
+            },
+            result => completeMbLookupsBeforeElements(album_link_elements, result),
+        );
         if (query) album_urls_data.push(query);
     });
 
