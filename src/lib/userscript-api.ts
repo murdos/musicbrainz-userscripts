@@ -4,18 +4,29 @@ interface GmApi {
     xmlHttpRequest: (...args: Parameters<typeof GM_xmlhttpRequest>) => unknown;
 }
 
-const LEGACY_GM_API_NAMES = {
-    getValue: 'GM_getValue',
-    setValue: 'GM_setValue',
-    xmlHttpRequest: 'GM_xmlhttpRequest',
-} as const satisfies Record<keyof GmApi, string>;
-
 export function getOptionalGlobal(name: string): unknown {
     return Reflect.get(globalThis, name);
 }
 
 export function getGmApi<Name extends keyof GmApi>(name: Name): GmApi[Name] | undefined {
-    const modernGM = getOptionalGlobal('GM') as Partial<typeof GM> | undefined;
-    const modernApi = modernGM?.[name] as GmApi[Name] | undefined;
-    return modernApi ?? (getOptionalGlobal(LEGACY_GM_API_NAMES[name]) as GmApi[Name] | undefined);
+    // Tampermonkey may only inject granted APIs when the script references them directly.
+    const apis: Partial<GmApi> = {};
+
+    if (typeof GM !== 'undefined') {
+        apis.getValue = GM.getValue;
+        apis.setValue = GM.setValue;
+        apis.xmlHttpRequest = GM.xmlHttpRequest;
+    }
+
+    if (!apis.getValue && typeof GM_getValue !== 'undefined') {
+        apis.getValue = GM_getValue;
+    }
+    if (!apis.setValue && typeof GM_setValue !== 'undefined') {
+        apis.setValue = GM_setValue;
+    }
+    if (!apis.xmlHttpRequest && typeof GM_xmlhttpRequest !== 'undefined') {
+        apis.xmlHttpRequest = GM_xmlhttpRequest;
+    }
+
+    return apis[name];
 }
