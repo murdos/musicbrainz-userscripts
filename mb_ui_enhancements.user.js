@@ -641,7 +641,8 @@ $(document).ready(function () {
         const supportedProviderUrls = Array.from(externalLinks?.querySelectorAll('li a[href]') ?? [])
             .map(link => new URL(link.href))
             .filter(url => harmonyProviderHostname.test(url.hostname));
-        const lowerPriorityHostname = /^(?:[^.]+\.bandcamp\.com|www\.beatport\.com|(?:geo\.)?(?:itunes|music)\.apple\.com)$/i;
+        const lowerPriorityHostname =
+            /^(?:[^.]+\.bandcamp\.com|www\.beatport\.com|www\.discogs\.com|(?:geo\.)?(?:itunes|music)\.apple\.com)$/i;
         const providerUrl = supportedProviderUrls.find(url => !lowerPriorityHostname.test(url.hostname)) ?? supportedProviderUrls[0];
 
         if (providerUrl) {
