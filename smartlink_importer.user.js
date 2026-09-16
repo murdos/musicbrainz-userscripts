@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.13.9
+// @version      2026.09.16.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -645,18 +645,27 @@
       return elements;
     }
 
-    const LEGACY_GM_API_NAMES = {
-      getValue: 'GM_getValue',
-      setValue: 'GM_setValue',
-      xmlHttpRequest: 'GM_xmlhttpRequest'
-    };
     function getOptionalGlobal(name) {
       return Reflect.get(globalThis, name);
     }
     function getGmApi(name) {
-      const modernGM = getOptionalGlobal('GM');
-      const modernApi = modernGM?.[name];
-      return modernApi ?? getOptionalGlobal(LEGACY_GM_API_NAMES[name]);
+      // Tampermonkey may only inject granted APIs when the script references them directly.
+      const apis = {};
+      if (typeof GM !== 'undefined') {
+        apis.getValue = GM.getValue;
+        apis.setValue = GM.setValue;
+        apis.xmlHttpRequest = GM.xmlHttpRequest;
+      }
+      if (!apis.getValue && typeof GM_getValue !== 'undefined') {
+        apis.getValue = GM_getValue;
+      }
+      if (!apis.setValue && typeof GM_setValue !== 'undefined') {
+        apis.setValue = GM_setValue;
+      }
+      if (!apis.xmlHttpRequest && typeof GM_xmlhttpRequest !== 'undefined') {
+        apis.xmlHttpRequest = GM_xmlhttpRequest;
+      }
+      return apis[name];
     }
 
     /**

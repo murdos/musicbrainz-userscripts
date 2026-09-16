@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Deezer releases into MusicBrainz
 // @description  One-click importing of releases from deezer.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version      2026.09.15.1
+// @version      2026.09.16.1
 // @author       atj
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/deezer_importer.user.js
@@ -746,18 +746,24 @@
       };
     }
 
-    const LEGACY_GM_API_NAMES = {
-      getValue: 'GM_getValue',
-      setValue: 'GM_setValue',
-      xmlHttpRequest: 'GM_xmlhttpRequest'
-    };
-    function getOptionalGlobal(name) {
-      return Reflect.get(globalThis, name);
-    }
     function getGmApi(name) {
-      const modernGM = getOptionalGlobal('GM');
-      const modernApi = modernGM?.[name];
-      return modernApi ?? getOptionalGlobal(LEGACY_GM_API_NAMES[name]);
+      // Tampermonkey may only inject granted APIs when the script references them directly.
+      const apis = {};
+      if (typeof GM !== 'undefined') {
+        apis.getValue = GM.getValue;
+        apis.setValue = GM.setValue;
+        apis.xmlHttpRequest = GM.xmlHttpRequest;
+      }
+      if (!apis.getValue && typeof GM_getValue !== 'undefined') {
+        apis.getValue = GM_getValue;
+      }
+      if (!apis.setValue && typeof GM_setValue !== 'undefined') {
+        apis.setValue = GM_setValue;
+      }
+      if (!apis.xmlHttpRequest && typeof GM_xmlhttpRequest !== 'undefined') {
+        apis.xmlHttpRequest = GM_xmlhttpRequest;
+      }
+      return apis[name];
     }
 
     const releaseCache = new Map();
