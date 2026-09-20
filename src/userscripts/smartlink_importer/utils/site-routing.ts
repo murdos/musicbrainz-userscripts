@@ -5,7 +5,7 @@ const DOMAINS_BY_SITE: Readonly<Record<SmartLinkSite, readonly string[]>> = {
     bandlink: ['band.link'],
     bfan: ['bfan.link'],
     fanlink: ['fanlink.tv'],
-    ffm: ['ffm.to', 'orcd.co'],
+    ffm: ['ffm.to', 'idm.fm', 'orcd.co'],
     promolinks: ['promolinks.me'],
     songlink: ['song.link'],
 };

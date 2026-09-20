@@ -237,6 +237,7 @@ Supported sites:
 - `bfan.link`
 - `fanlink.tv`
 - `ffm.to`
+- `idm.fm`
 - `orcd.co`
 - `promolinks.me`
 - `song.link`

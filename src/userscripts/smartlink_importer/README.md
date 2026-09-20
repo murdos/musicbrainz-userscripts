@@ -30,13 +30,14 @@ Provider destinations are read from Fanlink’s `window.preloadLink` page data b
 
 Test link: [fanlink.tv/CraveYou](https://fanlink.tv/CraveYou)
 
-### Feature.fm (`ffm.to` and `orcd.co`)
+### Feature.fm (`ffm.to`, `idm.fm`, and `orcd.co`)
 
-The Feature.fm adapter supports `ffm.to`, branded subdomains such as `label-caster.ffm.to`, and `orcd.co`. Destinations embedded in Feature.fm’s tracking data are decoded locally; other links are resolved by following their redirects.
+The Feature.fm adapter supports `ffm.to`, branded subdomains such as `label-caster.ffm.to`, the custom `idm.fm` domain, and `orcd.co`. Destinations embedded in Feature.fm’s tracking data are decoded locally; other links are resolved by following their redirects.
 
 Test links:
 
 - [ffm.to/buried-memories](https://ffm.to/buried-memories)
+- [idm.fm/walks-sonian-forest](https://idm.fm/walks-sonian-forest)
 - [orcd.co/salvaging-the-future](https://orcd.co/salvaging-the-future)
 
 ### PromoLinks.me
