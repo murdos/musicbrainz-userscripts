@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.20.2
+// @version      2026.09.20.3
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -20,6 +20,8 @@
 // @match        https://*.idm.fm/*
 // @match        https://orcd.co/*
 // @match        https://*.orcd.co/*
+// @match        https://lnk.to/*
+// @match        https://*.lnk.to/*
 // @match        https://promolinks.me/*
 // @match        https://*.promolinks.me/*
 // @match        https://song.link/*
@@ -736,6 +738,45 @@
         mountPanel: panel => {
           const musicServices = document.querySelector('.music-services-section');
           if (musicServices?.parentElement) musicServices.parentElement.insertBefore(panel, musicServices);else document.body.appendChild(panel);
+        }
+      };
+    }
+
+    const NON_RELEASE_SERVICES = new Set(['bandsintown', 'facebook', 'goout', 'instagram', 'songkick']);
+    function linkfireSkipReasonForServiceLink(service, action, sourceUrl) {
+      if (NON_RELEASE_SERVICES.has(normalizeServiceName(service))) return 'Non-release link';
+      return skipReasonForServiceLink(service, action, sourceUrl);
+    }
+    function collectLinkfireServiceElements() {
+      const counters = new Map();
+      const elements = [];
+      for (const element of document.querySelectorAll('#music-services a[data-test="music-service-list-link"][data-label][href]')) {
+        const rawService = element.dataset['label'] ?? '';
+        const service = normalizeServiceName(rawService);
+        const action = element.dataset['action'] ?? '';
+        if (!service || !element.href) continue;
+        elements.push({
+          cacheKey: nextCacheKey(counters, service),
+          element,
+          service,
+          label: element.querySelector('img[alt]')?.alt || rawService,
+          action,
+          sourceUrl: element.href,
+          skipReason: linkfireSkipReasonForServiceLink(service, action, element.href)
+        });
+      }
+      return elements;
+    }
+
+    function createLinkfireConfig() {
+      return {
+        id: 'linkfire',
+        siteName: 'Linkfire',
+        collectServiceElements: collectLinkfireServiceElements,
+        resolveDestination: element => element.sourceUrl,
+        mountPanel: panel => {
+          const services = document.querySelector('#music-services');
+          if (services?.parentElement) services.parentElement.insertBefore(panel, services);else document.body.appendChild(panel);
         }
       };
     }
@@ -1556,6 +1597,7 @@
       bfan: ['bfan.link'],
       fanlink: ['fanlink.tv'],
       ffm: ['ffm.to', 'idm.fm', 'orcd.co'],
+      linkfire: ['lnk.to'],
       promolinks: ['promolinks.me'],
       songlink: ['song.link']
     };
@@ -1573,6 +1615,7 @@
       bfan: createBfanConfig,
       fanlink: createFanlinkConfig,
       ffm: createFfmConfig,
+      linkfire: createLinkfireConfig,
       promolinks: createPromoLinksConfig,
       songlink: createSonglinkConfig
     };
