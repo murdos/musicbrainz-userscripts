@@ -40,6 +40,12 @@ Test links:
 - [idm.fm/walks-sonian-forest](https://idm.fm/walks-sonian-forest)
 - [orcd.co/salvaging-the-future](https://orcd.co/salvaging-the-future)
 
+### Linkfire (`lnk.to`)
+
+Provider destinations and actions are read directly from Linkfire’s rendered music-service rows. Artist, social-media, event, track-only, and physical-media links are ignored.
+
+Test link: [lnk.to/director-no3](https://lnk.to/director-no3)
+
 ### PromoLinks.me
 
 The PromoLinks adapter supports branded subdomains. Provider destinations are read from the page’s `MusicRelease` or `MusicAlbum` JSON-LD metadata; provider search fallbacks and track-only URLs are ignored.

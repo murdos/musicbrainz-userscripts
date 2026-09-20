@@ -3,6 +3,7 @@ import { createBandLinkConfig } from '~/userscripts/smartlink_importer/utils/con
 import { createBfanConfig } from '~/userscripts/smartlink_importer/utils/configs/bfan';
 import { createFanlinkConfig } from '~/userscripts/smartlink_importer/utils/configs/fanlink';
 import { createFfmConfig } from '~/userscripts/smartlink_importer/utils/configs/ffm';
+import { createLinkfireConfig } from '~/userscripts/smartlink_importer/utils/configs/linkfire';
 import { createPromoLinksConfig } from '~/userscripts/smartlink_importer/utils/configs/promolinks';
 import { createSonglinkConfig } from '~/userscripts/smartlink_importer/utils/configs/songlink';
 import { runSmartLinkImporter } from '~/userscripts/smartlink_importer/utils/runtime';
@@ -15,6 +16,7 @@ const configFactories: Record<SmartLinkSite, () => SmartLinkImporterConfig | und
     bfan: createBfanConfig,
     fanlink: createFanlinkConfig,
     ffm: createFfmConfig,
+    linkfire: createLinkfireConfig,
     promolinks: createPromoLinksConfig,
     songlink: createSonglinkConfig,
 };

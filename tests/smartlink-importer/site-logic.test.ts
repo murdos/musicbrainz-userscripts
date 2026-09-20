@@ -8,6 +8,7 @@ import {
 } from '~/userscripts/smartlink_importer/utils/extractors/albumlink';
 import { extractBfanServiceData } from '~/userscripts/smartlink_importer/utils/extractors/bfan';
 import { extractFanlinkServiceData, extractFanlinkServiceDataFromScript } from '~/userscripts/smartlink_importer/utils/extractors/fanlink';
+import { linkfireSkipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/extractors/linkfire';
 import { extractPromoLinksServiceData } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
 import { extractSonglinkSourceRelease, parseSonglinkAriaLabel } from '~/userscripts/smartlink_importer/utils/extractors/songlink';
 import { smartLinkSiteForHostname } from '~/userscripts/smartlink_importer/utils/site-routing';
@@ -82,6 +83,8 @@ describe('Smartlink importer site adapters', () => {
         ['idm.fm', 'ffm'],
         ['listen.idm.fm', 'ffm'],
         ['orcd.co', 'ffm'],
+        ['lnk.to', 'linkfire'],
+        ['artist.lnk.to', 'linkfire'],
         ['promolinks.me', 'promolinks'],
         ['slowecho.promolinks.me', 'promolinks'],
         ['song.link', 'songlink'],
@@ -94,8 +97,20 @@ describe('Smartlink importer site adapters', () => {
         expect(smartLinkSiteForHostname('notalbum.link.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('evilffm.to.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('idm.fm.example')).toBeUndefined();
+        expect(smartLinkSiteForHostname('lnk.to.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('song.link.example')).toBeUndefined();
+    });
+
+    it('filters Linkfire links that do not identify a release', () => {
+        expect(linkfireSkipReasonForServiceLink('instagram', 'Go To', 'https://www.instagram.com/floex1/')).toBe('Non-release link');
+        expect(linkfireSkipReasonForServiceLink('songkick', 'Go To', 'https://www.songkick.com/artists/328853-floex')).toBe(
+            'Non-release link',
+        );
+        expect(linkfireSkipReasonForServiceLink('minority-records', 'LP/CD PRE-ORDER', 'https://store.minorityrecords.com/')).toBe(
+            'Physical-media link',
+        );
+        expect(linkfireSkipReasonForServiceLink('amazonmusic', 'Play', 'https://music.amazon.com/albums/B0HFT2CW1Z')).toBeUndefined();
     });
 
     it('reads Songlink provider names and actions from rendered link labels', () => {

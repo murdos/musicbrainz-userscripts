@@ -238,6 +238,7 @@ Supported sites:
 - `fanlink.tv`
 - `ffm.to`
 - `idm.fm`
+- `lnk.to`
 - `orcd.co`
 - `promolinks.me`
 - `song.link`
