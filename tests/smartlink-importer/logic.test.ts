@@ -185,6 +185,9 @@ describe('Smartlink importer shared logic', () => {
 
     it('maps service actions to MusicBrainz URL relationship types', () => {
         expect(relationshipTypeFor(serviceLink('amazon'))).toBe(URL_RELATIONSHIP_TYPES.streaming);
+        expect(relationshipTypeFor(serviceLink('amazon', 'https://music.amazon.com/albums/B0HC49XD9K', 'Download'))).toBe(
+            URL_RELATIONSHIP_TYPES.streaming,
+        );
         expect(relationshipTypeFor(serviceLink('tidal', 'https://tidal.com/album/534550860', 'Listen'))).toBe(
             URL_RELATIONSHIP_TYPES.streaming,
         );

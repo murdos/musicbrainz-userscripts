@@ -324,6 +324,7 @@ export function relationshipTypeFor(link: ServiceLink): number {
     const service = normalizeServiceName(link.service);
     if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
     if (service === 'officialsite') return URL_RELATIONSHIP_TYPES.discographyEntry;
+    if (service === 'amazon') return URL_RELATIONSHIP_TYPES.streaming;
     if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
     if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
