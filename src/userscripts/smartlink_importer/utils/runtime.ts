@@ -30,6 +30,18 @@ function clearSkippedMark(element: HTMLElement): void {
     element.querySelector(':scope > .smartlink-mb-skipped-badge')?.remove();
 }
 
+function markPresent(element: HTMLElement, present: boolean): void {
+    element.classList.toggle('smartlink-mb-present', present);
+    element.querySelector(':scope > .smartlink-mb-present-badge')?.remove();
+    if (!present) return;
+
+    const badge = document.createElement('span');
+    badge.className = 'smartlink-mb-present-badge';
+    badge.textContent = '\u2713';
+    badge.setAttribute('aria-hidden', 'true');
+    element.appendChild(badge);
+}
+
 function markSkipped(element: HTMLElement, reason: string): void {
     clearSkippedMark(element);
     element.classList.add('smartlink-mb-skipped');
@@ -187,7 +199,7 @@ function markExistingLinks(elements: ServiceElement[], links: ServiceLink[], mat
         const serviceMatches = links.filter(candidate => candidate.service === element.service);
         const link = serviceMatches.find(candidate => candidate.sourceUrl === element.sourceUrl) ?? serviceMatches[0];
         const present = link ? matchedUrls.has(link.url) : false;
-        element.element.classList.toggle('smartlink-mb-present', present);
+        markPresent(element.element, present);
         if (present) element.element.title = 'This URL is already linked to the MusicBrainz release';
     }
 }
