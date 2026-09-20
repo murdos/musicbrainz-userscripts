@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.20.3
+// @version      2026.09.20.4
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -1153,7 +1153,7 @@
         .smartlink-mb-skipped { position: relative; }
         .smartlink-mb-present { outline: 3px solid #32a852 !important; }
         .smartlink-mb-skipped { outline: 3px solid #888 !important; filter: grayscale(1); opacity: 0.65; }
-        .smartlink-mb-present::after,
+        .smartlink-mb-present-badge,
         .smartlink-mb-skipped-badge {
             position: absolute;
             top: -7px;
@@ -1167,7 +1167,6 @@
             text-align: center;
             z-index: 2;
         }
-        .smartlink-mb-present::after { content: '\u2713'; }
         .smartlink-mb-skipped-badge { background: #777; }
     `;
       document.head.appendChild(style);
@@ -1253,6 +1252,16 @@
     function clearSkippedMark(element) {
       element.classList.remove('smartlink-mb-skipped');
       element.querySelector(':scope > .smartlink-mb-skipped-badge')?.remove();
+    }
+    function markPresent(element, present) {
+      element.classList.toggle('smartlink-mb-present', present);
+      element.querySelector(':scope > .smartlink-mb-present-badge')?.remove();
+      if (!present) return;
+      const badge = document.createElement('span');
+      badge.className = 'smartlink-mb-present-badge';
+      badge.textContent = '\u2713';
+      badge.setAttribute('aria-hidden', 'true');
+      element.appendChild(badge);
     }
     function markSkipped(element, reason) {
       clearSkippedMark(element);
@@ -1413,7 +1422,7 @@
         const serviceMatches = links.filter(candidate => candidate.service === element.service);
         const link = serviceMatches.find(candidate => candidate.sourceUrl === element.sourceUrl) ?? serviceMatches[0];
         const present = link ? matchedUrls.has(link.url) : false;
-        element.element.classList.toggle('smartlink-mb-present', present);
+        markPresent(element.element, present);
         if (present) element.element.title = 'This URL is already linked to the MusicBrainz release';
       }
     }
