@@ -17,6 +17,8 @@
         "https://*.fanlink.tv/*",
         "https://ffm.to/*",
         "https://*.ffm.to/*",
+        "https://idm.fm/*",
+        "https://*.idm.fm/*",
         "https://orcd.co/*",
         "https://*.orcd.co/*",
         "https://promolinks.me/*",
@@ -24,7 +26,7 @@
         "https://song.link/*",
         "https://*.song.link/*"
     ],
-    "supportedSites": ["album.link", "band.link", "bfan.link", "fanlink.tv", "ffm.to", "orcd.co", "promolinks.me", "song.link"],
+    "supportedSites": ["album.link", "band.link", "bfan.link", "fanlink.tv", "ffm.to", "idm.fm", "orcd.co", "promolinks.me", "song.link"],
     "connect": ["*"],
     "grant": ["GM.getValue", "GM.setValue", "GM.xmlHttpRequest", "GM_getValue", "GM_setValue", "GM_xmlhttpRequest"],
     "runAt": "document-idle",

@@ -79,6 +79,8 @@ describe('Smartlink importer site adapters', () => {
         ['fanlink.tv', 'fanlink'],
         ['ffm.to', 'ffm'],
         ['label-caster.ffm.to', 'ffm'],
+        ['idm.fm', 'ffm'],
+        ['listen.idm.fm', 'ffm'],
         ['orcd.co', 'ffm'],
         ['promolinks.me', 'promolinks'],
         ['slowecho.promolinks.me', 'promolinks'],
@@ -91,6 +93,7 @@ describe('Smartlink importer site adapters', () => {
     it('does not route lookalike hostnames', () => {
         expect(smartLinkSiteForHostname('notalbum.link.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('evilffm.to.example')).toBeUndefined();
+        expect(smartLinkSiteForHostname('idm.fm.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('song.link.example')).toBeUndefined();
     });
