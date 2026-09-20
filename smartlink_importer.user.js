@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.20.1
+// @version      2026.09.20.2
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -309,6 +309,7 @@
       const service = normalizeServiceName(link.service);
       if (amazonAsinFromUrl(link.url)) return URL_RELATIONSHIP_TYPES.asin;
       if (service === 'officialsite') return URL_RELATIONSHIP_TYPES.discographyEntry;
+      if (service === 'amazon') return URL_RELATIONSHIP_TYPES.streaming;
       if (action.includes('free') && action.includes('download')) return URL_RELATIONSHIP_TYPES.downloadForFree;
       if (action.includes('buy') || action.includes('download') || ['amazonstore', 'beatport'].includes(service)) {
         return URL_RELATIONSHIP_TYPES.purchaseForDownload;
