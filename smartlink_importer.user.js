@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.16.1
+// @version      2026.09.20.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -16,6 +16,8 @@
 // @match        https://*.fanlink.tv/*
 // @match        https://ffm.to/*
 // @match        https://*.ffm.to/*
+// @match        https://idm.fm/*
+// @match        https://*.idm.fm/*
 // @match        https://orcd.co/*
 // @match        https://*.orcd.co/*
 // @match        https://promolinks.me/*
@@ -1552,7 +1554,7 @@
       bandlink: ['band.link'],
       bfan: ['bfan.link'],
       fanlink: ['fanlink.tv'],
-      ffm: ['ffm.to', 'orcd.co'],
+      ffm: ['ffm.to', 'idm.fm', 'orcd.co'],
       promolinks: ['promolinks.me'],
       songlink: ['song.link']
     };
