@@ -109,7 +109,7 @@ describe('Smartlink importer site adapters', () => {
     it('maps DistroKid HyperFollow store identifiers and actions', () => {
         expect(distrokidServiceName('spotify')).toBe('spotify');
         expect(distrokidServiceName('applemusic')).toBe('apple');
-        expect(distrokidServiceName('google')).toBe('youtubemusic');
+        expect(distrokidServiceName('google')).toBe('googleplay');
         expect(distrokidServiceAction('itunes')).toBe('Download');
         expect(distrokidServiceAction('deezer')).toBe('Listen');
     });

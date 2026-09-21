@@ -26,7 +26,7 @@ Test link: [bfan.link/elan](https://bfan.link/elan)
 
 ### DistroKid HyperFollow
 
-Provider destinations are read directly from DistroKid HyperFollow’s rendered store links. DistroKid’s store identifiers are normalized, including its legacy Google identifier for YouTube Music, and iTunes links are treated as downloads.
+Provider destinations are read directly from DistroKid HyperFollow’s rendered store links. Legacy Google Play Music and Napster links are ignored, and iTunes links are treated as downloads.
 
 Test link: [distrokid.com/hyperfollow/timerival/stride](https://distrokid.com/hyperfollow/timerival/stride)
 
