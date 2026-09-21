@@ -125,8 +125,10 @@ describe('Smartlink importer shared logic', () => {
         expect(chooseHarmonyLink(links.slice(0, 2))?.service).toBe('tidal');
     });
 
-    it('ignores sunset Juno Download services', () => {
+    it('ignores discontinued services', () => {
+        expect(isIgnoredService('googleplay')).toBe(true);
         expect(isIgnoredService('junodownload')).toBe(true);
+        expect(isIgnoredService('napster')).toBe(true);
         expect(isIgnoredService('beatport')).toBe(false);
     });
 
@@ -176,6 +178,12 @@ describe('Smartlink importer shared logic', () => {
 
     it('provides a shared reason for links that should be skipped', () => {
         expect(skipReasonForServiceLink('junodownload', 'Buy', 'https://example.com/release')).toBe('Ignored service');
+        expect(skipReasonForServiceLink('googleplay', 'Listen', 'https://play.google.com/store/music/album/example')).toBe(
+            'Ignored service',
+        );
+        expect(skipReasonForServiceLink('napster', 'Listen', 'https://us.napster.com/artist/example/album/example')).toBe(
+            'Ignored service',
+        );
         expect(skipReasonForServiceLink('unknown-store', 'Buy Vinyl', 'https://example.com/release')).toBe('Physical-media link');
         expect(skipReasonForServiceLink('tidal', 'Play', 'https://tidal.com/search?q=example')).toBe('Search fallback');
         expect(skipReasonForServiceLink('youtube', 'Play', 'https://www.youtube.com/results?search_query=example')).toBe('Search fallback');

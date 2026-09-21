@@ -4,7 +4,7 @@ import type { ServiceElement } from '~/userscripts/smartlink_importer/utils/type
 import { nextCacheKey } from './common';
 
 const SERVICE_ALIASES: Readonly<Record<string, string>> = {
-    google: 'youtubemusic',
+    google: 'googleplay',
 };
 
 export function distrokidServiceName(store: string): string {
