@@ -24,6 +24,12 @@ Bfan is Believe Digital’s link aggregator service. Provider destinations are r
 
 Test link: [bfan.link/elan](https://bfan.link/elan)
 
+### DistroKid HyperFollow
+
+Provider destinations are read directly from DistroKid HyperFollow’s rendered store links. DistroKid’s store identifiers are normalized, including its legacy Google identifier for YouTube Music, and iTunes links are treated as downloads.
+
+Test link: [distrokid.com/hyperfollow/timerival/stride](https://distrokid.com/hyperfollow/timerival/stride)
+
 ### fanlink.tv
 
 Provider destinations are read from Fanlink’s `window.preloadLink` page data because its rendered service rows do not contain the links. Redirecting destinations are resolved before they are normalized.

@@ -7,6 +7,7 @@ import {
     serviceLabelFromAriaLabel,
 } from '~/userscripts/smartlink_importer/utils/extractors/albumlink';
 import { extractBfanServiceData } from '~/userscripts/smartlink_importer/utils/extractors/bfan';
+import { distrokidServiceAction, distrokidServiceName } from '~/userscripts/smartlink_importer/utils/extractors/distrokid';
 import { extractFanlinkServiceData, extractFanlinkServiceDataFromScript } from '~/userscripts/smartlink_importer/utils/extractors/fanlink';
 import { linkfireSkipReasonForServiceLink } from '~/userscripts/smartlink_importer/utils/extractors/linkfire';
 import { extractPromoLinksServiceData } from '~/userscripts/smartlink_importer/utils/extractors/promolinks';
@@ -77,6 +78,8 @@ describe('Smartlink importer site adapters', () => {
         ['band.link', 'bandlink'],
         ['artist.band.link', 'bandlink'],
         ['bfan.link', 'bfan'],
+        ['distrokid.com', 'distrokid'],
+        ['www.distrokid.com', 'distrokid'],
         ['fanlink.tv', 'fanlink'],
         ['ffm.to', 'ffm'],
         ['label-caster.ffm.to', 'ffm'],
@@ -96,10 +99,19 @@ describe('Smartlink importer site adapters', () => {
     it('does not route lookalike hostnames', () => {
         expect(smartLinkSiteForHostname('notalbum.link.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('evilffm.to.example')).toBeUndefined();
+        expect(smartLinkSiteForHostname('distrokid.com.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('idm.fm.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('lnk.to.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('promolinks.me.example')).toBeUndefined();
         expect(smartLinkSiteForHostname('song.link.example')).toBeUndefined();
+    });
+
+    it('maps DistroKid HyperFollow store identifiers and actions', () => {
+        expect(distrokidServiceName('spotify')).toBe('spotify');
+        expect(distrokidServiceName('applemusic')).toBe('apple');
+        expect(distrokidServiceName('google')).toBe('youtubemusic');
+        expect(distrokidServiceAction('itunes')).toBe('Download');
+        expect(distrokidServiceAction('deezer')).toBe('Listen');
     });
 
     it('filters Linkfire links that do not identify a release', () => {
