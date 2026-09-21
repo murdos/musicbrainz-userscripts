@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.21.1
+// @version      2026.09.21.2
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -45,7 +45,7 @@
     /** Shared domain logic for the Smartlink importer. */
     const HARMONY_SERVICE_PREFERENCE = ['spotify', 'tidal', 'deezer', 'bandcamp', 'apple', 'itunes'];
     const TRACKING_PARAMETER_NAMES = new Set(['at', 'ct', 'ffm', 'lid', 'ref', 'ref_', 'si', 'src', 'tag']);
-    const IGNORED_SERVICES = new Set(['junodownload']);
+    const IGNORED_SERVICES = new Set(['googleplay', 'junodownload', 'napster']);
     const PHYSICAL_MEDIA_SERVICES = new Set(['amazoncdvinyl', 'barnesnoble', 'hmvjapan', 'imusic', 'sanity', 'towerrecords']);
     const FREE_STREAMING_SERVICES = new Set(['boomplay', 'deezer', 'spotify', 'youtube']);
     const STREAMING_SERVICES = new Set(['amazon', 'apple', 'itunes', 'kkbox', 'pandora', 'qobuz', 'soundcloud', 'tidal', 'youtubemusic']);
@@ -575,7 +575,7 @@
     }
 
     const SERVICE_ALIASES = {
-      google: 'youtubemusic'
+      google: 'googleplay'
     };
     function distrokidServiceName(store) {
       const normalized = normalizeServiceName(store);
