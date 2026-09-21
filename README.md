@@ -235,6 +235,7 @@ Supported sites:
 - `album.link`
 - `band.link`
 - `bfan.link`
+- `distrokid.com/hyperfollow`
 - `fanlink.tv`
 - `ffm.to`
 - `idm.fm`

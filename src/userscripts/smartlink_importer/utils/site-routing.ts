@@ -1,9 +1,10 @@
-export type SmartLinkSite = 'albumlink' | 'bandlink' | 'bfan' | 'fanlink' | 'ffm' | 'linkfire' | 'promolinks' | 'songlink';
+export type SmartLinkSite = 'albumlink' | 'bandlink' | 'bfan' | 'distrokid' | 'fanlink' | 'ffm' | 'linkfire' | 'promolinks' | 'songlink';
 
 const DOMAINS_BY_SITE: Readonly<Record<SmartLinkSite, readonly string[]>> = {
     albumlink: ['album.link'],
     bandlink: ['band.link'],
     bfan: ['bfan.link'],
+    distrokid: ['distrokid.com'],
     fanlink: ['fanlink.tv'],
     ffm: ['ffm.to', 'idm.fm', 'orcd.co'],
     linkfire: ['lnk.to'],
