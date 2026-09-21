@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainz Smartlink importer
 // @description  Import a release from smart links aggregators with Harmony and add their remaining URL relationships to MusicBrainz.
-// @version      2026.09.20.4
+// @version      2026.09.21.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/smartlink_importer.user.js
@@ -12,6 +12,8 @@
 // @match        https://*.band.link/*
 // @match        https://bfan.link/*
 // @match        https://*.bfan.link/*
+// @match        https://distrokid.com/hyperfollow/*
+// @match        https://*.distrokid.com/hyperfollow/*
 // @match        https://fanlink.tv/*
 // @match        https://*.fanlink.tv/*
 // @match        https://ffm.to/*
@@ -569,6 +571,51 @@
         siteName: 'bfan.link',
         collectServiceElements: collectBfanServiceElements,
         resolveDestination: element => element.sourceUrl
+      };
+    }
+
+    const SERVICE_ALIASES = {
+      google: 'youtubemusic'
+    };
+    function distrokidServiceName(store) {
+      const normalized = normalizeServiceName(store);
+      return SERVICE_ALIASES[normalized] ?? normalized;
+    }
+    function distrokidServiceAction(store) {
+      return distrokidServiceName(store) === 'itunes' ? 'Download' : 'Listen';
+    }
+    function collectDistrokidServiceElements() {
+      const counters = new Map();
+      const elements = [];
+      for (const element of document.querySelectorAll('a[data-testid="hyperfollow-store-link"][data-hyperfollow-store][href]')) {
+        const rawService = element.dataset['hyperfollowStore'] ?? '';
+        const service = distrokidServiceName(rawService);
+        const label = element.textContent.trim().replaceAll(/\s+/g, ' ') || rawService;
+        const action = distrokidServiceAction(rawService);
+        if (!service || !element.href) continue;
+        elements.push({
+          cacheKey: nextCacheKey(counters, service),
+          element,
+          service,
+          label,
+          action,
+          sourceUrl: element.href,
+          skipReason: skipReasonForServiceLink(service, action, element.href)
+        });
+      }
+      return elements;
+    }
+
+    function createDistrokidConfig() {
+      return {
+        id: 'distrokid',
+        siteName: 'DistroKid HyperFollow',
+        collectServiceElements: collectDistrokidServiceElements,
+        resolveDestination: element => element.sourceUrl,
+        mountPanel: panel => {
+          const firstService = document.querySelector('a[data-testid="hyperfollow-store-link"]');
+          if (firstService?.parentElement) firstService.parentElement.insertBefore(panel, firstService);else document.body.appendChild(panel);
+        }
       };
     }
 
@@ -1604,6 +1651,7 @@
       albumlink: ['album.link'],
       bandlink: ['band.link'],
       bfan: ['bfan.link'],
+      distrokid: ['distrokid.com'],
       fanlink: ['fanlink.tv'],
       ffm: ['ffm.to', 'idm.fm', 'orcd.co'],
       linkfire: ['lnk.to'],
@@ -1622,6 +1670,7 @@
       albumlink: createAlbumLinkConfig,
       bandlink: createBandLinkConfig,
       bfan: createBfanConfig,
+      distrokid: createDistrokidConfig,
       fanlink: createFanlinkConfig,
       ffm: createFfmConfig,
       linkfire: createLinkfireConfig,
