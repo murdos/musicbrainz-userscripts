@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.30.1
+// @version      2026.9.30.3
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -12,7 +12,7 @@
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
 // @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/755843cf53404869f6817310153fc8bb6cf9cb9b/lib/mblinks.js
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/2cbee9d1c5bdc749e0e23354504cf686dbc79dc2/lib/mbimportstyle.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/07068ab3a4dd38bbdc8502ab3d3d71c1c0ef51e6/lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -681,26 +681,13 @@ const initTrackLinks = mblinks => {
     const resolvedLinks = new Map();
     const lookupStates = new Map();
 
-    const createSearchIndicator = trackTitle => {
-        const indicator = document.createElement('span');
-        indicator.className = 'mb_valign mb_searchit';
-        const searchLink = document.createElement('a');
-        searchLink.className = 'mb_search_link';
-        searchLink.target = '_blank';
-        searchLink.title = 'Search this recording on MusicBrainz (open in a new tab)';
-        searchLink.href = MBImport.searchUrlFor('recording', trackTitle);
-        searchLink.innerHTML = '<small>T</small>?';
-        indicator.append(searchLink);
-        return indicator;
-    };
-
     const renderCellContents = (linkCell, trackUrl, trackTitle) => {
         const links = resolvedLinks.get(trackUrl);
         linkCell.replaceChildren();
         if (links?.length) {
             links.forEach(link => linkCell.insertAdjacentHTML('beforeend', link));
         } else {
-            const indicator = createSearchIndicator(trackTitle);
+            const indicator = MBCreateLookupIndicator('recording', trackTitle);
             MBSetLookupIndicatorState(indicator, trackUrl ? (lookupStates.get(trackUrl) ?? 'loading') : 'search');
             linkCell.append(indicator);
         }
@@ -886,29 +873,33 @@ async function init() {
         const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
 
         if (release.type == 'track') {
-            mblinks.searchAndDisplayMbLink(
-                root_url,
-                'artist',
-                function (link) {
-                    lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+            mblinks.searchAndDisplayMbLinks([
+                {
+                    url: root_url,
+                    mb_type: 'artist',
+                    key: `artist:${root_url}`,
+                    insert_func: link => {
+                        lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+                    },
                 },
-                `artist:${root_url}`,
-            );
+            ]);
             // add MB links to parent album
             mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
                 firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
         } else {
             const artistCacheKey = `artist:${root_url}`;
-            mblinks.searchAndDisplayMbLink(
-                root_url,
-                'artist',
-                function (link) {
-                    firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+            mblinks.searchAndDisplayMbLinks([
+                {
+                    url: root_url,
+                    mb_type: 'artist',
+                    key: artistCacheKey,
+                    insert_func: link => {
+                        firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+                    },
+                    complete_func: () => updateArtistMbid(artistCacheKey),
                 },
-                artistCacheKey,
-                () => updateArtistMbid(artistCacheKey),
-            );
+            ]);
             // add MB release links to album or single (skip for private streams)
             if (!isPrivateStream) {
                 const releaseLookupUrls = [release.url, ...release.alternateUrls];
@@ -945,22 +936,24 @@ async function init() {
         let label_url = '';
 
         const rootLabelCacheKey = `label:${root_url}`;
-        mblinks.searchAndDisplayMbLink(
-            root_url,
-            'label',
-            function (link) {
-                document.querySelector('p#band-name-location span.title')?.insertAdjacentHTML('beforeend', link);
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: root_url,
+                mb_type: 'label',
+                key: rootLabelCacheKey,
+                insert_func: link => {
+                    document.querySelector('p#band-name-location span.title')?.insertAdjacentHTML('beforeend', link);
+                },
+                complete_func: () => {
+                    queueMicrotask(() => {
+                        if (!label_url) {
+                            const labelName = document.querySelector('p#band-name-location span.title')?.textContent.trim() ?? '';
+                            updateLabelMbid(rootLabelCacheKey, labelName);
+                        }
+                    });
+                },
             },
-            rootLabelCacheKey,
-            () => {
-                queueMicrotask(() => {
-                    if (!label_url) {
-                        const labelName = document.querySelector('p#band-name-location span.title')?.textContent.trim() ?? '';
-                        updateLabelMbid(rootLabelCacheKey, labelName);
-                    }
-                });
-            },
-        );
+        ]);
         const labelback = document.querySelector('a.back-to-label-link');
         if (labelback) {
             const labelbacklink = labelback.getAttribute('href');
@@ -968,15 +961,17 @@ async function init() {
                 let cleanLabelLink = labelbacklink.fix_bandcamp_url();
                 label_url = cleanLabelLink.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
                 const labelCacheKey = `label:${label_url}`;
-                mblinks.searchAndDisplayMbLink(
-                    label_url,
-                    'label',
-                    function (link) {
-                        document.querySelector('a.back-to-label-link span.back-link-text')?.insertAdjacentHTML('beforeend', link);
+                mblinks.searchAndDisplayMbLinks([
+                    {
+                        url: label_url,
+                        mb_type: 'label',
+                        key: labelCacheKey,
+                        insert_func: link => {
+                            document.querySelector('a.back-to-label-link span.back-link-text')?.insertAdjacentHTML('beforeend', link);
+                        },
+                        complete_func: () => updateLabelMbid(labelCacheKey, BandcampImport.getlabelname()),
                     },
-                    labelCacheKey,
-                    () => updateLabelMbid(labelCacheKey, BandcampImport.getlabelname()),
-                );
+                ]);
             }
         }
 
@@ -1058,81 +1053,81 @@ async function init() {
 
     if (hasBandData) {
         const cleanURL = `${unsafeWindow.location.protocol}//${unsafeWindow.location.hostname}`;
-
+        const entityName = unsafeWindow.BandData.name;
         let isLinkInserted = false;
         const linkStyle = {
             position: 'absolute',
             marginLeft: '3px',
         };
 
-        const applyLinkStyle = element => {
-            element.querySelectorAll('a').forEach(anchor => {
-                Object.assign(anchor.style, linkStyle);
+        MBSearchItStyle();
+
+        const lookupWrappers = [
+            document.querySelector('div.stub-page-content h1'),
+            document.querySelector('p#band-name-location span.title'),
+        ]
+            .filter(Boolean)
+            .map(target => {
+                const wrapper = document.createElement('span');
+                wrapper.className = 'mb_wrapper';
+                wrapper.dataset.bciBandLookup = '';
+                Object.assign(wrapper.style, linkStyle);
+                const artistIndicator = MBCreateLookupIndicator('artist', entityName);
+                artistIndicator.dataset.bciBandLookupType = 'artist';
+                const labelIndicator = MBCreateLookupIndicator('label', entityName);
+                labelIndicator.dataset.bciBandLookupType = 'label';
+                wrapper.append(artistIndicator, labelIndicator);
+                target.append(wrapper);
+                return { target, wrapper };
+            });
+
+        const insertLinkCb = link => {
+            if (isLinkInserted) return;
+
+            const mbUrl = link.match(/href="([^"]+)"/)?.[1];
+            lookupWrappers.forEach(({ target, wrapper }) => {
+                const existingLink = mbUrl
+                    ? Array.from(target.querySelectorAll('a[href]')).find(anchor => anchor.href === mbUrl)
+                    : undefined;
+                if (existingLink) {
+                    Object.assign(existingLink.style, linkStyle);
+                } else {
+                    wrapper.insertAdjacentHTML('beforebegin', link);
+                    const insertedLink = wrapper.previousElementSibling;
+                    if (insertedLink) Object.assign(insertedLink.style, linkStyle);
+                }
+                wrapper.remove();
+            });
+            isLinkInserted = true;
+        };
+
+        const completeLookup = (mbType, result) => {
+            if (isLinkInserted) return;
+            lookupWrappers.forEach(({ wrapper }) => {
+                const indicator = wrapper.querySelector(`[data-bci-band-lookup-type="${mbType}"]`);
+                if (indicator) MBSetLookupIndicatorState(indicator, result.status === 'error' ? 'error' : 'search');
             });
         };
 
-        const insertLinkCb = function (link) {
-            if (!isLinkInserted) {
-                // Append the artist/label link on Stub discography pages
-                const stubPageHeading = document.querySelector('div.stub-page-content h1');
-                if (stubPageHeading) {
-                    stubPageHeading.insertAdjacentHTML('beforeend', link);
-                    applyLinkStyle(stubPageHeading);
-                }
-
-                // Append the artist/label link on actual discography pages
-                const bandNameTitle = document.querySelector('p#band-name-location span.title');
-                if (bandNameTitle) {
-                    bandNameTitle.insertAdjacentHTML('beforeend', link);
-                    applyLinkStyle(bandNameTitle);
-                }
-                isLinkInserted = true;
-            }
-        };
-
-        const showLookupButtonsIfNoLink = function () {
-            if (!isLinkInserted) {
-                MBSearchItStyle();
-                const entityName = unsafeWindow.BandData.name;
-                const artistSearchUrl = MBImport.searchUrlFor('artist', entityName);
-                const labelSearchUrl = MBImport.searchUrlFor('label', entityName);
-
-                document.querySelector('div.stub-page-content h1')?.insertAdjacentHTML(
-                    'beforeend',
-                    `<span class="mb_wrapper">
-                        <span class="mb_valign mb_searchit">
-                            <a class="mb_search_link"
-                                class="musicbrainz_import"
-                                target="_blank"
-                                title="Search this artist on MusicBrainz (open in a new tab)" 
-                                href="${artistSearchUrl}"
-                            ><small>A</small>?</a>
-                        </span>
-                        <span class="mb_valign mb_searchit">
-                            <a 
-                                class="mb_search_link musicbrainz_import"
-                                target="_blank"
-                                title="Search this label on MusicBrainz (open in a new tab)"
-                                href="${labelSearchUrl}"
-                            ><small>L</small>?</a>
-                        </span>
-                    </span>`,
-                );
-            }
-        };
-
         // The URL could either be a band or a label page, we don't know which, so we search for both.
-        // Show lookup buttons only after both searches have completed and neither found a link.
-        let pendingSearches = 2;
-        const onSearchComplete = function () {
-            pendingSearches -= 1;
-            if (pendingSearches === 0) {
-                showLookupButtonsIfNoLink();
-            }
-        };
-
-        mblinks.searchAndDisplayMbLink(cleanURL, 'artist', insertLinkCb, `artist:${cleanURL}`, onSearchComplete);
-        mblinks.searchAndDisplayMbLink(cleanURL, 'label', insertLinkCb, `label:${cleanURL}`, onSearchComplete);
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: cleanURL,
+                mb_type: 'artist',
+                key: `artist:${cleanURL}`,
+                insert_func: insertLinkCb,
+                complete_func: result => completeLookup('artist', result),
+            },
+        ]);
+        mblinks.searchAndDisplayMbLinks([
+            {
+                url: cleanURL,
+                mb_type: 'label',
+                key: `label:${cleanURL}`,
+                insert_func: insertLinkCb,
+                complete_func: result => completeLookup('label', result),
+            },
+        ]);
     }
 
     // Recording relationships are the least important lookups, so queue them last.

@@ -2,7 +2,7 @@
 
 // @name         Import Discogs releases to MusicBrainz
 // @description  Add a button to import Discogs releases to MusicBrainz and add links to matching MusicBrainz entities for various Discogs entities (artist,release,master,label)
-// @version      2026.9.15.5
+// @version      2026.9.30.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/discogs_importer.user.js
@@ -14,7 +14,7 @@
 // @require      lib/mbimport.js
 // @require      lib/logger.js
 // @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/755843cf53404869f6817310153fc8bb6cf9cb9b/lib/mblinks.js
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/2cbee9d1c5bdc749e0e23354504cf686dbc79dc2/lib/mbimportstyle.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/07068ab3a4dd38bbdc8502ab3d3d71c1c0ef51e6/lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
@@ -130,9 +130,9 @@ function getDiscogsEntityListPage() {
 }
 
 const discogsEntityListTypes = [
-    { discogsType: 'release', mbType: 'release', mark: 'R' },
-    { discogsType: 'artist', mbType: 'artist', mark: 'A' },
-    { discogsType: 'label', mbType: 'label', mark: 'L' },
+    { discogsType: 'release', mbType: 'release' },
+    { discogsType: 'artist', mbType: 'artist' },
+    { discogsType: 'label', mbType: 'label' },
 ];
 
 function getDiscogsEntityInfo(link, discogsType) {
@@ -172,19 +172,9 @@ function removeDiscogsListEntitySearchLink(entityLink) {
     }
 }
 
-function insertDiscogsListEntitySearchLink(entityLink, mbType, mark) {
-    const searchIndicator = document.createElement('span');
-    searchIndicator.className = 'mb_valign mb_searchit';
+function insertDiscogsListEntitySearchLink(entityLink, mbType) {
+    const searchIndicator = MBCreateLookupIndicator(mbType, entityLink.textContent.trim());
     searchIndicator.setAttribute('data-mb-discogs-list-indicator', 'search');
-
-    const searchLink = document.createElement('a');
-    searchLink.className = 'mb_search_link';
-    searchLink.target = '_blank';
-    searchLink.title = `Search this ${mbType} on MusicBrainz (open in a new tab)`;
-    searchLink.href = MBImport.searchUrlFor(mbType, entityLink.textContent.trim());
-    searchLink.innerHTML = `<small>${mark}</small>?`;
-    searchIndicator.append(searchLink);
-    MBSetLookupIndicatorState(searchIndicator, 'loading');
     entityLink.before(searchIndicator);
 }
 
@@ -201,7 +191,7 @@ function initDiscogsEntityListPage(pageConfig) {
     let scanScheduled = false;
 
     const addEntityLinks = roots => {
-        discogsEntityListTypes.forEach(({ discogsType, mbType, mark }) => {
+        discogsEntityListTypes.forEach(({ discogsType, mbType }) => {
             const urlsData = [];
             const processedEntityUrlAttribute = `data-mb-discogs-list-${discogsType}-url`;
             const entitySelector = pageConfig.getEntitySelector(discogsType);
@@ -214,7 +204,7 @@ function initDiscogsEntityListPage(pageConfig) {
 
                     keepDiscogsListIndicatorWithEntity(entityLink);
                     removeDiscogsListMbIndicators(entityLink);
-                    insertDiscogsListEntitySearchLink(entityLink, mbType, mark);
+                    insertDiscogsListEntitySearchLink(entityLink, mbType);
                     entityLink.setAttribute(processedEntityUrlAttribute, entityInfo.clean_url);
                     urlsData.push({
                         url: entityInfo.clean_url,
@@ -304,33 +294,12 @@ function insertMBLinks(current_page_key) {
                 if (!has_wrapper) {
                     $link.wrap('<span class="mb_wrapper"><span class="mb_valign"></span></span>');
                 }
+                let searchIndicator;
                 if (!nosearch) {
                     // add search link for the current link text
-                    const entities = {
-                        artist: { mark: 'A' },
-                        release: { mark: 'R' },
-                        'release-group': { mark: 'G' },
-                        place: { mark: 'P' },
-                        label: { mark: 'L' },
-                        series: { mark: 'S' },
-                    };
-                    let mark = '';
-                    let entity_name = 'entity';
-                    if (mb_type in entities) {
-                        mark = entities[mb_type].mark;
-                        entity_name = mb_type.replace(/[_-]/g, ' ');
-                    }
-                    $link
-                        .closest('span.mb_wrapper')
-                        .prepend(
-                            `<span class="mb_valign mb_searchit"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${MBImport.searchUrlFor(
-                                mb_type,
-                                $link.text(),
-                            )}"><small>${mark}</small>?</a></span>`,
-                        );
+                    searchIndicator = MBCreateLookupIndicator(mb_type, $link.text());
+                    $link.closest('span.mb_wrapper').prepend(searchIndicator);
                 }
-                const searchIndicator = nosearch ? undefined : $link.closest('span.mb_wrapper').find('.mb_searchit').get(0);
-                if (searchIndicator) MBSetLookupIndicatorState(searchIndicator, 'loading');
                 const insert_normal = function (link) {
                     $link.closest('span.mb_valign').before(`<span class="mb_valign">${link}</span>`);
                     searchIndicator?.remove();

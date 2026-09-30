@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Qobuz releases to MusicBrainz
 // @description  Add a button on Qobuz's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.15.6
+// @version      2026.9.30.1
 // @namespace    https://github.com/murdos/musicbrainz-userscripts
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/qobuz_importer.user.js
@@ -13,7 +13,7 @@
 // @require      lib/mbimport.js?version=v2026.05.30.1
 // @require      lib/logger.js
 // @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/755843cf53404869f6817310153fc8bb6cf9cb9b/lib/mblinks.js
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/2cbee9d1c5bdc749e0e23354504cf686dbc79dc2/lib/mbimportstyle.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/07068ab3a4dd38bbdc8502ab3d3d71c1c0ef51e6/lib/mbimportstyle.js
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlhttpRequest
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
@@ -518,19 +518,6 @@ function lookupLabelAndDisplayLinks({ release, mblinks }) {
     mblinks.searchAndDisplayMbLinksByRegex(queries);
 }
 
-const MB_SEARCH_MARKS = {
-    artist: 'A',
-    label: 'L',
-    release: 'R',
-};
-
-function createMbSearchLink(mb_type, entityName) {
-    const mark = MB_SEARCH_MARKS[mb_type] || '?';
-    const entity_name = mb_type.replace(/[_-]/g, ' ');
-    const href = mb_type === 'release' ? MBImport.searchUrlFor(mb_type, entityName) : MBImport.exactSearchUrlFor(mb_type, entityName);
-    return `<span class="mb_valign mb_searchit mb_lookup_loading" role="status" aria-label="Looking up this entity on MusicBrainz" title="Looking up this entity on MusicBrainz"><a class="mb_search_link" target="_blank" title="Search this ${entity_name} on MusicBrainz (open in a new tab)" href="${href}"><small>${mark}</small>?</a></span>`;
-}
-
 function completeMbLookupsBeforeElements(elements, result) {
     for (const element of elements) {
         const indicator = element.previousElementSibling;
@@ -558,7 +545,11 @@ function insertMbSearchLinkBeforeElement(element, mb_type, entityName) {
     if (hasMbIndicatorBeforeElement(element)) {
         return;
     }
-    element.insertAdjacentHTML('beforebegin', createMbSearchLink(mb_type, entityName));
+    element.before(
+        MBCreateLookupIndicator(mb_type, entityName, {
+            searchMode: mb_type === 'release' ? 'indexed' : 'exact',
+        }),
+    );
 }
 
 /*
