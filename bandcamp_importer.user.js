@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.15.5
+// @version      2026.9.30.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -836,6 +836,45 @@ async function init() {
 
         let release = await BandcampImport.retrieveReleaseInfo(isPrivateStream);
 
+        const updateImportFormValue = (name, value) => {
+            const form = document.querySelector('#mb_buttons form.musicbrainz_import_add');
+            if (!form) return;
+
+            let input = Array.from(form.elements).find(element => element.name === name);
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                form.append(input);
+            }
+            input.value = value;
+        };
+
+        const updateArtistMbid = cacheKey => {
+            if (release.artist_credit.length !== 1) return;
+
+            const mbid = mblinks.resolveMBID(cacheKey);
+            if (!mbid) return;
+            release.artist_credit[0].mbid = mbid;
+            updateImportFormValue('artist_credit.names.0.mbid', mbid);
+        };
+
+        const updateLabelMbid = (cacheKey, name) => {
+            const mbid = mblinks.resolveMBID(cacheKey);
+            if (!mbid) return;
+            if (release.labels.length === 0) {
+                release.labels.push({
+                    name: '',
+                    mbid: '',
+                    catno: 'none',
+                });
+            }
+            release.labels[0].name = name;
+            release.labels[0].mbid = mbid;
+            updateImportFormValue('labels.0.name', name);
+            updateImportFormValue('labels.0.mbid', mbid);
+        };
+
         // add MB artist link
         let root_url = getBandRootUrl();
         if (!root_url && /^https?:\/\//.test(release.url)) {
@@ -847,17 +886,29 @@ async function init() {
         const lastNameSectionSpan = nameSectionSpans[nameSectionSpans.length - 1];
 
         if (release.type == 'track') {
-            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
-            });
+            mblinks.searchAndDisplayMbLink(
+                root_url,
+                'artist',
+                function (link) {
+                    lastNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+                },
+                `artist:${root_url}`,
+            );
             // add MB links to parent album
             mblinks.searchAndDisplayMbLink(release.parent_album_url, 'release', function (link) {
                 firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
             });
         } else {
-            mblinks.searchAndDisplayMbLink(root_url, 'artist', function (link) {
-                firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
-            });
+            const artistCacheKey = `artist:${root_url}`;
+            mblinks.searchAndDisplayMbLink(
+                root_url,
+                'artist',
+                function (link) {
+                    firstNameSectionSpan?.insertAdjacentHTML('beforebegin', link);
+                },
+                artistCacheKey,
+                () => updateArtistMbid(artistCacheKey),
+            );
             // add MB release links to album or single (skip for private streams)
             if (!isPrivateStream) {
                 const releaseLookupUrls = [release.url, ...release.alternateUrls];
@@ -893,13 +944,22 @@ async function init() {
 
         let label_url = '';
 
+        const rootLabelCacheKey = `label:${root_url}`;
         mblinks.searchAndDisplayMbLink(
             root_url,
             'label',
             function (link) {
                 document.querySelector('p#band-name-location span.title')?.insertAdjacentHTML('beforeend', link);
             },
-            `label:${root_url}`,
+            rootLabelCacheKey,
+            () => {
+                queueMicrotask(() => {
+                    if (!label_url) {
+                        const labelName = document.querySelector('p#band-name-location span.title')?.textContent.trim() ?? '';
+                        updateLabelMbid(rootLabelCacheKey, labelName);
+                    }
+                });
+            },
         );
         const labelback = document.querySelector('a.back-to-label-link');
         if (labelback) {
@@ -907,13 +967,15 @@ async function init() {
             if (labelbacklink) {
                 let cleanLabelLink = labelbacklink.fix_bandcamp_url();
                 label_url = cleanLabelLink.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
+                const labelCacheKey = `label:${label_url}`;
                 mblinks.searchAndDisplayMbLink(
                     label_url,
                     'label',
                     function (link) {
                         document.querySelector('a.back-to-label-link span.back-link-text')?.insertAdjacentHTML('beforeend', link);
                     },
-                    `label:${label_url}`,
+                    labelCacheKey,
+                    () => updateLabelMbid(labelCacheKey, BandcampImport.getlabelname()),
                 );
             }
         }
