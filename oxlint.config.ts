@@ -24,10 +24,17 @@ export default defineConfig({
     },
     overrides: [
         {
+            files: ['lib/mbimportstyle.js'],
+            globals: {
+                MBImport: 'readonly',
+            },
+        },
+        {
             files: ['**/*.user.js'],
             globals: {
                 LOGGER: 'readonly',
                 MB: 'readonly',
+                MBCreateLookupIndicator: 'readonly',
                 MBImportStyle: 'readonly',
                 MBImport: 'readonly',
                 MBLinks: 'readonly',
