@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.30.3
+// @version      2026.9.30.4
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -77,6 +77,8 @@ const normalizeUrlForComparison = url => {
         return normalized.replace(/\/$/, '');
     }
 };
+
+const normalizeBandcampRootResource = url => `${url.replace(/\/+$/, '')}/`;
 
 /**
  * Resolve the canonical release URL from the page location, cross-checking TralbumData.url.
@@ -867,6 +869,7 @@ async function init() {
         if (!root_url && /^https?:\/\//.test(release.url)) {
             root_url = release.url.match(/^(https?:\/\/[^/]+)/)[1].split('?')[0];
         }
+        const rootResourceUrl = normalizeBandcampRootResource(root_url);
 
         const nameSectionSpans = document.querySelectorAll('div#name-section h3 span');
         const firstNameSectionSpan = nameSectionSpans[0];
@@ -875,7 +878,7 @@ async function init() {
         if (release.type == 'track') {
             mblinks.searchAndDisplayMbLinks([
                 {
-                    url: root_url,
+                    url: rootResourceUrl,
                     mb_type: 'artist',
                     key: `artist:${root_url}`,
                     insert_func: link => {
@@ -891,7 +894,7 @@ async function init() {
             const artistCacheKey = `artist:${root_url}`;
             mblinks.searchAndDisplayMbLinks([
                 {
-                    url: root_url,
+                    url: rootResourceUrl,
                     mb_type: 'artist',
                     key: artistCacheKey,
                     insert_func: link => {
@@ -938,7 +941,7 @@ async function init() {
         const rootLabelCacheKey = `label:${root_url}`;
         mblinks.searchAndDisplayMbLinks([
             {
-                url: root_url,
+                url: rootResourceUrl,
                 mb_type: 'label',
                 key: rootLabelCacheKey,
                 insert_func: link => {
@@ -963,7 +966,7 @@ async function init() {
                 const labelCacheKey = `label:${label_url}`;
                 mblinks.searchAndDisplayMbLinks([
                     {
-                        url: label_url,
+                        url: normalizeBandcampRootResource(label_url),
                         mb_type: 'label',
                         key: labelCacheKey,
                         insert_func: link => {
@@ -1053,6 +1056,7 @@ async function init() {
 
     if (hasBandData) {
         const cleanURL = `${unsafeWindow.location.protocol}//${unsafeWindow.location.hostname}`;
+        const resourceURL = normalizeBandcampRootResource(cleanURL);
         const entityName = unsafeWindow.BandData.name;
         let isLinkInserted = false;
         const linkStyle = {
@@ -1112,7 +1116,7 @@ async function init() {
         // The URL could either be a band or a label page, we don't know which, so we search for both.
         mblinks.searchAndDisplayMbLinks([
             {
-                url: cleanURL,
+                url: resourceURL,
                 mb_type: 'artist',
                 key: `artist:${cleanURL}`,
                 insert_func: insertLinkCb,
@@ -1121,7 +1125,7 @@ async function init() {
         ]);
         mblinks.searchAndDisplayMbLinks([
             {
-                url: cleanURL,
+                url: resourceURL,
                 mb_type: 'label',
                 key: `label:${cleanURL}`,
                 insert_func: insertLinkCb,
