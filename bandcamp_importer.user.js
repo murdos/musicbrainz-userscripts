@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.9.30.4
+// @version      2026.10.2.1
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -844,8 +844,11 @@ async function init() {
 
             const mbid = mblinks.resolveMBID(cacheKey);
             if (!mbid) return;
-            release.artist_credit[0].mbid = mbid;
+            const artistCredit = release.artist_credit[0];
+            artistCredit.mbid = mbid;
+            artistCredit.credited_name = artistCredit.artist_name;
             updateImportFormValue('artist_credit.names.0.mbid', mbid);
+            updateImportFormValue('artist_credit.names.0.name', artistCredit.credited_name);
         };
 
         const updateLabelMbid = (cacheKey, name) => {
@@ -982,7 +985,9 @@ async function init() {
             // try to get artist's mbid from cache
             let artist_mbid = mblinks.resolveMBID(`artist:${root_url}`);
             if (artist_mbid) {
-                release.artist_credit[0].mbid = artist_mbid;
+                const artistCredit = release.artist_credit[0];
+                artistCredit.mbid = artist_mbid;
+                artistCredit.credited_name = artistCredit.artist_name;
             }
         }
 
