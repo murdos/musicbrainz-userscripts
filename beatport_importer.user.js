@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.09.15.1
+// @version      2026.10.06.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -165,7 +165,7 @@
      * 3. Honor an explicit "Single" token when the release remains within broad track count and duration guards. Unlike "EP", "single" is common English text and therefore needs basic false-positive protection.
      * 4. Normalize track titles by removing technical version qualifiers such as "Remix", "Instrumental", "Edit", "Live", and "Version". If every track then has the same non-empty title, classify the release as a multi-track Single.
      * 5. If duration is missing, use track count only where it is reasonably decisive: one track is a Single, three to six tracks is an EP, and seven or more tracks is an album. Leave two tracks unclassified because both Singles and electronic EPs commonly have two tracks.
-     * 6. With duration available, seven or more tracks or more than 30 minutes is an album. For releases with fewer than seven tracks, one to seven minutes is a Single; more than seven and up to 30 minutes with at least two tracks is an EP. Leave sub-minute releases and one-track releases between seven and 30 minutes unclassified rather than making a weak guess.
+     * 6. With duration available, seven or more tracks or more than 30 minutes is an album. A one-track release from one to 15 minutes is a Single, while one over 15 and up to 30 minutes is an EP. For multi-track releases with fewer than seven tracks, one to seven minutes is a Single and more than seven and up to 30 minutes is an EP. Leave sub-minute releases unclassified.
      *
      * `durationMs` is the complete release duration. Pass NaN when one or more track durations are unavailable. `trackTitles` must contain every track title for the multi-track Single check to apply.
      */
@@ -197,11 +197,9 @@
       if (numTracks >= 7) return 'album';
       if (durationMinutes > 30) return 'album';
       if (durationMinutes < 1) return '';
+      if (numTracks === 1) return durationMinutes <= 15 ? 'single' : 'EP';
       if (durationMinutes <= 7) return 'single';
-      if (numTracks >= 2) return 'EP';
-
-      // A long one-track release is album-like; 7..30 minutes remains too ambiguous.
-      return '';
+      return 'EP';
     }
 
     function buildArtistCreditsFormParameters(parameters, paramPrefix, artist_credit) {
