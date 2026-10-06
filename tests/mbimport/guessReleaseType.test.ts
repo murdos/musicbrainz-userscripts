@@ -66,13 +66,13 @@ describe('guessReleaseType implementation', () => {
         });
 
         it.each([
-            [['First Song', 'Second Song'], 2, 'different base titles'],
-            [['Song', 'Song (Part 2)'], 2, 'non-version qualifiers'],
-            [['Song', 'Song (Remix)'], 3, 'an incomplete title list'],
-            [['(Remix)', '[Live]'], 2, 'empty normalized titles'],
-            [['Song'], 1, 'a one-track release'],
-        ] as const)('does not deduplicate %s (%s)', (titles, count, description) => {
-            expect(guessReleaseType('Release', count, minutes(10), titles), description).not.toBe('single');
+            [['First Song', 'Second Song'], 2, 10, 'different base titles'],
+            [['Song', 'Song (Part 2)'], 2, 10, 'non-version qualifiers'],
+            [['Song', 'Song (Remix)'], 3, 10, 'an incomplete title list'],
+            [['(Remix)', '[Live]'], 2, 10, 'empty normalized titles'],
+            [['Song'], 1, 20, 'a one-track release'],
+        ] as const)('does not deduplicate %s (%s)', (titles, count, durationMinutes, description) => {
+            expect(guessReleaseType('Release', count, minutes(durationMinutes), titles), description).not.toBe('single');
         });
     });
 
@@ -86,10 +86,13 @@ describe('guessReleaseType implementation', () => {
             [8, Number.NaN, 'album'],
             [1, minutes(0.999), ''],
             [1, minutes(1), 'single'],
+            [1, minutes(8.583), 'single'],
+            [1, minutes(15), 'single'],
+            [1, minutes(15.001), 'EP'],
+            [1, minutes(30), 'EP'],
             [6, minutes(7), 'single'],
             [2, minutes(7.001), 'EP'],
             [6, minutes(30), 'EP'],
-            [1, minutes(15), ''],
             [1, minutes(30.001), 'album'],
             [6, minutes(30.001), 'album'],
             [7, minutes(5), 'album'],
