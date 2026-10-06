@@ -2,7 +2,7 @@
 // @name         Import VGMdb releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from vgmdb.net into MusicBrainz. **⚠️ Currently broken:** The VGMdb API is unavailable (returns 503). The script displays a notice to users and links to [VGMdb's BlueSky](https://bsky.app/profile/vgmdb.net/post/3lcvclcpny22d) for status updates.
-// @version      2026.9.6
+// @version      2026.10.6
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/vgmdb_importer.user.js
 // @match        https://vgmdb.net/album/*
@@ -10,7 +10,7 @@
 // @match        https://vgmdb.net/org/*
 // @run-at       document-start
 // @require      https://code.jquery.com/jquery-3.5.1.min.js
-// @require      lib/mbimport.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/6886f50a8bfa231416831cdfd6421ba6782aee75/lib/mbimport.js
 // @require      lib/logger.js
 // @require      lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
