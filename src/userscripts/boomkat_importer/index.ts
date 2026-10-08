@@ -1,47 +1,46 @@
-// ==UserScript==
-// @name         Import Boomkat releases to Musicbrainz
-// @description  Add a button on Boomkat release pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.10.8
-// @license      X11
-// @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
-// @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/boomkat_importer.user.js
-// @namespace    https://github.com/murdos/musicbrainz-userscripts
-// @match        https://boomkat.com/artists/*/releases/*/*
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/6886f50a8bfa231416831cdfd6421ba6782aee75/lib/mbimport.js
-// @require      lib/logger.js
-// @require      lib/mbimportstyle.js
-// ==/UserScript==
+import { Logger, LogLevel } from '~/lib/logger';
+import { MBImport } from '~/lib/mbimport';
+import { MBImportStyle } from '~/lib/mbimportstyle';
+import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
+import type { Release, Track } from '~/types/importers';
 
-function onLoad() {
-    MBImportStyle();
+const LOGGER = new Logger('boomkat_importer', LogLevel.INFO);
 
-    const release_url = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
-    const releases = retrieveReleaseInfo(release_url);
-    insertLink(releases, release_url);
+const CONTAINER_CLASS = 'musicbrainz-import';
+
+// A release as parsed for a single Boomkat buying format, paired with the
+// human-readable format label used to tell the import buttons apart.
+interface FormatRelease {
+    release: Release;
+    formatLabel: string;
 }
 
-function getFormat(format) {
-    if (format.match(/MP3|WAV|FLAC|AAC|LOSSLESS|DOWNLOAD|DIGITAL/i)) {
+function isReleasePage(): boolean {
+    return /^\/artists\/[^/]+\/releases\/[^/]+\/[^/]+/.test(window.location.pathname);
+}
+
+function getFormat(format: string): string {
+    if (/MP3|WAV|FLAC|AAC|LOSSLESS|DOWNLOAD|DIGITAL/i.test(format)) {
         return 'Digital Media';
     }
 
-    if (format.match(/CD/i)) {
+    if (/CD/i.test(format)) {
         return 'CD';
     }
 
-    if (format.match(/LP|VINYL|\d+\s*["″]/i)) {
+    if (/LP|VINYL|\d+\s*["″]/i.test(format)) {
         return 'Vinyl';
     }
 
-    if (format.match(/CASSETTE|TAPE/i)) {
+    if (/CASSETTE|TAPE/i.test(format)) {
         return 'Cassette';
     }
 
     return '';
 }
 
-function getLinkType(media) {
-    if (media == 'Digital Media') {
+function getLinkType(media: string): number {
+    if (media === 'Digital Media') {
         return MBImport.URL_TYPES.purchase_for_download;
     }
     return MBImport.URL_TYPES.purchase_for_mail_order;
@@ -49,7 +48,7 @@ function getLinkType(media) {
 
 // Boomkat shows release dates as e.g. “1st October 2026”. Strip the ordinal
 // suffix so the string can be parsed into a Date.
-function parseReleaseDate(str) {
+function parseReleaseDate(str: string): Date | null {
     if (!str) return null;
     const cleaned = str.replace(/(\d+)(?:st|nd|rd|th)/i, '$1').trim();
     const date = new Date(`${cleaned} UTC`);
@@ -57,17 +56,17 @@ function parseReleaseDate(str) {
 }
 
 // Return the release artist displayed in the page header.
-function getReleaseArtist() {
+function getReleaseArtist(): string {
     const el = document.querySelector('[data-role="artist"]');
-    return el ? el.textContent.trim() : '';
+    return el ? (el.textContent ?? '').trim() : '';
 }
 
 // Split a leading “Artist - Title” string. Returns null when there is no
 // “ - ” separator to split on.
-function splitArtistTitle(text) {
+function splitArtistTitle(text: string): { artist: string; title: string } | null {
     const parts = text.split(/\s[-–—]\s/);
     if (parts.length < 2) return null;
-    return { artist: parts.shift().trim(), title: parts.join(' - ').trim() };
+    return { artist: (parts.shift() ?? '').trim(), title: parts.join(' - ').trim() };
 }
 
 // Extract the tracks for a given tracklisting container.
@@ -77,23 +76,22 @@ function splitArtistTitle(text) {
 // tracklists), and a trailing text node after the link may hold the track
 // artist, the release artist, or nothing at all. We reconcile those shapes per
 // track, preferring the most specific artist available.
-function retrieveTracks(container, releaseArtist) {
-    const tracks = [];
-    if (!container) return tracks;
+function retrieveTracks(container: Element, releaseArtist: string): Track[] {
+    const tracks: Track[] = [];
 
     const isVarious = /various/i.test(releaseArtist);
     const releaseArtistKey = releaseArtist.replace(/[.\s]+$/, '').toLowerCase();
 
-    container.querySelectorAll('ul li[data-track-ids]').forEach(function (li) {
-        const link = li.querySelector('a[href*="/tracks/"]');
+    container.querySelectorAll('ul li[data-track-ids]').forEach(li => {
+        const link = li.querySelector<HTMLAnchorElement>('a[href*="/tracks/"]');
         if (!link) return;
 
-        const anchor = link.textContent.replace(/\s+/g, ' ').trim();
+        const anchor = (link.textContent ?? '').replace(/\s+/g, ' ').trim();
 
         let trailing = '';
         for (let node = link.nextSibling; node; node = node.nextSibling) {
             if (node.nodeType === Node.TEXT_NODE) {
-                trailing += node.textContent;
+                trailing += node.textContent ?? '';
             } else if (node.nodeType === Node.ELEMENT_NODE) {
                 break;
             }
@@ -137,7 +135,7 @@ function retrieveTracks(container, releaseArtist) {
         }
 
         const durationEl = li.querySelector('.font-regular');
-        const duration = durationEl ? durationEl.textContent.trim() : '';
+        const duration = durationEl ? (durationEl.textContent ?? '').trim() : '';
 
         tracks.push({
             artist_credit: MBImport.makeArtistCredits([trackArtist]),
@@ -150,16 +148,20 @@ function retrieveTracks(container, releaseArtist) {
 }
 
 // Build one release object per available format/tracklisting.
-function retrieveReleaseInfo(release_url) {
+function retrieveReleaseInfo(release_url: string): FormatRelease[] {
+    const titleEl = document.querySelector('[data-role="title"]');
+    if (!titleEl) return [];
+
     const releaseArtist = getReleaseArtist();
-    const title = document.querySelector('[data-role="title"]').textContent.trim();
+    const title = (titleEl.textContent ?? '').trim();
     const labelEl = document.querySelector('[data-role="release-details"] a[href*="/labels/"]');
-    const label = labelEl ? labelEl.textContent.trim() : '';
+    const label = labelEl ? (labelEl.textContent ?? '').trim() : '';
 
-    const releases = [];
+    const releases: FormatRelease[] = [];
 
-    document.querySelectorAll('.tracklisting-container[data-switcher-id]').forEach(function (container) {
-        const id = container.dataset.switcherId;
+    document.querySelectorAll<HTMLElement>('.tracklisting-container[data-switcher-id]').forEach(container => {
+        const id = container.dataset['switcherId'];
+        if (!id) return;
 
         // Prefer the human-readable label from the tracklisting selector,
         // falling back to the matching buying-option card.
@@ -168,10 +170,10 @@ function retrieveReleaseInfo(release_url) {
 
         let formatLabel = '';
         if (option) {
-            formatLabel = option.textContent.trim();
+            formatLabel = (option.textContent ?? '').trim();
         } else if (card) {
             const h = card.querySelector('h4 span');
-            if (h) formatLabel = h.textContent.trim();
+            if (h) formatLabel = (h.textContent ?? '').trim();
         }
 
         // Catalogue number and release date live together in the buying-option
@@ -179,16 +181,15 @@ function retrieveReleaseInfo(release_url) {
         let catno = '';
         let dateStr = '';
         if (card) {
-            const paragraphs = card.querySelectorAll('p');
-            for (const p of paragraphs) {
-                const text = p.textContent.replace(/\s+/g, ' ').trim();
+            for (const p of card.querySelectorAll('p')) {
+                const text = (p.textContent ?? '').replace(/\s+/g, ' ').trim();
                 if (/release date:/i.test(text)) {
                     const parts = text.split('|');
                     if (parts.length >= 2) {
-                        catno = parts[0].trim();
+                        catno = (parts[0] ?? '').trim();
                     }
-                    const dateMatch = text.match(/release date:\s*(.+)$/i);
-                    if (dateMatch) dateStr = dateMatch[1].trim();
+                    const dateMatch = /release date:\s*(.+)$/i.exec(text);
+                    if (dateMatch?.[1]) dateStr = dateMatch[1].trim();
                     break;
                 }
             }
@@ -197,7 +198,7 @@ function retrieveReleaseInfo(release_url) {
         const releaseDate = parseReleaseDate(dateStr);
         const format = getFormat(formatLabel);
 
-        const release = {
+        const release: Release = {
             artist_credit: MBImport.makeArtistCredits([releaseArtist]),
             title: title,
             country: 'XW',
@@ -209,7 +210,7 @@ function retrieveReleaseInfo(release_url) {
             labels: [],
             discs: [],
             format: format,
-            formatLabel: formatLabel,
+            packaging: format === 'Digital Media' ? 'None' : '',
         };
 
         if (releaseDate) {
@@ -219,47 +220,49 @@ function retrieveReleaseInfo(release_url) {
         }
 
         if (label || catno) {
-            release.labels.push({ name: label, catno: catno });
+            release.labels = [{ name: label, catno: catno }];
         }
 
-        release.packaging = release.format == 'Digital Media' ? 'None' : '';
+        release.urls = [
+            {
+                url: release_url,
+                link_type: getLinkType(format),
+            },
+        ];
 
-        release.urls.push({
-            url: release_url,
-            link_type: getLinkType(release.format),
-        });
-
-        release.discs.push({
-            tracks: retrieveTracks(container, releaseArtist),
-            format: release.format,
-        });
+        release.discs = [
+            {
+                tracks: retrieveTracks(container, releaseArtist),
+                format: format,
+            },
+        ];
 
         LOGGER.info('Parsed release: ', release);
-        releases.push(release);
+        releases.push({ release, formatLabel });
     });
 
     return releases;
 }
 
 // Insert import/search buttons into the page.
-function insertLink(releases, release_url) {
+function insertLink(releases: FormatRelease[], release_url: string): void {
     // Remove any existing buttons
-    document.querySelectorAll('.musicbrainz-import').forEach(function (elem) {
+    document.querySelectorAll(`.${CONTAINER_CLASS}`).forEach(elem => {
         elem.remove();
     });
 
     if (!releases.length) return;
 
     const container = document.createElement('div');
-    container.className = 'musicbrainz-import';
+    container.className = CONTAINER_CLASS;
     container.style.margin = '1em 0';
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
     container.style.gap = '0.5em';
     container.style.alignItems = 'center';
 
-    releases.forEach(function (release) {
-        const edit_note = MBImport.makeEditNote(release_url, 'Boomkat', release.formatLabel);
+    releases.forEach(({ release, formatLabel }) => {
+        const edit_note = MBImport.makeEditNote(release_url, 'Boomkat', formatLabel);
 
         const formButton = document.createElement('span');
         formButton.innerHTML = MBImport.buildFormHTML(MBImport.buildFormParameters(release, edit_note));
@@ -267,10 +270,10 @@ function insertLink(releases, release_url) {
         // Label each button with its format so the different imports can be
         // told apart. buildFormHTML() renders an icon followed by the text
         // node “Import into MB”; replace that text with the format label.
-        if (release.formatLabel) {
+        if (formatLabel) {
             const button = formButton.querySelector('button');
-            if (button && button.lastChild) {
-                button.lastChild.textContent = `Import ${release.formatLabel}`;
+            if (button?.lastChild) {
+                button.lastChild.textContent = `Import ${formatLabel}`;
             }
         }
 
@@ -278,9 +281,12 @@ function insertLink(releases, release_url) {
     });
 
     // A single search button is enough — searching is format-independent.
-    const searchButton = document.createElement('span');
-    searchButton.innerHTML = MBImport.buildSearchButton(releases[0]);
-    container.appendChild(searchButton);
+    const firstRelease = releases[0];
+    if (firstRelease) {
+        const searchButton = document.createElement('span');
+        searchButton.innerHTML = MBImport.buildSearchButton(firstRelease.release);
+        container.appendChild(searchButton);
+    }
 
     const albumHeader = document.querySelector('[data-role="title"]');
     if (albumHeader) {
@@ -290,8 +296,29 @@ function insertLink(releases, release_url) {
     }
 }
 
-if (document.readyState !== 'loading') {
-    onLoad();
+function run(): void {
+    if (!isReleasePage()) {
+        document.querySelectorAll(`.${CONTAINER_CLASS}`).forEach(elem => {
+            elem.remove();
+        });
+        return;
+    }
+
+    const release_url = window.location.href.replace(/\?.*$/, '').replace(/#.*$/, '');
+    insertLink(retrieveReleaseInfo(release_url), release_url);
+}
+
+MBImportStyle();
+
+subscribeToSPANavigation({
+    onNavigate: () => {
+        run();
+        return Promise.resolve();
+    },
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
 } else {
-    document.addEventListener('DOMContentLoaded', onLoad);
+    run();
 }
