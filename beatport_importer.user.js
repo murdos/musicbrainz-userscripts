@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.10.06.1
+// @version      2026.10.13.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -1042,13 +1042,13 @@
     function insertMBButtons(mbrelease, release_url, isrcs) {
       const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
       const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
-      const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+      const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard_info"]');
       const lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
       if (!lastReleaseInfo) {
         LOGGER.error('Could not find release info container');
         return;
       }
-      const controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Controls"]');
+      const controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard_controls"]');
       const controls = controlsElements[0];
       if (!controls) {
         LOGGER.error('Could not find controls container');
