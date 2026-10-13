@@ -153,14 +153,14 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
     const edit_note = MBImport.makeEditNote(release_url, 'Beatport');
     const parameters = MBImport.buildFormParameters(mbrelease, edit_note);
 
-    const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Info"]');
+    const releaseInfoElements = document.querySelectorAll('div[class^="ReleaseDetailCard_info"]');
     const lastReleaseInfo = releaseInfoElements[releaseInfoElements.length - 1];
     if (!lastReleaseInfo) {
         LOGGER.error('Could not find release info container');
         return;
     }
 
-    const controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard-style__Controls"]');
+    const controlsElements = document.querySelectorAll('div[class^="ReleaseDetailCard_controls"]');
     const controls = controlsElements[0];
     if (!controls) {
         LOGGER.error('Could not find controls container');
