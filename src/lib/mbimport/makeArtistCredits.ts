@@ -1,5 +1,13 @@
 import type { ArtistCredit } from '~/types/importers';
 
+import { specialArtist } from './specialArtist';
+
+const VARIOUS_ARTISTS = /^(?:various(?: artists?)?|v\.?a\.?)$/i;
+
+function normalizeSpecialArtist(artistCredit: ArtistCredit): ArtistCredit {
+    return VARIOUS_ARTISTS.test(artistCredit.artist_name.trim()) ? specialArtist('various_artists', artistCredit) : artistCredit;
+}
+
 // Convert a list of artists to a list of artist credits with joinphrases
 export function makeArtistCredits(artists_list: string[]): ArtistCredit[] {
     const artists: ArtistCredit[] = artists_list.map(function (item) {
@@ -29,20 +37,20 @@ export function makeArtistCredits(artists_list: string[]): ArtistCredit[] {
         }
     }
     const credits: ArtistCredit[] = [];
-    // re-split artists if featuring or vs
+    // Re-split artist strings containing common join phrases.
     artists.map(function (item) {
         let c = item.artist_name.replace(/\s*\b(?:feat\.?|ft\.?|featuring)\s+/gi, ' feat. ');
         c = c.replace(/\s*\(( feat. )([^)]+)\)/g, '$1$2');
         c = c.replace(/\s*\b(?:versus|vs\.?)\s+/gi, ' vs. ');
         c = c.replace(/\s+/g, ' ');
-        const splitted = c.split(/( feat\. | vs\. )/);
+        const splitted = c.split(/( feat\. | vs\. | \/ | & )/);
         if (splitted.length === 1) {
-            credits.push(item); // nothing to split
+            credits.push(normalizeSpecialArtist(item)); // nothing to split
         } else {
             const new_items: ArtistCredit[] = [];
             let n = 0;
             for (const element of splitted) {
-                if (n && (element === ' feat. ' || element === ' vs. ')) {
+                if (n && [' feat. ', ' vs. ', ' / ', ' & '].includes(element)) {
                     const prevItem = new_items[n - 1];
                     if (prevItem) {
                         prevItem.joinphrase = element;
@@ -58,7 +66,7 @@ export function makeArtistCredits(artists_list: string[]): ArtistCredit[] {
             if (lastItem && item.joinphrase) {
                 lastItem.joinphrase = item.joinphrase;
             }
-            new_items.forEach(newit => credits.push(newit));
+            new_items.forEach(newit => credits.push(normalizeSpecialArtist(newit)));
         }
     });
     return credits;
