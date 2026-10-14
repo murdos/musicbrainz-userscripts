@@ -3,7 +3,7 @@ import { appendParameter } from '~/lib/shared/search-params';
 import { hmsToMilliSeconds } from '~/lib/shared/time-functions';
 import type { ArtistCredit, Release } from '~/types/importers';
 
-import { guessReleaseType } from './guessReleaseType';
+import { guessReleaseType, guessSecondaryReleaseTypes } from './guessReleaseType';
 
 function buildArtistCreditsFormParameters(parameters: FormParameter[], paramPrefix: string, artist_credit: ArtistCredit[]): void {
     for (let i = 0; i < artist_credit.length; i++) {
@@ -28,12 +28,13 @@ export function buildFormParameters(release: Release, edit_note?: string): FormP
     // Release Artist credits
     buildArtistCreditsFormParameters(parameters, '', release.artist_credit);
 
-    if (release['secondary_types']) {
-        for (let i = 0; i < release.secondary_types.length; i++) {
-            const secondaryType = release.secondary_types[i];
-            if (secondaryType) {
-                appendParameter(parameters, 'type', secondaryType);
-            }
+    const secondaryTypes = new Set(release.secondary_types?.filter(Boolean));
+    for (const secondaryType of guessSecondaryReleaseTypes(release.title)) {
+        secondaryTypes.add(secondaryType);
+    }
+    for (const secondaryType of secondaryTypes) {
+        if (secondaryType) {
+            appendParameter(parameters, 'type', secondaryType);
         }
     }
     if (release.status) appendParameter(parameters, 'status', release.status);
