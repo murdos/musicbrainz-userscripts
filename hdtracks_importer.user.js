@@ -2,14 +2,14 @@
 // @name         Import HDtracks releases into MusicBrainz
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @description  One-click importing of releases from hdtracks.com into MusicBrainz. Also allows to submit their ISRCs to MusicBrainz releases.
-// @version      2026.10.14.1
+// @version      2026.10.14.2
 // @author       kellnerd
 // @license      MIT
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/hdtracks_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/hdtracks_importer.user.js
 // @match        *://www.hdtracks.com/
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/e1585e5550a22f88880d7d2479accc2ad767ed9c/lib/mbimport.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/0d35cbc2fc679e20b7ff865c7945a3cc64f3615a/lib/mbimport.js
 // @require      lib/mbimportstyle.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // @grant        GM_xmlhttpRequest

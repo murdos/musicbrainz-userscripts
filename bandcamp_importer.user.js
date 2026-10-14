@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Bandcamp releases to MusicBrainz
 // @description  Add a button on Bandcamp's album pages to open MusicBrainz release editor with pre-filled data for the selected release
-// @version      2026.10.14.1
+// @version      2026.10.14.2
 // @namespace    http://userscripts.org/users/22504
 // @downloadURL  https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
 // @updateURL    https://raw.github.com/murdos/musicbrainz-userscripts/master/bandcamp_importer.user.js
@@ -9,7 +9,7 @@
 // @match        https://web.archive.org/web/*
 // @connect      bandcamp.com
 // @connect      musicbrainz.org
-// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/e1585e5550a22f88880d7d2479accc2ad767ed9c/lib/mbimport.js
+// @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/0d35cbc2fc679e20b7ff865c7945a3cc64f3615a/lib/mbimport.js
 // @require      lib/logger.js
 // @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/755843cf53404869f6817310153fc8bb6cf9cb9b/lib/mblinks.js
 // @require      https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/07068ab3a4dd38bbdc8502ab3d3d71c1c0ef51e6/lib/mbimportstyle.js
