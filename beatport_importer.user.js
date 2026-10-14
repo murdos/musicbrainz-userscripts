@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.10.14.1
+// @version      2026.10.14.2
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -136,6 +136,16 @@
       return params;
     }
 
+    const SECONDARY_TYPE_TITLE_MATCHERS = [['remix', /\bremix(?:e[sd])?\b/i],
+    // Soundtrack patterns adapted from Harmony’s title detection.
+    ['soundtrack', /\bsoundtrack\b/i], ['soundtrack', /(?<!\p{L})саундтрек(?:а|у|ом|е|и|ов|ам|ами|ах)?(?!\p{L})/iu], ['soundtrack', /\b(?:bande (?:originale|sonore)|trame sonore|bandes (?:originales|sonores)|trames sonores)\b/i], ['soundtrack', /(?:Original|Official)(?:.*?)(?:Soundtrack|Score)/i], ['soundtrack', /(?:Soundtrack|Score|Music)\s(?:(?:from|to) the)\s(?:.+[\s-])?(?:(?:Video\s)?Game|Motion Picture|Film|Movie|(?:(?:TV|Television)[\s-]?)?(?:Mini[\s-]?)?Series|Musical)/i],
+    // Harmony treats uppercase OST variants as soundtrack markers only at the start or end of a longer title.
+    ['soundtrack', /(?:^(?:\(O\.S\.T\.\)|O\.S\.T\.|OST|\(OST\))\s.+|.+\s(?:\(O\.S\.T\.\)|O\.S\.T\.|OST|\(OST\))$)/], ['soundtrack', /Original (?:.+\s)?Cast Recording/i], ['soundtrack', /(?:Soundtrack|Musik)\s(?:zum|zur)\s(?:.+[\s-])?(?:(?:Kino)?Film|Theaterstück|(?:TV[\s-]?)?Serie)/i], ['soundtrack', /(?:Soundtrack|Musik(?:en)?)\s(?:från|till|ur)\s(?:.+[\s-])?(?:Film(?:en)?|(?:TV[\s-]?)?(?:Mini[\s-]?)?Serien?|Musikalen)/i], ['soundtrack', /Musikk(?:en)? (?:fra) (?:Filmen|TV[\s-]serien|(?:teater)?forestillingen)/i]];
+
+    /** Guess secondary release types from explicit words in the release title. */
+    function guessSecondaryReleaseTypes(title) {
+      return [...new Set(SECONDARY_TYPE_TITLE_MATCHERS.filter(([, pattern]) => pattern.test(title)).map(([type]) => type))];
+    }
     const VERSION_MARKER = /\b(?:acoustic|clean|club|demo|dub|edit|explicit|extended|instrumental|karaoke|live|mix|mono|radio|remaster(?:ed)?|remix|stereo|version|vocal)\b/i;
 
     /** Remove version information while retaining the actual work title. */
@@ -224,12 +234,13 @@
 
       // Release Artist credits
       buildArtistCreditsFormParameters(parameters, '', release.artist_credit);
-      if (release['secondary_types']) {
-        for (let i = 0; i < release.secondary_types.length; i++) {
-          const secondaryType = release.secondary_types[i];
-          if (secondaryType) {
-            appendParameter(parameters, 'type', secondaryType);
-          }
+      const secondaryTypes = new Set(release.secondary_types?.filter(Boolean));
+      for (const secondaryType of guessSecondaryReleaseTypes(release.title)) {
+        secondaryTypes.add(secondaryType);
+      }
+      for (const secondaryType of secondaryTypes) {
+        if (secondaryType) {
+          appendParameter(parameters, 'type', secondaryType);
         }
       }
       if (release.status) appendParameter(parameters, 'status', release.status);
