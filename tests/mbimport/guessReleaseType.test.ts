@@ -1,10 +1,66 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildFormParameters } from '~/lib/mbimport/buildFormParameters';
-import { guessReleaseType, type MBReleaseType } from '~/lib/mbimport/guessReleaseType';
+import { guessReleaseType, guessSecondaryReleaseTypes, type MBReleaseType } from '~/lib/mbimport/guessReleaseType';
 import type { Release, Track } from '~/types/importers';
 
 const minutes = (value: number): number => value * 60_000;
+
+describe('guessSecondaryReleaseTypes', () => {
+    it.each(['Song (Artist Remix)', 'The Remixes', 'Remixed & Revisited'])('detects the remix secondary type in %j', title => {
+        expect(guessSecondaryReleaseTypes(title)).toEqual(['remix']);
+    });
+
+    it.each([
+        'Original Soundtrack',
+        'Soundtrack from the Film',
+        'OST Das Boot',
+        'Das Boot OST',
+        'O.S.T. Das Boot',
+        'Das Boot (O.S.T.)',
+        '(OST) Das Boot',
+        'Das Boot (OST)',
+        'F1: The Movie (Original Score by Hans Zimmer)',
+        'The Good Wife (The Official TV Score)',
+        'Inception (Music from the Motion Picture)',
+        'The Lion King: Original Broadway Cast Recording',
+        'Get Up (Der Original Soundtrack zum Kinofilm)',
+        'Fejkpatient (Musik från TV-serien)',
+        'Kärlek Fårever (Soundtrack till Netflix-filmen)',
+        'Kvitebjørn (Musikken fra filmen)',
+        'Døden på Oslo S (Musikken fra teaterforestillingen)',
+        'Брат (Саундтрек к фильму)',
+        'Музыка из саундтрека к фильму',
+        'Лучшие саундтреки',
+        'Le Fabuleux Destin d’Amélie Poulain (Bande originale)',
+        'Bandes originales de films',
+        'La trame sonore du film',
+    ])('detects the soundtrack secondary type in %j', title => {
+        expect(guessSecondaryReleaseTypes(title)).toEqual(['soundtrack']);
+    });
+
+    it('detects both secondary types', () => {
+        expect(guessSecondaryReleaseTypes('The Remixes (Original Soundtrack)')).toEqual(['remix', 'soundtrack']);
+    });
+
+    it.each(['Premix Version', 'Soundtracking the Film', 'Regular Album'])('does not match inside another word in %j', title => {
+        expect(guessSecondaryReleaseTypes(title)).toEqual([]);
+    });
+
+    it.each(['Псевдосаундтрековый альбом', 'Bandes originalement enregistrées'])(
+        'does not match Russian or French soundtrack terms inside longer words in %j',
+        title => {
+            expect(guessSecondaryReleaseTypes(title)).toEqual([]);
+        },
+    );
+
+    it.each(['OST', 'O.S.T.', '(OST)', '(O.S.T.)', 'ost Das Boot', 'Das Boot ost'])(
+        'does not treat a standalone or lowercase OST marker as a soundtrack in %j',
+        title => {
+            expect(guessSecondaryReleaseTypes(title)).toEqual([]);
+        },
+    );
+});
 
 describe('guessReleaseType implementation', () => {
     describe('input validation', () => {
@@ -136,5 +192,32 @@ describe('buildFormParameters release-type guessing', () => {
         buildFormParameters(input);
 
         expect(input.type).toBe('EP');
+    });
+
+    it('adds title-derived secondary types alongside an importer-supplied type', () => {
+        const input = {
+            ...release([track('Song')]),
+            title: 'Song Remixes (Original Soundtrack)',
+            secondary_types: ['compilation'],
+        };
+
+        const parameters = buildFormParameters(input);
+
+        expect(parameters.filter(parameter => parameter.name === 'type')).toEqual([
+            { name: 'type', value: 'compilation' },
+            { name: 'type', value: 'remix' },
+            { name: 'type', value: 'soundtrack' },
+            { name: 'type', value: 'single' },
+        ]);
+    });
+
+    it('does not duplicate a title-derived secondary type already supplied by an importer', () => {
+        const parameters = buildFormParameters({
+            ...release([track('Song')]),
+            title: 'Song (Remix)',
+            secondary_types: ['remix'],
+        });
+
+        expect(parameters.filter(parameter => parameter.name === 'type' && parameter.value === 'remix')).toHaveLength(1);
     });
 });
