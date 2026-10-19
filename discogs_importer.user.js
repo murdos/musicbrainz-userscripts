@@ -824,6 +824,10 @@ function parseDiscogsRelease(discogsRelease) {
     let heading = '';
     let releaseNumber = 1;
     let lastPosition = 0;
+    // Tracklist order may differ from the order of formats in the Discogs API.
+    const prefixedMediumNumbers = new Map();
+    const prefixedMediumFormats = [];
+    const unusedPrefixedFormats = release_formats.slice();
     $.each(discogsRelease.tracklist, function (index, discogsTrack) {
         if (discogsTrack.type_ === 'heading') {
             heading = discogsTrack.title;
@@ -896,6 +900,25 @@ function parseDiscogsRelease(discogsRelease) {
         // 1-1 or 1.1 => releaseNumber.trackNumber
         // 1          => trackNumber
         let buggyTrackNumber = false;
+        // Explicit CD/DVD prefixes identify physical media, even when Discogs
+        // lists their formats in a different order (e.g. CD1, DVD, CD2).
+        const prefixedPosition = trackPosition.match(/^(CD|DVD)(\\d*)[.-](\\d+)$/i);
+        if (prefixedPosition) {
+            const kind = prefixedPosition[1].toUpperCase();
+            const key = kind + (prefixedPosition[2] || '1');
+            if (!prefixedMediumNumbers.has(key)) {
+                const number = prefixedMediumNumbers.size + 1;
+                prefixedMediumNumbers.set(key, number);
+                const formatIndex = unusedPrefixedFormats.findIndex(format =>
+                    kind === 'DVD' ? /^DVD/i.test(format) : /CD/i.test(format) && !/^DVD/i.test(format)
+                );
+                prefixedMediumFormats[number - 1] = formatIndex < 0
+                    ? release_formats[number - 1]
+                    : unusedPrefixedFormats.splice(formatIndex, 1)[0];
+            }
+            releaseNumber = prefixedMediumNumbers.get(key);
+            lastPosition = parseInt(prefixedPosition[3], 10);
+        } else {
         const tmp = trackPosition.match(/(\d+|[A-Z])(?:[.-]+(\d+))?/i);
         if (tmp) {
             tmp[1] = parseInt(tmp[1], 10);
@@ -938,12 +961,14 @@ function parseDiscogsRelease(discogsRelease) {
             }
         }
 
+        }
+
         // Create release if needed
         let discindex = releaseNumber - 1;
         while (!release.discs[discindex]) {
             let newdisc = {
                 tracks: [],
-                format: release_formats[discindex],
+                format: prefixedMediumFormats[discindex] || release_formats[discindex],
             };
             if (heading) {
                 newdisc.title = heading;
