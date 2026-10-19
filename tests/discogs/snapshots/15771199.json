@@ -56,7 +56,13 @@
                     "title": "Our Future",
                     "duration": 235000,
                     "artist_credit": []
-                },
+                }
+            ],
+            "format": "CD",
+            "title": "Peace"
+        },
+        {
+            "tracks": [
                 {
                     "title": "All The Unknown",
                     "duration": 138000,
@@ -101,7 +107,13 @@
                     "title": "Our Future (Cut La Roc Remix)",
                     "duration": 299000,
                     "artist_credit": []
-                },
+                }
+            ],
+            "format": "CD",
+            "title": "Bonus CD"
+        },
+        {
+            "tracks": [
                 {
                     "title": "Food Roof Family",
                     "duration": 423000,
@@ -188,8 +200,8 @@
                     "artist_credit": []
                 }
             ],
-            "format": "CD",
-            "title": ""
+            "format": "DVD-Video",
+            "title": "The Video Album"
         }
     ],
     "maybe_buggy": false,
