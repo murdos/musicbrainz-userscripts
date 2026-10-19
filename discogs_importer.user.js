@@ -910,57 +910,55 @@ function parseDiscogsRelease(discogsRelease) {
                 const number = prefixedMediumNumbers.size + 1;
                 prefixedMediumNumbers.set(key, number);
                 const formatIndex = unusedPrefixedFormats.findIndex(format =>
-                    kind === 'DVD' ? /^DVD/i.test(format) : /CD/i.test(format) && !/^DVD/i.test(format)
+                    kind === 'DVD' ? /^DVD/i.test(format) : /CD/i.test(format) && !/^DVD/i.test(format),
                 );
-                prefixedMediumFormats[number - 1] = formatIndex < 0
-                    ? release_formats[number - 1]
-                    : unusedPrefixedFormats.splice(formatIndex, 1)[0];
+                prefixedMediumFormats[number - 1] =
+                    formatIndex < 0 ? release_formats[number - 1] : unusedPrefixedFormats.splice(formatIndex, 1)[0];
             }
             releaseNumber = prefixedMediumNumbers.get(key);
             lastPosition = parseInt(prefixedPosition[3], 10);
         } else {
-        const tmp = trackPosition.match(/(\d+|[A-Z])(?:[.-]+(\d+))?/i);
-        if (tmp) {
-            tmp[1] = parseInt(tmp[1], 10);
-            let prevReleaseNumber = releaseNumber;
+            const tmp = trackPosition.match(/(\d+|[A-Z])(?:[.-]+(\d+))?/i);
+            if (tmp) {
+                tmp[1] = parseInt(tmp[1], 10);
+                let prevReleaseNumber = releaseNumber;
 
-            if (Number.isInteger(tmp[1])) {
-                if (tmp[2]) {
-                    // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
-                    releaseNumber = tmp[1];
-                    lastPosition = parseInt(tmp[2], 10);
-                } else if (tmp[1] <= lastPosition) {
-                    // 1, 2, 3, ... - We've moved onto a new medium
-                    releaseNumber++;
-                    lastPosition = tmp[1];
+                if (Number.isInteger(tmp[1])) {
+                    if (tmp[2]) {
+                        // 1-1, 1-2, 2-1, ... - we can get release number and track number from this
+                        releaseNumber = tmp[1];
+                        lastPosition = parseInt(tmp[2], 10);
+                    } else if (tmp[1] <= lastPosition) {
+                        // 1, 2, 3, ... - We've moved onto a new medium
+                        releaseNumber++;
+                        lastPosition = tmp[1];
+                    } else {
+                        lastPosition = tmp[1];
+                    }
                 } else {
-                    lastPosition = tmp[1];
+                    if (trackPosition.match(/^[A-Z]\d*$/i)) {
+                        // Vinyl or cassette, handle it specially
+                        // A,B -> 1; C,D -> 2; E,F -> 3, etc...
+                        releaseNumber = (((32 | trackPosition.charCodeAt(0)) - 97) >> 1) + 1;
+                        lastPosition++;
+                    } else if (trackPosition.match(/^[A-Z]+\d*$/i)) {
+                        // Vinyl or cassette, handle it specially
+                        // something like AA1, exemple : http://www.discogs.com/release/73531
+                        // TODO: find a better fix
+                        buggyTrackNumber = true;
+                    }
                 }
-            } else {
-                if (trackPosition.match(/^[A-Z]\d*$/i)) {
-                    // Vinyl or cassette, handle it specially
-                    // A,B -> 1; C,D -> 2; E,F -> 3, etc...
-                    releaseNumber = (((32 | trackPosition.charCodeAt(0)) - 97) >> 1) + 1;
-                    lastPosition++;
-                } else if (trackPosition.match(/^[A-Z]+\d*$/i)) {
-                    // Vinyl or cassette, handle it specially
-                    // something like AA1, exemple : http://www.discogs.com/release/73531
-                    // TODO: find a better fix
+
+                if (releaseNumber > release_formats.length) {
+                    // something went wrong in track position parsing
                     buggyTrackNumber = true;
+                    releaseNumber = prevReleaseNumber;
+                }
+                if (buggyTrackNumber) {
+                    // well, it went wrong so ...
+                    lastPosition++;
                 }
             }
-
-            if (releaseNumber > release_formats.length) {
-                // something went wrong in track position parsing
-                buggyTrackNumber = true;
-                releaseNumber = prevReleaseNumber;
-            }
-            if (buggyTrackNumber) {
-                // well, it went wrong so ...
-                lastPosition++;
-            }
-        }
-
         }
 
         // Create release if needed
