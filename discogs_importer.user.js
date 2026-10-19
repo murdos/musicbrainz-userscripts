@@ -902,7 +902,7 @@ function parseDiscogsRelease(discogsRelease) {
         let buggyTrackNumber = false;
         // Explicit CD/DVD prefixes identify physical media, even when Discogs
         // lists their formats in a different order (e.g. CD1, DVD, CD2).
-        const prefixedPosition = trackPosition.match(/^(CD|DVD)(\\d*)[.-](\\d+)$/i);
+        const prefixedPosition = trackPosition.match(/^(CD|DVD)(\d*)[.-](\d+)$/i);
         if (prefixedPosition) {
             const kind = prefixedPosition[1].toUpperCase();
             const key = kind + (prefixedPosition[2] || '1');
