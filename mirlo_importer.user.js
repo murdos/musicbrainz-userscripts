@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Mirlo releases to MusicBrainz
 // @description  One-click importing of releases from mirlo.space into MusicBrainz
-// @version      2026.10.14.2
+// @version      2026.10.27.1
 // @author       Raman Sinclair
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/mirlo_importer.user.js
@@ -587,17 +587,17 @@
         c = c.replace(/\s*\(( feat. )([^)]+)\)/g, '$1$2');
         c = c.replace(/\s*\b(?:versus|vs\.?)\s+/gi, ' vs. ');
         c = c.replace(/\s+/g, ' ');
-        const splitted = c.split(/( feat\. | vs\. | \/ | & )/);
+        const splitted = c.split(/( feat\. | vs\. | \/ | & | x | × )/);
         if (splitted.length === 1) {
           credits.push(normalizeSpecialArtist(item)); // nothing to split
         } else {
           const new_items = [];
           let n = 0;
           for (const element of splitted) {
-            if (n && [' feat. ', ' vs. ', ' / ', ' & '].includes(element)) {
+            if (n && [' feat. ', ' vs. ', ' / ', ' & ', ' x ', ' × '].includes(element)) {
               const prevItem = new_items[n - 1];
               if (prevItem) {
-                prevItem.joinphrase = element;
+                prevItem.joinphrase = element === ' x ' ? ' × ' : element;
               }
             } else {
               new_items[n++] = {
