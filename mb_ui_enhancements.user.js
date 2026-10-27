@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.9.16.1
+// @version      2026.10.27.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
@@ -191,6 +191,20 @@ function setNoLabelButtonMenu() {
     );
 }
 setNoLabelButtonMenu();
+
+// ISRC column: menu command to enable/disable (default enabled)
+function setIsrcColumnMenu() {
+    if (typeof GM_registerMenuCommand !== 'function') return;
+    GM_registerMenuCommand(
+        `${GM_getValue('isrcColumnEnabled', true) ? '☑' : '☐'} ISRC column`,
+        function () {
+            GM_setValue('isrcColumnEnabled', !GM_getValue('isrcColumnEnabled', true));
+            setIsrcColumnMenu();
+        },
+        { autoClose: false, id: 'isrcColumn' },
+    );
+}
+setIsrcColumnMenu();
 
 $(document).ready(function () {
     // Follow the instructions found at https://www.last.fm/api/authentication
@@ -543,6 +557,7 @@ $(document).ready(function () {
         // ISRCs and recording comment - only on main release page (tracklisting exists there)
         const mainReleaseRe = /musicbrainz\.org\/release\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}#?$/i;
         if (mainReleaseRe.test(window.location.href)) {
+            const isrcColumnEnabled = GM_getValue('isrcColumnEnabled', true);
             let ISRC_COLUMN_POSITION = 2;
             // Get tracks data from webservice
             let wsurl = `/ws/2/release/${mbid}?inc=isrcs+recordings`;
@@ -581,16 +596,18 @@ $(document).ready(function () {
             });
 
             const handleMedium = function ($medium, ws_tracks) {
-                // Extend colspan for medium table header
-                $medium.find('thead tr').each(function () {
-                    $(this)
-                        .find('th:eq(0)')
-                        .attr('colspan', $(this).find('th:eq(0)').attr('colspan') * 1 + 1);
-                });
-                // Table sub-header
-                $medium
-                    .find(`tbody tr.subh th:nth-last-child(${ISRC_COLUMN_POSITION})`)
-                    .before("<th style='width: 150px;' class='isrc c'> ISRC </th>");
+                if (isrcColumnEnabled) {
+                    // Extend colspan for medium table header
+                    $medium.find('thead tr').each(function () {
+                        $(this)
+                            .find('th:eq(0)')
+                            .attr('colspan', $(this).find('th:eq(0)').attr('colspan') * 1 + 1);
+                    });
+                    // Table sub-header
+                    $medium
+                        .find(`tbody tr.subh th:nth-last-child(${ISRC_COLUMN_POSITION})`)
+                        .before("<th style='width: 150px;' class='isrc c'> ISRC </th>");
+                }
 
                 // Handle each track
                 $medium.find('tbody tr[id]').each(function (index, medium_track) {
@@ -607,16 +624,18 @@ $(document).ready(function () {
                                 .after(` <span class="comment">(${recording.disambiguation})</span>`);
                         }
                         // ISRCS
-                        if (recording.isrcs.length != 0) {
+                        if (isrcColumnEnabled && recording.isrcs.length != 0) {
                             let links = jQuery.map(recording.isrcs, function (isrc) {
                                 return `<a href='/isrc/${isrc}'>${isrc}</a>`;
                             });
                             isrcsLinks = links.join(', ');
                         }
                     }
-                    $(`#${track_mbid}`)
-                        .find(`td:nth-last-child(${ISRC_COLUMN_POSITION})`)
-                        .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
+                    if (isrcColumnEnabled) {
+                        $(`#${track_mbid}`)
+                            .find(`td:nth-last-child(${ISRC_COLUMN_POSITION})`)
+                            .before(`<td class='isrc c'><small>${isrcsLinks}</small></td>`);
+                    }
                 });
             };
         }
