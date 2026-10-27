@@ -22,6 +22,33 @@ describe('makeArtistCredits', () => {
         ]);
     });
 
+    it.each(['Andy Leech x Emiliano Secchi', 'Andy Leech × Emiliano Secchi'])(
+        'splits %j using the multiplication sign as the join phrase',
+        artist => {
+            expect(makeArtistCredits([artist])).toEqual([
+                { artist_name: 'Andy Leech', joinphrase: ' × ' },
+                { artist_name: 'Emiliano Secchi', joinphrase: '' },
+            ]);
+        },
+    );
+
+    it('preserves surrounding join phrases when splitting multiple collaborations', () => {
+        expect(makeArtistCredits(['Artist 1 x Artist 2 x Artist 3 feat. Artist 4', 'Artist 5'])).toEqual([
+            { artist_name: 'Artist 1', joinphrase: ' × ' },
+            { artist_name: 'Artist 2', joinphrase: ' × ' },
+            { artist_name: 'Artist 3', joinphrase: ' feat. ' },
+            { artist_name: 'Artist 4', joinphrase: ' & ' },
+            { artist_name: 'Artist 5' },
+        ]);
+    });
+
+    it.each(['Axwell', 'deadmau5xKaskade', 'Artist xName', 'Artistx Name', 'X Ambassadors'])(
+        'preserves %j without a spaced lowercase x separator',
+        artist => {
+            expect(makeArtistCredits([artist])).toEqual([{ artist_name: artist }]);
+        },
+    );
+
     it('handles multiple kinds of join phrase in one credit', () => {
         expect(makeArtistCredits(['Artist 1 / Artist 2 feat. Artist 3 & Artist 4'])).toEqual([
             { artist_name: 'Artist 1', joinphrase: ' / ' },
