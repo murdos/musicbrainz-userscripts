@@ -35,32 +35,16 @@ async function processReleasePage() {
     }
 
     const releaseData = await getBeatportReleaseData(LOGGER);
-    if (!releaseData?.pageProps.release) {
-        LOGGER.error('Could not find release data on the release page');
+    if (!releaseData) {
+        LOGGER.error('Could not load release data');
         return;
     }
 
     const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
 
     try {
-        const release = releaseData.pageProps.release;
-
-        // Reversing is less reliable, but the API does not provide track numbers.
-        const tracks_table = release.tracks.reverse();
-
-        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => /tracks/g.test(element.queryKey));
-        const tracks_data_array = tracks_release?.state?.data.results;
-        if (!tracks_data_array) {
-            LOGGER.error('Could not find tracks data');
-            return;
-        }
-        const tracks_data = tracks_table
-            .map((url: string) => tracks_data_array.find(element => element.url === url))
-            .filter((track): track is BeatportTrackData => track !== undefined);
-        const isrcs = tracks_data.map(track => track.isrc || null);
-
-        const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
-
+        const isrcs = releaseData.tracks.map(track => track.isrc || null);
+        const mbrelease = retrieveReleaseInfo(release_url, releaseData.release, releaseData.tracks);
         insertMBButtons(mbrelease, release_url, isrcs);
     } catch (error) {
         LOGGER.error('Error processing release page:', error);
