@@ -93,6 +93,15 @@ export type BeatportTrackData = {
     url?: string;
 };
 
+export type BeatportTracksResponse = {
+    next: unknown;
+    previous: unknown;
+    count: number;
+    page: string;
+    per_page: number;
+    results: BeatportTrackData[];
+}
+
 export type BeatportSSRState = {
     buildId?: string;
     props: BeatportPageData;
