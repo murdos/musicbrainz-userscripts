@@ -101,7 +101,7 @@ async function processReleasePage() {
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
 
         insertMBButtons(mbrelease, release_url, isrcs);
-        stopLinking = linkBeatportRelease(mblinks, mbrelease, release);
+        stopLinking = linkBeatportRelease(mblinks, mbrelease, release, tracks_data);
     } catch (error) {
         LOGGER.error('Error processing release page:', error);
     }

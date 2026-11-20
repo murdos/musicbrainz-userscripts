@@ -4,7 +4,7 @@ import { MBImport } from '~/lib/mbimport';
 import type { MBLinks, MBLinkQuery } from '~/lib/mblinks';
 import type { Release } from '~/types/importers';
 import { linkBeatportRelease } from '~/userscripts/beatport_importer/linking';
-import type { BeatportReleaseData } from '~/userscripts/beatport_importer/types';
+import type { BeatportReleaseData, BeatportTrackData } from '~/userscripts/beatport_importer/types';
 
 class ElementStub {
     attributes = new Map<string, string>();
@@ -91,7 +91,30 @@ function setup() {
     const queries: MBLinkQuery[] = [];
     const resolveMBID = vi.fn((): string | undefined => 'matched-mbid');
     const mblinks = { searchAndDisplayMbLinks: (batch: MBLinkQuery[]) => queries.push(...batch), resolveMBID } as unknown as MBLinks;
-    const release: Release = { title: 'Space Chiller', artist_credit: [{ artist_name: 'Germind' }, { artist_name: 'Other' }], discs: [] };
+    const release: Release = {
+        title: 'Space Chiller',
+        artist_credit: [{ artist_name: 'Germind' }, { artist_name: 'Other' }],
+        discs: [
+            {
+                format: 'Digital Media',
+                tracks: [
+                    { title: 'First', artist_credit: [{ artist_name: 'Other' }, { artist_name: 'Germind', credited_name: 'GERMIND' }] },
+                    { title: 'Second', artist_credit: [{ artist_name: 'Germind' }] },
+                    { title: 'Namesake', artist_credit: [{ artist_name: 'Germind' }] },
+                ],
+            },
+        ],
+    };
+    const tracks = [
+        {
+            artists: [
+                { id: 99, name: 'Other' },
+                { id: 300027, name: 'Germind' },
+            ],
+        },
+        { artists: [{ id: 300027, name: 'Germind' }] },
+        { artists: [{ id: 123, name: 'Germind' }] },
+    ] as BeatportTrackData[];
     const data = {
         artists: [
             { id: 300027, name: 'Germind' },
@@ -99,7 +122,7 @@ function setup() {
         ],
         label: { id: 30978 },
     } as BeatportReleaseData;
-    const stop = linkBeatportRelease(mblinks, release, data);
+    const stop = linkBeatportRelease(mblinks, release, data, tracks);
     const finish = (query: MBLinkQuery) => {
         query.insert_func('<a href="https://musicbrainz.org/artist/matched-mbid">icon</a>');
         query.complete_func?.({ found: true, status: 'success' });
@@ -107,7 +130,7 @@ function setup() {
     return { queries, artist, label, secondary, title, form, finish, resolveMBID, setState, scan: () => scan(), links, stop, disconnect };
 }
 
-it('links the release header and table entities and seeds only header artist and label matches', () => {
+it('seeds release and track credits independently using matched Beatport artist IDs', () => {
     const { queries, form, finish } = setup();
     expect(queries.map(query => query.url)).toEqual(
         expect.arrayContaining([
@@ -121,6 +144,12 @@ it('links the release header and table entities and seeds only header artist and
     expect(form.children.map(input => [input.name, input.value])).toEqual([
         ['artist_credit.names.0.mbid', 'matched-mbid'],
         ['artist_credit.names.0.name', 'Germind'],
+        ['mediums.0.track.0.artist_credit.names.1.mbid', 'matched-mbid'],
+        ['mediums.0.track.0.artist_credit.names.1.name', 'GERMIND'],
+        ['mediums.0.track.1.artist_credit.names.0.mbid', 'matched-mbid'],
+        ['mediums.0.track.1.artist_credit.names.0.name', 'Germind'],
+        ['mediums.0.track.0.artist_credit.names.0.mbid', 'matched-mbid'],
+        ['mediums.0.track.0.artist_credit.names.0.name', 'Other'],
         ['labels.0.mbid', 'matched-mbid'],
     ]);
 });
@@ -153,4 +182,14 @@ it('ignores results from the previous page during SPA navigation', () => {
     window.location.href = 'https://www.beatport.com/release/another/123';
     queries.forEach(finish);
     expect(form.children).toEqual([]);
+});
+
+it('populates a track-only artist without a release artist match', () => {
+    const { queries, finish, form } = setup();
+    const trackArtistQuery = queries.find(query => query.url.endsWith('/artist/other/99'))!;
+    finish(trackArtistQuery);
+    expect(form.children.map(input => [input.name, input.value])).toEqual([
+        ['mediums.0.track.0.artist_credit.names.0.mbid', 'matched-mbid'],
+        ['mediums.0.track.0.artist_credit.names.0.name', 'Other'],
+    ]);
 });
