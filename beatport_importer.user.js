@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.10.27.1
+// @version      2026.11.20.1
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
 // @match        https://www.beatport.com/*
+// @grant        none
+// @run-at       document-start
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
 // ==/UserScript==
 
@@ -757,12 +759,171 @@
       };
     }
 
+    const API_ORIGIN = 'https://api.beatport.com';
+    const trackRequests = new Map();
+    let authorization = null;
+    const readTracks = async request => {
+      try {
+        const response = await request;
+        if (!response.ok) {
+          return null;
+        }
+        const copy = response.clone();
+        const data = await copy.json();
+        return data.results;
+      } catch {
+        return null;
+      }
+    };
+
+    // Called before awaiting fetch so the importer can reuse an in-flight request.
+    const captureTrackRequest = (input, init, request) => {
+      let requestURL = String(input);
+      let requestHeaders = init?.headers;
+      if (input instanceof Request) {
+        requestURL = input.url;
+        requestHeaders ??= input.headers;
+      }
+      const url = new URL(requestURL, window.location.href);
+      if (url.origin !== API_ORIGIN) {
+        return;
+      }
+      const headers = new Headers(requestHeaders);
+      authorization = headers.get('Authorization') ?? authorization;
+      const isTracksRequest = /^\/v4\/catalog\/releases\/\d+\/tracks\/$/.test(url.pathname);
+      if (isTracksRequest) {
+        url.searchParams.sort();
+        const tracks = readTracks(request);
+        trackRequests.set(url.href, tracks);
+      }
+    };
+    const readXHRResponse = xhr => {
+      try {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          let response;
+          if (xhr.responseType === 'json') {
+            response = Response.json(xhr.response);
+          } else {
+            response = new Response(xhr.responseText);
+          }
+          return response;
+        }
+      } catch {
+        // Unsupported response types are ignored without affecting Beatport.
+      }
+      const failedResponse = Response.error();
+      return failedResponse;
+    };
+
+    /** Beatport’s API client uses XHR rather than fetch on some pages. */
+    const installXHRInterceptor = logger => {
+      const requests = new WeakMap();
+      const prototype = XMLHttpRequest.prototype;
+      const originalOpen = prototype.open;
+      const originalSetRequestHeader = prototype.setRequestHeader;
+      const originalSend = prototype.send;
+      try {
+        prototype.open = function (method, url, async = true, username, password) {
+          originalOpen.call(this, method, url, async, username, password);
+          const requestURL = new URL(url, window.location.href);
+
+          // Clear metadata when the same XHR object is reused for another origin.
+          requests.delete(this);
+          if (requestURL.origin === API_ORIGIN) {
+            const headers = new Headers();
+            const request = {
+              url: requestURL.href,
+              headers
+            };
+            requests.set(this, request);
+          }
+        };
+        prototype.setRequestHeader = function (name, value) {
+          originalSetRequestHeader.call(this, name, value);
+          const request = requests.get(this);
+          request?.headers.append(name, value);
+        };
+        prototype.send = function (body) {
+          const request = requests.get(this);
+          if (request) {
+            const response = new Promise(resolve => {
+              const onLoadEnd = () => {
+                const capturedResponse = readXHRResponse(this);
+                resolve(capturedResponse);
+              };
+              this.addEventListener('loadend', onLoadEnd, {
+                once: true
+              });
+            });
+            const options = {
+              headers: request.headers
+            };
+            captureTrackRequest(request.url, options, response);
+          }
+          originalSend.call(this, body);
+        };
+      } catch {
+        logger.error('Could not intercept Beatport’s XMLHttpRequest requests');
+      }
+    };
+    const getBeatportTracks = async (releaseId, trackCount, logger) => {
+      const path = `/v4/catalog/releases/${releaseId}/tracks/`;
+      const startedAt = Date.now();
+      const deadline = startedAt + 10_000;
+
+      // Beatport may start its authenticated request after the importer runs.
+      while (!authorization) {
+        const now = Date.now();
+        if (now >= deadline) {
+          logger.error('Could not load tracks: no authenticated Beatport request was observed. Reload the page and try again.');
+          return null;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      const tracks = [];
+      const totalPages = Math.ceil(trackCount / 100);
+      for (let page = 1; page <= totalPages; page++) {
+        const url = new URL(path, API_ORIGIN);
+        const pageNumber = String(page);
+        url.searchParams.set('page', pageNumber);
+        url.searchParams.set('per_page', '100');
+        url.searchParams.sort();
+        const cached = trackRequests.get(url.href);
+        let pageTracks = null;
+        if (cached) {
+          pageTracks = await cached;
+        }
+        if (!pageTracks) {
+          const options = {
+            headers: {
+              Authorization: authorization
+            },
+            redirect: 'error'
+          };
+          const request = fetch(url.href, options);
+          pageTracks = await readTracks(request);
+        }
+        if (!pageTracks) {
+          // Do not log request objects or credentials.
+          logger.error('Could not fetch Beatport tracks');
+          return null;
+        }
+        tracks.push(...pageTracks);
+      }
+      return tracks;
+    };
+
     /**
      * Cache for release data intercepted from Beatport's own fetch requests.
      * When the user navigates via SPA, Beatport fetches the release JSON — we capture
      * it here to avoid making a duplicate request.
      */
     const interceptedReleaseCache = new Map();
+    const isTracksQuery = queryKey => {
+      const key = String(queryKey);
+      const matchesTracks = /tracks/.test(key);
+      return matchesTracks;
+    };
 
     /**
      * Install a fetch interceptor to capture Beatport's release data responses.
@@ -770,9 +931,12 @@
      * Skips installation if fetch is read-only (e.g. Firefox/Greasemonkey sandbox).
      */
     function installFetchInterceptor(logger) {
+      installXHRInterceptor(logger);
       const originalFetch = window.fetch.bind(window);
       const interceptor = async function (input, init) {
-        const response = await originalFetch(input, init);
+        const request = originalFetch(input, init);
+        captureTrackRequest(input, init, request);
+        const response = await request;
         const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
         const releaseMatch = url.match(/beatport\.com\/_next\/data\/[^/]+\/[a-z]{2}(?:-[a-z]{2})?\/release\/[^/]+\/(\d+)\.json/);
         const releaseId = releaseMatch?.[1];
@@ -835,7 +999,7 @@
       if (!release || release.track_count <= 100) {
         return pageData;
       }
-      const tracksQuery = pageData.pageProps.dehydratedState.queries.find(q => /tracks/.test(q.queryKey));
+      const tracksQuery = pageData.pageProps.dehydratedState.queries.find(q => isTracksQuery(q.queryKey));
       const currentTrackCount = tracksQuery?.state?.data.results.length ?? 0;
       if (currentTrackCount >= release.track_count) {
         return pageData;
@@ -846,7 +1010,7 @@
         logger.info(`Fetching page ${page}/${totalPages} to get full track list (${release.track_count} tracks)`);
         const paginatedData = await fetchReleaseFromNextDataApi(buildId, releaseId, logger, page);
         if (!paginatedData) continue;
-        const pageTracksQuery = paginatedData.pageProps.dehydratedState.queries.find(q => /tracks/.test(q.queryKey));
+        const pageTracksQuery = paginatedData.pageProps.dehydratedState.queries.find(q => isTracksQuery(q.queryKey));
         const pageResults = pageTracksQuery?.state?.data.results ?? [];
         allResults.push(...pageResults);
       }
@@ -857,7 +1021,7 @@
 
       // Merge full track data into our page data
       const updatedQueries = pageData.pageProps.dehydratedState.queries.map(q => {
-        if (!/tracks/.test(q.queryKey)) return q;
+        if (!isTracksQuery(q.queryKey)) return q;
         const updatedState = q.state ? {
           ...q.state,
           data: {
@@ -927,8 +1091,28 @@
         return null;
       }
       buildId ??= getBuildId();
-      if (buildId) {
+      const queries = pageData.pageProps.dehydratedState.queries;
+      const tracksQuery = queries.find(query => isTracksQuery(query.queryKey));
+      if (buildId && tracksQuery) {
         pageData = await ensureFullTrackData(pageData, buildId, releaseIdFromURL, logger);
+      }
+
+      // Newer pages fetch tracks separately rather than embedding a tracks query.
+      if (!tracksQuery && pageData.pageProps.release) {
+        const trackCount = pageData.pageProps.release.track_count;
+        const tracks = await getBeatportTracks(releaseIdFromURL, trackCount, logger);
+        if (!tracks) {
+          return null;
+        }
+        const query = {
+          queryKey: [`release-${releaseIdFromURL}-tracks`],
+          state: {
+            data: {
+              results: tracks
+            }
+          }
+        };
+        queries.push(query);
       }
       return pageData;
     };
@@ -957,8 +1141,17 @@
         return;
       }
       const releaseData = await getBeatportReleaseData(LOGGER);
-      if (!releaseData?.pageProps.release) {
+      if (!releaseData) {
+        return;
+      }
+      if (!releaseData.pageProps.release) {
         LOGGER.error('Could not find release data on the release page');
+        return;
+      }
+      const releaseMatch = window.location.pathname.match(/release\/[^/]+\/(\d+)/);
+      const currentReleaseId = releaseMatch?.[1];
+      const loadedReleaseId = String(releaseData.pageProps.release.id);
+      if (currentReleaseId !== loadedReleaseId) {
         return;
       }
       const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
@@ -966,14 +1159,27 @@
         const release = releaseData.pageProps.release;
 
         // Reversing is less reliable, but the API does not provide track numbers.
-        const tracks_table = release.tracks.reverse();
-        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => /tracks/g.test(element.queryKey));
+        const tracks_table = release.tracks.toReversed();
+        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => {
+          const key = String(element.queryKey);
+          const isTracksQuery = /tracks/.test(key);
+          return isTracksQuery;
+        });
         const tracks_data_array = tracks_release?.state?.data.results;
         if (!tracks_data_array) {
           LOGGER.error('Could not find tracks data');
           return;
         }
-        const tracks_data = tracks_table.map(url => tracks_data_array.find(element => element.url === url)).filter(track => track !== undefined);
+        const tracks_data = tracks_table.map(url => {
+          const match = url.match(/\/tracks\/(\d+)\/?$/);
+          const trackId = Number(match?.[1]);
+          const track = tracks_data_array.find(element => element.id === trackId && element.release.id === release.id);
+          return track;
+        }).filter(track => track !== undefined);
+        if (tracks_data.length !== release.track_count) {
+          LOGGER.error('Could not find complete tracks data');
+          return;
+        }
         const isrcs = tracks_data.map(track => track.isrc || null);
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
         insertMBButtons(mbrelease, release_url, isrcs);
