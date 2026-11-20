@@ -3,9 +3,9 @@ import { MBImport } from '~/lib/mbimport';
 import { MBImportStyle } from '~/lib/mbimportstyle';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
 import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
+import { getBeatportReleaseData, installFetchInterceptor } from '~/userscripts/beatport_importer/utils/getBeatportReleaseData';
 
 import type { BeatportReleaseData, BeatportTrackData } from './types';
-import { getBeatportReleaseData, installFetchInterceptor } from './utils/getBeatportReleaseData';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
@@ -35,8 +35,20 @@ async function processReleasePage() {
     }
 
     const releaseData = await getBeatportReleaseData(LOGGER);
-    if (!releaseData?.pageProps.release) {
+    if (!releaseData) {
+        return;
+    }
+
+    if (!releaseData.pageProps.release) {
         LOGGER.error('Could not find release data on the release page');
+        return;
+    }
+
+    const releaseMatch = window.location.pathname.match(/release\/[^/]+\/(\d+)/);
+    const currentReleaseId = releaseMatch?.[1];
+    const loadedReleaseId = String(releaseData.pageProps.release.id);
+
+    if (currentReleaseId !== loadedReleaseId) {
         return;
     }
 
@@ -46,17 +58,35 @@ async function processReleasePage() {
         const release = releaseData.pageProps.release;
 
         // Reversing is less reliable, but the API does not provide track numbers.
-        const tracks_table = release.tracks.reverse();
+        const tracks_table = release.tracks.toReversed();
 
-        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => /tracks/g.test(element.queryKey));
+        const tracks_release = releaseData.pageProps.dehydratedState.queries.find(element => {
+            const key = String(element.queryKey);
+            const isTracksQuery = /tracks/.test(key);
+
+            return isTracksQuery;
+        });
         const tracks_data_array = tracks_release?.state?.data.results;
         if (!tracks_data_array) {
             LOGGER.error('Could not find tracks data');
             return;
         }
         const tracks_data = tracks_table
-            .map((url: string) => tracks_data_array.find(element => element.url === url))
+            .map((url: string) => {
+                const match = url.match(/\/tracks\/(\d+)\/?$/);
+                const trackId = Number(match?.[1]);
+                const track = tracks_data_array.find(element => element.id === trackId && element.release.id === release.id);
+
+                return track;
+            })
             .filter((track): track is BeatportTrackData => track !== undefined);
+
+        if (tracks_data.length !== release.track_count) {
+            LOGGER.error('Could not find complete tracks data');
+
+            return;
+        }
+
         const isrcs = tracks_data.map(track => track.isrc || null);
 
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
