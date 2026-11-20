@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.11.20.2
+// @version      2026.11.20.3
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -1848,7 +1848,7 @@
     const INDICATOR_CLASS = 'mb-beatport-link';
 
     /** Link the release header and visible table entities, including newly paginated rows. */
-    function linkBeatportRelease(mblinks, release, data) {
+    function linkBeatportRelease(mblinks, release, data, tracks) {
       const pageUrl = window.location.href;
       const form = document.querySelector('.musicbrainz-import form.musicbrainz_import_add');
       let active = true;
@@ -1916,19 +1916,34 @@
           const id = Number(match[2]);
           const path = url.pathname.replace(/^\/[a-z]{2}(?:-[a-z]{2})?(?=\/(?:artist|label)\/)/, '').replace(/\/$/, '');
           const primary = header?.contains(link);
-          addLookup(link, type, `https://www.beatport.com${path}`, link.title || link.textContent.trim(), primary ? mbid => {
-            if (type === 'label' && data.label.id === id) {
-              updateForm('labels.0.mbid', mbid);
-            } else if (type === 'artist') {
-              const artist = data.artists.find(candidate => candidate.id === id);
-              if (!artist || data.artists.filter(candidate => candidate.name === artist.name).length !== 1) return;
-              release.artist_credit.forEach((credit, index) => {
-                if (credit.artist_name !== artist.name || credit.mbid) return;
-                updateForm(`artist_credit.names.${index}.mbid`, mbid);
-                updateForm(`artist_credit.names.${index}.name`, credit.credited_name || credit.artist_name);
-              });
+          addLookup(link, type, `https://www.beatport.com${path}`, link.title || link.textContent.trim(), mbid => {
+            if (type === 'label') {
+              if (primary && data.label.id === id) updateForm('labels.0.mbid', mbid);
+              return;
             }
-          } : undefined);
+            if (primary) {
+              const artist = data.artists.find(candidate => candidate.id === id);
+              if (artist && data.artists.filter(candidate => candidate.name === artist.name).length === 1) {
+                release.artist_credit.forEach((credit, index) => {
+                  if (credit.artist_name !== artist.name || credit.mbid) return;
+                  updateForm(`artist_credit.names.${index}.mbid`, mbid);
+                  updateForm(`artist_credit.names.${index}.name`, credit.credited_name || credit.artist_name);
+                });
+              }
+            }
+
+            // Track credits use their own Beatport artist IDs, independently of release credits.
+            tracks.forEach((track, trackIndex) => {
+              track.artists.forEach((trackArtist, artistIndex) => {
+                if (trackArtist.id !== id) return;
+                const credit = release.discs[0]?.tracks[trackIndex]?.artist_credit[artistIndex];
+                if (!credit || credit.mbid) return;
+                const prefix = `mediums.0.track.${trackIndex}.artist_credit.names.${artistIndex}`;
+                updateForm(`${prefix}.mbid`, mbid);
+                updateForm(`${prefix}.name`, credit.credited_name || credit.artist_name);
+              });
+            });
+          });
         });
         Object.values(queries).forEach(batch => {
           if (batch.length) mblinks.searchAndDisplayMbLinks(batch);
@@ -2021,7 +2036,7 @@
         const isrcs = tracks_data.map(track => track.isrc || null);
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
         insertMBButtons(mbrelease, release_url, isrcs);
-        stopLinking = linkBeatportRelease(mblinks, mbrelease, release);
+        stopLinking = linkBeatportRelease(mblinks, mbrelease, release, tracks_data);
       } catch (error) {
         LOGGER.error('Error processing release page:', error);
       }
