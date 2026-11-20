@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Import Beatport releases to MusicBrainz
 // @description  One-click importing of releases from beatport.com/release pages into MusicBrainz
-// @version      2026.11.20.1
+// @version      2026.11.20.2
 // @author       VxJasonxV
 // @namespace    https://github.com/murdos/musicbrainz-userscripts/
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/beatport_importer.user.js
@@ -692,6 +692,733 @@
   `;
       _add_css(css_import_button);
     }
+    function MBSearchItStyle() {
+      const css_search_it = `
+   .mb_valign {
+     display: inline-block;
+     vertical-align: top;
+   }
+   .mb_searchit {
+     width: 16px;
+     height: 16px;
+     margin: 0;
+     padding: 0;
+     background-color: #FFF7BE;
+     border: 0px;
+     vertical-align: top;
+     font-size: 11px;
+     text-align: center;
+   }
+   .mb_valign.mb_searchit {
+     font-weight: bold;
+     line-height: 16px;
+   }
+   a.mb_search_link {
+     color: #888;
+     text-decoration: none;
+   }
+   a.mb_search_link small {
+     font-size: 8px;
+   }
+   .mb_searchit a.mb_search_link:hover {
+     color: darkblue;
+   }
+   .mb_lookup_loading > *,
+   .mb_lookup_error > * {
+     display: none !important;
+   }
+   .mb_lookup_loading,
+   .mb_lookup_error {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+   }
+   .mb_lookup_loading::before {
+     content: '';
+     display: block;
+     width: 11px;
+     height: 11px;
+     box-sizing: border-box;
+     border: 2px solid #d7ca75;
+     border-top-color: #ba478f;
+     border-radius: 50%;
+     animation: mb_lookup_spin 1.2s linear infinite;
+   }
+   .mb_lookup_error::before {
+     content: '⚠';
+     color: #c62828;
+     font-size: 13px;
+     line-height: 16px;
+   }
+   @keyframes mb_lookup_spin {
+     to { transform: rotate(360deg); }
+   }
+   .mb_wrapper {
+     display: inline-block;
+   }
+   `;
+      _add_css(css_search_it);
+    }
+
+    function getGmApi(name) {
+      // Tampermonkey may only inject granted APIs when the script references them directly.
+      const apis = {};
+      if (typeof GM !== 'undefined') {
+        apis.getValue = GM.getValue;
+        apis.setValue = GM.setValue;
+        apis.xmlHttpRequest = GM.xmlHttpRequest;
+      }
+      if (!apis.getValue && typeof GM_getValue !== 'undefined') {
+        apis.getValue = GM_getValue;
+      }
+      if (!apis.setValue && typeof GM_setValue !== 'undefined') {
+        apis.setValue = GM_setValue;
+      }
+      if (!apis.xmlHttpRequest && typeof GM_xmlhttpRequest !== 'undefined') {
+        apis.xmlHttpRequest = GM_xmlhttpRequest;
+      }
+      return apis[name];
+    }
+
+    // Class MBLinks : query MusicBrainz for urls and display links for matching urls
+    // The main method is searchAndDisplayMbLinks()
+
+    function getRawHeader(rawHeaders, name) {
+      const expectedName = name.toLowerCase();
+      for (const line of rawHeaders.split(/\r?\n/)) {
+        const separator = line.indexOf(':');
+        if (separator >= 0 && line.slice(0, separator).trim().toLowerCase() === expectedName) {
+          return line.slice(separator + 1).trim();
+        }
+      }
+      return null;
+    }
+    function requestJSON(url) {
+      const gmRequest = getGmApi('xmlHttpRequest');
+      if (!gmRequest) {
+        return fetch(url, {
+          headers: {
+            Accept: 'application/json'
+          }
+        }).then(response => ({
+          ok: response.ok,
+          status: response.status,
+          getHeader: name => response.headers?.get(name) ?? null,
+          json: () => response.json()
+        }));
+      }
+      return new Promise((resolve, reject) => {
+        gmRequest({
+          method: 'GET',
+          url,
+          headers: {
+            Accept: 'application/json'
+          },
+          responseType: 'json',
+          onload: response => {
+            resolve({
+              ok: response.status >= 200 && response.status < 300,
+              status: response.status,
+              getHeader: name => getRawHeader(response.responseHeaders, name),
+              json: () => Promise.resolve(response.response ?? JSON.parse(response.responseText))
+            });
+          },
+          onerror: () => reject(new Error('Network request failed'))
+        });
+      });
+    }
+    function getRetryDelayMs(response) {
+      const retryAfter = response.getHeader('retry-after');
+      if (retryAfter) {
+        const seconds = Number(retryAfter);
+        const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(retryAfter) - Date.now();
+        if (Number.isFinite(delay) && delay >= 0) return delay;
+      }
+      const resetSeconds = Number(response.getHeader('x-ratelimit-reset'));
+      if (!Number.isFinite(resetSeconds) || resetSeconds <= 0) return undefined;
+      const serverDate = Date.parse(response.getHeader('date') ?? '');
+      const referenceTime = Number.isFinite(serverDate) ? serverDate : Date.now();
+      return Math.max(0, resetSeconds * 1000 - referenceTime);
+    }
+    class AjaxRequests {
+      // properties: "key": {handler: function, next: property, context: {}}
+      first = '';
+      last = '';
+      empty() {
+        return this.first == '';
+      }
+      push(key, handler, context) {
+        const request = this[key];
+        if (typeof request === 'object') {
+          request.handler = handler;
+          request.context = context;
+        } else {
+          this[key] = {
+            handler: handler,
+            next: '',
+            context: context
+          };
+          if (this.first == '') {
+            this.first = this.last = key;
+          } else {
+            const lastRequest = this[this.last];
+            if (typeof lastRequest === 'object') {
+              lastRequest.next = key;
+            }
+            this.last = key;
+          }
+        }
+      }
+      shift() {
+        if (this.empty()) {
+          return;
+        }
+        const key = this.first;
+        const request = this[key];
+        if (typeof request !== 'object') {
+          return;
+        }
+        const handler = request.handler;
+        const context = request.context;
+        this.first = request.next;
+        // oxlint-disable-next-line typescript/no-dynamic-delete -- Kept in line with the original request queue.
+        delete this[key]; // delete this property
+        return handler.bind(context);
+      }
+    }
+
+    /**
+     * Processes a URL match from the MusicBrainz API response: updates cache and inserts
+     * MusicBrainz links into all batch entries that reference this resource.
+     *
+     * @private
+     * @param options - Options for processing the URL match.
+     * @param options.mblinks - The MBLinks instance (for cache and link creation).
+     * @param options.batch - Batch of URL data entries for this request.
+     * @param options.resource - The resource URL from the API response.
+     * @param options.relations - Relations array from the API response.
+     */
+    function processUrlMatch({
+      mblinks,
+      batch,
+      resource,
+      relations,
+      foundQueries
+    }) {
+      const matching_urls_data = batch.filter(query => queryMatchesResource(query, resource));
+      if (matching_urls_data.length === 0) return;
+      if (!relations) return;
+      matching_urls_data.forEach(reference => {
+        const key = reference.key || reference.url;
+        const _type = reference.mb_type.replace('-', '_');
+        if (!mblinks.cache[key]) {
+          mblinks.cache[key] = {
+            timestamp: new Date().getTime(),
+            urls: []
+          };
+        }
+
+        // Build map of mb_url -> ended (true only if every relation for that URL+entity is ended).
+        const urlData = {};
+        relations.forEach(relation => {
+          if (_type in relation) {
+            const entity = relation[_type];
+            const mb_url = `${mblinks.mb_server}/${reference.mb_type}/${entity.id}`;
+            if (!(mb_url in urlData)) urlData[mb_url] = {
+              ended: true
+            };
+            if (!relation.ended) urlData[mb_url].ended = false;
+          }
+        });
+        const cacheUrls = mblinks.cache[key].urls;
+        const getUrl = entry => typeof entry === 'string' ? entry : entry.url;
+        Object.keys(urlData).forEach(mb_url => {
+          foundQueries?.add(reference);
+          const ended = urlData[mb_url].ended;
+          const alreadyCached = cacheUrls.some(e => getUrl(e) === mb_url);
+          if (!alreadyCached) {
+            cacheUrls.push({
+              url: mb_url,
+              ended: _type === 'release' ? ended : false
+            });
+          }
+          const link = mblinks.createMusicBrainzLink(mb_url, _type, _type === 'release' ? {
+            ended
+          } : {});
+          reference.insert_func(link);
+        });
+      });
+    }
+    function queryMatchesResource(query, resource) {
+      if (!query.url_regex) return query.url === resource;
+      try {
+        return new RegExp(`^(?:${query.url_regex})$`).test(resource);
+      } catch {
+        return false;
+      }
+    }
+
+    // user_cache_key = textual key used to store cached data in local storage
+    // version = optionnal version,  to force creation of a cache (ie. when format of keys changes)
+    // expiration = time in minutes before an entry is refreshed, value <= 0 disables cache reads, if undefined or false, use defaults
+    class MBLinks {
+      supports_local_storage;
+      ajax_requests = new AjaxRequests();
+      pendingRequests = [];
+      requestTimer;
+      requestInFlight = false;
+      nextRequestAt = 0;
+      rateLimitResetAt = 0;
+      consecutiveRequestFailures = 0;
+      cache = {};
+      expirationMinutes;
+      user_cache_key;
+      cache_key;
+      mb_server = 'https://musicbrainz.org';
+      type_link_info;
+      constructor(user_cache_key, version, expiration) {
+        this.supports_local_storage = (() => {
+          try {
+            return !!localStorage.getItem;
+          } catch {
+            return false;
+          }
+        })();
+        this.expirationMinutes = typeof expiration != 'undefined' && expiration !== false ? parseInt(String(expiration), 10) : 90 * 24 * 60; // default to 90 days
+        const cache_version = 3;
+        this.user_cache_key = user_cache_key;
+        this.cache_key = `${this.user_cache_key}-v${cache_version}${typeof version != 'undefined' ? `.${version}` : ''}`;
+        // overrides link title and img src url (per type), see createMusicBrainzLink()
+        this.type_link_info = {
+          release_group: {
+            title: 'See this release group on MusicBrainz'
+          },
+          place: {
+            img_src: `<img src="${this.mb_server}/static/images/entity/place.svg" height=16 width=16 />`
+          }
+        };
+        this.initCache();
+        this.initAjaxEngine();
+      }
+      initAjaxEngine() {
+        const ajax_requests = this.ajax_requests;
+        setInterval(function () {
+          if (!ajax_requests.empty()) {
+            const request = ajax_requests.shift();
+            if (typeof request === 'function') {
+              request();
+            }
+          }
+        }, 1000);
+      }
+
+      /**
+       * GET JSON with retry on 5xx and status-less network errors, using server-provided rate-limit headers when available, with queue-wide exponential backoff capped at 30 seconds and a five-minute retry budget.
+       * @param url - The URL to request.
+       * @param successCallback - Called with response data on success.
+       * @param alwaysCallback - Called when the request is finally done (success or after giving up retries).
+       */
+      getJSONWithRetry(url, successCallback, alwaysCallback) {
+        const retryDeadline = Date.now() + 5 * 60 * 1000;
+        const retry = (serverDelayMs = 0) => {
+          const retryDelayMs = this.recordRequestFailure(serverDelayMs);
+          if (Date.now() + retryDelayMs <= retryDeadline) {
+            setTimeout(() => this.scheduleRequest(doRequest, true), retryDelayMs);
+          } else {
+            alwaysCallback?.(false);
+          }
+        };
+        const doRequest = async () => {
+          let response;
+          try {
+            response = await requestJSON(url);
+          } catch {
+            // Extension throttling and ordinary network failures both arrive without an HTTP status.
+            retry();
+            return;
+          }
+          const serverDelayMs = getRetryDelayMs(response) ?? 0;
+          if (!response.ok) {
+            if (response.status >= 500 && response.status < 600) {
+              retry(serverDelayMs);
+            } else if (response.status === 404) {
+              // The URL endpoint uses 404 to report a resource with no relationships.
+              this.consecutiveRequestFailures = 0;
+              try {
+                successCallback({});
+                alwaysCallback?.(true);
+              } catch {
+                alwaysCallback?.(false);
+              }
+            } else {
+              this.consecutiveRequestFailures = 0;
+              alwaysCallback?.(false);
+            }
+            return;
+          }
+          this.consecutiveRequestFailures = 0;
+          if (response.getHeader('x-ratelimit-remaining') === '0') this.pauseRequests(serverDelayMs);
+          try {
+            successCallback(await response.json());
+            alwaysCallback?.(true);
+          } catch {
+            alwaysCallback?.(false);
+          }
+        };
+        this.scheduleRequest(doRequest);
+      }
+      scheduleRequest(request, priority = false) {
+        if (priority) this.pendingRequests.unshift(request);else this.pendingRequests.push(request);
+        this.runNextRequest();
+      }
+      recordRequestFailure(serverDelayMs) {
+        this.consecutiveRequestFailures += 1;
+        const retryDelayMs = Math.max(serverDelayMs, Math.min(30_000, 1000 * 2 ** (this.consecutiveRequestFailures - 1)));
+        this.pauseRequests(retryDelayMs);
+        return retryDelayMs;
+      }
+      pauseRequests(delayMs) {
+        this.rateLimitResetAt = Math.max(this.rateLimitResetAt, Date.now() + delayMs);
+      }
+      runNextRequest() {
+        if (this.requestTimer || this.requestInFlight || this.pendingRequests.length === 0) return;
+        const now = Date.now();
+        const runAt = Math.max(now, this.nextRequestAt, this.rateLimitResetAt);
+        const delay = runAt - now;
+        if (delay > 0) {
+          this.requestTimer = setTimeout(() => {
+            this.requestTimer = undefined;
+            this.runNextRequest();
+          }, delay);
+          return;
+        }
+        const request = this.pendingRequests.shift();
+        this.nextRequestAt = now + 1000;
+        this.requestInFlight = true;
+        void Promise.resolve().then(request).catch(() => undefined).finally(() => {
+          this.requestInFlight = false;
+          this.runNextRequest();
+        });
+      }
+      initCache() {
+        if (!this.supports_local_storage) return;
+        // Check if we already added links for this content
+        this.cache = JSON.parse(localStorage.getItem(this.cache_key) || '{}');
+        // remove old entries
+        this.clearCacheExpired();
+        // remove old cache versions
+        this.removeOldCacheVersions();
+      }
+      saveCache() {
+        if (!this.supports_local_storage) return;
+        try {
+          localStorage.setItem(this.cache_key, JSON.stringify(this.cache));
+        } catch (e) {
+          alert(e);
+        }
+      }
+      removeOldCacheVersions() {
+        const to_remove = [];
+        for (let i = 0, len = localStorage.length; i < len; ++i) {
+          const key = localStorage.key(i);
+          if (key.startsWith(this.user_cache_key)) {
+            if (key !== this.cache_key) {
+              // we don't want to remove current cache
+              to_remove.push(key);
+            }
+          }
+        }
+        // remove old cache keys
+        for (const element of to_remove) {
+          localStorage.removeItem(element);
+        }
+      }
+      clearCacheExpired() {
+        const new_cache = {};
+        Object.keys(this.cache).forEach(key => {
+          if (this.is_cached(key)) {
+            new_cache[key] = this.cache[key];
+          }
+        });
+        this.cache = new_cache;
+      }
+      is_cached(key) {
+        const entry = this.cache[key];
+        return Boolean(entry && entry.urls && entry.urls.length > 0 && this.expirationMinutes > 0 && new Date().getTime() < entry.timestamp + this.expirationMinutes * 60 * 1000);
+      }
+
+      // Search for ressource 'url' in local cache, and return the matching MBID if there's only matching MB entity.
+      // If the url is not known by the cache, no attempt will be made to request the MusicBrainz webservice, in order to keep this method synchronous.
+      resolveMBID(key) {
+        if (this.is_cached(key) && this.cache[key].urls.length == 1) {
+          const entry = this.cache[key].urls[0];
+          const mb_url = typeof entry === 'string' ? entry : entry.url;
+          return mb_url.slice(-36);
+        }
+        return undefined;
+      }
+
+      /**
+       * Create an HTML element for a MusicBrainz link with the given type and URL.
+       * @param mb_url - The URL of the MusicBrainz entity.
+       * @param _type - The type of the MusicBrainz entity.
+       * @param options - Optional options.
+       * @param options.ended - When true and type is release, applies grayscale to the icon.
+       * @returns The HTML for the MusicBrainz link.
+       */
+      createMusicBrainzLink(mb_url, _type, options) {
+        let title = `See this ${_type} on MusicBrainz`;
+        let img_url = `${this.mb_server}/static/images/entity/${_type}.svg`;
+        let img_src = `<img src="${img_url}" height=16 width=16 />`;
+        // handle overrides
+        const ti = this.type_link_info[_type];
+        if (ti) {
+          if (ti.title) title = ti.title;
+          if (ti.img_url) img_url = ti.img_url;
+          if (ti.img_src) img_src = ti.img_src;
+        }
+        if (_type === 'release' && options?.ended) {
+          img_src = img_src.replace('/>', ' style="filter: grayscale(1)" />');
+        }
+        return `<a href="${mb_url}" title="${title}">${img_src}</a> `;
+      }
+
+      // Batch process multiple URLs in a single request
+      // urls_data should be an array of objects with the following structure:
+      // { url: string, mb_type: string, insert_func: function, key: string }
+      searchAndDisplayMbLinks(urls_data) {
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback contexts.
+        const mblinks = this;
+
+        // Filter out URLs that are already cached
+        const uncached_urls = [];
+        urls_data.forEach(data => {
+          const key = data.key || data.url;
+          if (this.is_cached(key)) {
+            // Handle cached results immediately
+            const data_type = data.mb_type.replace('-', '_');
+            mblinks.cache[key].urls.forEach(cacheEntry => {
+              const mb_url = typeof cacheEntry === 'string' ? cacheEntry : cacheEntry.url;
+              const ended = typeof cacheEntry === 'string' ? false : cacheEntry.ended;
+              const options = data_type === 'release' ? {
+                ended
+              } : {};
+              data.insert_func(mblinks.createMusicBrainzLink(mb_url, data_type, options));
+            });
+            data.complete_func?.({
+              found: true,
+              status: 'success'
+            });
+          } else {
+            uncached_urls.push(data);
+          }
+        });
+        if (uncached_urls.length === 0) {
+          return; // All URLs were cached
+        }
+
+        // Process URLs in batches
+        const BATCH_SIZE = 75;
+        for (let i = 0; i < uncached_urls.length; i += BATCH_SIZE) {
+          const batch = uncached_urls.slice(i, i + BATCH_SIZE);
+          const resources = batch.map(data => encodeURIComponent(data.url)).join('&resource=');
+          const mb_type = batch[0].mb_type;
+          const query = `${mblinks.mb_server}/ws/2/url?resource=${resources}&inc=${mb_type}-rels`;
+
+          // Merge with previous context if there's already a pending ajax request
+          let handlers = [];
+          let failureHandlers = [];
+          const request = mblinks.ajax_requests[query];
+          if (typeof request === 'object') {
+            handlers = request.context.handlers;
+            failureHandlers = request.context.failureHandlers;
+          }
+          handlers.push(function (data) {
+            const foundQueries = new Set();
+            if ('urls' in data) {
+              const processedResources = {};
+              data.urls.forEach(url_data => {
+                if (processedResources[url_data.resource]) return;
+                processedResources[url_data.resource] = true;
+                processUrlMatch({
+                  mblinks,
+                  batch,
+                  resource: url_data.resource,
+                  relations: url_data.relations,
+                  foundQueries
+                });
+              });
+            } else if ('relations' in data && 'resource' in data) {
+              /**
+               * For some reason, for a single entity request the API response has a different shape.
+               */
+              processUrlMatch({
+                mblinks,
+                batch,
+                resource: data.resource,
+                relations: data.relations,
+                foundQueries
+              });
+            }
+            mblinks.saveCache();
+            batch.forEach(queryData => {
+              queryData.complete_func?.({
+                found: foundQueries.has(queryData),
+                status: 'success'
+              });
+            });
+          });
+          failureHandlers.push(() => {
+            batch.forEach(queryData => queryData.complete_func?.({
+              found: false,
+              status: 'error'
+            }));
+          });
+          mblinks.ajax_requests.push(query, function () {
+            // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
+            const ctx = this;
+            ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
+              ctx.handlers.forEach(handler => {
+                handler(data);
+              });
+            }, function (succeeded) {
+              if (!succeeded) ctx.failureHandlers.forEach(handler => handler());
+            });
+          }, {
+            failureHandlers,
+            handlers: handlers,
+            query: query,
+            mblinks: mblinks
+          });
+        }
+      }
+
+      /**
+       * Search MusicBrainz's indexed URL field with Lucene regular expressions,
+       * then resolve the discovered resources to load their relationships.
+       */
+      searchAndDisplayMbLinksByRegex(urls_data) {
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
+        const mblinks = this;
+        const uncachedQueries = [];
+        urls_data.forEach(data => {
+          const key = data.key || data.url;
+          if (this.is_cached(key)) {
+            const dataType = data.mb_type.replace('-', '_');
+            mblinks.cache[key].urls.forEach(cacheEntry => {
+              const mbUrl = typeof cacheEntry === 'string' ? cacheEntry : cacheEntry.url;
+              const ended = typeof cacheEntry === 'string' ? false : cacheEntry.ended;
+              data.insert_func(mblinks.createMusicBrainzLink(mbUrl, dataType, dataType === 'release' ? {
+                ended
+              } : {}));
+            });
+            data.complete_func?.({
+              found: true,
+              status: 'success'
+            });
+          } else if (data.url_regex) {
+            uncachedQueries.push(data);
+          }
+        });
+        const batchSize = 20;
+        for (let i = 0; i < uncachedQueries.length; i += batchSize) {
+          const batch = uncachedQueries.slice(i, i + batchSize);
+          const regex = batch.map(data => `(${data.url_regex})`).join('|');
+          const lookup = {
+            batch,
+            discoveredResources: new Set(),
+            outcomes: new Map(batch.map(query => [query, {
+              failed: false,
+              found: false
+            }])),
+            pending: 0
+          };
+          this.enqueueRegexSearchPage(batch, regex, 0, lookup);
+        }
+      }
+      enqueueRegexSearchPage(batch, regex, offset, lookup) {
+        lookup.pending += 1;
+        // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the callback contexts above.
+        const mblinks = this;
+        const search = `url:/(${regex})/`;
+        const query = `${mblinks.mb_server}/ws/2/url?query=${encodeURIComponent(search)}&fmt=json&limit=100&offset=${offset}`;
+        let handlers = [];
+        let failureHandlers = [];
+        const request = mblinks.ajax_requests[query];
+        if (typeof request === 'object') {
+          handlers = request.context.handlers;
+          failureHandlers = request.context.failureHandlers;
+        }
+        handlers.push(function (data) {
+          const urls = data.urls ?? [];
+          const discoveredQueries = [];
+          const discoveredResources = new Set();
+          urls.forEach(urlData => {
+            if (discoveredResources.has(urlData.resource)) return;
+            discoveredResources.add(urlData.resource);
+            batch.forEach(queryData => {
+              if (!queryMatchesResource(queryData, urlData.resource)) return;
+              const resourceKey = `${queryData.key ?? queryData.url}\0${urlData.resource}`;
+              if (lookup.discoveredResources.has(resourceKey)) return;
+              lookup.discoveredResources.add(resourceKey);
+              lookup.pending += 1;
+              discoveredQueries.push({
+                url: urlData.resource,
+                mb_type: queryData.mb_type,
+                insert_func: queryData.insert_func,
+                key: queryData.key || queryData.url,
+                complete_func: result => {
+                  const outcome = lookup.outcomes.get(queryData);
+                  outcome.found ||= result.found;
+                  outcome.failed ||= result.status === 'error';
+                  mblinks.finishRegexOperation(lookup);
+                }
+              });
+            });
+          });
+          mblinks.searchAndDisplayMbLinks(discoveredQueries);
+          const responseOffset = data.offset ?? offset;
+          const nextOffset = responseOffset + urls.length;
+          if (typeof data.count === 'number' && urls.length > 0 && nextOffset < data.count) {
+            mblinks.enqueueRegexSearchPage(batch, regex, nextOffset, lookup);
+          }
+          mblinks.finishRegexOperation(lookup);
+        });
+        failureHandlers.push(() => {
+          lookup.outcomes.forEach(outcome => {
+            outcome.failed = true;
+          });
+          mblinks.finishRegexOperation(lookup);
+        });
+        mblinks.ajax_requests.push(query, function () {
+          // oxlint-disable-next-line typescript/no-this-alias -- Kept in line with the original callback context.
+          const ctx = this;
+          ctx.mblinks.getJSONWithRetry(ctx.query, function (data) {
+            ctx.handlers.forEach(handler => {
+              handler(data);
+            });
+          }, function (succeeded) {
+            if (!succeeded) ctx.failureHandlers.forEach(handler => handler());
+          });
+        }, {
+          failureHandlers,
+          handlers,
+          query,
+          mblinks
+        });
+      }
+      finishRegexOperation(lookup) {
+        lookup.pending -= 1;
+        if (lookup.pending !== 0) return;
+        lookup.batch.forEach(query => {
+          const outcome = lookup.outcomes.get(query);
+          query.complete_func?.({
+            found: outcome.found,
+            status: outcome.failed ? 'error' : 'success'
+          });
+        });
+      }
+    }
 
     /**
      * Subscribe to Single Page Application (SPA) navigation events.
@@ -1117,6 +1844,110 @@
       return pageData;
     };
 
+    const LOOKUP_ATTRIBUTE = 'data-mb-beatport-lookup';
+    const INDICATOR_CLASS = 'mb-beatport-link';
+
+    /** Link the release header and visible table entities, including newly paginated rows. */
+    function linkBeatportRelease(mblinks, release, data) {
+      const pageUrl = window.location.href;
+      const form = document.querySelector('.musicbrainz-import form.musicbrainz_import_add');
+      let active = true;
+      const updateForm = (name, value) => {
+        if (!active || window.location.href !== pageUrl || !form?.isConnected) return;
+        let input = [...form.querySelectorAll('input')].find(element => element.name === name);
+        if (!input) {
+          input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          form.append(input);
+        }
+        input.value = value;
+      };
+      const scan = () => {
+        if (!active || window.location.href !== pageUrl) return;
+        const queries = {
+          artist: [],
+          label: [],
+          release: []
+        };
+        const addLookup = (target, type, url, name, onMatch) => {
+          if (!name || target.hasAttribute(LOOKUP_ATTRIBUTE)) return;
+          target.setAttribute(LOOKUP_ATTRIBUTE, type);
+          const indicator = MBImport.createEntityLookupIndicator(type, name);
+          indicator.classList.add(INDICATOR_CLASS);
+          indicator.style.marginRight = '4px';
+          indicator.addEventListener('click', event => event.stopPropagation());
+          if (type === 'release') target.prepend(indicator);else target.before(indicator);
+          let matched = false;
+          const key = `${type}:${url}`;
+          queries[type].push({
+            url,
+            mb_type: type,
+            key,
+            insert_func: link => {
+              if (!active || window.location.href !== pageUrl || !indicator.isConnected) return;
+              if (!matched) {
+                indicator.replaceChildren();
+                MBImport.setEntityLookupState(indicator, 'matched');
+                matched = true;
+              }
+              indicator.insertAdjacentHTML('beforeend', link.trim());
+            },
+            complete_func: result => {
+              if (!active || window.location.href !== pageUrl || !indicator.isConnected) return;
+              if (!matched) MBImport.setEntityLookupState(indicator, result.status === 'error' ? 'error' : 'search');
+              // Ambiguous URL relationships remain visible, but must not select an arbitrary entity.
+              const mbid = result.status === 'success' && matched ? mblinks.resolveMBID(key) : undefined;
+              if (mbid) onMatch?.(mbid);
+            }
+          });
+        };
+        const header = document.querySelector('[class^="ReleaseDetailCard_meta"]');
+        const title = header?.querySelector('h1');
+        if (title) {
+          const path = window.location.pathname.replace(/^\/[a-z]{2}(?:-[a-z]{2})?(?=\/release\/)/, '').replace(/\/$/, '');
+          addLookup(title, 'release', `https://www.beatport.com${path}`, release.title);
+        }
+        document.querySelectorAll('[class^="ReleaseDetailCard_meta"] a[href], [class*="DetailsCell-style__"] a[href]').forEach(link => {
+          const url = new URL(link.href, window.location.origin);
+          const match = /^\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?(artist|label)\/[^/]+\/(\d+)\/?$/.exec(url.pathname);
+          if (url.origin !== window.location.origin || !match) return;
+          const type = match[1];
+          const id = Number(match[2]);
+          const path = url.pathname.replace(/^\/[a-z]{2}(?:-[a-z]{2})?(?=\/(?:artist|label)\/)/, '').replace(/\/$/, '');
+          const primary = header?.contains(link);
+          addLookup(link, type, `https://www.beatport.com${path}`, link.title || link.textContent.trim(), primary ? mbid => {
+            if (type === 'label' && data.label.id === id) {
+              updateForm('labels.0.mbid', mbid);
+            } else if (type === 'artist') {
+              const artist = data.artists.find(candidate => candidate.id === id);
+              if (!artist || data.artists.filter(candidate => candidate.name === artist.name).length !== 1) return;
+              release.artist_credit.forEach((credit, index) => {
+                if (credit.artist_name !== artist.name || credit.mbid) return;
+                updateForm(`artist_credit.names.${index}.mbid`, mbid);
+                updateForm(`artist_credit.names.${index}.name`, credit.credited_name || credit.artist_name);
+              });
+            }
+          } : undefined);
+        });
+        Object.values(queries).forEach(batch => {
+          if (batch.length) mblinks.searchAndDisplayMbLinks(batch);
+        });
+      };
+      const observer = new MutationObserver(scan);
+      scan();
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      return () => {
+        active = false;
+        observer.disconnect();
+        document.querySelectorAll(`.${INDICATOR_CLASS}`).forEach(indicator => indicator.remove());
+        document.querySelectorAll(`[${LOOKUP_ATTRIBUTE}]`).forEach(target => target.removeAttribute(LOOKUP_ATTRIBUTE));
+      };
+    }
+
     const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
 
     // Capture Beatport's release fetches to avoid duplicate requests on SPA navigation
@@ -1124,23 +1955,30 @@
     const MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
     const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
     const RELEASE_INFO_STYLE = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+    let mblinks;
+    let stopLinking;
+    let processingGeneration = 0;
 
     /**
      * Remove existing MusicBrainz import UI to avoid duplicates
      */
     const cleanup = () => {
+      stopLinking?.();
+      stopLinking = undefined;
       document.querySelectorAll(MB_IMPORT_SELECTOR).forEach(el => {
         el.remove();
       });
       document.getElementById(MB_IMPORT_BARCODE_ELEMENT)?.remove();
     };
     async function processReleasePage() {
+      const generation = ++processingGeneration;
       cleanup();
       const isReleasePage = window.location.pathname.includes('/release/');
       if (!isReleasePage) {
         return;
       }
       const releaseData = await getBeatportReleaseData(LOGGER);
+      if (generation !== processingGeneration) return;
       if (!releaseData) {
         return;
       }
@@ -1154,7 +1992,7 @@
       if (currentReleaseId !== loadedReleaseId) {
         return;
       }
-      const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+      const release_url = `${window.location.origin}${window.location.pathname}`;
       try {
         const release = releaseData.pageProps.release;
 
@@ -1183,6 +2021,7 @@
         const isrcs = tracks_data.map(track => track.isrc || null);
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
         insertMBButtons(mbrelease, release_url, isrcs);
+        stopLinking = linkBeatportRelease(mblinks, mbrelease, release);
       } catch (error) {
         LOGGER.error('Error processing release page:', error);
       }
@@ -1317,6 +2156,44 @@
     }
     function init() {
       MBImportStyle();
+      MBSearchItStyle();
+      document.head.insertAdjacentHTML('beforeend', `<style>
+            .mb-beatport-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
+                font-size: 11px;
+                line-height: 16px;
+            }
+            .mb-beatport-link > a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                line-height: 16px;
+            }
+            .mb-beatport-link img {
+                display: block;
+            }
+            [class^="ReleaseDetailCard_artistList__"] {
+                font-family: var(--font-aeonik);
+                font-size: var(--bp-font-size-xl);
+                line-height: var(--bp-line-height-xl);
+            }
+            [class^="ReleaseDetailCard_info"] > span:has(> .mb-beatport-link) {
+                display: inline-flex;
+                align-items: center;
+                min-width: 0;
+            }
+            [class^="ReleaseDetailCard_info"] > span > .mb-beatport-link {
+                flex-shrink: 0;
+            }
+            [class^="ReleaseDetailCard_info"] > span:has(> .mb-beatport-link) > a {
+                min-width: 0;
+            }
+        </style>`);
+      mblinks = new MBLinks('BEATPORT_MBLINKS_CACHE', 1);
 
       // Process initial page load
       setTimeout(() => {
