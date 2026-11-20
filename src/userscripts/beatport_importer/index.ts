@@ -1,10 +1,12 @@
 import { Logger, LogLevel } from '~/lib/logger';
 import { MBImport } from '~/lib/mbimport';
-import { MBImportStyle } from '~/lib/mbimportstyle';
+import { MBImportStyle, MBSearchItStyle } from '~/lib/mbimportstyle';
+import { MBLinks } from '~/lib/mblinks';
 import { subscribeToSPANavigation } from '~/lib/shared/spa-navigation';
 import { type ArtistCredit, type Disc, type Label, type Release, type Track, type URL } from '~/types/importers';
 import { getBeatportReleaseData, installFetchInterceptor } from '~/userscripts/beatport_importer/utils/getBeatportReleaseData';
 
+import { linkBeatportRelease } from './linking';
 import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOGGER = new Logger('beatport_importer', LogLevel.INFO);
@@ -15,11 +17,16 @@ installFetchInterceptor(LOGGER);
 const MB_IMPORT_SELECTOR = 'div.musicbrainz-import';
 const MB_IMPORT_BARCODE_ELEMENT = 'mb-import-barcode';
 const RELEASE_INFO_STYLE = 'display: flex; align-items: center; gap: 5px; flex-wrap: wrap;';
+let mblinks: MBLinks;
+let stopLinking: (() => void) | undefined;
+let processingGeneration = 0;
 
 /**
  * Remove existing MusicBrainz import UI to avoid duplicates
  */
 const cleanup = () => {
+    stopLinking?.();
+    stopLinking = undefined;
     document.querySelectorAll(MB_IMPORT_SELECTOR).forEach(el => {
         el.remove();
     });
@@ -27,6 +34,7 @@ const cleanup = () => {
 };
 
 async function processReleasePage() {
+    const generation = ++processingGeneration;
     cleanup();
 
     const isReleasePage = window.location.pathname.includes('/release/');
@@ -35,6 +43,7 @@ async function processReleasePage() {
     }
 
     const releaseData = await getBeatportReleaseData(LOGGER);
+    if (generation !== processingGeneration) return;
     if (!releaseData) {
         return;
     }
@@ -52,7 +61,7 @@ async function processReleasePage() {
         return;
     }
 
-    const release_url = window.location.href.replace('/?.*$/', '').replace(/#.*$/, '');
+    const release_url = `${window.location.origin}${window.location.pathname}`;
 
     try {
         const release = releaseData.pageProps.release;
@@ -92,6 +101,7 @@ async function processReleasePage() {
         const mbrelease = retrieveReleaseInfo(release_url, release, tracks_data);
 
         insertMBButtons(mbrelease, release_url, isrcs);
+        stopLinking = linkBeatportRelease(mblinks, mbrelease, release);
     } catch (error) {
         LOGGER.error('Error processing release page:', error);
     }
@@ -242,6 +252,47 @@ function insertMBButtons(mbrelease: Release, release_url: string, isrcs: (string
 
 function init() {
     MBImportStyle();
+    MBSearchItStyle();
+    document.head.insertAdjacentHTML(
+        'beforeend',
+        `<style>
+            .mb-beatport-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
+                font-size: 11px;
+                line-height: 16px;
+            }
+            .mb-beatport-link > a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                line-height: 16px;
+            }
+            .mb-beatport-link img {
+                display: block;
+            }
+            [class^="ReleaseDetailCard_artistList__"] {
+                font-family: var(--font-aeonik);
+                font-size: var(--bp-font-size-xl);
+                line-height: var(--bp-line-height-xl);
+            }
+            [class^="ReleaseDetailCard_info"] > span:has(> .mb-beatport-link) {
+                display: inline-flex;
+                align-items: center;
+                min-width: 0;
+            }
+            [class^="ReleaseDetailCard_info"] > span > .mb-beatport-link {
+                flex-shrink: 0;
+            }
+            [class^="ReleaseDetailCard_info"] > span:has(> .mb-beatport-link) > a {
+                min-width: 0;
+            }
+        </style>`,
+    );
+    mblinks = new MBLinks('BEATPORT_MBLINKS_CACHE', 1);
 
     // Process initial page load
     setTimeout(() => {
