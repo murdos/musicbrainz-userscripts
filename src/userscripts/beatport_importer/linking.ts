@@ -2,13 +2,18 @@ import { MBImport } from '~/lib/mbimport';
 import { MBLinks, type MBLinkQuery } from '~/lib/mblinks';
 import type { Release } from '~/types/importers';
 
-import type { BeatportReleaseData } from './types';
+import type { BeatportReleaseData, BeatportTrackData } from './types';
 
 const LOOKUP_ATTRIBUTE = 'data-mb-beatport-lookup';
 const INDICATOR_CLASS = 'mb-beatport-link';
 
 /** Link the release header and visible table entities, including newly paginated rows. */
-export function linkBeatportRelease(mblinks: MBLinks, release: Release, data: BeatportReleaseData): () => void {
+export function linkBeatportRelease(
+    mblinks: MBLinks,
+    release: Release,
+    data: BeatportReleaseData,
+    tracks: BeatportTrackData[],
+): () => void {
     const pageUrl = window.location.href;
     const form = document.querySelector<HTMLFormElement>('.musicbrainz-import form.musicbrainz_import_add');
     let active = true;
@@ -87,27 +92,35 @@ export function linkBeatportRelease(mblinks: MBLinks, release: Release, data: Be
                 const id = Number(match[2]);
                 const path = url.pathname.replace(/^\/[a-z]{2}(?:-[a-z]{2})?(?=\/(?:artist|label)\/)/, '').replace(/\/$/, '');
                 const primary = header?.contains(link);
-                addLookup(
-                    link,
-                    type,
-                    `https://www.beatport.com${path}`,
-                    link.title || link.textContent.trim(),
-                    primary
-                        ? mbid => {
-                              if (type === 'label' && data.label.id === id) {
-                                  updateForm('labels.0.mbid', mbid);
-                              } else if (type === 'artist') {
-                                  const artist = data.artists.find(candidate => candidate.id === id);
-                                  if (!artist || data.artists.filter(candidate => candidate.name === artist.name).length !== 1) return;
-                                  release.artist_credit.forEach((credit, index) => {
-                                      if (credit.artist_name !== artist.name || credit.mbid) return;
-                                      updateForm(`artist_credit.names.${index}.mbid`, mbid);
-                                      updateForm(`artist_credit.names.${index}.name`, credit.credited_name || credit.artist_name);
-                                  });
-                              }
-                          }
-                        : undefined,
-                );
+                addLookup(link, type, `https://www.beatport.com${path}`, link.title || link.textContent.trim(), mbid => {
+                    if (type === 'label') {
+                        if (primary && data.label.id === id) updateForm('labels.0.mbid', mbid);
+                        return;
+                    }
+
+                    if (primary) {
+                        const artist = data.artists.find(candidate => candidate.id === id);
+                        if (artist && data.artists.filter(candidate => candidate.name === artist.name).length === 1) {
+                            release.artist_credit.forEach((credit, index) => {
+                                if (credit.artist_name !== artist.name || credit.mbid) return;
+                                updateForm(`artist_credit.names.${index}.mbid`, mbid);
+                                updateForm(`artist_credit.names.${index}.name`, credit.credited_name || credit.artist_name);
+                            });
+                        }
+                    }
+
+                    // Track credits use their own Beatport artist IDs, independently of release credits.
+                    tracks.forEach((track, trackIndex) => {
+                        track.artists.forEach((trackArtist, artistIndex) => {
+                            if (trackArtist.id !== id) return;
+                            const credit = release.discs[0]?.tracks[trackIndex]?.artist_credit[artistIndex];
+                            if (!credit || credit.mbid) return;
+                            const prefix = `mediums.0.track.${trackIndex}.artist_credit.names.${artistIndex}`;
+                            updateForm(`${prefix}.mbid`, mbid);
+                            updateForm(`${prefix}.name`, credit.credited_name || credit.artist_name);
+                        });
+                    });
+                });
             });
 
         Object.values(queries).forEach(batch => {
