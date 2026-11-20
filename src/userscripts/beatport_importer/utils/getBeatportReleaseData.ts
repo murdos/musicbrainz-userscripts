@@ -1,6 +1,7 @@
 import { Logger } from '~/lib/logger';
+import type { BeatportPageData, BeatportSSRState, BeatportTrackData } from '~/userscripts/beatport_importer/types';
 
-import type { BeatportPageData, BeatportSSRState, BeatportTrackData } from '../types';
+import { captureTrackRequest, getBeatportTracks, installXHRInterceptor } from './getBeatportTracks';
 
 /**
  * Cache for release data intercepted from Beatport's own fetch requests.
@@ -9,15 +10,26 @@ import type { BeatportPageData, BeatportSSRState, BeatportTrackData } from '../t
  */
 const interceptedReleaseCache = new Map<string, BeatportPageData>();
 
+const isTracksQuery = (queryKey: string | string[]): boolean => {
+    const key = String(queryKey);
+    const matchesTracks = /tracks/.test(key);
+
+    return matchesTracks;
+};
+
 /**
  * Install a fetch interceptor to capture Beatport's release data responses.
  * Call once at script load, before any navigation can occur.
  * Skips installation if fetch is read-only (e.g. Firefox/Greasemonkey sandbox).
  */
 export function installFetchInterceptor(logger: Logger): void {
+    installXHRInterceptor(logger);
+
     const originalFetch = window.fetch.bind(window);
     const interceptor = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-        const response = await originalFetch(input, init);
+        const request = originalFetch(input, init);
+        captureTrackRequest(input, init, request);
+        const response = await request;
         const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
         const releaseMatch = url.match(/beatport\.com\/_next\/data\/[^/]+\/[a-z]{2}(?:-[a-z]{2})?\/release\/[^/]+\/(\d+)\.json/);
         const releaseId = releaseMatch?.[1];
@@ -98,7 +110,7 @@ async function ensureFullTrackData(
         return pageData;
     }
 
-    const tracksQuery = pageData.pageProps.dehydratedState.queries.find(q => /tracks/.test(q.queryKey));
+    const tracksQuery = pageData.pageProps.dehydratedState.queries.find(q => isTracksQuery(q.queryKey));
 
     const currentTrackCount = tracksQuery?.state?.data.results.length ?? 0;
     if (currentTrackCount >= release.track_count) {
@@ -113,7 +125,7 @@ async function ensureFullTrackData(
         const paginatedData = await fetchReleaseFromNextDataApi(buildId, releaseId, logger, page);
         if (!paginatedData) continue;
 
-        const pageTracksQuery = paginatedData.pageProps.dehydratedState.queries.find(q => /tracks/.test(q.queryKey));
+        const pageTracksQuery = paginatedData.pageProps.dehydratedState.queries.find(q => isTracksQuery(q.queryKey));
         const pageResults = pageTracksQuery?.state?.data.results ?? [];
         allResults.push(...pageResults);
     }
@@ -125,7 +137,7 @@ async function ensureFullTrackData(
 
     // Merge full track data into our page data
     const updatedQueries = pageData.pageProps.dehydratedState.queries.map(q => {
-        if (!/tracks/.test(q.queryKey)) return q;
+        if (!isTracksQuery(q.queryKey)) return q;
         const updatedState = q.state ? { ...q.state, data: { ...q.state.data, results: allResults } } : undefined;
         return updatedState != null ? { ...q, state: updatedState } : q;
     });
@@ -193,8 +205,27 @@ export const getBeatportReleaseData = async (logger: Logger): Promise<BeatportPa
     }
 
     buildId ??= getBuildId();
-    if (buildId) {
+    const queries = pageData.pageProps.dehydratedState.queries;
+    const tracksQuery = queries.find(query => isTracksQuery(query.queryKey));
+
+    if (buildId && tracksQuery) {
         pageData = await ensureFullTrackData(pageData, buildId, releaseIdFromURL, logger);
+    }
+
+    // Newer pages fetch tracks separately rather than embedding a tracks query.
+    if (!tracksQuery && pageData.pageProps.release) {
+        const trackCount = pageData.pageProps.release.track_count;
+        const tracks = await getBeatportTracks(releaseIdFromURL, trackCount, logger);
+
+        if (!tracks) {
+            return null;
+        }
+
+        const query = {
+            queryKey: [`release-${releaseIdFromURL}-tracks`],
+            state: { data: { results: tracks } },
+        };
+        queries.push(query);
     }
 
     return pageData;

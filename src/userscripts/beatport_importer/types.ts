@@ -103,7 +103,7 @@ export type BeatportPageData = {
         release: BeatportReleaseData | undefined;
         dehydratedState: {
             queries: Array<{
-                queryKey: string;
+                queryKey: string | string[];
                 state?: {
                     data: {
                         results: BeatportTrackData[];
