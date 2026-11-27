@@ -27,10 +27,36 @@
                     "number": "A4"
                 },
                 {
-                    "title": "Lizard: Prince Rupert Awakes / Bolero - The Peacock's Tale / The Battle Of Glass Tears (Including:) / Dawn Song / Last Skirmish / Prince Rupert's Lament / Big Top",
-                    "duration": 1344000,
-                    "artist_credit": [],
-                    "number": ""
+                    "duration": 274000,
+                    "title": "Lizard: Prince Rupert Awakes",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 390000,
+                    "title": "Lizard: Bolero - The Peacock's Tale",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 655000,
+                    "title": "Lizard: The Battle Of Glass Tears (Including:)",
+                    "artist_credit": []
+                },
+                {
+                    "title": "Lizard: Dawn Song",
+                    "artist_credit": []
+                },
+                {
+                    "title": "Lizard: Last Skirmish",
+                    "artist_credit": []
+                },
+                {
+                    "title": "Lizard: Prince Rupert's Lament",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 65000,
+                    "title": "Lizard: Big Top",
+                    "artist_credit": []
                 }
             ],
             "format": "12\" Vinyl"

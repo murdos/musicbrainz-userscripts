@@ -3,23 +3,63 @@
         {
             "tracks": [
                 {
-                    "title": "Harpsichord Concerto In D Minor, BWV 1052: I. Allegro / II. Adagio / III. Allegro",
-                    "duration": 1255000,
+                    "duration": 447000,
+                    "title": "Harpsichord Concerto In D Minor, BWV 1052: I. Allegro",
                     "artist_credit": []
                 },
                 {
-                    "title": "Harpsichord Concerto In F Major, BWV 1057: I. [Allegro] / II. Andante / III. Allegro Assai",
-                    "duration": 942000,
+                    "duration": 361000,
+                    "title": "Harpsichord Concerto In D Minor, BWV 1052: II. Adagio",
                     "artist_credit": []
                 },
                 {
-                    "title": "Harpsichord Concerto In G Minor, BWV 1058: I. [Allegro] / II. Andante / III. Allegro Assai ",
-                    "duration": 763000,
+                    "duration": 441000,
+                    "title": "Harpsichord Concerto In D Minor, BWV 1052: III. Allegro",
                     "artist_credit": []
                 },
                 {
-                    "title": "Harpsichord Concerto In D Major, BWV 1054: I. Allegro / II. Adagio E Piano Sempre / III. Allegro",
-                    "duration": 955000,
+                    "duration": 410000,
+                    "title": "Harpsichord Concerto In F Major, BWV 1057: I. [Allegro]",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 228000,
+                    "title": "Harpsichord Concerto In F Major, BWV 1057: II. Andante",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 300000,
+                    "title": "Harpsichord Concerto In F Major, BWV 1057: III. Allegro Assai",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 204000,
+                    "title": "Harpsichord Concerto In G Minor, BWV 1058: I. [Allegro]",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 350000,
+                    "title": "Harpsichord Concerto In G Minor, BWV 1058: II. Andante",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 205000,
+                    "title": "Harpsichord Concerto In G Minor, BWV 1058: III. Allegro Assai ",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 453000,
+                    "title": "Harpsichord Concerto In D Major, BWV 1054: I. Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 331000,
+                    "title": "Harpsichord Concerto In D Major, BWV 1054: II. Adagio E Piano Sempre",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 166000,
+                    "title": "Harpsichord Concerto In D Major, BWV 1054: III. Allegro",
                     "artist_credit": []
                 }
             ],
@@ -28,23 +68,63 @@
         {
             "tracks": [
                 {
-                    "title": "Harpsichord Concerto In E Major, BWV 1053: I. [Allegro] / II. Siciliano / III. Allegro",
-                    "duration": 1216000,
+                    "duration": 467000,
+                    "title": "Harpsichord Concerto In E Major, BWV 1053: I. [Allegro]",
                     "artist_credit": []
                 },
                 {
-                    "title": "Harpsichord Concerto In F Minor, BWV 1056: I. [Allegro] / II. Largo / III. Presto",
-                    "duration": 554000,
+                    "duration": 323000,
+                    "title": "Harpsichord Concerto In E Major, BWV 1053: II. Siciliano",
                     "artist_credit": []
                 },
                 {
-                    "title": "Harpsichord Concerto In A Major, BWV 1055: I. Allegro / II. Larghetto (Siciliano) / III. Allegro Ma Non Tanto",
-                    "duration": 769000,
+                    "duration": 362000,
+                    "title": "Harpsichord Concerto In E Major, BWV 1053: III. Allegro",
                     "artist_credit": []
                 },
                 {
-                    "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044: I. Allegro / II. Adagio Ma Non Tanto E Dolce / III. Tempo Di Allabreve",
-                    "duration": 1267000,
+                    "duration": 189000,
+                    "title": "Harpsichord Concerto In F Minor, BWV 1056: I. [Allegro]",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 168000,
+                    "title": "Harpsichord Concerto In F Minor, BWV 1056: II. Largo",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 194000,
+                    "title": "Harpsichord Concerto In F Minor, BWV 1056: III. Presto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 252000,
+                    "title": "Harpsichord Concerto In A Major, BWV 1055: I. Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 278000,
+                    "title": "Harpsichord Concerto In A Major, BWV 1055: II. Larghetto (Siciliano)",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 235000,
+                    "title": "Harpsichord Concerto In A Major, BWV 1055: III. Allegro Ma Non Tanto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 513000,
+                    "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044: I. Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 333000,
+                    "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044: II. Adagio Ma Non Tanto E Dolce",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 420000,
+                    "title": "Concerto For Flute, Violin And Harpsichord In A Minor, BWV 1044: III. Tempo Di Allabreve",
                     "artist_credit": []
                 }
             ],

@@ -73,8 +73,23 @@
                     "artist_credit": []
                 },
                 {
-                    "title": "Eine Kleine Nachtmusik, K.525: I. Allegro / II. Romance: Andante / III. Menuetto: Allegretto / IV. Rondo: Allegro",
-                    "duration": 1056000,
+                    "duration": 338000,
+                    "title": "Eine Kleine Nachtmusik, K.525: I. Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 362000,
+                    "title": "Eine Kleine Nachtmusik, K.525: II. Romance: Andante",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 124000,
+                    "title": "Eine Kleine Nachtmusik, K.525: III. Menuetto: Allegretto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 232000,
+                    "title": "Eine Kleine Nachtmusik, K.525: IV. Rondo: Allegro",
                     "artist_credit": []
                 }
             ],

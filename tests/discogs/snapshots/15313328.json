@@ -3,8 +3,23 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Allegro Con Brio / Marcia Funebre: Adagio Assi / Scherzo And Trio: Allegro Vivace / Finale: Allegro Molto",
-                    "duration": 2953000,
+                    "duration": 1070000,
+                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Allegro Con Brio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 862000,
+                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Marcia Funebre: Adagio Assi",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 354000,
+                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Scherzo And Trio: Allegro Vivace",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 667000,
+                    "title": "Symphony No 3 In E Flat Major, Op 55 'Eroica' (1803): Finale: Allegro Molto",
                     "artist_credit": []
                 },
                 {
@@ -18,13 +33,43 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Adagio - Allegro Vivace / Adagio / Allegro Vivace / Allegro Ma Non Troppo",
-                    "duration": 1970000,
+                    "duration": 679000,
+                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Adagio - Allegro Vivace",
                     "artist_credit": []
                 },
                 {
-                    "title": "Symphony No 8 In F Major, Op 93 (1812): Allegro Vivace E Con Brio / Allegretto Scherzando / Tempo Di Menuetto / Allegro Vivace",
-                    "duration": 1491000,
+                    "duration": 546000,
+                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Adagio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 338000,
+                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Allegro Vivace",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 407000,
+                    "title": "Symphony No 4 In B Flat Major, Op 60 (1806): Allegro Ma Non Troppo",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 548000,
+                    "title": "Symphony No 8 In F Major, Op 93 (1812): Allegro Vivace E Con Brio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 234000,
+                    "title": "Symphony No 8 In F Major, Op 93 (1812): Allegretto Scherzando",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 264000,
+                    "title": "Symphony No 8 In F Major, Op 93 (1812): Tempo Di Menuetto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 445000,
+                    "title": "Symphony No 8 In F Major, Op 93 (1812): Allegro Vivace",
                     "artist_credit": []
                 }
             ],
@@ -33,13 +78,43 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Allegro Con Brio / Andante Con Moto / Allegro / Allegro",
-                    "duration": 1883000,
+                    "duration": 455000,
+                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Allegro Con Brio",
                     "artist_credit": []
                 },
                 {
-                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Adagio Molto - Allegro Con Brio / Andante Cantabile Con Moto / Menuetto & Trio: Allegro Molto E Vivace / Adagio - Allegro Molto E Vivace",
-                    "duration": 1537000,
+                    "duration": 516000,
+                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Andante Con Moto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 294000,
+                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 618000,
+                    "title": "Symphony No 5 In C Minor, Op 67 (1807-08): Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 580000,
+                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Adagio Molto - Allegro Con Brio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 412000,
+                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Andante Cantabile Con Moto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 199000,
+                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Menuetto & Trio: Allegro Molto E Vivace",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 346000,
+                    "title": "Symphony No 1 In C Major, Op 21 (1799-1800): Adagio - Allegro Molto E Vivace",
                     "artist_credit": []
                 }
             ],
@@ -48,13 +123,48 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Erwachen Heiterer Gefühle Bei Der Ankunft Auf Dem Lande (Allegro Ma Non Troppo) / Szene Am Bach (Andante Molto Mosso) / Lustiges Zusammensein Der Landleute (Allegro) / Gewitter, Sturm (Allegro) / Hirtengesang - Frohe, Dankbare Gefühle Nach Dem Sturm (Allegretto)",
-                    "duration": 2495000,
+                    "duration": 699000,
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Erwachen Heiterer Gefühle Bei Der Ankunft Auf Dem Lande (Allegro Ma Non Troppo)",
                     "artist_credit": []
                 },
                 {
-                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Adagio Molto - Allegro Con Brio / Larghetto / Scherzo & Trio: Allegro / Allegro Molto",
-                    "duration": 2068000,
+                    "duration": 708000,
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Szene Am Bach (Andante Molto Mosso)",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 299000,
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Lustiges Zusammensein Der Landleute (Allegro)",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 212000,
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Gewitter, Sturm (Allegro)",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 577000,
+                    "title": "Symphony No 6 In F Major, Op 68 'Pastoral' (1807-08): Hirtengesang - Frohe, Dankbare Gefühle Nach Dem Sturm (Allegretto)",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 786000,
+                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Adagio Molto - Allegro Con Brio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 643000,
+                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Larghetto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 240000,
+                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Scherzo & Trio: Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 399000,
+                    "title": "Symphony No 2 In D Major, Op 36 (1799-1802): Allegro Molto",
                     "artist_credit": []
                 }
             ],
@@ -63,13 +173,38 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Poco Sostenuto - Vivace / Allegretto / Presto / Allegro Con Brio",
-                    "duration": 2321000,
+                    "duration": 805000,
+                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Poco Sostenuto - Vivace",
                     "artist_credit": []
                 },
                 {
-                    "title": "Triple Concerto In C Major For Piano, Violin And Cello Op 56 (1803-1804): Allegro / Largo / Rondo Alla Polacca",
-                    "duration": 2154000,
+                    "duration": 461000,
+                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Allegretto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 545000,
+                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Presto",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 510000,
+                    "title": "Symphony No 7 In A Major, Op 92 (1811-12): Allegro Con Brio",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 1060000,
+                    "title": "Triple Concerto In C Major For Piano, Violin And Cello Op 56 (1803-1804): Allegro",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 301000,
+                    "title": "Triple Concerto In C Major For Piano, Violin And Cello Op 56 (1803-1804): Largo",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 793000,
+                    "title": "Triple Concerto In C Major For Piano, Violin And Cello Op 56 (1803-1804): Rondo Alla Polacca",
                     "artist_credit": []
                 }
             ],
@@ -78,8 +213,23 @@
         {
             "tracks": [
                 {
-                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Allegro Ma Non Troppo, Un Poco Maestoso / Scherzo: Molto Vivace / Adagio Molto E Cantabile / Presto - Allegro Ma Non Troppo - Vivace - Adagio Cantabile",
-                    "duration": 4091000,
+                    "duration": 936000,
+                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Allegro Ma Non Troppo, Un Poco Maestoso",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 830000,
+                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Scherzo: Molto Vivace",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 852000,
+                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Adagio Molto E Cantabile",
+                    "artist_credit": []
+                },
+                {
+                    "duration": 1473000,
+                    "title": "Symphony No 9 In D Minor, Op 125 'Choral' (1823-24): Presto - Allegro Ma Non Troppo - Vivace - Adagio Cantabile",
                     "artist_credit": []
                 }
             ],
