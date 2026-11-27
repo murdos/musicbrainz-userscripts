@@ -1,0 +1,11 @@
+{
+    "name": "Import Ampwall releases to MusicBrainz",
+    "description": "Add a button on Ampwall release pages to open MusicBrainz release editor with pre-filled data for the selected release",
+    "version": "2026.09.16.1",
+    "author": "djl",
+    "namespace": "https://github.com/murdos/musicbrainz-userscripts/",
+    "downloadURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ampwall_importer.user.js",
+    "updateURL": "https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/dist/ampwall_importer.user.js",
+    "match": ["https://ampwall.com/a/*/album/*"],
+    "icon": "https://metabrainz.org/static/img/projects/musicbrainz.svg"
+}
