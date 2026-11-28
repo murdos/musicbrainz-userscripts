@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Musicbrainz UI enhancements
 // @description  Various UI enhancements for Musicbrainz
-// @version      2026.10.27.1
+// @version      2026.11.28.1
 // @downloadURL  https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @updateURL    https://raw.githubusercontent.com/murdos/musicbrainz-userscripts/master/mb_ui_enhancements.user.js
 // @icon         https://metabrainz.org/static/img/projects/musicbrainz.svg
@@ -21,6 +21,8 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @connect      bandcamp.com
 // @grant        GM_addElement
 // ==/UserScript==
 
@@ -136,6 +138,307 @@ function installRelEditorPageBridge() {
     script.remove();
 }
 
+// Bandcamp’s embedded JSON is parsed as data; fetched scripts are never executed.
+function getBandcampLinkTypes(data, description = '') {
+    if (!data.current || !Array.isArray(data.trackinfo)) throw new Error('Missing Bandcamp release data');
+
+    if (data.is_private_stream) throw new Error('Private Bandcamp streams are not supported');
+
+    const types = [];
+    const current = data.current;
+
+    if (current.download_pref != null) {
+        if (current.minimum_price > 0 || current.download_pref === 2) types.push('74');
+
+        if (data.freeDownloadPage || current.download_pref === 1 || (current.minimum_price === 0 && !current.is_set_price)) {
+            types.push('75');
+        }
+    }
+
+    const tracks = data.trackinfo;
+    const advertisedTracks = Number(description.match(/(\d+) track/i)?.[1] || 0);
+
+    if (
+        !data.tralbum_subscriber_only &&
+        tracks.length > 0 &&
+        advertisedTracks <= tracks.length &&
+        tracks.every(track => track.streaming === 1 && track.file && Object.keys(track.file).length > 0)
+    ) {
+        types.push('85');
+    }
+
+    return types;
+}
+
+function normalizeBandcampReleaseUrl(value) {
+    try {
+        const url = new URL(value);
+
+        if (!/^https?:$/.test(url.protocol) || !/^[a-z0-9-]+\.bandcamp\.com$/i.test(url.hostname)) return null;
+
+        if (!/^\/(album|track)\/[^/]+\/?$/.test(url.pathname) || url.username || url.password || url.port) return null;
+
+        return `https://${url.hostname}${url.pathname.replace(/\/$/, '')}`;
+    } catch {
+        return null;
+    }
+}
+
+function fetchBandcampLinkTypes(url) {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url,
+            anonymous: true,
+            timeout: 20000,
+            onload(response) {
+                try {
+                    if (response.status !== 200) throw new Error(`Bandcamp returned HTTP ${response.status}`);
+
+                    const page = new DOMParser().parseFromString(response.responseText, 'text/html');
+                    const json = page.querySelector('[data-tralbum]')?.getAttribute('data-tralbum');
+
+                    if (!json) throw new Error('Bandcamp release data was not found');
+
+                    resolve(getBandcampLinkTypes(JSON.parse(json), page.querySelector('meta[property="og:description"]')?.content));
+                } catch (error) {
+                    reject(error);
+                }
+            },
+            onerror: () => reject(new Error('Could not load Bandcamp')),
+            ontimeout: () => reject(new Error('Bandcamp request timed out')),
+        });
+    });
+}
+
+function getExternalLinkRows(row) {
+    const rows = [];
+
+    for (let next = row.nextElementSibling; next && !next.matches('.external-link-item'); next = next.nextElementSibling) {
+        rows.push(next);
+    }
+
+    return rows;
+}
+
+// Use React’s normal change/click handlers so relationships reach edit generation.
+async function populateBandcampLinkTypes(row, url, types) {
+    const managedTypes = new Set(['74', '75', '85']);
+
+    const nextRender = () => new Promise(resolve => setTimeout(resolve, 0));
+
+    const isCurrent = () =>
+        row.isConnected && normalizeBandcampReleaseUrl(row.querySelector('a.url')?.href) === url && isBandcampDetectionAllowed();
+
+    const getSelects = () => getExternalLinkRows(row).flatMap(item => [...item.querySelectorAll('select.link-type')]);
+
+    const setType = (select, value) => {
+        select.value = value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    // Retain unrelated types (e.g. mail order) and reuse the automatically guessed type.
+    const missing = types.filter(type => !getSelects().some(select => select.value === type));
+
+    for (const type of missing) {
+        if (!isCurrent()) return;
+
+        let select = getSelects().find(item => !item.value || (managedTypes.has(item.value) && !types.includes(item.value)));
+
+        if (!select) {
+            const button = getExternalLinkRows(row)
+                .find(item => item.matches('.add-relationship'))
+                ?.querySelector('button');
+
+            if (!button) throw new Error('Could not add a Bandcamp relationship');
+
+            button.click();
+            await nextRender();
+
+            if (!isCurrent()) return;
+
+            select = getSelects().find(item => !item.value);
+        }
+
+        if (!select || ![...select.options].some(option => option.value === type)) {
+            throw new Error('Bandcamp relationship type is unavailable');
+        }
+
+        setType(select, type);
+        await nextRender();
+    }
+
+    // Clear guesses that Bandcamp does not support. Never remove the URL itself.
+    for (const select of getSelects()) {
+        if (!isCurrent()) return;
+
+        if (managedTypes.has(select.value) && !types.includes(select.value)) {
+            const remove = select.closest('tr').querySelector('button.remove-item');
+
+            if (remove) remove.click();
+            else setType(select, '');
+
+            await nextRender();
+        }
+    }
+}
+
+function isBandcampDetectionAllowed() {
+    // Digital Media is format 12. Leave unknown formats eligible while adding a release.
+    return [...document.querySelectorAll('select[id^="medium-format-"]')].every(select => !select.value || select.value === '12');
+}
+
+function installBandcampLinkDetection() {
+    if (typeof GM_xmlhttpRequest !== 'function') return;
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes mb-ui-bandcamp-spin { to { transform: rotate(360deg); } }
+        .mb-ui-bandcamp-progress {
+            display: inline-block;
+            width: 0.8em;
+            height: 0.8em;
+            margin-left: 0.5em;
+            vertical-align: -0.1em;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: mb-ui-bandcamp-spin 0.8s linear infinite;
+        }
+    `;
+    document.head.appendChild(style);
+
+    const pending = new Map();
+    const cache = new Map();
+    const active = new WeakMap();
+
+    const scan = () => {
+        for (const [row, request] of pending) {
+            if (!row.isConnected || !isBandcampDetectionAllowed()) {
+                pending.delete(row);
+
+                continue;
+            }
+
+            if (row.querySelector('button[aria-controls="url-input-popover"]')) continue;
+
+            const link = row.querySelector('a.url');
+
+            if (!link || normalizeBandcampReleaseUrl(link.href) !== request.url) continue;
+
+            pending.delete(row);
+
+            const isCurrent = () =>
+                active.get(row) === request &&
+                row.isConnected &&
+                normalizeBandcampReleaseUrl(row.querySelector('a.url')?.href) === request.url &&
+                isBandcampDetectionAllowed();
+
+            const rowsSnapshot = () =>
+                getExternalLinkRows(row)
+                    .map(item =>
+                        [...item.querySelectorAll('select, input')].map(input => `${input.id}:${input.value}:${input.checked}`).join(','),
+                    )
+                    .join(';');
+
+            const snapshot = rowsSnapshot();
+
+            const status = document.createElement('span');
+            status.className = 'mb-ui-bandcamp-progress';
+            status.setAttribute('role', 'status');
+            status.setAttribute('aria-label', 'Checking Bandcamp…');
+            status.title = 'Checking Bandcamp…';
+
+            link.after(status);
+
+            let failed = false;
+
+            void request.result
+                .then(async result => {
+                    if (!isCurrent()) return;
+
+                    if (result.error) throw result.error;
+
+                    if (rowsSnapshot() !== snapshot) return;
+
+                    await populateBandcampLinkTypes(row, request.url, result.types);
+                })
+                .catch(error => {
+                    if (!isCurrent()) return;
+
+                    failed = true;
+                    status.className = '';
+                    status.style.marginLeft = '0.5em';
+                    status.removeAttribute('aria-label');
+                    status.textContent = 'Bandcamp check failed.';
+                    status.title = error.message;
+                    link.after(status);
+                    console.warn('Bandcamp link detection:', error);
+                })
+                .finally(() => {
+                    if (!failed) status.remove();
+                });
+        }
+    };
+
+    document.addEventListener('paste', event => {
+        const input = event.target;
+
+        if (!(input instanceof HTMLInputElement) || !isBandcampDetectionAllowed()) return;
+
+        let row;
+        const isPopover = input.matches('#url-input-popover input.raw-url');
+
+        if (input.matches('#external-links-editor input.value')) {
+            row = input.closest('.external-link-item');
+        } else if (isPopover) {
+            row = document
+                .querySelector('#external-links-editor button[aria-controls="url-input-popover"]')
+                ?.closest('.external-link-item');
+        }
+
+        if (!row) return;
+
+        setTimeout(() => {
+            const url = normalizeBandcampReleaseUrl(input.value.trim());
+
+            if (!url || !row.isConnected || !isBandcampDetectionAllowed()) return;
+
+            if (!cache.has(url)) {
+                cache.set(
+                    url,
+                    fetchBandcampLinkTypes(url).then(
+                        types => ({ types }),
+                        error => {
+                            cache.delete(url);
+
+                            return { error };
+                        },
+                    ),
+                );
+            }
+
+            const request = { url, result: cache.get(url) };
+            active.set(row, request);
+            pending.set(row, request);
+
+            // Accept the pasted URL through the editor’s handlers without waiting for blur.
+            if (isPopover) input.closest('form').requestSubmit();
+            else input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+
+            scan();
+        }, 0);
+    });
+
+    // Release editor tabs and URL submission render asynchronously.
+    new MutationObserver(scan).observe(document.querySelector('#content') || document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['href', 'aria-controls'],
+    });
+}
+
 // Copy release title: menu command to enable/disable (default enabled)
 function setCopyTitleMenu() {
     if (typeof GM_registerMenuCommand !== 'function') return;
@@ -223,6 +526,9 @@ $(document).ready(function () {
 
     // Set a release label row to the special [no label] entity and [none] cat. no.
     const releaseEditorPageRegex = /^\/release\/(?:add|[a-f0-9-]{36}\/edit)\/?$/i;
+
+    if (releaseEditorPageRegex.test(window.location.pathname)) installBandcampLinkDetection();
+
     if (releaseEditorPageRegex.test(window.location.pathname) && GM_getValue('noLabelButtonEnabled', false)) {
         $('head').append(`<style>
 .mb-ui-set-no-label {
